@@ -1,0 +1,26 @@
+{
+  "canisters": {
+    "KYC_Application_backend": {
+      "main": "src/KYC_Application_backend/main.mo",
+      "type": "motoko"
+    },
+    "KYC_Application_frontend": {
+      "dependencies": [
+        "KYC_Application_backend"
+      ],
+      "source": [
+        "src/KYC_Application_frontend/dist"
+      ],
+      "type": "assets",
+      "workspace": "KYC_Application_frontend"
+    }
+  },
+  "defaults": {
+    "build": {
+      "args": "",
+      "packtool": ""
+    }
+  },
+  "output_env_file": ".env",
+  "version": 1
+}
