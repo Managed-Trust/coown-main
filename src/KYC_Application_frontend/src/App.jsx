@@ -1,30 +1,26 @@
 import { useState } from 'react';
 import { KYC_Application_backend } from 'declarations/KYC_Application_backend';
+import { useRoutes } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { ThemeSettings } from './theme/Theme';
+import RTL from './layouts/full/shared/customizer/RTL';
+import ScrollToTop from './components/shared/ScrollToTop';
+import { CssBaseline, ThemeProvider } from '@mui/material';
+import FullLayout from './layouts/full/FullLayout';
 
 function App() {
-  const [greeting, setGreeting] = useState('');
-
-  function handleSubmit(event) {
-    event.preventDefault();
-    const name = event.target.elements.name.value;
-    KYC_Application_backend.greet(name).then((greeting) => {
-      setGreeting(greeting);
-    });
-    return false;
-  }
+  const theme = ThemeSettings();
+  const customizer = useSelector((state) => state.customizer);
 
   return (
-    <main>
-      <img src="/logo2.svg" alt="DFINITY logo" />
-      <br />
-      <br />
-      <form action="#" onSubmit={handleSubmit}>
-        <label htmlFor="name">Enter your name: &nbsp;</label>
-        <input id="name" alt="Name" type="text" />
-        <button type="submit">Click Me!</button>
-      </form>
-      <section id="greeting">{greeting}</section>
-    </main>
+    <ThemeProvider theme={theme}>
+      <RTL direction={customizer.activeDir}>
+        <CssBaseline />
+        <ScrollToTop>
+          <FullLayout />
+        </ScrollToTop>
+      </RTL>
+    </ThemeProvider>
   );
 }
 
