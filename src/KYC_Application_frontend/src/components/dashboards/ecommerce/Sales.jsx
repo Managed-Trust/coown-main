@@ -9,7 +9,7 @@ const Sales = () => {
 
   return (
     <DashboardCard>
-      <Box display="flex" flexDirection="column" alignItems="center" p={2}>
+      <Box display="flex" flexDirection="column" alignItems="center" p={3.4}>
         <Typography variant="h6">
           Token Name: <Link href="#" color="primary" underline="none">TokenWiz</Link>
         </Typography>

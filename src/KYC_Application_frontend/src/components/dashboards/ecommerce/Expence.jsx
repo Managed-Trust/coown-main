@@ -9,7 +9,7 @@ const Expence = () => {
 
   return (
     <DashboardCard>
-      <Box display="flex" flexDirection="column" alignItems="center" p={2}>
+      <Box display="flex" flexDirection="column" alignItems="center" py={4}>
         <CurrencyExchange style={{ fontSize: 40, color: theme.palette.primary.main }} />
         <Typography variant="h5" mt={1}>
           1 ETH = 1000 TWZ

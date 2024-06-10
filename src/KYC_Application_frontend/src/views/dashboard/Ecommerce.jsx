@@ -30,16 +30,16 @@ const Ecommerce = () => {
             {/* column */}
             <Grid item xs={12} lg={6}>
               <Grid container spacing={3}>
-                <Grid item xs={12} sm={6}>
+                <Grid item xs={12} sm={5}>
                   <Expence />
                 </Grid>
-                <Grid item xs={12} sm={6}>
+                <Grid item xs={12} sm={7}>
                   <Sales />
                 </Grid>
               </Grid>
             </Grid>
           </Grid>
-          <Grid item xs={12} sm={6} lg={4}>
+          {/* <Grid item xs={12} sm={6} lg={4}>
             <RevenueUpdates />
           </Grid>
           <Grid item xs={12} sm={6} lg={4}>
@@ -57,19 +57,19 @@ const Ecommerce = () => {
                 <MonthlyEarnings />
               </Grid>
             </Grid>
-          </Grid>
+          </Grid> */}
           {/* column */}
-          <Grid item xs={12} sm={6} lg={4}>
+          {/* <Grid item xs={12} sm={6} lg={4}>
             <WeeklyStats />
-          </Grid>
+          </Grid> */}
           {/* column */}
-          <Grid item xs={12} lg={4}>
+          {/* <Grid item xs={12} lg={4}>
             <YearlySales />
-          </Grid>
+          </Grid> */}
           {/* column */}
-          <Grid item xs={12} lg={4}>
+          {/* <Grid item xs={12} lg={4}>
             <PaymentGateways />
-          </Grid>
+          </Grid> */}
           {/* column */}
 
           <Grid item xs={12} lg={4}>
