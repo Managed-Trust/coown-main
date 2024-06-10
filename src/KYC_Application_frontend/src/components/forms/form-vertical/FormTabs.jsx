@@ -134,6 +134,7 @@ const FormTabs = () => {
               <Tab label="Personal Details" value="1" />
               <Tab label="Address Details" value="2" />
               <Tab label="Document Details" value="3" />
+              <Tab label="Capture Image" value="4" />
             </TabList>
           </Box>
           <TabPanel value="1">
@@ -373,6 +374,19 @@ const FormTabs = () => {
               )}
             </Box>
           </TabPanel>
+          <TabPanel value="4">
+            <div>
+              {!image ? (
+                <WebcamCapture onCapture={handleCapture} />
+              ) : (
+                <div>
+                  <h2>Captured Image:</h2>
+                  <img src={image} alt="Captured" />
+                  <button onClick={() => setImage(null)}>Retake</button>
+                </div>
+              )}
+            </div>
+          </TabPanel>
         </TabContext>
       </BlankCard>
       <Stack direction="row" spacing={2} justifyContent="flex-end" mt={3} mb={5}>
@@ -380,25 +394,6 @@ const FormTabs = () => {
           Submit
         </Button>
       </Stack>
-
-      <div>
-        <div>
-          <h1>KYC Application</h1>
-          <p>
-            {/* <ConnectButton /> */}
-            <ConnectDialog dark={false} />
-          </p>
-          {!image ? (
-            <WebcamCapture onCapture={handleCapture} />
-          ) : (
-            <div>
-              <h2>Captured Image:</h2>
-              <img src={image} alt="Captured" />
-              <button onClick={() => setImage(null)}>Retake</button>
-            </div>
-          )}
-        </div>
-      </div>
     </div>
   );
 };

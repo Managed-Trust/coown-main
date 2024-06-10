@@ -62,7 +62,7 @@ const Menuitems = [
     id: uniqueId(),
     title: 'Dashboard',
     icon: IconAperture,
-    href: '/dashboards/ecommerce',
+    href: '/',
   },
   {
     id: uniqueId(),

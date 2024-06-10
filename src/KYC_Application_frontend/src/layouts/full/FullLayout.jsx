@@ -56,8 +56,8 @@ const FullLayout = () => {
         >
           <Box sx={{ minHeight: 'calc(100vh - 170px)' }}>
             <Routes>
-              <Route path="/" element={<Modern />} />
-              <Route path="/dashboards/ecommerce" element={<EcommerceDash />} />
+              <Route path="/" element={<EcommerceDash />} />
+              <Route path="/dashboards/modern" element={<Modern />} />
               <Route path="/apps/followers" element={<Followers />} />
               <Route path="/apps/friends" element={<Friends />} />
               <Route path="/apps/gallery" element={<Gallery />} />
