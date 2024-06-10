@@ -14,5 +14,11 @@
   "type": "module",
   "workspaces": [
     "src/KYC_Application_frontend"
-  ]
+  ],
+  "dependencies": {
+    "@connect2ic/core": "^0.2.0-beta.24",
+    "@connect2ic/react": "^0.2.0-beta.24",
+    "ic0": "^0.2.8",
+    "react-webcam": "^7.2.0"
+  }
 }
