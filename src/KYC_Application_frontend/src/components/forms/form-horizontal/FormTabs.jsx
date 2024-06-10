@@ -1,5 +1,19 @@
-import React from 'react';
-import { Box, Button, Grid, IconButton, InputAdornment, MenuItem, Stack, Tab } from '@mui/material';
+import React, { useState } from 'react';
+import {
+  Box,
+  Button,
+  Grid,
+  MenuItem,
+  Stack,
+  Tab,
+  Typography,
+  Select,
+  TextField,
+  OutlinedInput,
+  Tooltip,
+  Switch,
+  FormControlLabel
+} from '@mui/material';
 import TabContext from '@mui/lab/TabContext';
 import TabList from '@mui/lab/TabList';
 import TabPanel from '@mui/lab/TabPanel';
@@ -7,9 +21,7 @@ import TabPanel from '@mui/lab/TabPanel';
 // components
 import BlankCard from '../../shared/BlankCard';
 import CustomFormLabel from '../theme-elements/CustomFormLabel';
-import CustomSelect from '../theme-elements/CustomSelect';
-import CustomTextField from '../theme-elements/CustomTextField';
-import CustomOutlinedInput from '../theme-elements/CustomOutlinedInput';
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import { IconEye, IconEyeOff } from '@tabler/icons';
 
 const countries = [
@@ -27,367 +39,196 @@ const countries = [
   },
 ];
 
-const lang = [
-  {
-    value: 'en',
-    label: 'English',
-  },
-  {
-    value: 'fr',
-    label: 'French',
-  },
-];
+const initialState = {
+  family_name: '',
+  email: '',
+  given_name: '',
+  birth_date: '',
+  age_over_18: '',
+  gender: '',
+  issuance_date: '',
+  expiry_date: '',
+  resident_address: '',
+  resident_country: '',
+  document_number: '',
+  issuing_country: '',
+  phone_number: '',
+  openchat_id: '',
+  document_file: null,
+  publish_profile: false,
+  comments: '',
+};
 
 const FormTabs = () => {
-  const [value, setValue] = React.useState('1');
+  const [value, setValue] = useState('1');
+  const [formData, setFormData] = useState(initialState);
+  const [documentPreview, setDocumentPreview] = useState(null);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
 
-  //   country
-  const [country, setCountry] = React.useState('');
-
-  const handleChange2 = (event) => {
-    setCountry(event.target.value);
+  const handleInputChange = (e) => {
+    const { id, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [id]: value,
+    }));
   };
 
-  //   language
-  const [language, setLanguage] = React.useState('en');
-
-  const handleChange3 = (event) => {
-    setLanguage(event.target.value);
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    setFormData((prevData) => ({
+      ...prevData,
+      document_file: file,
+    }));
+    setDocumentPreview(URL.createObjectURL(file));
   };
 
-  //   password
-  //
-  const [showPassword, setShowPassword] = React.useState(false);
-
-  const handleClickShowPassword = () => setShowPassword((show) => !show);
-
-  const handleMouseDownPassword = (event) => {
-    event.preventDefault();
+  const handleSelectChange = (id) => (event) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      [id]: event.target.value,
+    }));
   };
 
-  //   confirm password
-  //
-  const [showPassword2, setShowPassword2] = React.useState(false);
+  const handleToggleChange = (event) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      publish_profile: event.target.checked,
+    }));
+  };
 
-  const handleClickShowPassword2 = () => setShowPassword2((show) => !show);
-
-  const handleMouseDownPassword2 = (event) => {
-    event.preventDefault();
+  const handleSubmit = () => {
+    // Handle form submission
+    console.log('Form Submitted', formData);
   };
 
   return (
     <div>
-      {/* ------------------------------------------------------------------------------------------------ */}
-      {/* Basic Layout */}
-      {/* ------------------------------------------------------------------------------------------------ */}
       <BlankCard>
         <TabContext value={value}>
           <Box sx={{ borderBottom: 1, borderColor: (theme) => theme.palette.divider }}>
-            <TabList onChange={handleChange} aria-label="lab API tabs example" variant="scrollable"
-              scrollButtons="auto">
-              <Tab label="Personal Info" value="1" />
-              <Tab label="Account Details" value="2" />
-              <Tab label="Social Links" value="3" />
+            <TabList onChange={handleChange} aria-label="lab API tabs example" variant="scrollable" scrollButtons="auto">
+              <Tab label="Personal Details" value="1" />
+              <Tab label="Communication Settings" value="2" />
             </TabList>
           </Box>
           <TabPanel value="1">
             <Grid container spacing={3}>
               <Grid item xs={12} lg={6}>
-                <Grid container spacing={3}>
-                  <Grid item xs={12} sm={3} display="flex" alignItems="center">
-                    <CustomFormLabel htmlFor="ft-fname" sx={{ mt: 0, mb: { xs: '-10px', sm: 0 } }}>
-                      First Name
-                    </CustomFormLabel>
-                  </Grid>
-                  <Grid item xs={12} sm={9}>
-                    <CustomTextField id="ft-fname" placeholder="John" fullWidth />
-                  </Grid>
-                  {/* 4 */}
-                  <Grid item xs={12} sm={3} display="flex" alignItems="center">
-                    <CustomFormLabel
-                      htmlFor="ft-country"
-                      sx={{ mt: 0, mb: { xs: '-10px', sm: 0 } }}
-                    >
-                      Country
-                    </CustomFormLabel>
-                  </Grid>
-                  <Grid item xs={12} sm={9}>
-                    <CustomSelect
-                      id="standard-select-currency"
-                      value={country}
-                      onChange={handleChange2}
-                      fullWidth
-                      variant="outlined"
-                    >
-                      {countries.map((option) => (
-                        <MenuItem key={option.value} value={option.value}>
-                          {option.label}
-                        </MenuItem>
-                      ))}
-                    </CustomSelect>
-                  </Grid>
-                  {/* 4 */}
-                  <Grid item xs={12} sm={3} display="flex" alignItems="center">
-                    <CustomFormLabel htmlFor="ft-date" sx={{ mt: 0, mb: { xs: '-10px', sm: 0 } }}>
-                      Birth Date
-                    </CustomFormLabel>
-                  </Grid>
-                  <Grid item xs={12} sm={9}>
-                    <CustomTextField type="date" id="ft-date" placeholder="John Deo" fullWidth />
-                  </Grid>
-                </Grid>
+                <CustomFormLabel htmlFor="given_name" sx={{ mt: 3 }} className="center">
+                  Given Name
+                </CustomFormLabel>
+                <TextField id="given_name" placeholder="John" fullWidth onChange={handleInputChange} />
+
+                <CustomFormLabel htmlFor="birth_date" sx={{ mt: 2 }} className="center">
+                  Date of Birth
+                </CustomFormLabel>
+                <TextField type="date" id="birth_date" fullWidth onChange={handleInputChange} />
+
+                <CustomFormLabel htmlFor="age_over_18" sx={{ mt: 2 }} className="center">
+                  Age Over 18
+                </CustomFormLabel>
+                <Select id="age_over_18" fullWidth onChange={handleSelectChange('age_over_18')} value={formData.age_over_18}>
+                  <MenuItem value="true">True</MenuItem>
+                  <MenuItem value="false">False</MenuItem>
+                </Select>
+
+                <CustomFormLabel htmlFor="resident_address" className="center">
+                  Resident Address
+                </CustomFormLabel>
+                <TextField id="resident_address" placeholder="123 Main St" fullWidth onChange={handleInputChange} />
+
               </Grid>
-              {/* 2 column */}
               <Grid item xs={12} lg={6}>
-                <Grid container spacing={3}>
-                  <Grid item xs={12} sm={3} display="flex" alignItems="center">
-                    <CustomFormLabel htmlFor="ft-fname" sx={{ mt: 0, mb: { xs: '-10px', sm: 0 } }}>
-                      Last Name
-                    </CustomFormLabel>
-                  </Grid>
-                  <Grid item xs={12} sm={9}>
-                    <CustomTextField id="ft-fname" placeholder="Deo" fullWidth />
-                  </Grid>
-                  {/* 4 */}
-                  <Grid item xs={12} sm={3} display="flex" alignItems="center">
-                    <CustomFormLabel htmlFor="ft-lang" sx={{ mt: 0, mb: { xs: '-10px', sm: 0 } }}>
-                      Language
-                    </CustomFormLabel>
-                  </Grid>
-                  <Grid item xs={12} sm={9}>
-                    <CustomSelect
-                      value={language}
-                      onChange={handleChange3}
-                      fullWidth
-                      variant="outlined"
-                    >
-                      {lang.map((option) => (
-                        <MenuItem key={option.value} value={option.value}>
-                          {option.label}
-                        </MenuItem>
-                      ))}
-                    </CustomSelect>
-                  </Grid>
-                  {/* 4 */}
-                  <Grid item xs={12} sm={3} display="flex" alignItems="center">
-                    <CustomFormLabel htmlFor="ft-phone" sx={{ mt: 0, mb: { xs: '-10px', sm: 0 } }}>
-                      Phone no
-                    </CustomFormLabel>
-                  </Grid>
-                  <Grid item xs={12} sm={9}>
-                    <CustomTextField id="ft-phone" placeholder="123 4567 201" fullWidth />
-                  </Grid>
-                </Grid>
-              </Grid>
-              <Grid item xs={12} sm={3}></Grid>
-              <Grid item xs={12} sm={9}>
-                <Stack direction="row" spacing={2}>
-                  <Button variant="contained" color="primary">
-                    Submit
-                  </Button>
-                  <Button variant="text" color="error">
-                    Cancel
-                  </Button>
-                </Stack>
+                <CustomFormLabel htmlFor="family_name" className="center">
+                  Family Name
+                </CustomFormLabel>
+                <TextField id="family_name" placeholder="Doe" fullWidth onChange={handleInputChange} />
+                
+                <CustomFormLabel htmlFor="birth_place" sx={{ mt: 2 }} className="center">
+                  Birth Place
+                </CustomFormLabel>
+                <TextField id="birth_place" fullWidth onChange={handleInputChange} />
+
+                <CustomFormLabel htmlFor="gender" sx={{ mt: 2 }} className="center">
+                  Gender
+                </CustomFormLabel>
+                <Select id="gender" fullWidth onChange={handleSelectChange('gender')} value={formData.gender}>
+                  <MenuItem value="0">Not known</MenuItem>
+                  <MenuItem value="1">Male</MenuItem>
+                  <MenuItem value="2">Female</MenuItem>
+                  <MenuItem value="9">Not applicable</MenuItem>
+                </Select>
+
+                <CustomFormLabel htmlFor="resident_country" sx={{ mt: 3 }} className="center">
+                  Resident Country
+                </CustomFormLabel>
+                <Select id="resident_country" fullWidth onChange={handleSelectChange('resident_country')} value={formData.resident_country}>
+                  {countries.map((option) => (
+                    <MenuItem key={option.value} value={option.value}>
+                      {option.label}
+                    </MenuItem>
+                  ))}
+                </Select>
               </Grid>
             </Grid>
           </TabPanel>
           <TabPanel value="2">
             <Grid container spacing={3}>
               <Grid item xs={12} lg={6}>
-                <Grid container spacing={3}>
-                  <Grid item xs={12} sm={3} display="flex" alignItems="center">
-                    <CustomFormLabel htmlFor="ft-uname" sx={{ mt: 0, mb: { xs: '-10px', sm: 0 } }}>
-                      Username
-                    </CustomFormLabel>
-                  </Grid>
-                  <Grid item xs={12} sm={9}>
-                    <CustomTextField id="ft-uname" placeholder="John.Deo" fullWidth />
-                  </Grid>
-                  {/* 4 */}
-                  <Grid item xs={12} sm={3} display="flex" alignItems="center">
-                    <CustomFormLabel htmlFor="ft-pwd" sx={{ mt: 0, mb: { xs: '-10px', sm: 0 } }}>
-                      Password
-                    </CustomFormLabel>
-                  </Grid>
-                  <Grid item xs={12} sm={9}>
-                    <CustomOutlinedInput
-                      type={showPassword ? 'text' : 'password'}
-                      endAdornment={
-                        <InputAdornment position="end">
-                          <IconButton
-                            aria-label="toggle password visibility"
-                            onClick={handleClickShowPassword}
-                            onMouseDown={handleMouseDownPassword}
-                            edge="end"
-                          >
-                            {showPassword ? <IconEyeOff size="20" /> : <IconEye size="20" />}
-                          </IconButton>
-                        </InputAdornment>
-                      }
-                      id="fs-pwd"
-                      placeholder="john.deo"
-                      fullWidth
+                <CustomFormLabel htmlFor="email" className="center">
+                  Email Address
+                </CustomFormLabel>
+                <TextField id="email" placeholder="user@gmail.com" fullWidth onChange={handleInputChange} />
+
+                <CustomFormLabel htmlFor="openchat_id" sx={{ mt: 2 }} className="center">
+                  OpenChat ID
+                </CustomFormLabel>
+                <TextField id="openchat_id" fullWidth onChange={handleInputChange} />
+                
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={formData.publish_profile}
+                      onChange={handleToggleChange}
+                      color="primary"
                     />
-                  </Grid>
-                </Grid>
-              </Grid>
-              {/* 2 column */}
-              <Grid item xs={12} lg={6}>
-                <Grid container spacing={3}>
-                  <Grid item xs={12} sm={3} display="flex" alignItems="center">
-                    <CustomFormLabel htmlFor="ft-email" sx={{ mt: 0, mb: { xs: '-10px', sm: 0 } }}>
-                      Email
-                    </CustomFormLabel>
-                  </Grid>
-                  <Grid item xs={12} sm={9}>
-                    <CustomOutlinedInput
-                      endAdornment={<InputAdornment position="end">@example.com</InputAdornment>}
-                      id="fs-email"
-                      placeholder="john.deo"
-                      fullWidth
-                    />
-                  </Grid>
-                  {/* 4 */}
-                  <Grid item xs={12} sm={3} display="flex" alignItems="center">
-                    <CustomFormLabel htmlFor="ft-lang" sx={{ mt: 0, mb: { xs: '-10px', sm: 0 } }}>
-                      Confirm
-                    </CustomFormLabel>
-                  </Grid>
-                  <Grid item xs={12} sm={9}>
-                    <CustomOutlinedInput
-                      type={showPassword2 ? 'text' : 'password'}
-                      endAdornment={
-                        <InputAdornment position="end">
-                          <IconButton
-                            aria-label="toggle password visibility"
-                            onClick={handleClickShowPassword2}
-                            onMouseDown={handleMouseDownPassword2}
-                            edge="end"
-                          >
-                            {showPassword2 ? <IconEyeOff size="20" /> : <IconEye size="20" />}
-                          </IconButton>
-                        </InputAdornment>
-                      }
-                      id="fs-pwd"
-                      placeholder="john.deo"
-                      fullWidth
-                    />
-                  </Grid>
-                </Grid>
-              </Grid>
-              <Grid item xs={12} sm={3}></Grid>
-              <Grid item xs={12} sm={9}>
-                <Stack direction="row" spacing={2}>
-                  <Button variant="contained" color="primary">
-                    Submit
-                  </Button>
-                  <Button variant="text" color="error">
-                    Cancel
-                  </Button>
-                </Stack>
-              </Grid>
-            </Grid>
-          </TabPanel>
-          <TabPanel value="3">
-            <Grid container spacing={3}>
-              <Grid item xs={12} lg={6}>
-                <Grid container spacing={3}>
-                  <Grid item xs={12} sm={3} display="flex" alignItems="center">
-                    <CustomFormLabel
-                      htmlFor="ft-twitter"
-                      sx={{ mt: 0, mb: { xs: '-10px', sm: 0 } }}
-                    >
-                      Twitter
-                    </CustomFormLabel>
-                  </Grid>
-                  <Grid item xs={12} sm={9}>
-                    <CustomTextField
-                      id="ft-twitter"
-                      placeholder="https://twitter.com/abc"
-                      fullWidth
-                    />
-                  </Grid>
-                  <Grid item xs={12} sm={3} display="flex" alignItems="center">
-                    <CustomFormLabel htmlFor="ft-google" sx={{ mt: 0, mb: { xs: '-10px', sm: 0 } }}>
-                      Google
-                    </CustomFormLabel>
-                  </Grid>
-                  <Grid item xs={12} sm={9}>
-                    <CustomTextField
-                      id="ft-google"
-                      placeholder="https://plus.google.com/abc"
-                      fullWidth
-                    />
-                  </Grid>
-                  <Grid item xs={12} sm={3} display="flex" alignItems="center">
-                    <CustomFormLabel htmlFor="ft-insta" sx={{ mt: 0, mb: { xs: '-10px', sm: 0 } }}>
-                      Instagram
-                    </CustomFormLabel>
-                  </Grid>
-                  <Grid item xs={12} sm={9}>
-                    <CustomTextField
-                      id="ft-insta"
-                      placeholder="https://instagram.com/abc"
-                      fullWidth
-                    />
-                  </Grid>
-                </Grid>
+                  }
+                  label="Publish Profile"
+                  sx={{ mt: 2 }}
+                />
+
+
               </Grid>
               <Grid item xs={12} lg={6}>
-                <Grid container spacing={3}>
-                  <Grid item xs={12} sm={3} display="flex" alignItems="center">
-                    <CustomFormLabel htmlFor="ft-fb" sx={{ mt: 0, mb: { xs: '-10px', sm: 0 } }}>
-                      Facebook
-                    </CustomFormLabel>
-                  </Grid>
-                  <Grid item xs={12} sm={9}>
-                    <CustomTextField id="ft-fb" placeholder="https://facebook.com/abc" fullWidth />
-                  </Grid>
-                  <Grid item xs={12} sm={3} display="flex" alignItems="center">
-                    <CustomFormLabel
-                      htmlFor="ft-linkedin"
-                      sx={{ mt: 0, mb: { xs: '-10px', sm: 0 } }}
-                    >
-                      Linkedin
-                    </CustomFormLabel>
-                  </Grid>
-                  <Grid item xs={12} sm={9}>
-                    <CustomTextField
-                      id="ft-linkedin"
-                      placeholder="https://linkedin.com/abc"
-                      fullWidth
-                    />
-                  </Grid>
-                  <Grid item xs={12} sm={3} display="flex" alignItems="center">
-                    <CustomFormLabel htmlFor="ft-quora" sx={{ mt: 0, mb: { xs: '-10px', sm: 0 } }}>
-                      Quora
-                    </CustomFormLabel>
-                  </Grid>
-                  <Grid item xs={12} sm={9}>
-                    <CustomTextField id="ft-quora" placeholder="https://quora.com/abc" fullWidth />
-                  </Grid>
-                </Grid>
-              </Grid>
-              <Grid item xs={12} sm={3}></Grid>
-              <Grid item xs={12} sm={9}>
-                <Stack direction="row" spacing={2}>
-                  <Button variant="contained" color="primary">
-                    Submit
-                  </Button>
-                  <Button variant="text" color="error">
-                    Cancel
-                  </Button>
-                </Stack>
+                <CustomFormLabel htmlFor="phone_number" className="center">
+                  Phone Number
+                </CustomFormLabel>
+                <TextField id="phone_number" placeholder="+271-0099-221" fullWidth onChange={handleInputChange} />
+
+                <CustomFormLabel htmlFor="comments" sx={{ mt: 2 }} className="center">
+                  Comments
+                </CustomFormLabel>
+                <TextField
+                  id="comments"
+                  placeholder="Provide additional information about your communications"
+                  fullWidth
+                  multiline
+                  rows={4}
+                  onChange={handleInputChange}
+                />
               </Grid>
             </Grid>
           </TabPanel>
         </TabContext>
       </BlankCard>
+      <Stack direction="row" spacing={2} justifyContent="flex-end" mt={3} mb={5}>
+        <Button variant="contained" color="primary" onClick={handleSubmit}>
+          Save
+        </Button>
+      </Stack>
     </div>
   );
 };

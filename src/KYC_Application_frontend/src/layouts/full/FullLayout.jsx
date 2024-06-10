@@ -9,6 +9,10 @@ import Customizer from './shared/customizer/Customizer';
 import Navigation from './horizontal/navbar/Navbar';
 import Modern from '../../views/dashboard/Modern';
 import EcommerceDash from '../../views/dashboard/Ecommerce.jsx';
+import UserProfile from "../../views/apps/user-profile/UserProfile.jsx";
+import Followers from "../../views/apps/user-profile/Followers.jsx";
+import Friends from "../../views/apps/user-profile/Friends.jsx";
+import Gallery from "../../views/apps/user-profile/Gallery.jsx";
 
 const MainWrapper = styled('div')(() => ({
   display: 'flex',
@@ -54,6 +58,10 @@ const FullLayout = () => {
             <Routes>
               <Route path="/" element={<Modern />} />
               <Route path="/dashboards/ecommerce" element={<EcommerceDash />} />
+              <Route path="/apps/followers" element={<Followers />} />
+              <Route path="/apps/friends" element={<Friends />} />
+              <Route path="/apps/gallery" element={<Gallery />} />
+              <Route path="/user-profile" element={<UserProfile />} />
             </Routes>
           </Box>
         </Container>

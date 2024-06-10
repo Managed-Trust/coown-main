@@ -1,6 +1,6 @@
 import React from 'react';
 import { Tabs, Tab, Box } from '@mui/material';
-import { IconHeart, IconPhoto, IconUserCircle } from '@tabler/icons';
+import { IconHeart, IconPhoto, IconUserCircle,IconLock, IconCash } from '@tabler/icons';
 import { Link, useLocation } from 'react-router-dom';
 
 const ProfileTab = () => {
@@ -16,19 +16,19 @@ const ProfileTab = () => {
       to: '/user-profile',
     },
     {
-      label: 'Followers',
-      icon: <IconHeart size="20" />,
+      label: 'Security',
+      icon: <IconLock size="20" />,
       to: '/apps/followers',
     },
     {
-      label: 'Friends',
+      label: 'Groups',
       icon: <IconUserCircle size="20" />,
-      to: '/apps/friends',
+      to: '/apps/gallery',
     },
     {
-      label: 'Gallery',
-      icon: <IconPhoto size="20" />,
-      to: '/apps/gallery',
+      label: 'Financial',
+      icon: <IconCash size="20" />,
+      to: '/apps/friends',
     },
   ];
 
