@@ -40,6 +40,8 @@ actor KYC_Canister {
     birth_country : ?Text;
     birth_state : ?Text;
     birth_city : ?Text;
+    cizitenship : [Text];
+    residency : Text;
     resident_address : ?Text;
     resident_country : ?Text;
     resident_state : ?Text;
@@ -68,7 +70,6 @@ actor KYC_Canister {
 
   //==================================================================================
 
- 
   // Storage for customer data
   // stable var customers : [Customer] = [];
 
@@ -94,7 +95,9 @@ actor KYC_Canister {
     };
 
   };
-
+  //owns account
+  //beneficicary
+  //executive
   public func addImage(newCustomer : Text) : async Text {
 
     map1.put("1", newCustomer);
@@ -154,7 +157,7 @@ actor KYC_Canister {
       };
     };
   };
-
+  //multiple citizenship 1 residency
   // Function to update customer information
   public func updateCustomer(id : Text, updatedCustomer : Customer) : async Text {
     switch (map.get(id)) {
@@ -251,10 +254,106 @@ actor KYC_Canister {
     return Iter.toArray(verifiedCustomers);
   };
 
+  //chat App
+
+  type Messaging = {
+    MessageId : Text;
+    Messages : Message;
+  };
+
+  type Message = {
+    SenderUserId : Text;
+    ReceiverUserId : Text;
+    Description : Text;
+  };
+
+  private stable var messageEntries : [(Text, [Messaging])] = [];
+  var message = HashMap.HashMap<Text, Buffer.Buffer<Messaging>>(0, Text.equal, Text.hash);
+
+  public func createMessaging(senderId : Text, receiverId : Text, description : Text) : async Bool {
+    let timeStamp = Time.now();
+
+    let newMessageId = Text.concat(senderId, receiverId);
+    let newMessageId2 = Text.concat(receiverId, senderId);
+    var messageId = newMessageId;
+
+    switch (message.get(newMessageId2)) {
+      case (?x) {
+        messageId := newMessageId2;
+      };
+      case (null) {};
+    };
+
+    let messageData : Messaging = {
+      MessageId = messageId;
+      Messages = {
+        SenderUserId = senderId;
+        ReceiverUserId = receiverId;
+        Description = description;
+      };
+    };
+
+    switch (message.get(messageId)) {
+      case (?x) {
+        x.add(messageData);
+        let res = message.put(messageId, x);
+        return true;
+      };
+      case (null) {
+        var userMessageBuffer = Buffer.Buffer<Messaging>(0);
+        userMessageBuffer.add(messageData);
+        message.put(messageId, userMessageBuffer);
+        return true;
+      };
+
+    };
+
+  };
+
+  public query func getMessaging(senderId : Text, receiverId : Text) : async [Messaging] {
+    let newMessageId = Text.concat(senderId, receiverId);
+    let newMessageId2 = Text.concat(receiverId, senderId);
+
+    switch (message.get(newMessageId)) {
+      case (?x) {
+        return Buffer.toArray<Messaging>(x);
+      };
+      case (null) {
+
+        switch (message.get(newMessageId2)) {
+          case (?x) {
+            return Buffer.toArray<Messaging>(x);
+          };
+          case (null) {
+
+            return [];
+          };
+        };
+
+      };
+    };
+
+  };
+
   system func preupgrade() {
     mapEntries := Iter.toArray(map.entries());
+
+    let Entries1 = Iter.toArray(message.entries());
+    var data1 = Map.HashMap<Text, [Messaging]>(0, Text.equal, Text.hash);
+
+    for (x in Iter.fromArray(Entries1)) {
+      data1.put(x.0, Buffer.toArray<Messaging>(x.1));
+    };
+    messageEntries := Iter.toArray(data1.entries());
+
   };
   system func postupgrade() {
     map := HashMap.fromIter<Text, Customer>(mapEntries.vals(), 1, Text.equal, Text.hash);
+
+    let his1 = HashMap.fromIter<Text, [Messaging]>(messageEntries.vals(), 1, Text.equal, Text.hash);
+    let Entries1 = Iter.toArray(his1.entries());
+    for (x in Iter.fromArray(Entries1)) {
+      message.put(x.0, Buffer.fromArray<Messaging>(x.1));
+    };
   };
 };
