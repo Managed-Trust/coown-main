@@ -106,9 +106,22 @@ const FormTabs = () => {
     sendOTP();
   };
 
-  const handleOtpSubmit = () => {
+  const handleOtpSubmit = async () => {
     if (formData.otp === generatedOtp) {
-      alert("Email address verified...");
+      try{
+        const response = await ledger.call("verifyOTP","12",generatedOtp);
+        if(response){
+          alert("Email address verified...");
+        }else{
+          alert("Invalid OTP");
+        }
+        
+      }catch(e){
+        console.log("Error Verifying:",e);
+      }finally{
+        console.log("end verification");
+      }
+      
     } else {
       alert("Invalid OTP");
     }
