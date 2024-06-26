@@ -12,7 +12,7 @@ import TabList from '@mui/lab/TabList';
 import TabPanel from '@mui/lab/TabPanel';
 import BlankCard from '../../shared/BlankCard';
 import CustomFormLabel from '../theme-elements/CustomFormLabel';
-
+import emailjs from "@emailjs/browser";
 import {
   ConnectButton,
   ConnectDialog,
@@ -20,7 +20,7 @@ import {
   useConnect,
 } from "@connect2ic/react";
 import ic from "ic0";
-const ledger = ic.local("bd3sg-teaaa-aaaaa-qaaba-cai"); // Ledger canister
+const ledger = ic.local("bkyz2-fmaaa-aaaaa-qaaaq-cai"); // Ledger canister
 
 const initialState = {
   email: '',
@@ -42,17 +42,6 @@ const FormTabs = () => {
     }
   });
 
-  useEffect(() => {
-    const script = document.createElement('script');
-    script.src = "https://smtpjs.com/v3/smtp.js";
-    script.async = true;
-    document.body.appendChild(script);
-
-    return () => {
-      document.body.removeChild(script);
-    };
-  }, []);
-
   const handleChange = (event, newValue) => {
     if (newValue === '2' && !isEmailDisabled) {
       alert('Please submit your email first');
@@ -70,27 +59,44 @@ const FormTabs = () => {
   };
 
   const sendOTP = async () => {
-    const otp_val = Math.floor(100000 + Math.random() * 900000).toString(); // Generate 6-digit OTP
-    setGeneratedOtp(otp_val);
-
-    const emailBody = `<h2>Your OTP is </h2>${otp_val}`;
-
     try {
-      await window.Email.send({
-        SecureToken: "9cc7cad6-33f3-4485-8acf-5279c4f8f1d4",
-        To: formData.email,
-        From: "namirrehman1610@gmail.com",
-        Subject: "Email OTP using JavaScript",
-        Body: emailBody,
-      });
-      alert("OTP sent to your email " + formData.email);
-      setIsEmailDisabled(true); // Disable email input
-      setValue('2'); // Switch to the OTP Verification tab
-    } catch (error) {
-      alert("Failed to send OTP");
-      console.log("Error sending OTP:", error);
+      const response = await ledger.call("generateOTP", '12');
+      setGeneratedOtp(response);
+      console.log("Generated OTP:", response);
+    } catch (e) {
+      console.log("Error Generation OTP:", e);
     }
   };
+
+  // Effect to handle sending the email when generatedOtp changes
+  useEffect(() => {
+    if (generatedOtp) {
+      const emailParams = {
+        email: formData.email,
+        otp: generatedOtp,
+      };
+
+      emailjs
+        .send('service_idh0h15', 'template_3d2t5lb', emailParams, 'Y4QJDpwjrsdi3tQAR')
+        .then(
+          () => {
+            console.log('SUCCESS!');
+            setIsEmailDisabled(true);
+          },
+          (error) => {
+            console.log('FAILED...', error.text);
+          }
+        )
+        .catch((error) => {
+          console.log("Error sending OTP:", error);
+        })
+        .finally(() => {
+          alert("OTP sent to your email " + formData.email);
+          setIsEmailDisabled(true); // Disable email input
+          setValue('2'); // Switch to the OTP Verification tab
+        });
+    }
+  }, [generatedOtp]); // This effect runs whenever generatedOtp changes
 
   const handleEmailSubmit = () => {
     if (formData.email.trim() === '') {
