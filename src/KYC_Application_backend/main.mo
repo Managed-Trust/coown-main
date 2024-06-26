@@ -45,6 +45,7 @@ actor KYC_Canister {
     groupId : Text;
     privateGroup : Bool;
     users : [GroupUser];
+    authThenticatedUsers : [Text];
   };
 
   public type GroupUser = {
@@ -129,6 +130,69 @@ actor KYC_Canister {
     return "User created with default group.";
   };
 
+  public func addUsersToGroup(adminUserId : Text, groupId : Text, userIds : [Text]) : async Text {
+    switch (users.get(adminUserId)) {
+      case (null) {
+        return "Admin user does not exist.";
+      };
+      case (?admin) {
+        switch (groups.get(groupId)) {
+          case (null) {
+            return "Group does not exist.";
+          };
+          case (?groupBuffer) {
+            let groupsArray = Buffer.toArray<Group>(groupBuffer);
+            var groupOwner : ?User = null;
+            var targetGroup : ?Group = null;
+
+            // Label the following block for a controlled exit with the ability to break out
+            label search_group {
+              for ((ownerId, user) in users.entries()) {
+                for (group in user.groups.vals()) {
+                  if (group.groupId == groupId) {
+                    groupOwner := ?user;
+                    targetGroup := ?group;
+                    break search_group; // Correctly breaking out of the loop when the group is found
+                  };
+                };
+              };
+            };
+            switch (targetGroup) {
+              case (null) {
+                return "Group is unexpectedly empty.";
+              };
+              case (?group) {
+                if (admin.userId != group.adminId) {
+                  return "Unauthorized operation. Only group admin can add users.";
+                } else {
+                  let updatedGroups = Array.append<Text>(group.authThenticatedUsers, userIds);
+                  let updatedGroup = {
+                    group with
+                    authThenticatedUsers = updatedGroups
+                  };
+
+                  // Update the group in the existing buffer
+                  // Clear the buffer, add the updated group, and retain any other groups
+                  groupBuffer.clear();
+                  for (grp in groupsArray.vals()) {
+                    if (grp.groupId == groupId) {
+                      groupBuffer.add(updatedGroup); // Add updated group
+                    } else {
+                      groupBuffer.add(grp); // Re-add other groups
+                    };
+                  };
+                  groups.put(groupId, groupBuffer);
+                
+                };
+              };
+            };
+
+            return "Users added successfully to the group.";
+          };
+        };
+      };
+    };
+  };
   // 1 personal
   // adding new user? company details
 
@@ -152,6 +216,7 @@ actor KYC_Canister {
     };
 
   };
+
   public func createGroup(
     userId : Text,
     groupName : Text,
@@ -173,7 +238,6 @@ actor KYC_Canister {
     proofOfAuthority : Blob,
     emailRep : Text,
     phoneNumber : Text,
-
   ) : async Text {
     switch (users.get(userId)) {
       case (null) {
@@ -224,6 +288,8 @@ actor KYC_Canister {
           groupId = groupId;
           privateGroup = groupAccess;
           users = [adminUser];
+          authThenticatedUsers = [];
+
         };
 
         let updatedGroups = Array.append<Group>(user.groups, [newGroup]);
@@ -363,6 +429,7 @@ actor KYC_Canister {
       };
     };
   };
+
   public func getUser(userId : Text) : async ?User {
     return users.get(userId);
   };
