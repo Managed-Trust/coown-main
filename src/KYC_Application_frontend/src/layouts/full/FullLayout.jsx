@@ -14,6 +14,10 @@ import Followers from "../../views/apps/user-profile/Followers.jsx";
 import Friends from "../../views/apps/user-profile/Friends.jsx";
 import Gallery from "../../views/apps/user-profile/Gallery.jsx";
 import FormHorizontal from "../../views/forms/FormHorizontal";
+import {
+  ConnectDialog,
+  
+} from "@connect2ic/react";
 
 const MainWrapper = styled('div')(() => ({
   display: 'flex',
@@ -68,6 +72,7 @@ const FullLayout = () => {
           </Box>
         </Container>
         <Customizer />
+        <ConnectDialog dark={false} />
       </PageWrapper>
     </MainWrapper>
   );
