@@ -155,7 +155,7 @@ const AppDD = () => {
         variant="text"
       > */}
         <ConnectButton />
-        {/* <ConnectDialog dark={false} /> */}
+        <ConnectDialog dark={false} />
       {/* </div> */}
     </>
   );
