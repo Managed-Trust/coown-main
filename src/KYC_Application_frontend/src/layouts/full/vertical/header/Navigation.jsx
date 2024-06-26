@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import { Box, Menu, Typography, Button, Divider, Grid } from "@mui/material";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { IconChevronDown, IconHelp } from "@tabler/icons";
 import AppLinks from "./AppLinks";
 import QuickLinks from "./QuickLinks";
@@ -12,9 +12,13 @@ import {
   useConnect,
 } from "@connect2ic/react";
 
+import ic from "ic0";
+
+const ledger = ic.local("bkyz2-fmaaa-aaaaa-qaaaq-cai"); // Ledger canister
+
 const AppDD = () => {
   const [anchorEl2, setAnchorEl2] = useState(null);
-
+ const navigate = useNavigate();
   const { isConnected, principal, activeProvider } = useConnect({
     onConnect: () => {
       // Signed in
@@ -23,6 +27,24 @@ const AppDD = () => {
       // Signed out
     },
   });
+  useEffect(() => {
+    const checkUserProfile = async () => {
+      if (isConnected && principal) {
+        try {
+          const profileResponse = await ledger.call("getUser", principal);
+          const hasProfile = profileResponse[0];
+          console.log("Profile:", profileResponse);
+          if (!hasProfile) {
+            navigate("/forms/form-horizontal");
+          }
+        } catch (e) {
+          console.log("Error checking user profile:", e);
+        }
+      }
+    };
+    checkUserProfile();
+  }, [isConnected, principal, navigate]);
+
   const handleClick2 = (event) => {
     setAnchorEl2(event.currentTarget);
   };

@@ -43,7 +43,7 @@ const FormTabs = () => {
   });
 
   const handleChange = (event, newValue) => {
-    if (newValue === '2' && !isEmailDisabled) {
+    if ((newValue === '2' || newValue === '3') && !isEmailDisabled) {
       alert('Please submit your email first');
       return;
     }
@@ -58,9 +58,19 @@ const FormTabs = () => {
     }));
   };
 
+  const createUser = async () => {
+    try {
+      const response = await ledger.call("createUser", principal,"1","1",formData.email );
+      console.log("User created:", formData.email);
+      alert(response);
+    } catch (e) {
+      console.log("Error creating user:", e);
+    }
+  };
+
   const sendOTP = async () => {
     try {
-      const response = await ledger.call("generateOTP", '12');
+      const response = await ledger.call("generateOTP", principal);
       setGeneratedOtp(response);
       console.log("Generated OTP:", response);
     } catch (e) {
@@ -92,36 +102,35 @@ const FormTabs = () => {
         })
         .finally(() => {
           alert("OTP sent to your email " + formData.email);
-          setIsEmailDisabled(true); // Disable email input
-          setValue('2'); // Switch to the OTP Verification tab
+          setValue('3'); // Switch to the OTP Verification tab
         });
     }
   }, [generatedOtp]); // This effect runs whenever generatedOtp changes
 
-  const handleEmailSubmit = () => {
+  const handleEmailSubmit = async () => {
     if (formData.email.trim() === '') {
       alert('Email cannot be empty');
       return;
     }
-    sendOTP();
+    await createUser();
+    setIsEmailDisabled(true);
+    setValue('2');
   };
 
   const handleOtpSubmit = async () => {
     if (formData.otp === generatedOtp) {
-      try{
-        const response = await ledger.call("verifyOTP","12",generatedOtp);
-        if(response){
+      try {
+        const response = await ledger.call("verifyOTP", principal, formData.otp );
+        if (response) {
           alert("Email address verified...");
-        }else{
+        } else {
           alert("Invalid OTP");
         }
-        
-      }catch(e){
-        console.log("Error Verifying:",e);
-      }finally{
+      } catch (e) {
+        console.log("Error Verifying:", e);
+      } finally {
         console.log("end verification");
       }
-      
     } else {
       alert("Invalid OTP");
     }
@@ -134,7 +143,8 @@ const FormTabs = () => {
           <Box sx={{ borderBottom: 1, borderColor: (theme) => theme.palette.divider }}>
             <TabList onChange={handleChange} aria-label="lab API tabs example" variant="scrollable" scrollButtons="auto">
               <Tab label="Email" value="1" />
-              <Tab label="OTP Verification" value="2" disabled={!isEmailDisabled} />
+              <Tab label="Verify Email" value="2" disabled={!isEmailDisabled} />
+              <Tab label="OTP Verification" value="3" disabled={!isEmailDisabled} />
             </TabList>
           </Box>
           <TabPanel value="1">
@@ -154,11 +164,31 @@ const FormTabs = () => {
             </Grid>
             <Stack direction="row" spacing={2} justifyContent="flex-end" mt={3} mb={5}>
               <Button variant="contained" color="primary" onClick={handleEmailSubmit}>
-                Send OTP
+                Create User
               </Button>
             </Stack>
           </TabPanel>
           <TabPanel value="2">
+            <Grid container spacing={3}>
+              <Grid item xs={12} lg={12}>
+                <CustomFormLabel htmlFor="email" className="center" style={{ marginTop: '0px' }}>
+                  Email Address
+                </CustomFormLabel>
+                <TextField
+                  id="email"
+                  value={formData.email}
+                  fullWidth
+                  disabled
+                />
+              </Grid>
+            </Grid>
+            <Stack direction="row" spacing={2} justifyContent="flex-end" mt={3} mb={5}>
+              <Button variant="contained" color="primary" onClick={sendOTP}>
+                Send OTP
+              </Button>
+            </Stack>
+          </TabPanel>
+          <TabPanel value="3">
             <Grid container spacing={3}>
               <Grid item xs={12} lg={12}>
                 <CustomFormLabel htmlFor="otp" className="center" style={{ marginTop: '0px' }}>
