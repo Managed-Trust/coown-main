@@ -8,7 +8,6 @@ import {
   Stack,
   MenuItem,
   FormControl,
-  InputLabel,
   Select,
   Paper,
 } from '@mui/material';
@@ -25,7 +24,7 @@ import {
   useConnect,
 } from "@connect2ic/react";
 import ic from "ic0";
-const ledger = ic.local("bd3sg-teaaa-aaaaa-qaaba-cai"); // Ledger canister
+const ledger = ic.local("bkyz2-fmaaa-aaaaa-qaaaq-cai"); // Ledger canister
 
 const initialState = {
   email: '',
@@ -39,16 +38,27 @@ const initialState = {
   legalStructure: '',
   registeredAddress: '',
   taxID: '',
-  incorporationCertificate: '',
-  memorandumAndArticles: '',
+  incorporationCertificate: [],
+  memorandumAndArticles: [],
   representativeFullName: '',
   position: '',
   idDocumentType: '',
   idDocumentNumber: '',
-  idDocument: '',
-  proofOfAuthority: '',
+  idDocument: [],
+  proofOfAuthority: [],
   emailRep: '',
   phoneNumber: '',
+  ecnomicOwner: '',
+  beneficialOwner: '',
+  publicLawEntity: false,
+  entity: {
+    mail: '',
+    name: '',
+    contactPerson: '',
+    website: '',
+    address: '',
+    phone: ''
+  },
 };
 
 const FormTabs = () => {
@@ -80,10 +90,21 @@ const FormTabs = () => {
   const handleInputChange = (e) => {
     const { id, value, name } = e.target;
     const inputId = id || name; // for Select component
-    setFormData((prevData) => ({
-      ...prevData,
-      [inputId]: value,
-    }));
+
+    if (inputId in formData.entity) {
+      setFormData((prevData) => ({
+        ...prevData,
+        entity: {
+          ...prevData.entity,
+          [inputId]: value,
+        }
+      }));
+    } else {
+      setFormData((prevData) => ({
+        ...prevData,
+        [inputId]: value,
+      }));
+    }
   };
 
   const handleFileChange = async (e) => {
@@ -188,11 +209,27 @@ const FormTabs = () => {
   };
 
   const handleCreateGroup = async () => {
-    // Add your logic for creating a group
+    console.log("Create Group Data:", formData);
+
+    try {
+      const response = await ledger.call("createGroup", principal, formData.groupName, formData.groupId, formData.groupAccess, formData.registerCompany, formData.companyName, formData.registrationNumber, formData.legalStructure, formData.registeredAddress, formData.taxID, formData.incorporationCertificate, formData.memorandumAndArticles, formData.representativeFullName, formData.position, formData.idDocumentType, formData.idDocumentNumber, formData.idDocument, formData.proofOfAuthority, formData.emailRep, formData.phoneNumber, formData.ecnomicOwner, formData.beneficialOwner, formData.publicLawEntity, formData.publicLawEntity ? formData.entity : null);
+
+      console.log("Create Group Response:", response);
+    } catch (e) {
+      console.log("Error Creating Group:", e);
+    }
   };
 
   const handleJoinGroup = async () => {
-    // Add your logic for joining a group
+    console.log("Join Group Data:", formData);
+
+    try {
+      const response = await ledger.call("joinGroup", principal, formData.groupId, formData.registerCompany, formData.representativeFullName, formData.position, formData.idDocumentType, formData.idDocumentNumber, formData.idDocument, formData.proofOfAuthority, formData.emailRep, formData.phoneNumber);
+
+      console.log("Join Group Response:", response);
+    } catch (e) {
+      console.log("Error Creating Group:", e);
+    }
   };
 
   return (
@@ -312,106 +349,161 @@ const FormTabs = () => {
                     </Select>
                   </FormControl>
                 </Grid>
-                <Grid item xs={12} md={6}>
-                  <CustomFormLabel htmlFor="companyName">Company Name</CustomFormLabel>
-                  <TextField id="companyName" fullWidth onChange={handleInputChange} />
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <CustomFormLabel htmlFor="registrationNumber">Registration Number</CustomFormLabel>
-                  <TextField id="registrationNumber" fullWidth onChange={handleInputChange} />
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <CustomFormLabel htmlFor="legalStructure">Legal Structure</CustomFormLabel>
-                  <TextField id="legalStructure" fullWidth onChange={handleInputChange} />
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <CustomFormLabel htmlFor="registeredAddress">Registered Address</CustomFormLabel>
-                  <TextField id="registeredAddress" fullWidth onChange={handleInputChange} />
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <CustomFormLabel htmlFor="taxID">Tax ID</CustomFormLabel>
-                  <TextField id="taxID" fullWidth onChange={handleInputChange} />
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <CustomFormLabel htmlFor="incorporationCertificate">Incorporation Certificate</CustomFormLabel>
-                  <TextField
-                    id="incorporationCertificate"
-                    type="file"
-                    fullWidth
-                    onChange={handleFileChange}
-                  />
-                  {filePreviews.incorporationCertificate && (
-                    <Paper elevation={3} sx={{ mt: 2 }}>
-                      <img src={filePreviews.incorporationCertificate} alt="Incorporation Certificate" width="100%" />
-                    </Paper>
-                  )}
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <CustomFormLabel htmlFor="memorandumAndArticles">Memorandum And Articles</CustomFormLabel>
-                  <TextField
-                    id="memorandumAndArticles"
-                    type="file"
-                    fullWidth
-                    onChange={handleFileChange}
-                  />
-                  {filePreviews.memorandumAndArticles && (
-                    <Paper elevation={3} sx={{ mt: 2 }}>
-                      <img src={filePreviews.memorandumAndArticles} alt="Memorandum And Articles" width="100%" />
-                    </Paper>
-                  )}
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <CustomFormLabel htmlFor="representativeFullName">Representative Full Name</CustomFormLabel>
-                  <TextField id="representativeFullName" fullWidth onChange={handleInputChange} />
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <CustomFormLabel htmlFor="position">Position</CustomFormLabel>
-                  <TextField id="position" fullWidth onChange={handleInputChange} />
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <CustomFormLabel htmlFor="idDocumentType">ID Document Type</CustomFormLabel>
-                  <TextField id="idDocumentType" fullWidth onChange={handleInputChange} />
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <CustomFormLabel htmlFor="idDocumentNumber">ID Document Number</CustomFormLabel>
-                  <TextField id="idDocumentNumber" fullWidth onChange={handleInputChange} />
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <CustomFormLabel htmlFor="idDocument">ID Document</CustomFormLabel>
-                  <TextField
-                    id="idDocument"
-                    type="file"
-                    fullWidth
-                    onChange={handleFileChange}
-                  />
-                  {filePreviews.idDocument && (
-                    <Paper elevation={3} sx={{ mt: 2 }}>
-                      <img src={filePreviews.idDocument} alt="ID Document" width="100%" />
-                    </Paper>
-                  )}
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <CustomFormLabel htmlFor="proofOfAuthority">Proof Of Authority</CustomFormLabel>
-                  <TextField
-                    id="proofOfAuthority"
-                    type="file"
-                    fullWidth
-                    onChange={handleFileChange}
-                  />
-                  {filePreviews.proofOfAuthority && (
-                    <Paper elevation={3} sx={{ mt: 2 }}>
-                      <img src={filePreviews.proofOfAuthority} alt="Proof Of Authority" width="100%" />
-                    </Paper>
-                  )}
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <CustomFormLabel htmlFor="emailRep">Representative Email</CustomFormLabel>
-                  <TextField id="emailRep" fullWidth onChange={handleInputChange} />
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <CustomFormLabel htmlFor="phoneNumber">Phone Number</CustomFormLabel>
-                  <TextField id="phoneNumber" fullWidth onChange={handleInputChange} />
-                </Grid>
+                {formData.registerCompany && (
+                  <>
+                    <Grid item xs={12} md={6}>
+                      <CustomFormLabel htmlFor="companyName">Company Name</CustomFormLabel>
+                      <TextField id="companyName" fullWidth onChange={handleInputChange} />
+                    </Grid>
+                    <Grid item xs={12} md={6}>
+                      <CustomFormLabel htmlFor="registrationNumber">Registration Number</CustomFormLabel>
+                      <TextField id="registrationNumber" fullWidth onChange={handleInputChange} />
+                    </Grid>
+                    <Grid item xs={12} md={6}>
+                      <CustomFormLabel htmlFor="legalStructure">Legal Structure</CustomFormLabel>
+                      <TextField id="legalStructure" fullWidth onChange={handleInputChange} />
+                    </Grid>
+                    <Grid item xs={12} md={6}>
+                      <CustomFormLabel htmlFor="registeredAddress">Registered Address</CustomFormLabel>
+                      <TextField id="registeredAddress" fullWidth onChange={handleInputChange} />
+                    </Grid>
+                    <Grid item xs={12} md={6}>
+                      <CustomFormLabel htmlFor="taxID">Tax ID</CustomFormLabel>
+                      <TextField id="taxID" fullWidth onChange={handleInputChange} />
+                    </Grid>
+                    <Grid item xs={12} md={6}>
+                      <CustomFormLabel htmlFor="incorporationCertificate">Incorporation Certificate</CustomFormLabel>
+                      <TextField
+                        id="incorporationCertificate"
+                        type="file"
+                        fullWidth
+                        onChange={handleFileChange}
+                      />
+                      {filePreviews.incorporationCertificate && (
+                        <Paper elevation={3} sx={{ mt: 2, width: 100, height: 100 }}>
+                          <img src={filePreviews.incorporationCertificate} alt="Incorporation Certificate" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        </Paper>
+                      )}
+                    </Grid>
+                    <Grid item xs={12} md={6}>
+                      <CustomFormLabel htmlFor="memorandumAndArticles">Memorandum And Articles</CustomFormLabel>
+                      <TextField
+                        id="memorandumAndArticles"
+                        type="file"
+                        fullWidth
+                        onChange={handleFileChange}
+                      />
+                      {filePreviews.memorandumAndArticles && (
+                        <Paper elevation={3} sx={{ mt: 2, width: 100, height: 100 }}>
+                          <img src={filePreviews.memorandumAndArticles} alt="Memorandum And Articles" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        </Paper>
+                      )}
+                    </Grid>
+                    <Grid item xs={12} md={6}>
+                      <CustomFormLabel htmlFor="representativeFullName">Representative Full Name</CustomFormLabel>
+                      <TextField id="representativeFullName" fullWidth onChange={handleInputChange} />
+                    </Grid>
+                    <Grid item xs={12} md={6}>
+                      <CustomFormLabel htmlFor="position">Position</CustomFormLabel>
+                      <TextField id="position" fullWidth onChange={handleInputChange} />
+                    </Grid>
+                    <Grid item xs={12} md={6}>
+                      <CustomFormLabel htmlFor="idDocumentType">ID Document Type</CustomFormLabel>
+                      <TextField id="idDocumentType" fullWidth onChange={handleInputChange} />
+                    </Grid>
+                    <Grid item xs={12} md={6}>
+                      <CustomFormLabel htmlFor="idDocumentNumber">ID Document Number</CustomFormLabel>
+                      <TextField id="idDocumentNumber" fullWidth onChange={handleInputChange} />
+                    </Grid>
+                    <Grid item xs={12} md={6}>
+                      <CustomFormLabel htmlFor="idDocument">ID Document</CustomFormLabel>
+                      <TextField
+                        id="idDocument"
+                        type="file"
+                        fullWidth
+                        onChange={handleFileChange}
+                      />
+                      {filePreviews.idDocument && (
+                        <Paper elevation={3} sx={{ mt: 2, width: 100, height: 100 }}>
+                          <img src={filePreviews.idDocument} alt="ID Document" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        </Paper>
+                      )}
+                    </Grid>
+                    <Grid item xs={12} md={6}>
+                      <CustomFormLabel htmlFor="proofOfAuthority">Proof Of Authority</CustomFormLabel>
+                      <TextField
+                        id="proofOfAuthority"
+                        type="file"
+                        fullWidth
+                        onChange={handleFileChange}
+                      />
+                      {filePreviews.proofOfAuthority && (
+                        <Paper elevation={3} sx={{ mt: 2, width: 100, height: 100 }}>
+                          <img src={filePreviews.proofOfAuthority} alt="Proof Of Authority" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        </Paper>
+                      )}
+                    </Grid>
+                    <Grid item xs={12} md={6}>
+                      <CustomFormLabel htmlFor="emailRep">Representative Email</CustomFormLabel>
+                      <TextField id="emailRep" fullWidth onChange={handleInputChange} />
+                    </Grid>
+                    <Grid item xs={12} md={6}>
+                      <CustomFormLabel htmlFor="phoneNumber">Phone Number</CustomFormLabel>
+                      <TextField id="phoneNumber" fullWidth onChange={handleInputChange} />
+                    </Grid>
+                    <Grid item xs={12} md={6}>
+                      <CustomFormLabel htmlFor="ecnomicOwner">Economic Owner</CustomFormLabel>
+                      <TextField id="ecnomicOwner" fullWidth onChange={handleInputChange} />
+                    </Grid>
+                    <Grid item xs={12} md={6}>
+                      <CustomFormLabel htmlFor="beneficialOwner">Beneficial Owner</CustomFormLabel>
+                      <TextField id="beneficialOwner" fullWidth onChange={handleInputChange} />
+                    </Grid>
+                    <Grid item xs={12} md={6}>
+                      <CustomFormLabel htmlFor="publicLawEntity">Public Law Entity</CustomFormLabel>
+                      <FormControl fullWidth>
+                        <Select
+                          labelId="publicLawEntity-label"
+                          id="publicLawEntity"
+                          name="publicLawEntity"
+                          value={formData.publicLawEntity}
+                          onChange={handleInputChange}
+                        >
+                          <MenuItem value={true}>Yes</MenuItem>
+                          <MenuItem value={false}>No</MenuItem>
+                        </Select>
+                      </FormControl>
+                    </Grid>
+                    {formData.publicLawEntity && (
+                      <>
+                        <Grid item xs={12} md={6}>
+                          <CustomFormLabel htmlFor="name">Entity Name</CustomFormLabel>
+                          <TextField id="name" fullWidth onChange={handleInputChange} />
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                          <CustomFormLabel htmlFor="contactPerson">Contact Person</CustomFormLabel>
+                          <TextField id="contactPerson" fullWidth onChange={handleInputChange} />
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                          <CustomFormLabel htmlFor="address">Address</CustomFormLabel>
+                          <TextField id="address" fullWidth onChange={handleInputChange} />
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                          <CustomFormLabel htmlFor="mail">Email</CustomFormLabel>
+                          <TextField id="mail" fullWidth onChange={handleInputChange} />
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                          <CustomFormLabel htmlFor="phone">Phone</CustomFormLabel>
+                          <TextField id="phone" fullWidth onChange={handleInputChange} />
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                          <CustomFormLabel htmlFor="website">Website</CustomFormLabel>
+                          <TextField id="website" fullWidth onChange={handleInputChange} />
+                        </Grid>
+                      </>
+                    )}
+                  </>
+                )}
                 <Grid item xs={12} md={12} lg={12}>
                   <Stack direction="row" spacing={2} justifyContent="flex-end" mt={3}>
                     <Button variant="contained" color="primary" onClick={handleCreateGroup}>
@@ -443,54 +535,6 @@ const FormTabs = () => {
                   </FormControl>
                 </Grid>
                 <Grid item xs={12} md={6}>
-                  <CustomFormLabel htmlFor="companyName">Company Name</CustomFormLabel>
-                  <TextField id="companyName" fullWidth onChange={handleInputChange} />
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <CustomFormLabel htmlFor="registrationNumber">Registration Number</CustomFormLabel>
-                  <TextField id="registrationNumber" fullWidth onChange={handleInputChange} />
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <CustomFormLabel htmlFor="legalStructure">Legal Structure</CustomFormLabel>
-                  <TextField id="legalStructure" fullWidth onChange={handleInputChange} />
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <CustomFormLabel htmlFor="registeredAddress">Registered Address</CustomFormLabel>
-                  <TextField id="registeredAddress" fullWidth onChange={handleInputChange} />
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <CustomFormLabel htmlFor="taxID">Tax ID</CustomFormLabel>
-                  <TextField id="taxID" fullWidth onChange={handleInputChange} />
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <CustomFormLabel htmlFor="incorporationCertificate">Incorporation Certificate</CustomFormLabel>
-                  <TextField
-                    id="incorporationCertificate"
-                    type="file"
-                    fullWidth
-                    onChange={handleFileChange}
-                  />
-                  {filePreviews.incorporationCertificate && (
-                    <Paper elevation={3} sx={{ mt: 2 }}>
-                      <img src={filePreviews.incorporationCertificate} alt="Incorporation Certificate" width="100%" />
-                    </Paper>
-                  )}
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <CustomFormLabel htmlFor="memorandumAndArticles">Memorandum And Articles</CustomFormLabel>
-                  <TextField
-                    id="memorandumAndArticles"
-                    type="file"
-                    fullWidth
-                    onChange={handleFileChange}
-                  />
-                  {filePreviews.memorandumAndArticles && (
-                    <Paper elevation={3} sx={{ mt: 2 }}>
-                      <img src={filePreviews.memorandumAndArticles} alt="Memorandum And Articles" width="100%" />
-                    </Paper>
-                  )}
-                </Grid>
-                <Grid item xs={12} md={6}>
                   <CustomFormLabel htmlFor="representativeFullName">Representative Full Name</CustomFormLabel>
                   <TextField id="representativeFullName" fullWidth onChange={handleInputChange} />
                 </Grid>
@@ -515,8 +559,8 @@ const FormTabs = () => {
                     onChange={handleFileChange}
                   />
                   {filePreviews.idDocument && (
-                    <Paper elevation={3} sx={{ mt: 2 }}>
-                      <img src={filePreviews.idDocument} alt="ID Document" width="100%" />
+                    <Paper elevation={3} sx={{ mt: 2, width: 100, height: 100 }}>
+                      <img src={filePreviews.idDocument} alt="ID Document" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                     </Paper>
                   )}
                 </Grid>
@@ -529,8 +573,8 @@ const FormTabs = () => {
                     onChange={handleFileChange}
                   />
                   {filePreviews.proofOfAuthority && (
-                    <Paper elevation={3} sx={{ mt: 2 }}>
-                      <img src={filePreviews.proofOfAuthority} alt="Proof Of Authority" width="100%" />
+                    <Paper elevation={3} sx={{ mt: 2, width: 100, height: 100 }}>
+                      <img src={filePreviews.proofOfAuthority} alt="Proof Of Authority" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                     </Paper>
                   )}
                 </Grid>
