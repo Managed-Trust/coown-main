@@ -62,12 +62,12 @@ actor KYC_Canister {
   // when new user join what taken
 
   public type QualifiedEntity = {
-    name : Text;
-    contactPerson : Text;
-    address : Text;
-    mail : Text;
-    phone : Text;
-    website : Text;
+    name : ?Text;
+    contactPerson : ?Text;
+    address : ?Text;
+    mail : ?Text;
+    phone : ?Text;
+    website : ?Text;
   };
   public type Company = {
     companyDetails : {
@@ -241,7 +241,12 @@ actor KYC_Canister {
     ecnomicOwner : Text,
     beneficialOwner : Text,
     publicLawEntity : Bool,
-    entity : ?QualifiedEntity
+    name : ?Text,
+    contactPerson : ?Text,
+    address : ?Text,
+    mail : ?Text,
+    phone : ?Text,
+    website : ?Text,
 
   ) : async Text {
     switch (users.get(userId)) {
@@ -250,6 +255,17 @@ actor KYC_Canister {
       };
       case (?user) {
         var store : ?Company = null;
+        var store2 : ?QualifiedEntity = null;
+        if (publicLawEntity) {
+           store2 := ?{
+            name = name;
+            contactPerson = contactPerson;
+            address = address;
+            mail = mail;
+            phone = phone;
+            website = website;
+          };
+        };
         if (registerCompany) {
           store := ?{
             companyDetails = {
@@ -263,7 +279,7 @@ actor KYC_Canister {
               incorporationCertificate = incorporationCertificate;
               memorandumAndArticles = memorandumAndArticles;
               publicLawEntity = publicLawEntity;
-              entity = entity;
+              entity = store2;
             };
             representativeDetails = {
               fullName = representativeFullName;
