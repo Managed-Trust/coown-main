@@ -182,7 +182,7 @@ actor KYC_Canister {
                     };
                   };
                   groups.put(groupId, groupBuffer);
-                
+
                 };
               };
             };
@@ -238,6 +238,11 @@ actor KYC_Canister {
     proofOfAuthority : Blob,
     emailRep : Text,
     phoneNumber : Text,
+    ecnomicOwner : Text,
+    beneficialOwner : Text,
+    publicLawEntity : Bool,
+    entity : ?QualifiedEntity
+
   ) : async Text {
     switch (users.get(userId)) {
       case (null) {
@@ -253,12 +258,12 @@ actor KYC_Canister {
               legalStructure = legalStructure;
               registeredAddress = registeredAddress;
               taxID = taxID;
-              ecnomicOwner = "";
-              beneficialOwner = "";
+              ecnomicOwner = ecnomicOwner;
+              beneficialOwner = beneficialOwner;
               incorporationCertificate = incorporationCertificate;
               memorandumAndArticles = memorandumAndArticles;
-              publicLawEntity = false;
-              entity = null;
+              publicLawEntity = publicLawEntity;
+              entity = entity;
             };
             representativeDetails = {
               fullName = representativeFullName;
