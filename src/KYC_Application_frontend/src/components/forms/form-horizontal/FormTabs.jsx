@@ -51,14 +51,12 @@ const initialState = {
   ecnomicOwner: '',
   beneficialOwner: '',
   publicLawEntity: false,
-  entity: {
-    mail: '',
-    name: '',
-    contactPerson: '',
-    website: '',
-    address: '',
-    phone: ''
-  },
+  name: '',
+  contactPerson: '',
+  address: '',
+  mail: '',
+  phone: '',
+  website: ''
 };
 
 const FormTabs = () => {
@@ -90,21 +88,10 @@ const FormTabs = () => {
   const handleInputChange = (e) => {
     const { id, value, name } = e.target;
     const inputId = id || name; // for Select component
-
-    if (inputId in formData.entity) {
-      setFormData((prevData) => ({
-        ...prevData,
-        entity: {
-          ...prevData.entity,
-          [inputId]: value,
-        }
-      }));
-    } else {
-      setFormData((prevData) => ({
-        ...prevData,
-        [inputId]: value,
-      }));
-    }
+    setFormData((prevData) => ({
+      ...prevData,
+      [inputId]: value,
+    }));
   };
 
   const handleFileChange = async (e) => {
@@ -212,7 +199,38 @@ const FormTabs = () => {
     console.log("Create Group Data:", formData);
 
     try {
-      const response = await ledger.call("createGroup", principal, formData.groupName, formData.groupId, formData.groupAccess, formData.registerCompany, formData.companyName, formData.registrationNumber, formData.legalStructure, formData.registeredAddress, formData.taxID, formData.incorporationCertificate, formData.memorandumAndArticles, formData.representativeFullName, formData.position, formData.idDocumentType, formData.idDocumentNumber, formData.idDocument, formData.proofOfAuthority, formData.emailRep, formData.phoneNumber, formData.ecnomicOwner, formData.beneficialOwner, formData.publicLawEntity, formData.publicLawEntity ? formData.entity : null);
+      const response = await ledger.call(
+        "createGroup",
+        principal,
+        formData.groupName,
+        formData.groupId,
+        formData.groupAccess,
+        formData.registerCompany,
+        formData.companyName,
+        formData.registrationNumber,
+        formData.legalStructure,
+        formData.registeredAddress,
+        formData.taxID,
+        formData.incorporationCertificate,
+        formData.memorandumAndArticles,
+        formData.representativeFullName,
+        formData.position,
+        formData.idDocumentType,
+        formData.idDocumentNumber,
+        formData.idDocument,
+        formData.proofOfAuthority,
+        formData.emailRep,
+        formData.phoneNumber,
+        formData.ecnomicOwner,
+        formData.beneficialOwner,
+        formData.publicLawEntity,
+        formData.publicLawEntity ? formData.name : null,
+        formData.publicLawEntity ? formData.contactPerson : null,
+        formData.publicLawEntity ? formData.address : null,
+        formData.publicLawEntity ? formData.mail : null,
+        formData.publicLawEntity ? formData.phone : null,
+        formData.publicLawEntity ? formData.website : null
+      );
 
       console.log("Create Group Response:", response);
     } catch (e) {
@@ -224,7 +242,20 @@ const FormTabs = () => {
     console.log("Join Group Data:", formData);
 
     try {
-      const response = await ledger.call("joinGroup", principal, formData.groupId, formData.registerCompany, formData.representativeFullName, formData.position, formData.idDocumentType, formData.idDocumentNumber, formData.idDocument, formData.proofOfAuthority, formData.emailRep, formData.phoneNumber);
+      const response = await ledger.call(
+        "joinGroup",
+        principal,
+        formData.groupId,
+        formData.registerCompany,
+        formData.representativeFullName,
+        formData.position,
+        formData.idDocumentType,
+        formData.idDocumentNumber,
+        formData.idDocument,
+        formData.proofOfAuthority,
+        formData.emailRep,
+        formData.phoneNumber
+      );
 
       console.log("Join Group Response:", response);
     } catch (e) {

@@ -7,6 +7,7 @@ import IntroCard from '../../../components/apps/userprofile/profile/IntroCard';
 import PhotosCard from '../../../components/apps/userprofile/profile/PhotosCard';
 import Post from '../../../components/apps/userprofile/profile/Post';
 import FormTabs from '../../../components/forms/form-horizontal/FormTabs';
+import ProfileForm from '../../../components/forms/form-horizontal/ProfileForm';
 
 const UserProfile = () => {
   return (
@@ -30,7 +31,7 @@ const UserProfile = () => {
         </Grid>
         {/* Posts Card */}
         <Grid item sm={12} lg={12} xs={12}>
-          <FormTabs />
+          <ProfileForm />
         </Grid>
       </Grid>
     </PageContainer>
