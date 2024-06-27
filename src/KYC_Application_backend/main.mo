@@ -312,13 +312,6 @@ actor KYC_Canister {
     userId : Text,
     groupId : Text,
     registerCompany : Bool,
-    companyName : Text,
-    registrationNumber : Text,
-    legalStructure : Text,
-    registeredAddress : Text,
-    taxID : Text,
-    incorporationCertificate : Blob,
-    memorandumAndArticles : Blob,
     representativeFullName : Text,
     position : Text,
     idDocumentType : Text,
@@ -354,15 +347,15 @@ actor KYC_Canister {
           if (registerCompany) {
             store := ?{
               companyDetails = {
-                companyName = companyName;
-                registrationNumber = registrationNumber;
-                legalStructure = legalStructure;
-                registeredAddress = registeredAddress;
-                taxID = taxID;
+                companyName = "";
+                registrationNumber = "";
+                legalStructure = "";
+                registeredAddress = "";
+                taxID = "";
                 ecnomicOwner = "";
                 beneficialOwner = "";
-                incorporationCertificate = incorporationCertificate;
-                memorandumAndArticles = memorandumAndArticles;
+                incorporationCertificate = "";
+                memorandumAndArticles = "";
                 publicLawEntity = false;
                 entity = null;
               };
