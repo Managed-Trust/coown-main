@@ -19,517 +19,526 @@ import Blob "mo:base/Blob";
 import Float "mo:base/Float";
 import ExperimentalStableMemory "mo:base/ExperimentalStableMemory";
 import StableMemory "mo:base/ExperimentalStableMemory";
-import Random "mo:base/Random";
+import Main2 "main2";
 
 actor KYC_Canister {
 
-  public type User = {
-    userId : Text;
-    emailAuth : Text;
-    joiningId : Text;
-    email : Text;
-    personalGroup : PersonalGroup;
-    groups : [Group];
-    otp : ?Text;
-    otpExpiry : ?Int;
+  type Customer = {
+    id : Text;
+    family_name : Text;
+    given_name : Text;
+    birth_date : Text; // ISO format
+    age_over_18 : Bool;
+    role : Text;
+    // Optional fields
+    age_over_NN : ?Bool;
+    age_in_years : ?Nat;
+    age_birth_year : ?Nat;
+    family_name_birth : ?Text;
+    given_name_birth : ?Text;
+    birth_place : ?Text;
+    birth_country : ?Text;
+    birth_state : ?Text;
+    birth_city : ?Text;
+    resident_address : ?Text;
+    resident_country : ?Text;
+    resident_state : ?Text;
+    resident_city : ?Text;
+    resident_postal_code : ?Text;
+    resident_street : ?Text;
+    gender : ?Nat; // 0, 1, 2 for unspecified, male, female
+    nationality : ?Text; // ISO Alpha-2 code
+    issuance_date : ?Text; // ISO format
+    expiry_date : ?Text; // ISO format
+    issuing_authority : ?Text;
+    document_number : ?Text;
+    issuing_country : ?Text;
+    issuing_jurisdiction : ?Text;
+    cizitenship : [Text];
+    residency : Text;
+    phone : Text;
+    identityNumber : Text;
+    identityDoc : Blob;
+    verified : Bool;
   };
 
-  public type PersonalGroup = {
-    groupId : Text;
-    status : Text; // "Pending", "Approved by Group Admin", "Approved by COOWN Admin"
-  };
+  private stable var mapEntries : [(Text, Customer)] = [];
+  var map = HashMap.HashMap<Text, Customer>(0, Text.equal, Text.hash);
 
-  public type Group = {
-    name : Text;
-    adminId : Text;
-    groupId : Text;
-    privateGroup : Bool;
-    users : [GroupUser];
-    authThenticatedUsers : [Text];
-  };
+  private stable var mapEntries1 : [(Text, Text)] = [];
+  var map1 = HashMap.HashMap<Text, Text>(0, Text.equal, Text.hash);
 
-  public type GroupUser = {
-    userId : Text;
-    coOwnStatus : Bool;
-    coAdminStatus : Bool;
-    isRegisteredCompany : Bool;
-    company : ?Company;
-  };
+  //==================================================================================
 
-  // to be improved
-  // more details/more types need to be added
-  // ecnomic owner of the funds(important)
-  // when new user join what taken
+  // Storage for customer data
+  // stable var customers : [Customer] = [];
 
-  public type QualifiedEntity = {
-    name : ?Text;
-    contactPerson : ?Text;
-    address : ?Text;
-    mail : ?Text;
-    phone : ?Text;
-    website : ?Text;
-  };
-  public type Company = {
-    companyDetails : {
-      companyName : Text;
-      registrationNumber : Text;
-      legalStructure : Text;
-      registeredAddress : Text;
-      taxID : Text;
-      ecnomicOwner : Text;
-      beneficialOwner : Text;
-      incorporationCertificate : Blob;
-      memorandumAndArticles : Blob;
-      publicLawEntity : Bool;
-      entity : ?QualifiedEntity;
-    };
-    representativeDetails : {
-      fullName : Text;
-      position : Text;
-      idDocumentType : Text;
-      idDocumentNumber : Text;
-      idDocument : Blob;
-      proofOfAuthority : Blob;
-      email : Text;
-      phoneNumber : Text;
-    };
-    // to remove these fields// log need to be maintained
+  // Function to add a new customer
+  public func addCustomer(newCustomer : Customer) : async Text {
 
-  };
-  // invitation to email, role // auth token
-  // use Internet identity aur authentication
-  private stable var userEntries : [(Text, User)] = [];
-  var users = HashMap.HashMap<Text, User>(0, Text.equal, Text.hash);
-
-  private stable var groupEntries : [(Text, [Group])] = [];
-  var groups = HashMap.HashMap<Text, Buffer.Buffer<Group>>(0, Text.equal, Text.hash);
-  //Do user need to add details of company
-
-  public func createUser(
-    userId : Text,
-    groupId : Text,
-    joiningId : Text,
-    email : Text
-
-  ) : async Text {
-
-    let newUser = {
-      userId = userId;
-      emailAuth = "pending";
-      joiningId = joiningId;
-      email = email;
-      personalGroup = { groupId = groupId; status = "Pending" };
-      groups = [];
-      otp = null;
-      otpExpiry = null;
-      // groups = [defaultGroup];
-
-    };
-
-    users.put(userId, newUser);
-    return "User created with default group.";
-  };
-
-  public func addUsersToGroup(adminUserId : Text, groupId : Text, userIds : [Text]) : async Text {
-    switch (users.get(adminUserId)) {
+    switch (map.get(newCustomer.id)) {
       case (null) {
-        return "Admin user does not exist.";
-      };
-      case (?admin) {
-        switch (groups.get(groupId)) {
-          case (null) {
-            return "Group does not exist.";
-          };
-          case (?groupBuffer) {
-            let groupsArray = Buffer.toArray<Group>(groupBuffer);
-            var groupOwner : ?User = null;
-            var targetGroup : ?Group = null;
-
-            // Label the following block for a controlled exit with the ability to break out
-            label search_group {
-              for ((ownerId, user) in users.entries()) {
-                for (group in user.groups.vals()) {
-                  if (group.groupId == groupId) {
-                    groupOwner := ?user;
-                    targetGroup := ?group;
-                    break search_group; // Correctly breaking out of the loop when the group is found
-                  };
-                };
-              };
-            };
-            switch (targetGroup) {
-              case (null) {
-                return "Group is unexpectedly empty.";
-              };
-              case (?group) {
-                if (admin.userId != group.adminId) {
-                  return "Unauthorized operation. Only group admin can add users.";
-                } else {
-                  let updatedGroups = Array.append<Text>(group.authThenticatedUsers, userIds);
-                  let updatedGroup = {
-                    group with
-                    authThenticatedUsers = updatedGroups
-                  };
-
-                  // Update the group in the existing buffer
-                  // Clear the buffer, add the updated group, and retain any other groups
-                  groupBuffer.clear();
-                  for (grp in groupsArray.vals()) {
-                    if (grp.groupId == groupId) {
-                      groupBuffer.add(updatedGroup); // Add updated group
-                    } else {
-                      groupBuffer.add(grp); // Re-add other groups
-                    };
-                  };
-                  groups.put(groupId, groupBuffer);
-
-                };
-              };
-            };
-
-            return "Users added successfully to the group.";
-          };
+        if (newCustomer.role == "") {
+          return "Role cannot be empty.";
         };
-      };
-    };
-  };
-  // 1 personal
-  // adding new user? company details
-
-  public func authOpt(status : Text, userId : Text) : async Text {
-    if (status == "verified") {
-
-      switch (users.get(userId)) {
-        case (null) {
-          return "User does not exist.";
+        if (newCustomer.phone == "" or newCustomer.identityNumber == "") {
+          return "Phone number and identity number cannot be empty.";
         };
-        case (?user) {
-          let updatedUser : User = {
-            user with emailAuth = "verified"
-          };
-          users.put(userId, updatedUser);
-        };
+        map.put(newCustomer.id, newCustomer);
+        return "Customer added successfully.";
       };
-      return "success";
-    } else {
-      return "failed";
+      case (?value) {
+
+        return "Customer with this ID already exists.";
+
+      };
     };
 
   };
 
-  public func createGroup(
-    userId : Text,
-    groupName : Text,
-    groupId : Text,
-    groupAccess : Bool,
-    registerCompany : Bool,
-    companyName : Text,
-    registrationNumber : Text,
-    legalStructure : Text,
-    registeredAddress : Text,
-    taxID : Text,
-    incorporationCertificate : Blob,
-    memorandumAndArticles : Blob,
-    representativeFullName : Text,
-    position : Text,
-    idDocumentType : Text,
-    idDocumentNumber : Text,
-    idDocument : Blob,
-    proofOfAuthority : Blob,
-    emailRep : Text,
-    phoneNumber : Text,
-    ecnomicOwner : Text,
-    beneficialOwner : Text,
-    publicLawEntity : Bool,
-    name : Text,
-    contactPerson : Text,
-    address : Text,
-    mail : Text,
+  public func addBasicInfoCustomer(
+    id : Text,
+    family_name : Text,
+    given_name : Text,
+    birth_date : Text, // ISO format
+    age_over_18 : Bool,
+    role : Text,
     phone : Text,
-    website : Text,
-
+    identityNumber : Text,
+    identityDoc : Blob,
+    verified : Bool,
+    cizitenship : [Text],
+    residency : Text,
   ) : async Text {
-    switch (users.get(userId)) {
+
+    switch (map.get(id)) {
       case (null) {
-        return "User does not exist.";
+        if (role == "") {
+          return "Role cannot be empty.";
+        };
+        if (phone == "" or identityNumber == "") {
+          return "Phone number and identity number cannot be empty.";
+        };
+        var newCustomer : Customer = {
+          id = id;
+          family_name = family_name;
+          given_name = given_name;
+          birth_date = birth_date;
+          age_over_18 = age_over_18;
+          role = role;
+          phone = phone;
+          //================================
+          age_over_NN = null;
+          age_in_years = null;
+          age_birth_year = null;
+          family_name_birth = null;
+          given_name_birth = null;
+          birth_place = null;
+          birth_country = null;
+          birth_state = null;
+          birth_city = null;
+          //===============================
+          resident_address = null;
+          resident_country = null;
+          resident_state = null;
+          resident_city = null;
+          resident_postal_code = null;
+          resident_street = null;
+          //================================
+          gender = null; // 0, 1, 2 for unspecified, male, female
+          nationality = null; // ISO Alpha-2 code
+          issuance_date = null; // ISO format
+          expiry_date = null; // ISO format
+          issuing_authority = null;
+          document_number = null;
+          issuing_country = null;
+          issuing_jurisdiction = null;
+
+          identityNumber = identityNumber;
+          identityDoc = identityDoc;
+          verified = verified;
+          cizitenship = cizitenship;
+          residency = residency;
+        };
+        map.put(id, newCustomer);
+        return "Customer added successfully.";
       };
-      case (?user) {
-        var store : ?Company = null;
-        var store2 : ?QualifiedEntity = null;
-        if (publicLawEntity) {
-           store2 := ?{
-            name = ?name;
-            contactPerson = ?contactPerson;
-            address = ?address;
-            mail = ?mail;
-            phone = ?phone;
-            website = ?website;
-          };
-        };
-        if (registerCompany) {
-          store := ?{
-            companyDetails = {
-              companyName = companyName;
-              registrationNumber = registrationNumber;
-              legalStructure = legalStructure;
-              registeredAddress = registeredAddress;
-              taxID = taxID;
-              ecnomicOwner = ecnomicOwner;
-              beneficialOwner = beneficialOwner;
-              incorporationCertificate = incorporationCertificate;
-              memorandumAndArticles = memorandumAndArticles;
-              publicLawEntity = publicLawEntity;
-              entity = store2;
-            };
-            representativeDetails = {
-              fullName = representativeFullName;
-              position = position;
-              idDocumentType = idDocumentType;
-              idDocumentNumber = idDocumentNumber;
-              idDocument = idDocument;
-              proofOfAuthority = proofOfAuthority;
-              email = emailRep;
-              phoneNumber = phoneNumber;
-            };
+      case (?value) {
 
-          };
-        };
+        return "Customer with this ID already exists.";
 
-        let adminUser = {
-          userId = userId;
-          coOwnStatus = true;
-          coAdminStatus = true;
-          isRegisteredCompany = registerCompany;
-          company = store;
-        };
-
-        let newGroup = {
-          name = groupName;
-          adminId = userId;
-          groupId = groupId;
-          privateGroup = groupAccess;
-          users = [adminUser];
-          authThenticatedUsers = [];
-
-        };
-
-        let updatedGroups = Array.append<Group>(user.groups, [newGroup]);
-        let updatedUser = {
-          user with
-          groups = updatedGroups
-        };
-        users.put(userId, updatedUser);
-
-        var a = Buffer.Buffer<Group>(0);
-        a.add(newGroup);
-        groups.put(groupId, a);
-
-        return "New group created.";
       };
     };
+
   };
 
-  public func joinGroup(
-    userId : Text,
-    groupId : Text,
-    registerCompany : Bool,
-    representativeFullName : Text,
-    position : Text,
-    idDocumentType : Text,
-    idDocumentNumber : Text,
-    idDocument : Blob,
-    proofOfAuthority : Blob,
-    email : Text,
-    phoneNumber : Text,
-
+  public func addFamilyCustomer(
+    id : Text,
+    age_over_NN : Bool,
+    age_in_years : Nat,
+    age_birth_year : Nat,
+    family_name_birth : Text,
+    given_name_birth : Text,
+    birth_place : Text,
+    birth_country : Text,
+    birth_state : Text,
+    birth_city : Text,
   ) : async Text {
-    var groupOwner : ?User = null;
-    var targetGroup : ?Group = null;
 
-    // Label the following block for a controlled exit with the ability to break out
-    label search_group {
-      for ((ownerId, user) in users.entries()) {
-        for (group in user.groups.vals()) {
-          if (group.groupId == groupId) {
-            groupOwner := ?user;
-            targetGroup := ?group;
-            break search_group; // Correctly breaking out of the loop when the group is found
-          };
-        };
-      };
-    };
-    switch (targetGroup, groupOwner) {
-      case (null, _) { return "Group not found." };
-      case (_, null) { return "Group not found." };
-      case (?group, ?owner) {
-        // Proceed to add the user to the group
-        if (not group.privateGroup) {
-          var store : ?Company = null;
-          if (registerCompany) {
-            store := ?{
-              companyDetails = {
-                companyName = "";
-                registrationNumber = "";
-                legalStructure = "";
-                registeredAddress = "";
-                taxID = "";
-                ecnomicOwner = "";
-                beneficialOwner = "";
-                incorporationCertificate = "";
-                memorandumAndArticles = "";
-                publicLawEntity = false;
-                entity = null;
-              };
-              representativeDetails = {
-                fullName = representativeFullName;
-                position = position;
-                idDocumentType = idDocumentType;
-                idDocumentNumber = idDocumentNumber;
-                idDocument = idDocument;
-                proofOfAuthority = proofOfAuthority;
-                email = email;
-                phoneNumber = phoneNumber;
-              };
-
-            };
-          };
-          let newUser = {
-            userId = userId;
-            coOwnStatus = false;
-            coAdminStatus = false;
-            isRegisteredCompany = false;
-            company = store;
-          };
-          // Add the new user to the group's user list
-          let updatedUsers = Array.append(group.users, [newUser]);
-          let updatedGroup = {
-            group with
-            users = updatedUsers
-          };
-
-          // Replace the old group with the updated group in the owner's list of groups
-          let updatedGroups = Array.map(
-            owner.groups,
-            func(g : Group) : Group {
-              if (g.groupId == groupId) {
-                return updatedGroup;
-              } else {
-                return g;
-              };
-            },
-          );
-
-          // // Update the user's information in the users HashMap
-          users.put(owner.userId, { owner with groups = updatedGroups });
-          // groups.put(groupId, updatedGroups);
-          switch (groups.get(groupId)) {
-            case (?x) {
-
-              var a = Buffer.Buffer<Group>(0);
-              a.add(updatedGroup);
-              groups.put(groupId, a);
-            };
-            case (null) {
-
-            };
-          };
-          return "Joined group successfully.";
-
-        } else {
-          return "Private group";
-        };
-        // Proceed to add the user to the group
-
-      };
-    };
-  };
-
-  public func getUser(userId : Text) : async ?User {
-    return users.get(userId);
-  };
-  public func getGroup(groupId : Text) : async [Group] {
-    switch (groups.get(groupId)) {
-      case (?x) {
-        return Buffer.toArray<Group>(x);
-      };
-      case (null) { return [] };
-    };
-  };
-  // OTP Generation
-  public func generateOTP(userId : Text) : async Text {
-    switch (users.get(userId)) {
+    switch (map.get(id)) {
       case (null) {
-        return "User does not exist.";
-      };
-      case (?user) {
-        let otp = await generateRandomOTP();
-        let now = Time.now();
 
-        let expiry : Int = now + (now % (5 * 60 * 1_000_000_000)); // OTP valid for 5 minutes
-        let updatedUser = {
-          user with
-          otp = ?otp;
-          otpExpiry = ?expiry;
+        return "Customer doesnot exsist.";
+      };
+      case (?value) {
+        let updatedProfile = {
+          value with
+          age_over_NN = ?age_over_NN;
+          age_in_years = ?age_in_years;
+          age_birth_year = ?age_birth_year;
+          family_name_birth = ?family_name_birth;
+          given_name_birth = ?given_name_birth;
+          birth_place = ?birth_place;
+          birth_country = ?birth_country;
+          birth_state = ?birth_state;
+          birth_city = ?birth_city;
         };
-        users.put(userId, updatedUser);
-        return otp;
+        map.put(id, updatedProfile);
+        return "Customer updated successfully.";
 
       };
     };
+
   };
 
-  public func generateRandomOTP() : async Text {
-    let seed = await Random.blob();
-    let finiteRandom = Random.Finite(seed);
-    let randNatOpt = finiteRandom.range(255); // Generate number between 0 and 255 (Nat8)
-    switch (randNatOpt) {
+  public func addOtherInfoCustomer(
+    id : Text,
+    gender : Nat, // 0, 1, 2 for unspecified, male, female
+    nationality : Text, // ISO Alpha-2 code
+    issuance_date : Text, // ISO format
+    expiry_date : Text, // ISO format
+    issuing_authority : Text,
+    document_number : Text,
+    issuing_country : Text,
+    issuing_jurisdiction : Text,
+  ) : async Text {
+
+    switch (map.get(id)) {
       case (null) {
-        return "000000"; // Fallback in case of random failure
+
+        return "Customer doesnot exsist.";
       };
-      case (?randNat) {
-        let rand = (randNat * 1000 + randNat) % 900000 + 100000; // Ensure it's a 6-digit number
-        return Nat.toText(rand);
+      case (?value) {
+        let updatedProfile = {
+          value with
+          gender = ?gender;
+          nationality = ?nationality;
+          issuance_date = ?issuance_date; // ISO format
+          expiry_date = ?expiry_date; // ISO format
+          issuing_authority = ?issuing_authority;
+          document_number = ?document_number;
+          issuing_country = ?issuing_country;
+          issuing_jurisdiction = ?issuing_jurisdiction;
+        };
+        map.put(id, updatedProfile);
+        return "Customer updated successfully.";
+
+      };
+    };
+
+  };
+
+  public func addResidencyCustomer(
+    id : Text,
+    resident_address : Text,
+    resident_country : Text,
+    resident_state : Text,
+    resident_city : Text,
+    resident_postal_code : Text,
+    resident_street : Text,
+  ) : async Text {
+
+    switch (map.get(id)) {
+      case (null) {
+
+        return "Customer doesnot exsist.";
+      };
+      case (?value) {
+        let updatedProfile = {
+          value with
+          resident_address = ?resident_address;
+          resident_country = ?resident_country;
+          resident_state = ?resident_state;
+          resident_city = ?resident_city;
+          resident_postal_code = ?resident_postal_code;
+          resident_street = ?resident_street;
+        };
+        map.put(id, updatedProfile);
+        return "Customer updated successfully.";
+
+      };
+    };
+
+  };
+  //owns account
+  //beneficicary
+  //executive
+  public func addImage(newCustomer : Text) : async Text {
+
+    map1.put("1", newCustomer);
+    return "success";
+  };
+
+  // Function to verify a customer
+  public func verifyCustomer(id : Text) : async Text {
+    //admin principal id
+    switch (map.get(id)) {
+      case (null) {
+        return "User profile does not exist";
+      };
+      case (?value) {
+        let updatedProfile = {
+          value with
+          verified = true;
+        };
+        map.put(id, updatedProfile);
+        return "Profile updated";
       };
     };
   };
 
-  public func verifyOTP(userId : Text, otp : Text) : async Bool {
-    switch (users.get(userId)) {
+  // Function to retrieve a customer's information
+  public query func getCustomer(id : Text) : async ?Customer {
+    return map.get(id);
+  };
+
+  public query func getCustomerImage(id : Text) : async ?Text {
+    return map1.get(id);
+  };
+  // Debugging: Function to list all customers (not recommended for production use)
+  public query func listCustomers() : async [Customer] {
+    let ids = Iter.toArray(map.vals());
+    return ids;
+  };
+
+  // Function to set the role of a customer
+  public shared (msg) func setRole(id : Text, setRole : Text) : async Text {
+    //admin
+    //operator
+    switch (map.get(id)) {
+      case (null) {
+        return "User profile does not exist.";
+      };
+      case (?value) {
+        if (setRole == "") {
+          return "Role cannot be empty.";
+        };
+        let updatedProfile = {
+          value with
+          role = setRole;
+        };
+        map.put(id, updatedProfile);
+        return "Role updated.";
+      };
+    };
+  };
+  //multiple citizenship 1 residency
+  // Function to update customer information
+  public func updateCustomer(id : Text, updatedCustomer : Customer) : async Text {
+    switch (map.get(id)) {
+      case (null) {
+        return "User profile does not exist";
+      };
+      case (?value) {
+        map.put(id, updatedCustomer);
+        return "Customer updated successfully.";
+      };
+    };
+  };
+
+  // Function to delete a customer
+  public func deleteCustomer(id : Text) : async Text {
+    switch (map.get(id)) {
+      case (null) {
+        return "User profile does not exist";
+      };
+      case (?value) {
+        map.delete(id);
+        return "Customer deleted successfully.";
+      };
+    };
+  };
+
+  // // Function to send email to a customer (mock implementation)
+  public func sendEmail(id : Text, subject : Text, body : Text) : async Text {
+    switch (map.get(id)) {
+      case (null) {
+        return "User profile does not exist";
+      };
+      case (?value) {
+        Debug.print("Sending email to " # id # " with subject: " # subject # " and body: " # body);
+        return "Email sent successfully.";
+      };
+    };
+  };
+
+  // // Function to check if the customer is an admin
+  public query func isAdmin(id : Text) : async Bool {
+    switch (map.get(id)) {
       case (null) {
         return false;
       };
-      case (?user) {
-        switch (user.otp, user.otpExpiry) {
-          case (?storedOtp, ?expiry) {
-            if (storedOtp == otp and Time.now() <= expiry) {
-              // OTP is valid
-              let updatedUser = {
-                user with
-                otp = null;
-                otpExpiry = null;
-                emailAuth = "verfified"; // Set emailAuth to true upon successful verification
-              };
-              users.put(userId, updatedUser);
-              return true;
-            } else {
-              return false;
-            };
-          };
-          case _ {
-            return false;
-          };
-        };
+      case (?value) {
+        return value.role == "Admin";
       };
     };
   };
+
+  // // Function to check if the customer is a registered user
+  public query func isRegisteredUser(id : Text) : async Bool {
+    switch (map.get(id)) {
+      case (null) {
+        return false;
+      };
+      case (?value) {
+        return value.role == "Registered User";
+      };
+    };
+  };
+
+  public query func getCustomersByRole(role : Text) : async [Customer] {
+    let customers = Iter.filter<Customer>(
+      map.vals(),
+      func(customer) : Bool {
+        customer.role == role;
+      },
+    );
+    return Iter.toArray(customers);
+  };
+
+  // Function to check if a customer is verified
+  public query func isVerified(id : Text) : async Bool {
+    switch (map.get(id)) {
+      case (null) {
+        return false;
+      };
+      case (?value) {
+        return value.verified;
+      };
+    };
+  };
+
+  // Function to get a list of verified customers
+  public query func getVerifiedCustomers() : async [Customer] {
+    let verifiedCustomers = Iter.filter<Customer>(
+      map.vals(),
+      func(customer) : Bool {
+        customer.verified;
+      },
+    );
+    return Iter.toArray(verifiedCustomers);
+  };
+
+  //chat App
+
+  type Messaging = {
+    MessageId : Text;
+    Messages : Message;
+  };
+
+  type Message = {
+    SenderUserId : Text;
+    ReceiverUserId : Text;
+    Description : Text;
+  };
+
+  private stable var messageEntries : [(Text, [Messaging])] = [];
+  var message = HashMap.HashMap<Text, Buffer.Buffer<Messaging>>(0, Text.equal, Text.hash);
+
+  public func createMessaging(senderId : Text, receiverId : Text, description : Text) : async Bool {
+    let timeStamp = Time.now();
+
+    let newMessageId = Text.concat(senderId, receiverId);
+    let newMessageId2 = Text.concat(receiverId, senderId);
+    var messageId = newMessageId;
+
+    switch (message.get(newMessageId2)) {
+      case (?x) {
+        messageId := newMessageId2;
+      };
+      case (null) {};
+    };
+
+    let messageData : Messaging = {
+      MessageId = messageId;
+      Messages = {
+        SenderUserId = senderId;
+        ReceiverUserId = receiverId;
+        Description = description;
+      };
+    };
+
+    switch (message.get(messageId)) {
+      case (?x) {
+        x.add(messageData);
+        let res = message.put(messageId, x);
+        return true;
+      };
+      case (null) {
+        var userMessageBuffer = Buffer.Buffer<Messaging>(0);
+        userMessageBuffer.add(messageData);
+        message.put(messageId, userMessageBuffer);
+        return true;
+      };
+
+    };
+
+  };
+
+  public query func getMessaging(senderId : Text, receiverId : Text) : async [Messaging] {
+    let newMessageId = Text.concat(senderId, receiverId);
+    let newMessageId2 = Text.concat(receiverId, senderId);
+
+    switch (message.get(newMessageId)) {
+      case (?x) {
+        return Buffer.toArray<Messaging>(x);
+      };
+      case (null) {
+
+        switch (message.get(newMessageId2)) {
+          case (?x) {
+            return Buffer.toArray<Messaging>(x);
+          };
+          case (null) {
+
+            return [];
+          };
+        };
+
+      };
+    };
+
+  };
+
   system func preupgrade() {
-    userEntries := Iter.toArray(users.entries());
-    // groupEntries := Iter.toArray(groups.entries().map(func((key, buffer)) { (key, Buffer.toArray(buffer)) }));
+    mapEntries := Iter.toArray(map.entries());
+
+    let Entries1 = Iter.toArray(message.entries());
+    var data1 = Map.HashMap<Text, [Messaging]>(0, Text.equal, Text.hash);
+
+    for (x in Iter.fromArray(Entries1)) {
+      data1.put(x.0, Buffer.toArray<Messaging>(x.1));
+    };
+    messageEntries := Iter.toArray(data1.entries());
 
   };
   system func postupgrade() {
-    users := HashMap.fromIter<Text, User>(userEntries.vals(), 1, Text.equal, Text.hash);
-    // groups := HashMap.fromIter<Text, Buffer.Buffer<Group>>(groupEntries.map(func((key, array)) { (key, Buffer.fromArray(array)) }), 1, Text.equal, Text.hash);
+    map := HashMap.fromIter<Text, Customer>(mapEntries.vals(), 1, Text.equal, Text.hash);
 
+    let his1 = HashMap.fromIter<Text, [Messaging]>(messageEntries.vals(), 1, Text.equal, Text.hash);
+    let Entries1 = Iter.toArray(his1.entries());
+    for (x in Iter.fromArray(Entries1)) {
+      message.put(x.0, Buffer.fromArray<Messaging>(x.1));
+    };
   };
 };
