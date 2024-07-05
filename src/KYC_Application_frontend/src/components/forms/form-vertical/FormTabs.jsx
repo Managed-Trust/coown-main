@@ -17,10 +17,6 @@ import {
   FormControlLabel,
   Alert
 } from '@mui/material';
-import TabContext from "@mui/lab/TabContext";
-import TabList from "@mui/lab/TabList";
-import TabPanel from "@mui/lab/TabPanel";
-import BlankCard from "../../shared/BlankCard";
 import ic from "ic0";
 import WebcamCapture from "../../../WebCapture";
 import CustomFormLabel from '../theme-elements/CustomFormLabel';
@@ -28,8 +24,13 @@ import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import ParentCard from '../../../components/shared/ParentCard';
 import PageContainer from '../../../components/container/PageContainer';
 import Breadcrumb from '../../../layouts/full/shared/breadcrumb/Breadcrumb';
-import { ConnectButton, ConnectDialog, Connect2ICProvider, useConnect } from "@connect2ic/react";
 
+import {
+  ConnectButton,
+  ConnectDialog,
+  Connect2ICProvider,
+  useConnect,
+} from "@connect2ic/react";
 const ledger = ic.local("bkyz2-fmaaa-aaaaa-qaaaq-cai"); // Ledger canister
 
 const countries = [
@@ -68,6 +69,16 @@ const FormTabs = () => {
 
   const isStepOptional = (step) => false;
   const isStepSkipped = (step) => skipped.has(step);
+
+  const { isConnected, principal, activeProvider } = useConnect({
+    onConnect: () => {
+      // Signed in
+    },
+    onDisconnect: () => {
+      // Signed out
+    }
+  });
+
 
   const handleNext = () => {
     let newSkipped = skipped;
@@ -136,20 +147,41 @@ const FormTabs = () => {
     }
   };
 
-  const handleSubmitStep = () => {
-    console.log('Step Submitted', formData);
-    handleNext();
-  };
-
   const handleCapture = async (imageSrc) => {
     setImage(imageSrc);
-
     try {
-      // Add your logic to handle the image capture here
       console.log("Captured Image: ", imageSrc);
     } catch (error) {
       console.error("There was a problem with the capture operation:", error);
     }
+  };
+
+  const handlePersonalDetailsSubmit = () => {
+    console.log('Personal Details Submitted', formData);
+    handleNext();
+  };
+
+  const handleAddressDetailsSubmit = () => {
+    console.log('Address Details Submitted', formData);
+    handleNext();
+  };
+
+  const handleDocumentDetailsSubmit = () => {
+    console.log('Document Details Submitted', formData);
+    handleNext();
+  };
+
+  const handleCaptureImageSubmit = async () => {
+    console.log('Image Captured', image);
+
+    try {
+      const response = await ledger.call("addImage", principal, image);
+      alert(response);
+    } catch (e) {
+      console.log("Error creating user:", e);
+    }
+
+    handleNext();
   };
 
   const handleSteps = (step) => {
@@ -242,6 +274,24 @@ const FormTabs = () => {
                 </Select>
               </Grid>
             </Grid>
+            <Box mt={3} display="flex" justifyContent="space-between">
+              <Button
+                variant="contained"
+                color="inherit"
+                disabled={activeStep === 0}
+                onClick={handleBack}
+              >
+                Back
+              </Button>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handlePersonalDetailsSubmit}
+                disabled={!isFormValid(0)}
+              >
+                Next
+              </Button>
+            </Box>
           </Box>
         );
       case 1:
@@ -306,6 +356,23 @@ const FormTabs = () => {
                 <TextField id="openchat_id" fullWidth onChange={handleInputChange} value={formData.openchat_id} />
               </Grid>
             </Grid>
+            <Box mt={3} display="flex" justifyContent="space-between">
+              <Button
+                variant="contained"
+                color="inherit"
+                onClick={handleBack}
+              >
+                Back
+              </Button>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handleAddressDetailsSubmit}
+                disabled={!isFormValid(1)}
+              >
+                Next
+              </Button>
+            </Box>
           </Box>
         );
       case 2:
@@ -400,6 +467,23 @@ const FormTabs = () => {
                 </Box>
               )}
             </Box>
+            <Box mt={3} display="flex" justifyContent="space-between">
+              <Button
+                variant="contained"
+                color="inherit"
+                onClick={handleBack}
+              >
+                Back
+              </Button>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handleDocumentDetailsSubmit}
+                disabled={!isFormValid(2)}
+              >
+                Next
+              </Button>
+            </Box>
           </Box>
         );
       case 3:
@@ -407,16 +491,32 @@ const FormTabs = () => {
           <Box>
             {!image ? (
               <div>
-                {/* Uncomment the next line and import WebcamCapture when using */}
-                 <WebcamCapture onCapture={handleCapture} /> 
+                <WebcamCapture onCapture={handleCapture} />
               </div>
             ) : (
               <div>
                 <h2>Captured Image:</h2>
                 <img src={image} alt="Captured" />
-                <button onClick={() => setImage(null)}>Retake</button>
+                <Button onClick={() => setImage(null)}>Retake</Button>
               </div>
             )}
+            <Box mt={3} display="flex" justifyContent="space-between">
+              <Button
+                variant="contained"
+                color="inherit"
+                onClick={handleBack}
+              >
+                Back
+              </Button>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handleCaptureImageSubmit}
+                disabled={!isFormValid(3)}
+              >
+                Finish
+              </Button>
+            </Box>
           </Box>
         );
       default:
@@ -462,7 +562,7 @@ const FormTabs = () => {
             <>
               <Box>{handleSteps(activeStep)}</Box>
 
-              <Box display="flex" flexDirection="row" mt={3}>
+              {/* <Box display="flex" flexDirection="row" mt={3}>
                 <Button
                   color="inherit"
                   variant="contained"
@@ -473,15 +573,7 @@ const FormTabs = () => {
                   Back
                 </Button>
                 <Box flex="1 1 auto" />
-                <Button
-                  onClick={handleSubmitStep}
-                  variant="contained"
-                  color={activeStep === steps.length - 1 ? 'success' : 'secondary'}
-                  disabled={!isFormValid(activeStep)}
-                >
-                  {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
-                </Button>
-              </Box>
+              </Box> */}
             </>
           )}
         </Box>

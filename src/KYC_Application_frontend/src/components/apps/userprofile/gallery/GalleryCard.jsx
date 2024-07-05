@@ -6,7 +6,6 @@ import {
   Typography,
   Chip,
   TextField,
-  InputAdornment,
   IconButton,
   CardMedia,
   Skeleton,
@@ -20,7 +19,7 @@ import BlankCard from '../../../../components/shared/BlankCard';
 import CustomFormLabel from '../../../forms/theme-elements/CustomFormLabel';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchPhotos } from '../../../../store/apps/userProfile/UserProfileSlice';
-import { IconDotsVertical, IconSearch } from '@tabler/icons';
+import { IconDotsVertical } from '@tabler/icons';
 import { format } from 'date-fns';
 import { useConnect } from '@connect2ic/react';
 import ic from 'ic0';
@@ -32,7 +31,7 @@ const initialState = {
   otp: '',
   groupName: '',
   groupId: '',
-  groupAccess: false,
+  entityType: '',
   registerCompany: false,
   companyName: '',
   registrationNumber: '',
@@ -144,7 +143,6 @@ const GalleryCard = () => {
         principal,
         formData.groupName,
         formData.groupId,
-        formData.groupAccess,
         formData.registerCompany,
         formData.companyName,
         formData.registrationNumber,
@@ -252,36 +250,22 @@ const GalleryCard = () => {
                   <TextField id="groupId" fullWidth onChange={handleInputChange} />
                 </Grid>
                 <Grid item xs={12} md={6}>
-                  <CustomFormLabel htmlFor="groupAccess">Group Access</CustomFormLabel>
+                  <CustomFormLabel htmlFor="entityType">Entity Type</CustomFormLabel>
                   <FormControl fullWidth>
                     <Select
-                      labelId="groupAccess-label"
-                      id="groupAccess"
-                      name="groupAccess"
-                      value={formData.groupAccess}
+                      labelId="entityType-label"
+                      id="entityType"
+                      name="entityType"
+                      value={formData.entityType}
                       onChange={handleInputChange}
                     >
-                      <MenuItem value={true}>Public</MenuItem>
-                      <MenuItem value={false}>Private</MenuItem>
+                      <MenuItem value="">Select Entity Type</MenuItem>
+                      <MenuItem value="registerCompany">Register Company</MenuItem>
+                      <MenuItem value="publicLawEntity">Public Law Entity</MenuItem>
                     </Select>
                   </FormControl>
                 </Grid>
-                <Grid item xs={12} md={6}>
-                  <CustomFormLabel htmlFor="registerCompany">Register Company</CustomFormLabel>
-                  <FormControl fullWidth>
-                    <Select
-                      labelId="registerCompany-label"
-                      id="registerCompany"
-                      name="registerCompany"
-                      value={formData.registerCompany}
-                      onChange={handleInputChange}
-                    >
-                      <MenuItem value={true}>Yes</MenuItem>
-                      <MenuItem value={false}>No</MenuItem>
-                    </Select>
-                  </FormControl>
-                </Grid>
-                {formData.registerCompany && (
+                {formData.entityType === 'registerCompany' && (
                   <>
                     <Grid item xs={12} md={6}>
                       <CustomFormLabel htmlFor="companyName">Company Name</CustomFormLabel>
@@ -391,49 +375,34 @@ const GalleryCard = () => {
                       <CustomFormLabel htmlFor="beneficialOwner">Beneficial Owner</CustomFormLabel>
                       <TextField id="beneficialOwner" fullWidth onChange={handleInputChange} />
                     </Grid>
+                  </>
+                )}
+                {formData.entityType === 'publicLawEntity' && (
+                  <>
                     <Grid item xs={12} md={6}>
-                      <CustomFormLabel htmlFor="publicLawEntity">Public Law Entity</CustomFormLabel>
-                      <FormControl fullWidth>
-                        <Select
-                          labelId="publicLawEntity-label"
-                          id="publicLawEntity"
-                          name="publicLawEntity"
-                          value={formData.publicLawEntity}
-                          onChange={handleInputChange}
-                        >
-                          <MenuItem value={true}>Yes</MenuItem>
-                          <MenuItem value={false}>No</MenuItem>
-                        </Select>
-                      </FormControl>
+                      <CustomFormLabel htmlFor="name">Entity Name</CustomFormLabel>
+                      <TextField id="name" fullWidth onChange={handleInputChange} />
                     </Grid>
-                    {formData.publicLawEntity && (
-                      <>
-                        <Grid item xs={12} md={6}>
-                          <CustomFormLabel htmlFor="name">Entity Name</CustomFormLabel>
-                          <TextField id="name" fullWidth onChange={handleInputChange} />
-                        </Grid>
-                        <Grid item xs={12} md={6}>
-                          <CustomFormLabel htmlFor="contactPerson">Contact Person</CustomFormLabel>
-                          <TextField id="contactPerson" fullWidth onChange={handleInputChange} />
-                        </Grid>
-                        <Grid item xs={12} md={6}>
-                          <CustomFormLabel htmlFor="address">Address</CustomFormLabel>
-                          <TextField id="address" fullWidth onChange={handleInputChange} />
-                        </Grid>
-                        <Grid item xs={12} md={6}>
-                          <CustomFormLabel htmlFor="mail">Email</CustomFormLabel>
-                          <TextField id="mail" fullWidth onChange={handleInputChange} />
-                        </Grid>
-                        <Grid item xs={12} md={6}>
-                          <CustomFormLabel htmlFor="phone">Phone</CustomFormLabel>
-                          <TextField id="phone" fullWidth onChange={handleInputChange} />
-                        </Grid>
-                        <Grid item xs={12} md={6}>
-                          <CustomFormLabel htmlFor="website">Website</CustomFormLabel>
-                          <TextField id="website" fullWidth onChange={handleInputChange} />
-                        </Grid>
-                      </>
-                    )}
+                    <Grid item xs={12} md={6}>
+                      <CustomFormLabel htmlFor="contactPerson">Contact Person</CustomFormLabel>
+                      <TextField id="contactPerson" fullWidth onChange={handleInputChange} />
+                    </Grid>
+                    <Grid item xs={12} md={6}>
+                      <CustomFormLabel htmlFor="address">Address</CustomFormLabel>
+                      <TextField id="address" fullWidth onChange={handleInputChange} />
+                    </Grid>
+                    <Grid item xs={12} md={6}>
+                      <CustomFormLabel htmlFor="mail">Email</CustomFormLabel>
+                      <TextField id="mail" fullWidth onChange={handleInputChange} />
+                    </Grid>
+                    <Grid item xs={12} md={6}>
+                      <CustomFormLabel htmlFor="phone">Phone</CustomFormLabel>
+                      <TextField id="phone" fullWidth onChange={handleInputChange} />
+                    </Grid>
+                    <Grid item xs={12} md={6}>
+                      <CustomFormLabel htmlFor="website">Website</CustomFormLabel>
+                      <TextField id="website" fullWidth onChange={handleInputChange} />
+                    </Grid>
                   </>
                 )}
                 <Grid item xs={12} md={12} lg={12}>
