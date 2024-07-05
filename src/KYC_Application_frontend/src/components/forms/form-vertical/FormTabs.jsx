@@ -408,7 +408,7 @@ const FormTabs = () => {
             {!image ? (
               <div>
                 {/* Uncomment the next line and import WebcamCapture when using */}
-                {/* <WebcamCapture onCapture={handleCapture} /> */}
+                 <WebcamCapture onCapture={handleCapture} /> 
               </div>
             ) : (
               <div>

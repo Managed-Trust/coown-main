@@ -1,7 +1,8 @@
-// WebcamCapture.jsx
 import React, { useRef, useCallback } from "react";
 import Webcam from "react-webcam";
-
+import {
+  Button,
+} from '@mui/material';
 const WebcamCapture = ({ onCapture }) => {
   const webcamRef = useRef(null);
 
@@ -21,7 +22,7 @@ const WebcamCapture = ({ onCapture }) => {
           facingMode: "user",
         }}
       />
-      <button onClick={capture}>Capture Photo</button>
+      <Button onClick={capture}>Capture Photo</Button>
     </div>
   );
 };
