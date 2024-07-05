@@ -19,7 +19,7 @@ import Blob "mo:base/Blob";
 import Float "mo:base/Float";
 import ExperimentalStableMemory "mo:base/ExperimentalStableMemory";
 import StableMemory "mo:base/ExperimentalStableMemory";
-import Main2 "main2";
+import Random "mo:base/Random";
 
 actor KYC_Canister {
 
@@ -68,6 +68,8 @@ actor KYC_Canister {
   private stable var mapEntries : [(Text, Customer)] = [];
   var map = HashMap.HashMap<Text, Customer>(0, Text.equal, Text.hash);
 
+  private stable var userEntries : [(Text, User)] = [];
+  var users = HashMap.HashMap<Text, User>(0, Text.equal, Text.hash);
   //==================================================================================
 
   // Storage for customer data
@@ -110,64 +112,75 @@ actor KYC_Canister {
     cizitenship : [Text],
     residency : Text,
   ) : async Text {
-
-    switch (map.get(id)) {
+    switch (users.get(id)) {
       case (null) {
-        if (role == "") {
-          return "Role cannot be empty.";
-        };
-        if (phone == "" or identityNumber == "") {
-          return "Phone number and identity number cannot be empty.";
-        };
-        var newCustomer : Customer = {
-          id = id;
-          family_name = family_name;
-          given_name = given_name;
-          birth_date = birth_date;
-          age_over_18 = age_over_18;
-          role = role;
-          phone = phone;
-          //================================
-          age_over_NN = null;
-          age_in_years = null;
-          age_birth_year = null;
-          family_name_birth = null;
-          given_name_birth = null;
-          birth_place = null;
-          birth_country = null;
-          birth_state = null;
-          birth_city = null;
-          //===============================
-          resident_address = null;
-          resident_country = null;
-          resident_state = null;
-          resident_city = null;
-          resident_postal_code = null;
-          resident_street = null;
-          //================================
-          gender = null; // 0, 1, 2 for unspecified, male, female
-          nationality = null; // ISO Alpha-2 code
-          issuance_date = null; // ISO format
-          expiry_date = null; // ISO format
-          issuing_authority = null;
-          document_number = null;
-          issuing_country = null;
-          issuing_jurisdiction = null;
-          image = null;
-          status = null;
-          identityNumber = identityNumber;
-          identityDoc = identityDoc;
-          verified = verified;
-          cizitenship = cizitenship;
-          residency = residency;
-        };
-        map.put(id, newCustomer);
-        return "Customer added successfully.";
+        return "Not verifid";
       };
-      case (?value) {
+      case (?user) {
+        if (user.emailAuth == "verified") {
+          switch (map.get(id)) {
+            case (null) {
+              if (role == "") {
+                return "Role cannot be empty.";
+              };
+              if (phone == "" or identityNumber == "") {
+                return "Phone number and identity number cannot be empty.";
+              };
+              var newCustomer : Customer = {
+                id = id;
+                family_name = family_name;
+                given_name = given_name;
+                birth_date = birth_date;
+                age_over_18 = age_over_18;
+                role = role;
+                phone = phone;
+                //================================
+                age_over_NN = null;
+                age_in_years = null;
+                age_birth_year = null;
+                family_name_birth = null;
+                given_name_birth = null;
+                birth_place = null;
+                birth_country = null;
+                birth_state = null;
+                birth_city = null;
+                //===============================
+                resident_address = null;
+                resident_country = null;
+                resident_state = null;
+                resident_city = null;
+                resident_postal_code = null;
+                resident_street = null;
+                //================================
+                gender = null; // 0, 1, 2 for unspecified, male, female
+                nationality = null; // ISO Alpha-2 code
+                issuance_date = null; // ISO format
+                expiry_date = null; // ISO format
+                issuing_authority = null;
+                document_number = null;
+                issuing_country = null;
+                issuing_jurisdiction = null;
+                image = null;
+                status = null;
+                identityNumber = identityNumber;
+                identityDoc = identityDoc;
+                verified = verified;
+                cizitenship = cizitenship;
+                residency = residency;
+              };
+              map.put(id, newCustomer);
+              return "Customer added successfully.";
+            };
+            case (?value) {
 
-        return "Customer with this ID already exists.";
+              return "Customer with this ID already exists.";
 
+            };
+          };
+
+        } else {
+          return "email not verified";
+        };
       };
     };
 
@@ -521,9 +534,123 @@ actor KYC_Canister {
 
   };
 
+  //====================================================================================
+
+  public type User = {
+    id : Text;
+    emailAuth : Text;
+    email : Text;
+    otp : ?Text;
+    otpExpiry : ?Int;
+  };
+
+  // public type Group = {
+  //   name : Text;
+  //   adminId : Text;
+  //   groupId : Nat;
+  //   privateGroup : Bool;
+  //   // users : [GroupUser];
+  //   authThenticatedUsers : [Text];
+  // };
+
+  public func generateOTP(userId : Text) : async Text {
+    switch (users.get(userId)) {
+      case (null) {
+        return "User does not exist.";
+      };
+      case (?user) {
+        let otp = await generateRandomOTP();
+        let now = Time.now();
+
+        let expiry : Int = now + (now % (5 * 60 * 1_000_000_000)); // OTP valid for 5 minutes
+        let updatedUser = {
+          user with
+          otp = ?otp;
+          otpExpiry = ?expiry;
+        };
+        users.put(userId, updatedUser);
+        return otp;
+
+      };
+    };
+  };
+
+  public func generateRandomOTP() : async Text {
+    let seed = await Random.blob();
+    let finiteRandom = Random.Finite(seed);
+    let randNatOpt = finiteRandom.range(255); // Generate number between 0 and 255 (Nat8)
+    switch (randNatOpt) {
+      case (null) {
+        return "000000"; // Fallback in case of random failure
+      };
+      case (?randNat) {
+        let rand = (randNat * 1000 + randNat) % 900000 + 100000; // Ensure it's a 6-digit number
+        return Nat.toText(rand);
+      };
+    };
+  };
+
+  public func verifyOTP(userId : Text, otp : Text) : async Bool {
+    switch (users.get(userId)) {
+      case (null) {
+        return false;
+      };
+      case (?user) {
+        switch (user.otp, user.otpExpiry) {
+          case (?storedOtp, ?expiry) {
+            if (storedOtp == otp and Time.now() <= expiry) {
+              // OTP is valid
+              let updatedUser = {
+                user with
+                otp = null;
+                otpExpiry = null;
+                emailAuth = "verified"; // Set emailAuth to true upon successful verification
+              };
+              users.put(userId, updatedUser);
+              return true;
+            } else {
+              return false;
+            };
+          };
+          case _ {
+            return false;
+          };
+        };
+      };
+    };
+  };
+
+  public type Group = {
+    name : Text;
+    adminId : Text;
+    privateGroup : Bool;
+    // users : [GroupUser];
+    // authThenticatedUsers : [Text];
+  };
+
+  public func createUser(
+    userId : Text,
+    email : Text
+
+  ) : async Text {
+
+    let newUser = {
+      id = userId;
+      emailAuth = "pending";
+      email = email;
+      otp = null;
+      otpExpiry = null;
+      // groups = [defaultGroup];
+
+    };
+
+    users.put(userId, newUser);
+    return "User created with default group.";
+  };
+
   system func preupgrade() {
     mapEntries := Iter.toArray(map.entries());
-
+    //==========================================================
     let Entries1 = Iter.toArray(message.entries());
     var data1 = Map.HashMap<Text, [Messaging]>(0, Text.equal, Text.hash);
 
@@ -531,15 +658,23 @@ actor KYC_Canister {
       data1.put(x.0, Buffer.toArray<Messaging>(x.1));
     };
     messageEntries := Iter.toArray(data1.entries());
+    //==========================================================
+    userEntries := Iter.toArray(users.entries());
+    //==========================================================
 
   };
   system func postupgrade() {
     map := HashMap.fromIter<Text, Customer>(mapEntries.vals(), 1, Text.equal, Text.hash);
+    //==========================================================
 
     let his1 = HashMap.fromIter<Text, [Messaging]>(messageEntries.vals(), 1, Text.equal, Text.hash);
     let Entries1 = Iter.toArray(his1.entries());
     for (x in Iter.fromArray(Entries1)) {
       message.put(x.0, Buffer.fromArray<Messaging>(x.1));
     };
+    //==========================================================
+    users := HashMap.fromIter<Text, User>(userEntries.vals(), 1, Text.equal, Text.hash);
+    //==========================================================
+
   };
 };
