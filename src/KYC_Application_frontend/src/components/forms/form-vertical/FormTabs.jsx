@@ -30,7 +30,7 @@ import PageContainer from '../../../components/container/PageContainer';
 import Breadcrumb from '../../../layouts/full/shared/breadcrumb/Breadcrumb';
 import { ConnectButton, ConnectDialog, Connect2ICProvider, useConnect } from "@connect2ic/react";
 
-const ledger = ic.local("bd3sg-teaaa-aaaaa-qaaba-cai"); // Ledger canister
+const ledger = ic.local("bkyz2-fmaaa-aaaaa-qaaaq-cai"); // Ledger canister
 
 const countries = [
   { value: 'IN', label: 'India' },

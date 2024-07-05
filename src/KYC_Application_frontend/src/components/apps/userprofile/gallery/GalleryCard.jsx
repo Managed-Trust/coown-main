@@ -204,7 +204,7 @@ const GalleryCard = () => {
     console.log("Invite User Data:", formData);
     try {
       const response = await ledger.call(
-        "inviteUserToGroup",
+        "addUsersToGroup",
         principal,
         formData.inviteUserId,
         formData.inviteGroupId
