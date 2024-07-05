@@ -68,6 +68,9 @@ actor KYC_Canister {
   private stable var mapEntries : [(Text, Customer)] = [];
   var map = HashMap.HashMap<Text, Customer>(0, Text.equal, Text.hash);
 
+  private stable var mapEntries1 : [(Text, Text)] = [];
+  var map1 = HashMap.HashMap<Text, Text>(0, Text.equal, Text.hash);
+
   //==================================================================================
 
   // Storage for customer data
@@ -329,6 +332,9 @@ actor KYC_Canister {
     return map.get(id);
   };
 
+  public query func getCustomerImage(id : Text) : async ?Text {
+    return map1.get(id);
+  };
   // Debugging: Function to list all customers (not recommended for production use)
   public query func listCustomers() : async [Customer] {
     let ids = Iter.toArray(map.vals());
@@ -379,6 +385,19 @@ actor KYC_Canister {
       case (?value) {
         map.delete(id);
         return "Customer deleted successfully.";
+      };
+    };
+  };
+
+  // // Function to send email to a customer (mock implementation)
+  public func sendEmail(id : Text, subject : Text, body : Text) : async Text {
+    switch (map.get(id)) {
+      case (null) {
+        return "User profile does not exist";
+      };
+      case (?value) {
+        Debug.print("Sending email to " # id # " with subject: " # subject # " and body: " # body);
+        return "Email sent successfully.";
       };
     };
   };
