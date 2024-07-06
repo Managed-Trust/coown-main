@@ -332,7 +332,48 @@ actor KYC_Canister {
           verified = true;
         };
         map.put(id, updatedProfile);
+        let defaultGroup : Group = {
+          name = "defaultGroup";
+          adminId = id;
+          defaultGroup = true;
+        };
+        groups.put(id, defaultGroup);
+
+        switch (groupIds.get(id)) {
+          case (?buffer) {
+            buffer.add(id);
+            groupIds.put(id, buffer);
+          };
+          case (null) {
+            var newBuffer = Buffer.Buffer<Text>(0);
+            newBuffer.add(id);
+            groupIds.put(id, newBuffer);
+          };
+        };
         return "Profile updated";
+      };
+    };
+  };
+
+  // Function to update an existing group ID
+  public func updateGroupId(groupId : Text, userIds : [Text]) : async Text {
+    var newBuffer = Buffer.Buffer<Text>(0);
+    for (userId in userIds.vals()) {
+      newBuffer.add(userId);
+    };
+    groupIds.put(groupId, newBuffer);
+    return "Group ID updated successfully.";
+  };
+
+  // Function to delete a group ID
+  public func deleteGroupId(groupId : Text) : async Text {
+    switch (groupIds.get(groupId)) {
+      case (?buffer) {
+        groupIds.delete(groupId);
+        return "Group ID deleted successfully.";
+      };
+      case (null) {
+        return "Group ID does not exist.";
       };
     };
   };
@@ -623,10 +664,65 @@ actor KYC_Canister {
   public type Group = {
     name : Text;
     adminId : Text;
-    privateGroup : Bool;
+    defaultGroup : Bool;
     // users : [GroupUser];
     // authThenticatedUsers : [Text];
   };
+
+  private stable var groupEntries : [(Text, Group)] = [];
+  var groups = HashMap.HashMap<Text, Group>(0, Text.equal, Text.hash);
+
+  // Function to create a new group
+  public func createGroup(groupId : Text, groupName : Text, adminId : Text) : async Text {
+    switch (groups.get(groupId)) {
+      case (?existingGroup) {
+        return "Group with this ID already exists.";
+      };
+      case (null) {
+        let newGroup : Group = {
+          name = groupName;
+          adminId = adminId;
+          defaultGroup = false;
+        };
+        groups.put(groupId, newGroup);
+        var newBuffer = Buffer.Buffer<Text>(0);
+        newBuffer.add(adminId);
+        groupIds.put(groupId, newBuffer);
+        return "Group created successfully.";
+      };
+    };
+  };
+
+  // Function to join an existing group
+  // public func joinGroup(groupId : Text, userId : Text) : async Text {
+  //   switch (groups.get(groupId)) {
+  //     case (null) {
+  //       return "Group does not exist.";
+  //     };
+  //     case (?group) {
+  //       switch (groupIds.get(groupId)) {
+  //         case (?buffer) {
+  //           if (Buffer.find(buffer, func(x) { x == userId }) != null) {
+  //             return "User already in the group.";
+  //           } else {
+  //             buffer.add(userId);
+  //             groupIds.put(groupId, buffer);
+  //             return "User added to the group.";
+  //           };
+  //         };
+  //         case (null) {
+  //           var newBuffer = Buffer.Buffer<Text>(0);
+  //           newBuffer.add(userId);
+  //           groupIds.put(groupId, newBuffer);
+  //           return "User added to the group.";
+  //         };
+  //       };
+  //     };
+  //   };
+  // };
+  //================================================================================//
+  private stable var groupIdEntries : [(Text, [Text])] = [];
+  var groupIds = HashMap.HashMap<Text, Buffer.Buffer<Text>>(0, Text.equal, Text.hash);
 
   public func createUser(
     userId : Text,
@@ -640,8 +736,6 @@ actor KYC_Canister {
       email = email;
       otp = null;
       otpExpiry = null;
-      // groups = [defaultGroup];
-
     };
 
     users.put(userId, newUser);
@@ -661,6 +755,17 @@ actor KYC_Canister {
     //==========================================================
     userEntries := Iter.toArray(users.entries());
     //==========================================================
+    groupEntries := Iter.toArray(groups.entries());
+    //==========================================================
+
+    let Entries = Iter.toArray(groupIds.entries());
+    var data = Map.HashMap<Text, [Text]>(0, Text.equal, Text.hash);
+
+    for (x in Iter.fromArray(Entries)) {
+      data.put(x.0, Buffer.toArray<Text>(x.1));
+    };
+    groupIdEntries := Iter.toArray(data.entries());
+    // groupIdEntries := Iter.toArray(groupIds.entries());
 
   };
   system func postupgrade() {
@@ -675,6 +780,14 @@ actor KYC_Canister {
     //==========================================================
     users := HashMap.fromIter<Text, User>(userEntries.vals(), 1, Text.equal, Text.hash);
     //==========================================================
+    groups := HashMap.fromIter<Text, Group>(groupEntries.vals(), 1, Text.equal, Text.hash);
+    //==========================================================
+    let his = HashMap.fromIter<Text, [Text]>(groupIdEntries.vals(), 1, Text.equal, Text.hash);
+    let Entries = Iter.toArray(his.entries());
+    for (x in Iter.fromArray(Entries)) {
+      groupIds.put(x.0, Buffer.fromArray<Text>(x.1));
+    };
+    // groupIds := HashMap.fromIter<Text, Buffer.Buffer<Text>>(groupIdEntries.vals(), 1, Text.equal, Text.hash);
 
   };
 };
