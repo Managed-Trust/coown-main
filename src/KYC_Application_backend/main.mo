@@ -103,12 +103,9 @@ actor KYC_Canister {
     family_name : Text,
     given_name : Text,
     birth_date : Text, // ISO format
-    age_over_18 : Bool,
-    role : Text,
     phone : Text,
     identityNumber : Text,
     identityDoc : Blob,
-    verified : Bool,
     cizitenship : [Text],
     residency : Text,
   ) : async Text {
@@ -120,9 +117,9 @@ actor KYC_Canister {
         if (user.emailAuth == "verified") {
           switch (map.get(id)) {
             case (null) {
-              if (role == "") {
-                return "Role cannot be empty.";
-              };
+              // if (true) {
+              //   return "Role cannot be empty.";
+              // };
               if (phone == "" or identityNumber == "") {
                 return "Phone number and identity number cannot be empty.";
               };
@@ -131,8 +128,8 @@ actor KYC_Canister {
                 family_name = family_name;
                 given_name = given_name;
                 birth_date = birth_date;
-                age_over_18 = age_over_18;
-                role = role;
+                age_over_18 = false;
+                role = "user";
                 phone = phone;
                 //================================
                 age_over_NN = null;
@@ -164,7 +161,7 @@ actor KYC_Canister {
                 status = null;
                 identityNumber = identityNumber;
                 identityDoc = identityDoc;
-                verified = verified;
+                verified = false;
                 cizitenship = cizitenship;
                 residency = residency;
               };
@@ -188,11 +185,6 @@ actor KYC_Canister {
 
   public func addFamilyCustomer(
     id : Text,
-    age_over_NN : Bool,
-    age_in_years : Nat,
-    age_birth_year : Nat,
-    family_name_birth : Text,
-    given_name_birth : Text,
     birth_place : Text,
     birth_country : Text,
     birth_state : Text,
@@ -207,11 +199,8 @@ actor KYC_Canister {
       case (?value) {
         let updatedProfile = {
           value with
-          age_over_NN = ?age_over_NN;
-          age_in_years = ?age_in_years;
-          age_birth_year = ?age_birth_year;
-          family_name_birth = ?family_name_birth;
-          given_name_birth = ?given_name_birth;
+          age_over_NN = ?false;
+          age_in_years = ?18;
           birth_place = ?birth_place;
           birth_country = ?birth_country;
           birth_state = ?birth_state;
@@ -336,6 +325,11 @@ actor KYC_Canister {
           name = "defaultGroup";
           adminId = id;
           defaultGroup = true;
+          groupUsers = [id];
+          isRegisteredCompany = ?false;
+          publicLawEntity = null;
+          isPublicLawEntity = ?false;
+          company = null;
         };
         groups.put(id, defaultGroup);
 
@@ -665,30 +659,215 @@ actor KYC_Canister {
     name : Text;
     adminId : Text;
     defaultGroup : Bool;
+    groupUsers : [Text];
+    isRegisteredCompany : ?Bool;
+    publicLawEntity : ?PublicLawEntity;
+    isPublicLawEntity : ?Bool;
+    company : ?Company;
     // users : [GroupUser];
     // authThenticatedUsers : [Text];
+  };
+
+  public type PublicLawEntity = {
+    entityName : Text;
+    jurisdiction : Text;
+    establishmentDate : Text; // ISO format
+    function : Text;
+    contactDetails : ContactDetails;
+  };
+
+  public type ContactDetails = {
+    address : Text;
+    phoneNumber : Text;
+    email : Text;
+  };
+
+  public type Company = {
+    companyDetails : {
+      companyName : Text;
+      registrationNumber : Text;
+      legalStructure : Text;
+      registeredAddress : Text;
+      taxID : Text;
+      beneficialOwner : Text;
+      incorporationCertificate : Blob;
+      memorandumAndArticles : Blob;
+      // entity : ?QualifiedEntity;
+    };
+    representativeDetails : {
+      fullName : Text;
+      position : Text;
+      idDocumentType : Text;
+      idDocumentNumber : Text;
+      idDocument : Blob;
+      proofOfAuthority : Blob;
+      email : Text;
+      phoneNumber : Text;
+    };
+    // to remove these fields// log need to be maintained
+
+  };
+
+  public func declareGroupAsPublicLawEntity(
+    groupId : Text,
+    entityName : Text,
+    jurisdiction : Text,
+    establishmentDate : Text,
+    function : Text,
+    address : Text,
+    phoneNumber : Text,
+    email : Text,
+    caller : Text,
+  ) : async Text {
+    switch (groups.get(groupId)) {
+      case (null) { "Group does not exist." };
+
+      case (?group) {
+
+        if (group.adminId != caller) {
+          return "Only the group admin can declare the group as a public law entity.";
+        } else {
+          let newPublicLawEntity : PublicLawEntity = {
+            entityName = entityName;
+            jurisdiction = jurisdiction;
+            establishmentDate = establishmentDate;
+            function = function;
+            contactDetails = {
+              address = address;
+              phoneNumber = phoneNumber;
+              email = email;
+            };
+          };
+          let updatedGroup = {
+            group with
+            publicLawEntity = ?newPublicLawEntity;
+            isPublicLawEntity = ?true;
+          };
+          groups.put(groupId, updatedGroup);
+          return "Group declared as public law entity successfully.";
+        };
+        return "success";
+      };
+    };
+  };
+
+  public func declareGroupAsCompany(
+    groupId : Text,
+    userId : Text,
+    companyName : Text,
+    registrationNumber : Text,
+    legalStructure : Text,
+    registeredAddress : Text,
+    taxID : Text,
+    beneficialOwner : Text,
+    incorporationCertificate : Blob,
+    memorandumAndArticles : Blob,
+    representativeFullName : Text,
+    representativePosition : Text,
+    idDocumentType : Text,
+    idDocumentNumber : Text,
+    idDocument : Blob,
+    proofOfAuthority : Blob,
+    email : Text,
+    phoneNumber : Text,
+  ) : async Text {
+    switch (groups.get(groupId)) {
+      case (null) { "Group does not exist." };
+      case (?group) {
+        if (group.adminId != userId) {
+          return "Only the group admin can register the company.";
+        } else {
+          let newCompany : Company = {
+            companyDetails = {
+              companyName = companyName;
+              registrationNumber = registrationNumber;
+              legalStructure = legalStructure;
+              registeredAddress = registeredAddress;
+              taxID = taxID;
+              beneficialOwner = beneficialOwner;
+              incorporationCertificate = incorporationCertificate;
+              memorandumAndArticles = memorandumAndArticles;
+            };
+            representativeDetails = {
+              fullName = representativeFullName;
+              position = representativePosition;
+              idDocumentType = idDocumentType;
+              idDocumentNumber = idDocumentNumber;
+              idDocument = idDocument;
+              proofOfAuthority = proofOfAuthority;
+              email = email;
+              phoneNumber = phoneNumber;
+            };
+          };
+          // let updatedGroup = {
+          //   group with
+          //   company = ?newCompany;
+          //   isRegisteredCompany = ?true;
+          // };
+          // groups.put(groupId, updatedGroup);
+          return "Company registered successfully within group: ";
+        };
+      };
+    };
   };
 
   private stable var groupEntries : [(Text, Group)] = [];
   var groups = HashMap.HashMap<Text, Group>(0, Text.equal, Text.hash);
 
   // Function to create a new group
-  public func createGroup(groupId : Text, groupName : Text, adminId : Text) : async Text {
+  public func createGroup(groupName : Text, adminId : Text, rand : Text) : async Text {
+    var groupId = Text.concat(adminId, rand);
     switch (groups.get(groupId)) {
       case (?existingGroup) {
         return "Group with this ID already exists.";
       };
       case (null) {
-        let newGroup : Group = {
-          name = groupName;
-          adminId = adminId;
-          defaultGroup = false;
+        switch (users.get(adminId)) {
+          case (null) {
+            return "Not verifid";
+          };
+          case (?user) {
+            if (user.emailAuth == "verified") {
+              let newGroup : Group = {
+                name = groupName;
+                adminId = adminId;
+                defaultGroup = false;
+                groupUsers = [adminId];
+                isRegisteredCompany = ?false;
+                publicLawEntity = null;
+                isPublicLawEntity = ?false;
+                company = null;
+              };
+              groups.put(groupId, newGroup);
+              var newBuffer = Buffer.Buffer<Text>(0);
+              newBuffer.add(groupId);
+              groupIds.put(adminId, newBuffer);
+              return "Group created successfully.";
+            } else {
+              return "Not verifid";
+            };
+
+          };
         };
-        groups.put(groupId, newGroup);
+      };
+    };
+  };
+  public func joinGroup(groupId : Text, userId : Text) : async Text {
+    switch (groups.get(groupId)) {
+      case (?existingGroup) {
         var newBuffer = Buffer.Buffer<Text>(0);
-        newBuffer.add(adminId);
-        groupIds.put(groupId, newBuffer);
+        newBuffer.add(groupId);
+        var updatedGroup = {
+          existingGroup with groupUsers = Array.append(existingGroup.groupUsers, [userId]);
+        };
+        groups.put(groupId, updatedGroup);
+        groupIds.put(userId, newBuffer);
         return "Group created successfully.";
+      };
+      case (null) {
+
+        return "Group with this ID already exists.";
+
       };
     };
   };
@@ -723,7 +902,7 @@ actor KYC_Canister {
   //================================================================================//
   private stable var groupIdEntries : [(Text, [Text])] = [];
   var groupIds = HashMap.HashMap<Text, Buffer.Buffer<Text>>(0, Text.equal, Text.hash);
-
+  //user to group ids
   public func createUser(
     userId : Text,
     email : Text
