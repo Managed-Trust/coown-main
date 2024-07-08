@@ -487,8 +487,9 @@ actor KYC_Canister {
     );
     return Iter.toArray(verifiedCustomers);
   };
-
+  //=====================================================================================
   //chat App
+  //=====================================================================================
 
   type Messaging = {
     MessageId : Text;
@@ -920,6 +921,93 @@ actor KYC_Canister {
     users.put(userId, newUser);
     return "User created with default group.";
   };
+
+  //=====================================================================================
+  //Operator
+  //=====================================================================================
+
+  type Operator = {
+    operatorId : Text;
+    operatorName : Text;
+    exclusiveCountries : [Text];
+    superAdminId : ?Text;
+    defaultGroupId : ?Text;
+    nominatedCEO : ?Text;
+    nominatedComplianceOfficer : ?Text;
+    nominatedDirector : ?Text;
+    knownUsers : ?[Text];
+    clients : ?[Text];
+    records : ?[Text];
+  };
+
+  private stable var operatorEntries : [(Text, Operator)] = [];
+  var operators : HashMap.HashMap<Text, Operator> = HashMap.HashMap<Text, Operator>(0, Text.equal, Text.hash);
+
+  public func addOperator(operatorId : Text, operatorName : Text, exclusiveCountries : [Text]) : async Text {
+    let existingOperator = operators.get(operatorId);
+    switch (existingOperator) {
+      case (null) {
+        let newOperator : Operator = {
+          operatorId = operatorId;
+          operatorName = operatorName;
+          exclusiveCountries = exclusiveCountries;
+          superAdminId = null;
+          defaultGroupId = null;
+          nominatedCEO = null;
+          nominatedComplianceOfficer = null;
+          nominatedDirector = null;
+          knownUsers = null;
+          clients = null;
+          records = null;
+        };
+        operators.put(operatorId, newOperator);
+        return "Operator added successfully.";
+      };
+      case (_) {
+        return "Operator with this ID already exists.";
+      };
+    };
+  };
+  // Function to update an existing operator with optional fields
+  public func updateOperator(
+    operatorId : Text,
+    superAdminId : ?Text,
+    defaultGroupId : ?Text,
+    nominatedCEO : ?Text,
+    nominatedComplianceOfficer : ?Text,
+    nominatedDirector : ?Text,
+    knownUsers : ?[Text],
+    clients : ?[Text],
+    records : ?[Text],
+  ) : async Text {
+    let existingOperator = operators.get(operatorId);
+    switch (existingOperator) {
+      case (null) {
+        return "Operator not found.";
+      };
+      case (?existing) {
+        // Update only the fields that are provided
+        let updatedOperator : Operator = {
+          existing with
+          operatorId = operatorId;
+          superAdminId = superAdminId;
+          defaultGroupId = defaultGroupId;
+          nominatedCEO = nominatedCEO;
+          nominatedComplianceOfficer = nominatedComplianceOfficer;
+          nominatedDirector = nominatedDirector;
+          knownUsers = knownUsers;
+          clients = clients;
+          records = records;
+        };
+        operators.put(operatorId, updatedOperator);
+        return "Operator updated successfully.";
+      };
+    };
+  };
+  //============================================================
+
+  
+  //============================================================
 
   system func preupgrade() {
     mapEntries := Iter.toArray(map.entries());
