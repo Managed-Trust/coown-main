@@ -311,7 +311,7 @@ actor KYC_Canister {
   // Function to verify a customer
   public func verifyCustomer(id : Text) : async Text {
     //admin principal id
-  
+
     switch (map.get(id)) {
       case (null) {
         return "User profile does not exist";
@@ -749,10 +749,10 @@ actor KYC_Canister {
     groupName : Text,
     adminId : Text,
     rand : Text,
-    addressOfLegalEntity : ?Text,
-    residencyOfGroup : ?Text,
-    groupDescription : ?Text,
-    groupImage : ?Text,
+    addressOfLegalEntity : Text,
+    residencyOfGroup : Text,
+    groupDescription : Text,
+    groupImage : Text,
   ) : async Text {
     let groupId = Text.concat(adminId, rand);
     switch (groups.get(groupId)) {
@@ -766,11 +766,11 @@ actor KYC_Canister {
                 name = groupName;
                 adminId = adminId;
                 defaultGroup = false;
-                addressOfLegalEntity = addressOfLegalEntity;
+                addressOfLegalEntity = ?addressOfLegalEntity;
                 personalRecords = [];
-                residencyOfGroup = residencyOfGroup;
-                groupDescription = groupDescription;
-                groupImage = groupImage;
+                residencyOfGroup = ?residencyOfGroup;
+                groupDescription = ?groupDescription;
+                groupImage = ?groupImage;
                 isRegisteredCompany = ?false;
                 publicLawEntity = null;
                 isPublicLawEntity = ?false;
