@@ -23,6 +23,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { fetchPhotos } from '../../../../store/apps/userProfile/UserProfileSlice';
 import { IconDotsVertical } from '@tabler/icons';
 import { format } from 'date-fns';
+import emailjs from "@emailjs/browser";
 import { useConnect } from '@connect2ic/react';
 import ic from 'ic0';
 
@@ -230,6 +231,27 @@ const GalleryCard = () => {
       console.log("Invite User Response:", response);
     } catch (e) {
       console.log("Error Inviting User:", e);
+    }finally{
+      const emailParams = {
+        to_email: formData.email
+      };
+
+      emailjs
+      .send('service_idh0h15', 'template_d21fhkr', emailParams, 'Y4QJDpwjrsdi3tQAR')
+      .then(
+        () => {
+          console.log('SUCCESS!');
+        },
+        (error) => {
+          console.log('FAILED...', error.text);
+        }
+      )
+      .catch((error) => {
+        console.log("Error sending Email:", error);
+      })
+      .finally(() => {
+        alert("Email sent to " + formData.email);
+      });
     }
   };
 
