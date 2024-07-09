@@ -14,6 +14,8 @@ import Followers from "../../views/apps/user-profile/Followers.jsx";
 import Friends from "../../views/apps/user-profile/Friends.jsx";
 import Gallery from "../../views/apps/user-profile/Gallery.jsx";
 import FormHorizontal from "../../views/forms/FormHorizontal";
+import Settings  from '../../views/apps/user-profile/Settings.jsx';
+import GroupDetailPage from '../../components/apps/userprofile/gallery/GroupDetail.jsx';
 import {
   ConnectDialog,
   
@@ -67,7 +69,9 @@ const FullLayout = () => {
               <Route path="/apps/friends" element={<Friends />} />
               <Route path="/apps/gallery" element={<Gallery />} />
               <Route path="/user-profile" element={<UserProfile />} />
+              <Route path="/user-profile/Settings" element={<Settings />} />
               <Route path="/forms/form-horizontal" element={<FormHorizontal />} />
+              <Route path="/group/:id" element={<GroupDetailPage />} />
             </Routes>
           </Box>
         </Container>

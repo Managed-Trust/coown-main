@@ -1,6 +1,6 @@
 import React from 'react';
 import { Tabs, Tab, Box } from '@mui/material';
-import { IconHeart, IconPhoto, IconUserCircle,IconLock, IconCash } from '@tabler/icons';
+import { IconHeart, IconPhoto, IconUserCircle,IconLock, IconCash,IconSettings } from '@tabler/icons';
 import { Link, useLocation } from 'react-router-dom';
 
 const ProfileTab = () => {
@@ -29,6 +29,11 @@ const ProfileTab = () => {
       label: 'Financial',
       icon: <IconCash size="20" />,
       to: '/apps/friends',
+    },
+    {
+      label: 'Settings',
+      icon: <IconSettings size="20" />,
+      to: '/user-profile/Settings',
     },
   ];
 

@@ -14,6 +14,7 @@ import {
   IconDownload,
   IconMail,
   IconPlayerPause,
+  IconPhone,
   IconTruckDelivery,
 } from '@tabler/icons';
 
@@ -21,21 +22,19 @@ const NotificationTab = () => {
   return (
     <>
       <Grid container spacing={3} justifyContent="center">
-        <Grid item xs={12} lg={9}>
+        <Grid item xs={12} lg={12}>
           <BlankCard>
             <CardContent>
               <Typography variant="h4" mb={2}>
-                Notification Preferences
+                Privacy Settings
               </Typography>
               <Typography color="textSecondary">
-                Select the notificaitons ou would like to receive via email. Please note that you
-                cannot opt out of receving service messages, such as payment, security or legal
-                notifications.
+                User Can adjust his/her privacy settings accordingly.
               </Typography>
 
-              <CustomFormLabel htmlFor="text-email">Email Address*</CustomFormLabel>
+              {/* <CustomFormLabel htmlFor="text-email">Email Address*</CustomFormLabel>
               <CustomTextField id="text-email" variant="outlined" fullWidth />
-              <Typography color="textSecondary">Required for notificaitons.</Typography>
+              <Typography color="textSecondary">Required for notificaitons.</Typography> */}
 
               {/* list 1 */}
               <Stack direction="row" spacing={2} mt={4}>
@@ -47,10 +46,10 @@ const NotificationTab = () => {
                 </Avatar>
                 <Box>
                   <Typography variant="h6" mb={1}>
-                    Our newsletter
+                    Display Address
                   </Typography>
                   <Typography variant="subtitle1" color="textSecondary">
-                    We'll always let you know about important changes
+                    User's address will be displayed to group members
                   </Typography>
                 </Box>
                 <Box sx={{ ml: 'auto !important' }}>
@@ -64,56 +63,14 @@ const NotificationTab = () => {
                   variant="rounded"
                   sx={{ bgcolor: 'grey.100', color: 'grey.500', width: 48, height: 48 }}
                 >
-                  <IconCheckbox size="22" />
+                  <IconPhone size="22" />
                 </Avatar>
                 <Box>
                   <Typography variant="h6" mb={1}>
-                    Order Confirmation
+                    Display Phone Number
                   </Typography>
                   <Typography variant="subtitle1" color="textSecondary">
-                    You will be notified when customer order any product
-                  </Typography>
-                </Box>
-                <Box sx={{ ml: 'auto !important' }}>
-                  <CustomSwitch checked />
-                </Box>
-              </Stack>
-
-              {/* list 3 */}
-              <Stack direction="row" spacing={2} mt={3}>
-                <Avatar
-                  variant="rounded"
-                  sx={{ bgcolor: 'grey.100', color: 'grey.500', width: 48, height: 48 }}
-                >
-                  <IconClock size="22" />
-                </Avatar>
-                <Box>
-                  <Typography variant="h6" mb={1}>
-                    Order Status Changed
-                  </Typography>
-                  <Typography variant="subtitle1" color="textSecondary">
-                    You will be notified when customer make changes to the order
-                  </Typography>
-                </Box>
-                <Box sx={{ ml: 'auto !important' }}>
-                  <CustomSwitch checked />
-                </Box>
-              </Stack>
-
-              {/* list 4 */}
-              <Stack direction="row" spacing={2} mt={3}>
-                <Avatar
-                  variant="rounded"
-                  sx={{ bgcolor: 'grey.100', color: 'grey.500', width: 48, height: 48 }}
-                >
-                  <IconTruckDelivery size="22" />
-                </Avatar>
-                <Box>
-                  <Typography variant="h6" mb={1}>
-                    Order Delivered
-                  </Typography>
-                  <Typography variant="subtitle1" color="textSecondary">
-                    You will be notified once the order is delivered
+                    User's phone number will be displayed to group members.
                   </Typography>
                 </Box>
                 <Box sx={{ ml: 'auto !important' }}>
@@ -121,31 +78,12 @@ const NotificationTab = () => {
                 </Box>
               </Stack>
 
-              {/* list 5 */}
-              <Stack direction="row" spacing={2} mt={3}>
-                <Avatar
-                  variant="rounded"
-                  sx={{ bgcolor: 'grey.100', color: 'grey.500', width: 48, height: 48 }}
-                >
-                  <IconMail size="22" />
-                </Avatar>
-                <Box>
-                  <Typography variant="h6" mb={1}>
-                    Email Notification
-                  </Typography>
-                  <Typography variant="subtitle1" color="textSecondary">
-                    Turn on email notificaiton to get updates through email
-                  </Typography>
-                </Box>
-                <Box sx={{ ml: 'auto !important' }}>
-                  <CustomSwitch checked />
-                </Box>
-              </Stack>
+
             </CardContent>
           </BlankCard>
         </Grid>
 
-        {/* 2 */}
+{/*    
         <Grid item xs={12} lg={9}>
           <BlankCard>
             <CardContent>
@@ -156,7 +94,7 @@ const NotificationTab = () => {
                 Time zones and calendar display settings.
               </Typography>
 
-              {/* list 1 */}
+            
               <Stack direction="row" spacing={2} mt={4}>
                 <Avatar
                   variant="rounded"
@@ -184,7 +122,7 @@ const NotificationTab = () => {
           </BlankCard>
         </Grid>
 
-        {/* 3 */}
+      
         <Grid item xs={12} lg={9}>
           <BlankCard>
             <CardContent>
@@ -192,7 +130,7 @@ const NotificationTab = () => {
                 Ignore Tracking
               </Typography>
 
-              {/* list 1 */}
+             
               <Stack direction="row" spacing={2} mt={4}>
                 <Avatar
                   variant="rounded"
@@ -214,17 +152,17 @@ const NotificationTab = () => {
               </Stack>
             </CardContent>
           </BlankCard>
-        </Grid>
+        </Grid> */}
       </Grid>
 
-      <Stack direction="row" spacing={2} sx={{ justifyContent: 'end' }} mt={3}>
+      {/* <Stack direction="row" spacing={2} sx={{ justifyContent: 'end' }} mt={3}>
         <Button size="large" variant="contained" color="primary">
           Save
         </Button>
         <Button size="large" variant="text" color="error">
           Cancel
         </Button>
-      </Stack>
+      </Stack> */}
     </>
   );
 };
