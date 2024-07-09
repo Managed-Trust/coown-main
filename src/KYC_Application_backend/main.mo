@@ -575,6 +575,64 @@ actor KYC_Canister {
 
   };
 
+  //===================================================================================
+
+  type GroupMessaging = {
+    MessageId : Text;
+    Messages : GroupMessage;
+  };
+
+  type GroupMessage = {
+    SenderUserId : Text;
+    Description : Text;
+  };
+
+  private stable var groupMessageEntries : [(Text, [GroupMessaging])] = [];
+  var groupMessage = HashMap.HashMap<Text, Buffer.Buffer<GroupMessaging>>(0, Text.equal, Text.hash);
+
+  public func createGroupMessaging(groupId : Text, senderId : Text, description : Text) : async Bool {
+    let timeStamp = Time.now();
+
+    var messageId = groupId;
+
+    let messageData : GroupMessaging = {
+      MessageId = messageId;
+      Messages = {
+        SenderUserId = senderId;
+        Description = description;
+      };
+    };
+
+    switch (groupMessage.get(messageId)) {
+      case (?x) {
+        x.add(messageData);
+        let res = groupMessage.put(messageId, x);
+        return true;
+      };
+      case (null) {
+        var userMessageBuffer = Buffer.Buffer<GroupMessaging>(0);
+        userMessageBuffer.add(messageData);
+        groupMessage.put(messageId, userMessageBuffer);
+        return true;
+      };
+
+    };
+    return true;
+  };
+
+  public query func getGroupMessaging(groupId : Text) : async [GroupMessaging] {
+
+    switch (groupMessage.get(groupId)) {
+      case (?x) {
+        return Buffer.toArray<GroupMessaging>(x);
+      };
+      case (null) {
+        return [];
+      };
+    };
+
+  };
+
   //====================================================================================
 
   public type User = {
