@@ -789,7 +789,7 @@ actor KYC_Canister {
 
   public func addPersonalRecordToGroup(
     groupId : Text,
-    userId : ?Text, // Optional user ID
+    userId : Text, // Optional user ID
     email : Text,
     contactDetails : Text,
     recordType : PersonalRecordType,
@@ -802,7 +802,7 @@ actor KYC_Canister {
       case (?group) {
         var record : PersonalRecord = {
           groupId = groupId;
-          userId = userId; // Optional user ID
+          userId = ?userId; // Optional user ID
           email = email;
           contactDetails = contactDetails;
           recordType = recordType;
