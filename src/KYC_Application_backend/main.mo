@@ -311,6 +311,11 @@ actor KYC_Canister {
   // Function to verify a customer
   public func verifyCustomer(id : Text) : async Text {
     //admin principal id
+    var userData : GroupUser = {
+      userId = id;
+      role = "admin";
+      status = "joined";
+    };
     switch (map.get(id)) {
       case (null) {
         return "User profile does not exist";
@@ -325,7 +330,12 @@ actor KYC_Canister {
           name = "defaultGroup";
           adminId = id;
           defaultGroup = true;
-          groupUsers = [id];
+          groupUsers = [userData];
+          personalRecords = [];
+          addressOfLegalEntity = null;
+          residencyOfGroup = null;
+          groupDescription = null;
+          groupImage = null;
           isRegisteredCompany = ?false;
           publicLawEntity = null;
           isPublicLawEntity = ?false;
@@ -488,7 +498,7 @@ actor KYC_Canister {
     return Iter.toArray(verifiedCustomers);
   };
   //=====================================================================================
-  //chat App
+  //chat Feature
   //=====================================================================================
 
   type Messaging = {
@@ -580,15 +590,9 @@ actor KYC_Canister {
     otpExpiry : ?Int;
   };
 
-  // public type Group = {
-  //   name : Text;
-  //   adminId : Text;
-  //   groupId : Nat;
-  //   privateGroup : Bool;
-  //   // users : [GroupUser];
-  //   authThenticatedUsers : [Text];
-  // };
-
+  //==============================================================
+  //OTP logic
+  //==============================================================
   public func generateOTP(userId : Text) : async Text {
     switch (users.get(userId)) {
       case (null) {
@@ -655,18 +659,57 @@ actor KYC_Canister {
       };
     };
   };
+  //==============================================================
+  //Group logic
+  //==============================================================
 
-  public type Group = {
+  public type PersonalRecordType = {
+    #EconomicBeneficiary;
+    #ExecutiveMember;
+    #InvitedViewer;
+    #LeadOperator; // Hidden from regular users
+    #StaffMember; // Hidden from regular users
+  };
+
+  public type PersonalRecordStatus = {
+    #Drafted; // Drafted by Creator
+    #Verified; // Verified by User or Email Holder
+    #Approved; // Approved by AML Officer
+  };
+
+  public type PersonalRecord = {
+    userId : ?Text; // Optional user ID
+    email : Text;
+    contactDetails : Text;
+    recordType : PersonalRecordType;
+    recordStatus : PersonalRecordStatus;
+  };
+
+  public type PersonalRecordConnection = {
+    link : Bool; // Is Personal Record associated with a System User?
+  };
+
+  //==============================================================
+  type GroupUser = {
+    userId : Text;
+    role : Text;
+    status : Text; //pending// joined // rejected
+  };
+
+  type Group = {
     name : Text;
     adminId : Text;
     defaultGroup : Bool;
-    groupUsers : [Text];
+    groupUsers : [GroupUser]; // Updated to use GroupUser type
+    personalRecords : [PersonalRecord]; // New field to store personal records
+    addressOfLegalEntity : ?Text;
+    residencyOfGroup : ?Text;
+    groupDescription : ?Text;
+    groupImage : ?Text;
     isRegisteredCompany : ?Bool;
     publicLawEntity : ?PublicLawEntity;
     isPublicLawEntity : ?Bool;
     company : ?Company;
-    // users : [GroupUser];
-    // authThenticatedUsers : [Text];
   };
 
   public type PublicLawEntity = {
@@ -707,6 +750,155 @@ actor KYC_Canister {
     };
     // to remove these fields// log need to be maintained
 
+  };
+
+  // Function to create a new group
+  private stable var groupEntries : [(Text, Group)] = [];
+  var groups = HashMap.HashMap<Text, Group>(0, Text.equal, Text.hash);
+
+  public func createGroup(
+    groupName : Text,
+    adminId : Text,
+    rand : Text,
+    addressOfLegalEntity : ?Text,
+    residencyOfGroup : ?Text,
+    groupDescription : ?Text,
+    groupImage : ?Text,
+  ) : async Text {
+    let groupId = Text.concat(adminId, rand);
+    switch (groups.get(groupId)) {
+      case (?existingGroup) { return "Group with this ID already exists." };
+      case (null) {
+        switch (users.get(adminId)) {
+          case (null) { return "Not verified" };
+          case (?user) {
+            if (user.emailAuth == "verified") {
+              let newGroup : Group = {
+                name = groupName;
+                adminId = adminId;
+                defaultGroup = false;
+                groupUsers = [{
+                  userId = adminId;
+                  role = "Admin";
+                  status = "joined";
+                }];
+                addressOfLegalEntity = addressOfLegalEntity;
+                personalRecords = [];
+                residencyOfGroup = residencyOfGroup;
+                groupDescription = groupDescription;
+                groupImage = groupImage;
+                isRegisteredCompany = ?false;
+                publicLawEntity = null;
+                isPublicLawEntity = ?false;
+                company = null;
+              };
+              groups.put(groupId, newGroup);
+              return "Group created successfully.";
+            } else {
+              return "Not verified";
+            };
+          };
+        };
+      };
+    };
+  };
+
+  public func addPersonalRecordToGroup(groupId : Text, record : PersonalRecord) : async Text {
+    switch (groups.get(groupId)) {
+      case (null) { "Group does not exist." };
+      case (?group) {
+        let updatedRecords = Array.append(group.personalRecords, [record]);
+        let updatedGroup = { group with personalRecords = updatedRecords };
+        groups.put(groupId, updatedGroup);
+        "Personal record added successfully.";
+      };
+    };
+  };
+  public func joinGroupProposal(groupId : Text, userId : Text, role : Text) : async Text {
+    var userData : GroupUser = {
+      userId = userId;
+      role = role;
+      status = "requested";
+    };
+    switch (groups.get(groupId)) {
+      case (?existingGroup) {
+        var newBuffer = Buffer.Buffer<Text>(0);
+        newBuffer.add(groupId);
+        var updatedGroup = {
+          existingGroup with groupUsers = Array.append(existingGroup.groupUsers, [userData]);
+        };
+        groups.put(groupId, updatedGroup);
+        groupIds.put(userId, newBuffer);
+        return "success";
+      };
+      case (null) {
+        return "Group with this ID already exists.";
+      };
+    };
+  };
+
+  public func updateGroup(
+    groupId : Text,
+    newGroupName : Text, // Optional, pass null if no change
+    newAddress : ?Text, // Optional, pass null if no change
+    newResidency : ?Text, // Optional, pass null if no change
+    newDescription : ?Text, // Optional, pass null if no change
+    newImage : ?Text // Optional, pass null if no change
+  ) : async Text {
+    switch (groups.get(groupId)) {
+      case (null) { return "Group does not exist." }; // Group not found
+      case (?group) {
+        // Update group with new details if provided, otherwise keep old
+        var updatedGroup : Group = {
+          group with
+          name = newGroupName;
+          addressOfLegalEntity = newAddress;
+          residencyOfGroup = newResidency;
+          groupDescription = newDescription;
+          groupImage = newImage;
+        };
+        groups.put(groupId, updatedGroup); // Save the updated group details
+        return "Group updated successfully.";
+      };
+    };
+  };
+
+  // // Helper function to find the index of a user in a group
+
+  public func updateGroupUserStatus(groupId : Text, userId : Text, newStatus : Text) : async Text {
+    switch (groups.get(groupId)) {
+      case (null) {
+        "Group does not exist.";
+      };
+      case (?group) {
+        var updated = false;
+        // Correctly map over the groupUsers to update the status
+        let updatedUsers = Array.map(
+          group.groupUsers,
+          func(user : GroupUser) : GroupUser {
+            if (user.userId == userId) {
+              updated := true;
+              return {
+                userId = user.userId;
+                role = user.role;
+                status = newStatus;
+              };
+            } else {
+              return user;
+            };
+          },
+        );
+
+        if (updated) {
+          let updatedGroup = { group with groupUsers = updatedUsers };
+          groups.put(groupId, updatedGroup);
+          return "User status updated successfully.";
+        } else {
+          return "User not found in group.";
+        };
+        return "success";
+      };
+    };
   };
 
   public func declareGroupAsPublicLawEntity(
@@ -808,67 +1000,6 @@ actor KYC_Canister {
           // groups.put(groupId, updatedGroup);
           return "Company registered successfully within group: ";
         };
-      };
-    };
-  };
-
-  private stable var groupEntries : [(Text, Group)] = [];
-  var groups = HashMap.HashMap<Text, Group>(0, Text.equal, Text.hash);
-
-  // Function to create a new group
-  public func createGroup(groupName : Text, adminId : Text, rand : Text) : async Text {
-    var groupId = Text.concat(adminId, rand);
-    switch (groups.get(groupId)) {
-      case (?existingGroup) {
-        return "Group with this ID already exists.";
-      };
-      case (null) {
-        switch (users.get(adminId)) {
-          case (null) {
-            return "Not verifid";
-          };
-          case (?user) {
-            if (user.emailAuth == "verified") {
-              let newGroup : Group = {
-                name = groupName;
-                adminId = adminId;
-                defaultGroup = false;
-                groupUsers = [adminId];
-                isRegisteredCompany = ?false;
-                publicLawEntity = null;
-                isPublicLawEntity = ?false;
-                company = null;
-              };
-              groups.put(groupId, newGroup);
-              var newBuffer = Buffer.Buffer<Text>(0);
-              newBuffer.add(groupId);
-              groupIds.put(adminId, newBuffer);
-              return "Group created successfully.";
-            } else {
-              return "Not verifid";
-            };
-
-          };
-        };
-      };
-    };
-  };
-  public func joinGroup(groupId : Text, userId : Text) : async Text {
-    switch (groups.get(groupId)) {
-      case (?existingGroup) {
-        var newBuffer = Buffer.Buffer<Text>(0);
-        newBuffer.add(groupId);
-        var updatedGroup = {
-          existingGroup with groupUsers = Array.append(existingGroup.groupUsers, [userId]);
-        };
-        groups.put(groupId, updatedGroup);
-        groupIds.put(userId, newBuffer);
-        return "Group created successfully.";
-      };
-      case (null) {
-
-        return "Group with this ID already exists.";
-
       };
     };
   };
@@ -1006,7 +1137,6 @@ actor KYC_Canister {
   };
   //============================================================
 
-  
   //============================================================
 
   system func preupgrade() {
