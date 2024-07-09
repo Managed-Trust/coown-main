@@ -311,11 +311,7 @@ actor KYC_Canister {
   // Function to verify a customer
   public func verifyCustomer(id : Text) : async Text {
     //admin principal id
-    var userData : GroupUser = {
-      userId = id;
-      role = "admin";
-      status = "joined";
-    };
+  
     switch (map.get(id)) {
       case (null) {
         return "User profile does not exist";
@@ -330,7 +326,6 @@ actor KYC_Canister {
           name = "defaultGroup";
           adminId = id;
           defaultGroup = true;
-          groupUsers = [userData];
           personalRecords = [];
           addressOfLegalEntity = null;
           residencyOfGroup = null;
@@ -690,17 +685,11 @@ actor KYC_Canister {
   };
 
   //==============================================================
-  type GroupUser = {
-    userId : Text;
-    role : Text;
-    status : Text; //pending// joined // rejected
-  };
 
   type Group = {
     name : Text;
     adminId : Text;
     defaultGroup : Bool;
-    groupUsers : [GroupUser]; // Updated to use GroupUser type
     personalRecords : [PersonalRecord]; // New field to store personal records
     addressOfLegalEntity : ?Text;
     residencyOfGroup : ?Text;
@@ -777,11 +766,6 @@ actor KYC_Canister {
                 name = groupName;
                 adminId = adminId;
                 defaultGroup = false;
-                groupUsers = [{
-                  userId = adminId;
-                  role = "Admin";
-                  status = "joined";
-                }];
                 addressOfLegalEntity = addressOfLegalEntity;
                 personalRecords = [];
                 residencyOfGroup = residencyOfGroup;
@@ -803,39 +787,56 @@ actor KYC_Canister {
     };
   };
 
-  public func addPersonalRecordToGroup(groupId : Text, record : PersonalRecord) : async Text {
+  public func addPersonalRecordToGroup(
+    groupId : Text,
+    userId : ?Text, // Optional user ID
+    email : Text,
+    contactDetails : Text,
+    recordType : PersonalRecordType,
+  ) : async Text {
     switch (groups.get(groupId)) {
-      case (null) { "Group does not exist." };
+      case (null) {
+        return "Group does not exist.";
+      };
+
       case (?group) {
+        var record : PersonalRecord = {
+          groupId = groupId;
+          userId = userId; // Optional user ID
+          email = email;
+          contactDetails = contactDetails;
+          recordType = recordType;
+          recordStatus = #Drafted;
+        };
         let updatedRecords = Array.append(group.personalRecords, [record]);
         let updatedGroup = { group with personalRecords = updatedRecords };
         groups.put(groupId, updatedGroup);
-        "Personal record added successfully.";
+        return "Personal record added successfully.";
       };
     };
   };
-  public func joinGroupProposal(groupId : Text, userId : Text, role : Text) : async Text {
-    var userData : GroupUser = {
-      userId = userId;
-      role = role;
-      status = "requested";
-    };
-    switch (groups.get(groupId)) {
-      case (?existingGroup) {
-        var newBuffer = Buffer.Buffer<Text>(0);
-        newBuffer.add(groupId);
-        var updatedGroup = {
-          existingGroup with groupUsers = Array.append(existingGroup.groupUsers, [userData]);
-        };
-        groups.put(groupId, updatedGroup);
-        groupIds.put(userId, newBuffer);
-        return "success";
-      };
-      case (null) {
-        return "Group with this ID already exists.";
-      };
-    };
-  };
+  // public func joinGroupProposal(groupId : Text, userId : Text, role : Text) : async Text {
+  //   var userData : GroupUser = {
+  //     userId = userId;
+  //     role = role;
+  //     status = "requested";
+  //   };
+  //   switch (groups.get(groupId)) {
+  //     case (?existingGroup) {
+  //       var newBuffer = Buffer.Buffer<Text>(0);
+  //       newBuffer.add(groupId);
+  //       var updatedGroup = {
+  //         existingGroup with groupUsers = Array.append(existingGroup.groupUsers, [userData]);
+  //       };
+  //       groups.put(groupId, updatedGroup);
+  //       groupIds.put(userId, newBuffer);
+  //       return "success";
+  //     };
+  //     case (null) {
+  //       return "Group with this ID already exists.";
+  //     };
+  //   };
+  // };
 
   public func updateGroup(
     groupId : Text,
@@ -865,7 +866,7 @@ actor KYC_Canister {
 
   // // Helper function to find the index of a user in a group
 
-  public func updateGroupUserStatus(groupId : Text, userId : Text, newStatus : Text) : async Text {
+  public func updateGroupUserStatus(groupId : Text, email : Text, newStatus : PersonalRecordStatus) : async Text {
     switch (groups.get(groupId)) {
       case (null) {
         "Group does not exist.";
@@ -874,14 +875,16 @@ actor KYC_Canister {
         var updated = false;
         // Correctly map over the groupUsers to update the status
         let updatedUsers = Array.map(
-          group.groupUsers,
-          func(user : GroupUser) : GroupUser {
-            if (user.userId == userId) {
+          group.personalRecords,
+          func(user : PersonalRecord) : PersonalRecord {
+            if (user.email == email) {
               updated := true;
               return {
-                userId = user.userId;
-                role = user.role;
-                status = newStatus;
+                userId = user.userId; // Optional user ID
+                email = user.email;
+                contactDetails = user.contactDetails;
+                recordType = user.recordType;
+                recordStatus = newStatus;
               };
             } else {
               return user;
@@ -890,7 +893,7 @@ actor KYC_Canister {
         );
 
         if (updated) {
-          let updatedGroup = { group with groupUsers = updatedUsers };
+          let updatedGroup = { group with personalRecords = updatedUsers };
           groups.put(groupId, updatedGroup);
           return "User status updated successfully.";
         } else {
