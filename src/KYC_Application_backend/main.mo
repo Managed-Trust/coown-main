@@ -835,6 +835,17 @@ actor KYC_Canister {
                 company = null;
               };
               groups.put(groupId, newGroup);
+              switch (groupIds.get(adminId)) {
+                case (?buffer) {
+                  buffer.add(groupId);
+                  groupIds.put(adminId, buffer);
+                };
+                case (null) {
+                  var newBuffer = Buffer.Buffer<Text>(0);
+                  newBuffer.add(groupId);
+                  groupIds.put(adminId, newBuffer);
+                };
+              };
               return "Group created successfully.";
             } else {
               return "Not verified";
@@ -873,6 +884,15 @@ actor KYC_Canister {
       };
     };
   };
+
+  public func getGroup(groupId : Text) : async ?Group {
+    return groups.get(groupId);
+  };
+  public func getAllGroups() : async [Group] {
+    let allGroups = Iter.toArray(groups.vals());
+    return allGroups;
+  };
+
   // public func joinGroupProposal(groupId : Text, userId : Text, role : Text) : async Text {
   //   var userData : GroupUser = {
   //     userId = userId;
@@ -932,11 +952,13 @@ actor KYC_Canister {
       case (?group) {
         var updated = false;
         // Correctly map over the groupUsers to update the status
+        var userSetId = ?"";
         let updatedUsers = Array.map(
           group.personalRecords,
           func(user : PersonalRecord) : PersonalRecord {
             if (user.email == email) {
               updated := true;
+              userSetId := user.userId;
               return {
                 userId = user.userId; // Optional user ID
                 email = user.email;
@@ -953,6 +975,27 @@ actor KYC_Canister {
         if (updated) {
           let updatedGroup = { group with personalRecords = updatedUsers };
           groups.put(groupId, updatedGroup);
+
+          switch (userSetId) {
+            case (?actualUserId) {
+              // Now that we've confirmed userSetId is not null, we can safely use actualUserId
+              switch (groupIds.get(actualUserId)) {
+                case (?buffer) {
+                  buffer.add(groupId);
+                  groupIds.put(actualUserId, buffer);
+                };
+                case (null) {
+                  var newBuffer = Buffer.Buffer<Text>(0);
+                  newBuffer.add(groupId);
+                  groupIds.put(actualUserId, newBuffer);
+                };
+              };
+            };
+            case (null) {
+              // Handle the case where userSetId is null, if necessary
+              // Perhaps log an error or handle the situation appropriately
+            };
+          };
           return "User status updated successfully.";
         } else {
           return "User not found in group.";
@@ -1114,6 +1157,14 @@ actor KYC_Canister {
     return "User created with default group.";
   };
 
+  public func getGroupIdsByUserId(userId : Text) : async [Text] {
+    let groupIdsBuffer = groupIds.get(userId);
+    switch (groupIdsBuffer) {
+      case (null) { return [] }; // No groups found for this user, returning an empty list
+      case (?buffer) { return Buffer.toArray<Text>(buffer) }; // Convert the buffer to a vector and return it
+    };
+  };
+
   //=====================================================================================
   //Operator
   //=====================================================================================
@@ -1196,6 +1247,18 @@ actor KYC_Canister {
       };
     };
   };
+
+  public query func getOperator(id : Text) : async ?Operator {
+    return operators.get(id);
+  };
+  public func isOperator(operatorId : Text) : async Bool {
+    let operator = operators.get(operatorId);
+    switch (operator) {
+      case (null) { return false }; // Operator ID does not exist
+      case (_) { return true }; // Operator ID exists
+    };
+  };
+
   //============================================================
 
   //============================================================
