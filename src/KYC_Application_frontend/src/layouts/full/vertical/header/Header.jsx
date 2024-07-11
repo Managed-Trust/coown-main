@@ -13,8 +13,27 @@ import Search from './Search';
 import Language from './Language';
 import Navigation from './Navigation';
 import MobileRightSidebar from './MobileRightSidebar';
+import {
+  ConnectButton,
+  ConnectDialog,
+  Connect2ICProvider,
+  useConnect,
+} from "@connect2ic/react";
+
+import ic from "ic0";
+
+const ledger = ic.local("bkyz2-fmaaa-aaaaa-qaaaq-cai"); // Ledger canister
 
 const Header = () => {
+  const { isConnected, principal, activeProvider } = useConnect({
+    onConnect: () => {
+      // Signed in
+    },
+    onDisconnect: () => {
+      // Signed out
+    },
+  });
+
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up('lg'));
   const lgDown = useMediaQuery((theme) => theme.breakpoints.down('lg'));
 
@@ -76,6 +95,7 @@ const Header = () => {
           {/* ------------------------------------------- */}
           {lgDown ? <MobileRightSidebar /> : null}
           <Profile />
+          <ConnectButton />
         </Stack>
       </ToolbarStyled>
     </AppBarStyled>

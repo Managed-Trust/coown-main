@@ -14,11 +14,14 @@ import Followers from "../../views/apps/user-profile/Followers.jsx";
 import Friends from "../../views/apps/user-profile/Friends.jsx";
 import Gallery from "../../views/apps/user-profile/Gallery.jsx";
 import FormHorizontal from "../../views/forms/FormHorizontal";
-import Settings  from '../../views/apps/user-profile/Settings.jsx';
+import Settings from '../../views/apps/user-profile/Settings.jsx';
 import GroupDetailPage from '../../components/apps/userprofile/gallery/GroupDetail.jsx';
+import Chats from '../../views/apps/chat/Chat.jsx';
+import GroupInvitation from '../../views/pages/group-invitation/group-invitation.jsx';
+
 import {
   ConnectDialog,
-  
+
 } from "@connect2ic/react";
 
 const MainWrapper = styled('div')(() => ({
@@ -42,43 +45,48 @@ const FullLayout = () => {
   const theme = useTheme();
 
   return (
-    <MainWrapper
-      className={customizer.activeMode === 'dark' ? 'darkbg mainwrapper' : 'mainwrapper'}
-    >
-      {customizer.isHorizontal ? '' : <Sidebar />}
-      <PageWrapper
-        className="page-wrapper"
-        sx={{
-          ...(customizer.isCollapse && {
-            [theme.breakpoints.up('lg')]: { ml: `${customizer.MiniSidebarWidth}px` },
-          }),
-        }}
+    <>
+      <MainWrapper
+        className={customizer.activeMode === 'dark' ? 'darkbg mainwrapper' : 'mainwrapper'}
       >
-        {customizer.isHorizontal ? <HorizontalHeader /> : <Header />}
-        {customizer.isHorizontal ? <Navigation /> : ''}
-        <Container
+        {customizer.isHorizontal ? '' : <Sidebar />}
+        <PageWrapper
+          className="page-wrapper"
           sx={{
-            maxWidth: customizer.isLayout === 'boxed' ? 'lg' : '100%!important',
+            ...(customizer.isCollapse && {
+              [theme.breakpoints.up('lg')]: { ml: `${customizer.MiniSidebarWidth}px` },
+            }),
           }}
         >
-          <Box sx={{ minHeight: 'calc(100vh - 170px)' }}>
-            <Routes>
-              <Route path="/" element={<EcommerceDash />} />
-              <Route path="/dashboards/modern" element={<Modern />} />
-              <Route path="/apps/followers" element={<Followers />} />
-              <Route path="/apps/friends" element={<Friends />} />
-              <Route path="/apps/gallery" element={<Gallery />} />
-              <Route path="/user-profile" element={<UserProfile />} />
-              <Route path="/user-profile/Settings" element={<Settings />} />
-              <Route path="/forms/form-horizontal" element={<FormHorizontal />} />
-              <Route path="/group/:id" element={<GroupDetailPage />} />
-            </Routes>
-          </Box>
-        </Container>
-        <Customizer />
-        <ConnectDialog dark={false} />
-      </PageWrapper>
-    </MainWrapper>
+          {customizer.isHorizontal ? <HorizontalHeader /> : <Header />}
+          {customizer.isHorizontal ? <Navigation /> : ''}
+          <Container
+            sx={{
+              maxWidth: customizer.isLayout === 'boxed' ? 'lg' : '100%!important',
+            }}
+          >
+            <Box sx={{ minHeight: 'calc(100vh - 170px)' }}>
+              <Routes>
+                <Route path="/" element={<EcommerceDash />} />
+                <Route path="/dashboards/modern" element={<Modern />} />
+                <Route path="/apps/followers" element={<Followers />} />
+                <Route path="/apps/friends" element={<Friends />} />
+                <Route path="/apps/gallery" element={<Gallery />} />
+                <Route path="/user-profile" element={<UserProfile />} />
+                <Route path="/user-profile/Settings" element={<Settings />} />
+                <Route path="/forms/form-horizontal" element={<FormHorizontal />} />
+                <Route path="/group/:id" element={<GroupDetailPage />} />
+                <Route path="/apps/chats" element={<Chats />} />
+                <Route path="/group-invitation" element={<GroupInvitation />} />
+              </Routes>
+            </Box>
+          </Container>
+          <Customizer />
+          <ConnectDialog dark={false} />
+        </PageWrapper>
+      </MainWrapper>
+    </>
+
   );
 };
 

@@ -53,6 +53,7 @@ const Sidebar = () => {
               }),
               width: toggleWidth,
               boxSizing: 'border-box',
+              zIndex: 'auto',  // Set z-index to auto
             },
           }}
         >
@@ -104,6 +105,7 @@ const Sidebar = () => {
           color: customizer.activeSidebarBg === '#ffffff' ? '' : 'white',
           border: '0 !important',
           boxShadow: (theme) => theme.shadows[8],
+          zIndex: 'auto',  // Set z-index to auto
         },
       }}
     >

@@ -92,24 +92,22 @@ const GalleryCard = () => {
     dispatch(fetchPhotos());
   }, [dispatch]);
 
-  const filterPhotos = (photos, cSearch) => {
-    if (photos)
-      return photos.filter((t) => t.name.toLocaleLowerCase().includes(cSearch.toLocaleLowerCase()));
-    return photos;
-  };
-
   const [search, setSearch] = useState('');
-  const getPhotos = useSelector((state) => filterPhotos(state.userpostsReducer.gallery, search));
   const [isLoading, setLoading] = useState(true);
   const [formData, setFormData] = useState(initialState);
   const [filePreviews, setFilePreviews] = useState({});
   const [showCreateGroupForm, setShowCreateGroupForm] = useState(false);
   const [showInviteUserForm, setShowInviteUserForm] = useState(false);
+  const [groups, setGroups] = useState([]);
 
   const { isConnected, principal } = useConnect({
     onConnect: () => { },
     onDisconnect: () => { },
   });
+
+  useEffect(() => {
+    console.log("Principal:", principal);
+  }, [principal]);
 
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
@@ -174,6 +172,37 @@ const GalleryCard = () => {
     }
   };
 
+  useEffect(() => {
+    const fetchGroup = async () => {
+      try {
+        if (principal) {
+          const response = await ledger.call('getGroupIdsByUserId', principal);
+          if (response != null) {
+            setGroups(response);
+            console.log('Group IDs:', response);
+            const groupDetails = await Promise.all(
+              response.map(async (groupId) => {
+                try {
+                  const groupDetailResponse = await ledger.call('getGroup', groupId);
+                  return groupDetailResponse;
+                } catch (e) {
+                  console.error(`Error fetching group details for group ID ${groupId}:`, e);
+                  return null;
+                }
+              })
+            );
+            setGroups(groupDetails.filter(group => group !== null));
+            console.log("Groups:", groupDetails);
+          }
+        }
+      } catch (e) {
+        console.log('Error fetching groups:', e);
+      }
+    };
+
+    fetchGroup();
+  }, [principal, ledger]);
+
   const generateGroupId = () => {
     const timestamp = new Date().getTime();
     const randomNum = Math.floor(Math.random() * 10000);
@@ -231,27 +260,29 @@ const GalleryCard = () => {
       console.log("Invite User Response:", response);
     } catch (e) {
       console.log("Error Inviting User:", e);
-    }finally{
+    } finally {
       const emailParams = {
-        to_email: formData.email
+        to_email: formData.email,
+        contactDetails: formData.contactDetails,
+        recordType: formData.recordType
       };
 
       emailjs
-      .send('service_idh0h15', 'template_d21fhkr', emailParams, 'Y4QJDpwjrsdi3tQAR')
-      .then(
-        () => {
-          console.log('SUCCESS!');
-        },
-        (error) => {
-          console.log('FAILED...', error.text);
-        }
-      )
-      .catch((error) => {
-        console.log("Error sending Email:", error);
-      })
-      .finally(() => {
-        alert("Email sent to " + formData.email);
-      });
+        .send('service_idh0h15', 'template_d21fhkr', emailParams, 'Y4QJDpwjrsdi3tQAR')
+        .then(
+          () => {
+            console.log('SUCCESS!');
+          },
+          (error) => {
+            console.log('FAILED...', error.text);
+          }
+        )
+        .catch((error) => {
+          console.log("Error sending Email:", error);
+        })
+        .finally(() => {
+          alert("Email sent to " + formData.email);
+        });
     }
   };
 
@@ -263,7 +294,7 @@ const GalleryCard = () => {
             <Box>
               <Typography variant="h3">
                 Groups &nbsp;
-                <Chip label={getPhotos.length} color="secondary" size="small" />
+                <Chip label={groups.length} color="secondary" size="small" />
               </Typography>
             </Box>
             <Box ml="auto">
@@ -551,53 +582,53 @@ const GalleryCard = () => {
                 <Box>
                   <Typography variant="h3">
                     Groups &nbsp;
-                    <Chip label={getPhotos.length} color="secondary" size="small" />
+                    <Chip label={groups.length} color="secondary" size="small" />
                   </Typography>
                 </Box>
               </Stack>
             </Grid>
-            {getPhotos.map((photo) => (
-              <Grid item xs={12} lg={4} key={photo.id}>
+            {groups &&
+              <>
+                {groups.map((group) => (
+                  <Grid item xs={12} lg={4} key={group.id}>
+                    <BlankCard className="hoverCard cursor-pointer" onClick={() => handleCardClick(group.id)}>
+                      <CardMedia component={'img'} height="220" alt="Group Image" src={group[0].groupImage} />
+                      <Box p={3}>
+                        <Stack direction="row" gap={1}>
+                          <Box>
+                            <Typography variant="h6">{group[0].name}</Typography>
+                            <Typography variant="caption">
+                              {group.description}
+                            </Typography>
+                          </Box>
+                          <Box ml={'auto'}>
+                            <IconButton onClick={handleMenuClick}>
+                              <IconDotsVertical size="16" />
+                            </IconButton>
+                            <Menu
+                              anchorEl={anchorEl}
+                              open={open}
+                              onClose={handleMenuClose}
+                              anchorOrigin={{
+                                vertical: 'top',
+                                horizontal: 'right',
+                              }}
+                              transformOrigin={{
+                                vertical: 'top',
+                                horizontal: 'right',
+                              }}
+                            >
+                              <MenuItem onClick={handleMenuClose}>Invite User to Group</MenuItem>
+                            </Menu>
+                          </Box>
+                        </Stack>
+                      </Box>
+                    </BlankCard>
+                  </Grid>
+                ))}
+              </>
+            }
 
-                <BlankCard className="hoverCard cursor-pointer" onClick={() => handleCardClick(photo.id)}>
-                  {isLoading ? (
-                    <Skeleton variant="square" animation="wave" width="100%" height={220} />
-                  ) : (
-                    <CardMedia component={'img'} height="220" alt="Remy Sharp" src={photo.cover} />
-                  )}
-                  <Box p={3}>
-                    <Stack direction="row" gap={1}>
-                      <Box>
-                        <Typography variant="h6">{photo.name}.jpg</Typography>
-                        <Typography variant="caption">
-                          {format(new Date(photo.time), 'E, MMM d, yyyy')}
-                        </Typography>
-                      </Box>
-                      <Box ml={'auto'}>
-                        <IconButton onClick={handleMenuClick}>
-                          <IconDotsVertical size="16" />
-                        </IconButton>
-                        <Menu
-                          anchorEl={anchorEl}
-                          open={open}
-                          onClose={handleMenuClose}
-                          anchorOrigin={{
-                            vertical: 'top',
-                            horizontal: 'right',
-                          }}
-                          transformOrigin={{
-                            vertical: 'top',
-                            horizontal: 'right',
-                          }}
-                        >
-                          <MenuItem onClick={handleMenuClose}>Invite User to Group</MenuItem>
-                        </Menu>
-                      </Box>
-                    </Stack>
-                  </Box>
-                </BlankCard>
-              </Grid>
-            ))}
           </Grid>
         )}
       </Grid>

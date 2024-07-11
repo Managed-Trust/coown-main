@@ -105,7 +105,7 @@ const FormTabs = () => {
 
   const createUser = async () => {
     try {
-      const response = await ledger.call("createUser", principal, "1", "1", formData.email);
+      const response = await ledger.call("createUser", principal, formData.email);
       console.log("User created:", formData.email);
       alert(response);
     } catch (e) {

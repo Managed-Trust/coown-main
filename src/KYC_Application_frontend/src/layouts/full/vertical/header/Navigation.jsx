@@ -176,7 +176,7 @@ const AppDD = () => {
         sx={{ color: (theme) => theme.palette.text.secondary }}
         variant="text"
       > */}
-        <ConnectButton />
+        {/* <ConnectButton /> */}
         {/* <ConnectDialog dark={false} /> */}
       {/* </div> */}
     </>
