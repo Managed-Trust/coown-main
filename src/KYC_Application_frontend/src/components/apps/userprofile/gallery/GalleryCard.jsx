@@ -15,14 +15,14 @@ import {
   Select,
   Paper,
   Menu,
+  CircularProgress,
 } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import BlankCard from '../../../../components/shared/BlankCard';
 import CustomFormLabel from '../../../forms/theme-elements/CustomFormLabel';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchPhotos } from '../../../../store/apps/userProfile/UserProfileSlice';
 import { IconDotsVertical } from '@tabler/icons';
-import { format } from 'date-fns';
 import emailjs from "@emailjs/browser";
 import { useConnect } from '@connect2ic/react';
 import ic from 'ic0';
@@ -99,6 +99,7 @@ const GalleryCard = () => {
   const [showCreateGroupForm, setShowCreateGroupForm] = useState(false);
   const [showInviteUserForm, setShowInviteUserForm] = useState(false);
   const [groups, setGroups] = useState([]);
+  const [fetchingGroups, setFetchingGroups] = useState(true);
 
   const { isConnected, principal } = useConnect({
     onConnect: () => { },
@@ -124,13 +125,6 @@ const GalleryCard = () => {
   const handleCardClick = (groupId) => {
     navigate(`/group/${groupId}`);
   };
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 500);
-    return () => clearTimeout(timer);
-  }, []);
 
   const handleInputChange = (e) => {
     const { id, value, name } = e.target;
@@ -174,6 +168,7 @@ const GalleryCard = () => {
 
   useEffect(() => {
     const fetchGroup = async () => {
+      setFetchingGroups(true);
       try {
         if (principal) {
           const response = await ledger.call('getGroupIdsByUserId', principal);
@@ -192,11 +187,13 @@ const GalleryCard = () => {
               })
             );
             setGroups(groupDetails.filter(group => group !== null));
-            console.log("Groups:", groupDetails);
+            console.log("Groups:", groupDetails[0][0]);
           }
         }
       } catch (e) {
         console.log('Error fetching groups:', e);
+      } finally {
+        setFetchingGroups(false);
       }
     };
 
@@ -587,17 +584,26 @@ const GalleryCard = () => {
                 </Box>
               </Stack>
             </Grid>
-            {groups &&
-              <>
-                {groups.map((group) => (
-                  <Grid item xs={12} lg={4} key={group.id}>
-                    <BlankCard className="hoverCard cursor-pointer" onClick={() => handleCardClick(group.id)}>
-                      <CardMedia component={'img'} height="220" alt="Group Image" src={group[0].groupImage} />
+            {fetchingGroups ? (
+              <Grid item xs={12} display="flex" justifyContent="center" alignItems="center">
+                <CircularProgress />
+              </Grid>
+            ) : (
+              groups.map((group) => (
+                <Grid item xs={12} lg={4} key={group[0].adminId}>
+                  <Link to={`/group/${group[0].adminId}`} style={{ textDecoration: 'none' }}>
+                    <BlankCard className="hoverCard cursor-pointer">
+                      <CardMedia
+                        component={'img'}
+                        height="220"
+                        alt="Group Image"
+                        src={group[0].groupImage && group[0].groupImage.length > 0 ? group[0].groupImage[0] : 'https://via.placeholder.com/150'}
+                      />
                       <Box p={3}>
                         <Stack direction="row" gap={1}>
                           <Box>
-                            <Typography variant="h6">{group[0].name}</Typography>
-                            <Typography variant="caption">
+                            <Typography variant="h6" color="textPrimary">{group[0].name}</Typography>
+                            <Typography variant="caption" color="textSecondary">
                               {group.description}
                             </Typography>
                           </Box>
@@ -624,11 +630,10 @@ const GalleryCard = () => {
                         </Stack>
                       </Box>
                     </BlankCard>
-                  </Grid>
-                ))}
-              </>
-            }
-
+                  </Link>
+                </Grid>
+              ))
+            )}
           </Grid>
         )}
       </Grid>
