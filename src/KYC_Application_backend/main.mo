@@ -54,7 +54,7 @@ actor KYC_Canister {
     document_number : ?Text;
     issuing_country : ?Text;
     issuing_jurisdiction : ?Text;
-    cizitenship : [Text];
+    citizenship : [Text];
     residency : Text;
     phone : Text;
     identityNumber : Text;
@@ -106,7 +106,7 @@ actor KYC_Canister {
     phone : Text,
     identityNumber : Text,
     identityDoc : Blob,
-    cizitenship : [Text],
+    citizenship : [Text],
     residency : Text,
   ) : async Text {
     switch (users.get(id)) {
@@ -162,7 +162,7 @@ actor KYC_Canister {
                 identityNumber = identityNumber;
                 identityDoc = identityDoc;
                 verified = false;
-                cizitenship = cizitenship;
+                citizenship = citizenship;
                 residency = residency;
               };
               map.put(id, newCustomer);
