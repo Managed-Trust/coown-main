@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Button,
@@ -44,7 +44,7 @@ const initialState = {
   nationality: '',
   document_number: '',
   issuing_country: '',
-  phone_number: '',
+  phone: '',
   openchat_id: '',
   document_file: null,
   role: '',
@@ -70,24 +70,33 @@ const ProfileForm = () => {
   const [activeTab, setActiveTab] = useState(0);
   const [formData, setFormData] = useState(initialState);
   const [documentPreview, setDocumentPreview] = useState(null);
-
+  const [profile, setProfile] = useState(null);
   const handleTabChange = (event, newValue) => {
     setActiveTab(newValue);
   };
 
   const { principal } = useConnect();
 
-  useEffect(()=>{
+  useEffect(() => {
     const fetchProfile = async () => {
-      try{
-        const response = await ledger.call("getCustomer",principal);
-        console.log("Profile:",response);
-      }catch(e){
-        console.log("Error Fetching Profile:",e);
+      try {
+        const response = await ledger.call("getCustomer", principal);
+        console.log("Profile:", response);
+        const profileData = response[0];
+        setProfile(profileData);
+        setFormData({
+          ...formData,
+          ...profileData,
+          citizenship: profileData.citizenship || []
+        });
+      } catch (e) {
+        console.log("Error Fetching Profile:", e);
       }
+    };
+    if (principal) {
+      fetchProfile();
     }
-    fetchProfile();
-  },[principal]);
+  }, [principal]);
 
   const handleInputChange = (e) => {
     const { id, value } = e.target;
@@ -149,7 +158,7 @@ const ProfileForm = () => {
   const handleSubmitPersonalDetails = async () => {
     console.log('Personal Details Submitted', formData);
     try {
-      const response = await ledger.call("addBasicInfoCustomer", principal, formData.family_name, formData.given_name, formData.birth_date, formData.age_over_18, formData.role, formData.phone_number, formData.identityNumber, formData.document_file, false, formData.citizenship, formData.residency);
+      const response = await ledger.call("addBasicInfoCustomer", principal, formData.family_name, formData.given_name, formData.birth_date, formData.age_over_18, formData.role, formData.phone, formData.identityNumber, formData.document_file, false, formData.citizenship, formData.residency);
       console.log('Response:', response);
       alert(response);
     } catch (e) {
@@ -194,6 +203,9 @@ const ProfileForm = () => {
   };
 
   const renderTabContent = (tab) => {
+    if (!profile) {
+      return <p>Loading...</p>;
+    }
     switch (tab) {
       case 0:
         return (
@@ -220,13 +232,13 @@ const ProfileForm = () => {
                   </Grid>
                 </Grid>
 
-                <CustomFormLabel htmlFor="phone_number" sx={{ mt: 2 }} className="center">
+                <CustomFormLabel htmlFor="phone" sx={{ mt: 2 }} className="center">
                   Phone
                   <Tooltip title="User's Phone Number" placement="top" cursor="pointer">
                     <ErrorOutlineIcon />
                   </Tooltip>
                 </CustomFormLabel>
-                <TextField id="phone_number" placeholder="+123456789" fullWidth onChange={handleInputChange} value={formData.phone_number} />
+                <TextField id="phone" placeholder="+123456789" fullWidth onChange={handleInputChange} value={formData.phone} />
 
                 <CustomFormLabel htmlFor="identityNumber" sx={{ mt: 2 }} className="center">
                   Identity Number
@@ -293,7 +305,6 @@ const ProfileForm = () => {
                 </CustomFormLabel>
                 <TextField id="document_file" type="file" fullWidth onChange={handleFileChange} />
                 {documentPreview && <img src={documentPreview} alt="Document Preview" style={{ marginTop: '10px', maxHeight: '200px' }} />}
-
               </Grid>
             </Grid>
             <Box display="flex" justifyContent="flex-end" mt={3}>
@@ -368,7 +379,6 @@ const ProfileForm = () => {
                   onChange={handleInputChange}
                   value={formData.birth_state}
                 />
-
               </Grid>
             </Grid>
             <Box display="flex" justifyContent="flex-end" mt={3}>

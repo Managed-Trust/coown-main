@@ -75,7 +75,7 @@ const FullLayout = () => {
                 <Route path="/user-profile" element={<UserProfile />} />
                 <Route path="/user-profile/Settings" element={<Settings />} />
                 <Route path="/forms/form-horizontal" element={<FormHorizontal />} />
-                <Route path="/group/:id" element={<GroupDetailPage />} />
+                <Route path="/group/:groupId" element={<GroupDetailPage />} />
                 <Route path="/apps/chats" element={<Chats />} />
                 <Route path="/group-invitation" element={<GroupInvitation />} />
               </Routes>
