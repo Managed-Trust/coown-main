@@ -1,5 +1,4 @@
-import React, { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import React from 'react';
 import {
   Box,
   Table,
@@ -8,67 +7,46 @@ import {
   TableCell,
   Typography,
   TableBody,
-  IconButton,
-  Chip,
+  Button,
   Stack,
   Avatar,
   Tooltip,
   TextField,
-  Pagination,
   TableContainer,
+  IconButton
 } from '@mui/material';
-import { fetchTickets, DeleteTicket, SearchTicket } from '../../../store/apps/tickets/TicketSlice';
 import { IconTrash } from '@tabler/icons';
+import { useConnect } from '@connect2ic/react';
+import ic from 'ic0';
 
-const TicketListing = () => {
-  const dispatch = useDispatch();
-  useEffect(() => {
-    dispatch(fetchTickets());
-  }, [dispatch]);
+const ledger = ic.local("bkyz2-fmaaa-aaaaa-qaaaq-cai"); // Ledger canister
 
-  const getVisibleTickets = (tickets, filter, ticketSearch) => {
-    switch (filter) {
-      case 'total_tickets':
-        return tickets.filter(
-          (c) => !c.deleted && c.ticketTitle.toLocaleLowerCase().includes(ticketSearch),
-        );
+const UserListing = ({ Users }) => {
 
-      case 'Pending':
-        return tickets.filter(
-          (c) =>
-            !c.deleted &&
-            c.Status === 'Pending' &&
-            c.ticketTitle.toLocaleLowerCase().includes(ticketSearch),
-        );
+  const { isConnected, principal } = useConnect({
+    onConnect: () => { },
+    onDisconnect: () => { },
+  });
 
-      case 'Closed':
-        return tickets.filter(
-          (c) =>
-            !c.deleted &&
-            c.Status === 'Closed' &&
-            c.ticketTitle.toLocaleLowerCase().includes(ticketSearch),
-        );
-
-      case 'Open':
-        return tickets.filter(
-          (c) =>
-            !c.deleted &&
-            c.Status === 'Open' &&
-            c.ticketTitle.toLocaleLowerCase().includes(ticketSearch),
-        );
-
-      default:
-        throw new Error(`Unknown filter: ${filter}`);
+  const handleVerify = async (userId) => {
+    try {
+      const response = await ledger.call("verifyCustomer", userId);
+      alert(response);
+    } catch (e) {
+      console.log("Error Verifying:", e);
     }
+    console.log(`Verify user with id: ${userId}`);
   };
 
-  const tickets = useSelector((state) =>
-    getVisibleTickets(
-      state.ticketReducer.tickets,
-      state.ticketReducer.currentFilter,
-      state.ticketReducer.ticketSearch,
-    ),
-  );
+  const handleReject = async (userId) => {
+    console.log(`Reject user with id: ${userId}`);
+  };
+
+  const formatId = (id) => {
+    if (id.length <= 12) return id;
+    return `${id.slice(0, 6)}...${id.slice(-6)}`;
+  };
+
   return (
     <Box mt={4}>
       <Box sx={{ maxWidth: '260px', ml: 'auto' }} mb={3}>
@@ -76,7 +54,9 @@ const TicketListing = () => {
           size="small"
           label="Search"
           fullWidth
-          onChange={(e) => dispatch(SearchTicket(e.target.value))}
+          onChange={(e) => {
+            // Implement search functionality here
+          }}
         />
       </Box>
       <TableContainer>
@@ -87,16 +67,16 @@ const TicketListing = () => {
                 <Typography variant="h6">Id</Typography>
               </TableCell>
               <TableCell>
-                <Typography variant="h6">Ticket</Typography>
+                <Typography variant="h6">Name</Typography>
               </TableCell>
               <TableCell>
-                <Typography variant="h6">Assigned To</Typography>
+                <Typography variant="h6">Residency</Typography>
               </TableCell>
               <TableCell>
-                <Typography variant="h6">Status</Typography>
+                <Typography variant="h6">Role</Typography>
               </TableCell>
               <TableCell>
-                <Typography variant="h6">Date</Typography>
+                <Typography variant="h6">Phone</Typography>
               </TableCell>
               <TableCell align="right">
                 <Typography variant="h6">Action</Typography>
@@ -104,74 +84,64 @@ const TicketListing = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {tickets.map((ticket) => (
-              <TableRow key={ticket.Id} hover>
-                <TableCell>{ticket.Id}</TableCell>
-                <TableCell>
-                  <Box>
-                    <Typography variant="h6" fontWeight="500" noWrap>
-                      {ticket.ticketTitle}
-                    </Typography>
-                    <Typography
-                      color="textSecondary"
-                      noWrap
-                      sx={{ maxWidth: '250px' }}
-                      variant="subtitle2"
-                      fontWeight="400"
-                    >
-                      {ticket.ticketDescription}
-                    </Typography>
-                  </Box>
-                </TableCell>
-                <TableCell>
-                  <Stack direction="row" gap="10px" alignItems="center">
-                    <Avatar
-                      src={ticket.thumb}
-                      alt={ticket.thumb}
-                      width="35"
-                      sx={{
-                        borderRadius: '100%',
-                      }}
-                    />
-                    <Typography variant="h6">{ticket.AgentName}</Typography>
-                  </Stack>
-                </TableCell>
-                <TableCell>
-                  <Chip
-                    sx={{
-                      backgroundColor:
-                        ticket.Status === 'Open'
-                          ? (theme) => theme.palette.success.light
-                          : ticket.Status === 'Closed'
-                            ? (theme) => theme.palette.error.light
-                            : ticket.Status === 'Pending'
-                              ? (theme) => theme.palette.warning.light
-                              : ticket.Status === 'Moderate',
-                    }}
-                    size="small"
-                    label={ticket.Status}
-                  />
-                </TableCell>
-                <TableCell>
-                  <Typography>{ticket.Date}</Typography>
-                </TableCell>
-                <TableCell align="right">
-                  <Tooltip title="Delete Ticket">
-                    <IconButton onClick={() => dispatch(DeleteTicket(ticket.Id))}>
-                      <IconTrash size="18" />
-                    </IconButton>
-                  </Tooltip>
+            {Users && Users.length > 0 ? (
+              Users.map((user) => (
+                <TableRow key={user.id} hover>
+                  <TableCell>{formatId(user.id)}</TableCell>
+                  <TableCell>
+                    <Stack direction="row" gap="10px" alignItems="center">
+                      <Avatar
+                        src={user.image[0]}
+                        alt={user.name}
+                        width="35"
+                        sx={{
+                          borderRadius: '100%',
+                        }}
+                      />
+                      <Typography variant="h6">{user.given_name} {user.family_name}</Typography>
+                    </Stack>
+                  </TableCell>
+                  <TableCell>
+                    <Typography variant="h6">{user.residency}</Typography>
+                  </TableCell>
+                  <TableCell>
+                    <Typography variant="h6">{user.role}</Typography>
+                  </TableCell>
+                  <TableCell>
+                    <Typography variant="h6">{user.phone}</Typography>
+                  </TableCell>
+                  <TableCell align="right">
+                    <Stack direction="row" spacing={1}>
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={() => handleVerify(user.id)}
+                      >
+                        Verify
+                      </Button>
+                      <Button
+                        variant="contained"
+                        color="error"
+                        onClick={() => handleReject(user.id)}
+                      >
+                        Reject
+                      </Button>
+                    </Stack>
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={6} align="center">
+                  <Typography variant="h6">No users available</Typography>
                 </TableCell>
               </TableRow>
-            ))}
+            )}
           </TableBody>
         </Table>
       </TableContainer>
-      <Box my={3} display="flex" justifyContent={'center'}>
-        <Pagination count={10} color="primary" />
-      </Box>
     </Box>
   );
 };
 
-export default TicketListing;
+export default UserListing;

@@ -728,6 +728,7 @@ actor KYC_Canister {
     #Drafted; // Drafted by Creator
     #Verified; // Verified by User or Email Holder
     #Approved; // Approved by AML Officer
+    #Rejected; // Rejected by User
   };
 
   public type PersonalRecord = {

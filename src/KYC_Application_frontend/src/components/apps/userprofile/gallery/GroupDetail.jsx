@@ -362,7 +362,8 @@ const GroupDetailPage = () => {
       const emailParams = {
         to_email: formData.email,
         contactDetails: formData.contactDetails,
-        recordType: formData.recordType
+        recordType: formData.recordType,
+        groupId: groupId
       };
 
       emailjs
