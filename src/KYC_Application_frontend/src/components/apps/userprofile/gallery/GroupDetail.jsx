@@ -119,12 +119,8 @@ const StyledPaper = styled(Paper)(({ theme, selected }) => ({
 
 const headCells = [
   { id: 'member', label: 'Member' },
-  { id: 'role', label: 'Role' },
-  { id: 'status', label: 'Status' },
-  { id: 'limitPerTransaction', label: 'Limit per Transaction' },
-  { id: 'dailyLimitation', label: 'Daily Limitation' },
-  { id: 'monthlyLimitation', label: 'Monthly Limitation' },
-  { id: 'limitationPercentage', label: 'Limitation in Percentage' },
+  { id: 'email', label: 'Emaik' },
+  { id: 'contact ', label: 'Contact' }
 ];
 
 const EnhancedTableHead = (props) => {
@@ -227,12 +223,18 @@ const GroupDetailPage = () => {
   const [filePreviews, setFilePreviews] = useState({});
   const [showForm, setShowForm] = useState(false);
   const [formType, setFormType] = useState(null);
+  const [group, setGroup] = useState(null);
+  const [fetchingGroup, setFetchingGroup] = useState(true);
 
   const { isConnected, principal } = useConnect({
     onConnect: () => { },
     onDisconnect: () => { },
   });
 
+  const formatId = (id) => {
+    if (id.length <= 12) return id;
+    return `${id.slice(0, 6)}...${id.slice(-6)}`;
+  };
   const handleInputChange = (e) => {
     const { id, value, name } = e.target;
     const inputId = id || name; // for Select component
@@ -383,6 +385,24 @@ const GroupDetailPage = () => {
           alert("Email sent to " + formData.email);
           setShowForm(false);
         });
+    }
+  };
+
+  useEffect(() => {
+    fetchGroup();
+  }, [principal]);
+  const fetchGroup = async () => {
+    setFetchingGroup(true);
+    try {
+      if (principal) {          
+          const groupDetailResponse = await ledger.call('getGroup', groupId);          
+          setGroup(groupDetailResponse);
+          console.log('Group',groupDetailResponse);
+        }
+    } catch (e) {
+      console.log('Error fetching groups:', e);
+    } finally {
+      setFetchingGroup(false);
     }
   };
 
@@ -712,111 +732,52 @@ const GroupDetailPage = () => {
 
       <Box mt={2}>
         <Paper>
-          <EnhancedTableToolbar numSelected={selected.length} />
-          <TableContainer>
-            <Table sx={{ minWidth: 750 }} aria-labelledby="tableTitle" size="large">
-              <EnhancedTableHead
-                numSelected={selected.length}
-                order={order}
-                orderBy={orderBy}
-                onSelectAllClick={handleSelectAllClick}
-                onRequestSort={handleRequestSort}
-                rowCount={groupDetails.users.length}
-              />
+          {group && <>
+            <TableContainer>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>
+                    <Typography variant="h6">Id</Typography>
+                  </TableCell>
+                  <TableCell>
+                    <Typography variant="h6">Email</Typography>
+                  </TableCell>
+                  <TableCell>
+                    <Typography variant="h6">Contact</Typography>
+                  </TableCell>
+                </TableRow>
+              </TableHead>
               <TableBody>
-                {stableSort(groupDetails.users, getComparator(order, orderBy))
-                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map((user, index) => {
-                    const isItemSelected = isSelected(user.name);
-                    const labelId = `enhanced-table-checkbox-${index}`;
-
-                    return (
-                      <TableRow
-                        hover
-                        onClick={(event) => handleClick(event, user.name)}
-                        role="checkbox"
-                        aria-checked={isItemSelected}
-                        tabIndex={-1}
-                        key={user.name}
-                        selected={isItemSelected}
-                      >
-                        <TableCell padding="checkbox">
-                          <Checkbox
-                            color="primary"
-                            checked={isItemSelected}
-                            inputProps={{
-                              'aria-labelledby': labelId,
-                            }}
-                          />
-                        </TableCell>
-                        <TableCell component="th" id={labelId} scope="row" padding="none">
-                          <Box display="flex" alignItems="center">
-                            <Avatar src={user.avatarUrl} alt={user.name} />
-                            <Box ml={2}>
-                              <Typography variant="body1">{user.name}</Typography>
-                            </Box>
-                          </Box>
-                        </TableCell>
-                        <TableCell align="left">{user.role}</TableCell>
-                        <TableCell align="left">
-                          <Stack spacing={1} direction="row" alignItems="center">
-                            <Badge
-                              color={
-                                user.status === 'Active'
-                                  ? 'success'
-                                  : user.status === 'Pending'
-                                  ? 'warning'
-                                  : user.status === 'Inactive'
-                                  ? 'error'
-                                  : 'secondary'
-                              }
-                              variant="dot"
-                            ></Badge>
-                            <Typography color={'textSecondary'} variant="body1">
-                              {user.status}
-                            </Typography>
-                          </Stack>
-                        </TableCell>
-                        <TableCell align="left">
-                          <Typography variant="body1" fontWeight="bold">
-                            {user.limitPerTransaction}
-                          </Typography>
-                        </TableCell>
-                        <TableCell align="left">
-                          <Typography variant="body1" fontWeight="bold">
-                            {user.dailyLimitation}
-                          </Typography>
-                        </TableCell>
-                        <TableCell align="left">
-                          <Typography variant="body1" fontWeight="bold">
-                            {user.monthlyLimitation}
-                          </Typography>
-                        </TableCell>
-                        <TableCell align="left">
-                          <Typography variant="body1" fontWeight="bold">
-                            {user.limitationPercentage}%
-                          </Typography>
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
-                {emptyRows > 0 && (
-                  <TableRow style={{ height: 53 * emptyRows }}>
-                    <TableCell colSpan={8} />
+                {group && group[0].personalRecords.length > 0 ? (
+                  group[0].personalRecords.map((user) => (
+                    <TableRow hover>
+                      
+                      <TableCell>
+                        <Typography variant="h6">{formatId(user.userId[0])}</Typography>
+                      </TableCell>
+                      
+                      <TableCell>
+                        <Typography >{user.email}</Typography>
+                      </TableCell>
+                      
+                      <TableCell>
+                        <Typography >{user.contactDetails}</Typography>
+                      </TableCell>                      
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={6} align="center">
+                      <Typography variant="h6">No users available</Typography>
+                    </TableCell>
                   </TableRow>
                 )}
               </TableBody>
             </Table>
           </TableContainer>
-          <TablePagination
-            rowsPerPageOptions={[5, 10, 25]}
-            component="div"
-            count={groupDetails.users.length}
-            rowsPerPage={rowsPerPage}
-            page={page}
-            onPageChange={handleChangePage}
-            onRowsPerPageChange={handleChangeRowsPerPage}
-          />
+          </>
+        }
         </Paper>
       </Box>
     </Container>
