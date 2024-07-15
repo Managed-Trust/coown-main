@@ -1,5 +1,6 @@
+import React from 'react';
 import { Box, Grid, Typography, styled } from '@mui/material';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { setVisibilityFilter } from '../../../store/apps/tickets/TicketSlice';
 
 const BoxStyled = styled(Box)(() => ({
@@ -12,20 +13,24 @@ const BoxStyled = styled(Box)(() => ({
   },
 }));
 
-const TicketFilter = () => {
+const TicketFilter = ({ Users = [] }) => {
   const dispatch = useDispatch();
-  const counter = useSelector((state) => state.ticketReducer.tickets);
-  const pendingC = counter.filter((t) => t.Status === 'Pending').length;
-  const openC = counter.filter((t) => t.Status === 'Open').length;
-  const closeC = counter.filter((t) => t.Status === 'Closed').length;
+
+  // Ensure Users is always an array
+  const usersArray = Array.isArray(Users) ? Users : [];
+  
+  const totalUsers = usersArray.length;
+  const pendingUsers = usersArray.filter((user) => !user.verified).length;
+  const openUsers = usersArray.filter((user) => user.verified).length;
+
   return (
     <Grid container spacing={3} textAlign="center">
       <Grid item xs={12} sm={6} lg={3}>
         <BoxStyled
-          onClick={() => dispatch(setVisibilityFilter('total_tickets'))}
+          onClick={() => dispatch(setVisibilityFilter('total_users'))}
           sx={{ backgroundColor: 'primary.light', color: 'primary.main' }}
         >
-          <Typography variant="h3">{counter.length}</Typography>
+          <Typography variant="h3">{totalUsers}</Typography>
           <Typography variant="h6">Total Users</Typography>
         </BoxStyled>
       </Grid>
@@ -34,7 +39,7 @@ const TicketFilter = () => {
           onClick={() => dispatch(setVisibilityFilter('Pending'))}
           sx={{ backgroundColor: 'warning.light', color: 'warning.main' }}
         >
-          <Typography variant="h3">{pendingC}</Typography>
+          <Typography variant="h3">{pendingUsers}</Typography>
           <Typography variant="h6">Pending Users</Typography>
         </BoxStyled>
       </Grid>
@@ -43,8 +48,8 @@ const TicketFilter = () => {
           onClick={() => dispatch(setVisibilityFilter('Open'))}
           sx={{ backgroundColor: 'success.light', color: 'success.main' }}
         >
-          <Typography variant="h3">{openC}</Typography>
-          <Typography variant="h6">Open Users</Typography>
+          <Typography variant="h3">{openUsers}</Typography>
+          <Typography variant="h6">Verified Users</Typography>
         </BoxStyled>
       </Grid>
       <Grid item xs={12} sm={6} lg={3}>
@@ -52,7 +57,7 @@ const TicketFilter = () => {
           onClick={() => dispatch(setVisibilityFilter('Closed'))}
           sx={{ backgroundColor: 'error.light', color: 'error.main' }}
         >
-          <Typography variant="h3">{closeC}</Typography>
+          <Typography variant="h3">{0}</Typography>
           <Typography variant="h6">Closed Users</Typography>
         </BoxStyled>
       </Grid>

@@ -45,7 +45,7 @@ const TicketList = () => {
     <PageContainer title="Operator App" description="this is Note page">
       <Breadcrumb title="Operator App" items={BCrumb} />
       <ChildCard> 
-        <TicketFilter />
+        <TicketFilter Users={users}  />
         <TicketListing Users={users} />
       </ChildCard>
     </PageContainer>
