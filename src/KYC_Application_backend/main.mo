@@ -105,7 +105,7 @@ actor KYC_Canister {
     birth_date : Text, // ISO format
     phone : Text,
     identityNumber : Text,
-    identityDoc : Blob,
+    identityDoc : Text,
     citizenship : [Text],
     residency : Text,
   ) : async Text {
