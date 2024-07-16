@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { Box, Typography, Avatar, Divider, IconButton, Button, Grid, Stack } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { useConnect } from '@connect2ic/react';
@@ -80,6 +80,16 @@ const UserDetail = ({ user, onClose }) => {
         </Grid>
         <Grid item xs={12}>
           <Divider />
+        </Grid>
+        <Grid item xs={12} sm={6} md={6}>
+          <Typography variant="h6">Identity Document</Typography>
+          {user.identityDoc && (
+            <img
+              src={`data:image/jpeg;base64,${user.identityDoc}`}
+              alt="Identity Document"
+              style={{ maxWidth: '100%',width:'150px', height: 'auto', marginTop: 10 }}
+            />
+          )}
         </Grid>
         <Grid item xs={12}>
           <Button variant="contained" color="primary" onClick={handleVerify}>

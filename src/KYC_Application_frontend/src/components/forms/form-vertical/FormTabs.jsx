@@ -79,7 +79,7 @@ const initialState = {
   role: "",
   phone: "",
   identityNumber: "",
-  identityDoc: null, // Store file as Uint8Array
+  identityDoc: null, // Store file as base64 string
   citizenship: [],
   residency: "",
   resident_state: "",
@@ -158,12 +158,11 @@ const FormTabs = () => {
 
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
-    const arrayBuffer = await file.arrayBuffer();
-    const uint8Array = new Uint8Array(arrayBuffer);
+    const base64String = await readFileAsBase64(file);
 
     setFormData((prevData) => ({
       ...prevData,
-      identityDoc: uint8Array,
+      identityDoc: base64String,
     }));
     setDocumentPreview(URL.createObjectURL(file));
   };
@@ -247,7 +246,14 @@ const FormTabs = () => {
     }
   };
 
-  //===============================================
+  const readFileAsBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result.split(',')[1]);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  };
 
   const arrayBufferToBase64 = (buffer) => {
     let binary = "";
@@ -305,10 +311,11 @@ const FormTabs = () => {
       const encryptedIdentityDoc3 = encryptData(formData.phone);
       const encryptedIdentityDoc4 = encryptData(formData.identityNumber);
       const encryptedIdentityDoc5 = encryptData(formData.residency);
-      // const encryptedIdentityDoc7 = await encryptBlob(formData.identityDoc);
+      const encryptedIdentityDoc6 = formData.identityDoc;
       const encryptedCitizenship = encryptArrayEntries(formData.citizenship);
 
-      // const encryptedIdentityDoc7 = encryptData(identityDocBase64);
+      console.log("Encrypted Identity Doc:", encryptedCitizenship);
+            // const encryptedIdentityDoc7 = encryptData(identityDocBase64);
       // console.log("EnCrypted Identity Doc:", encryptedIdentityDoc7);
 
       // const encryptedCitizenship = encryptData(
@@ -324,7 +331,7 @@ const FormTabs = () => {
         encryptData(formData.birth_date),
         encryptData(formData.phone),
         encryptData(formData.identityNumber),
-        encryptData(formData.identityDoc),
+        encryptedIdentityDoc6,
         encryptedCitizenship,
         encryptData(formData.residency)
       );
@@ -336,8 +343,6 @@ const FormTabs = () => {
       const decryptedIdentityDoc4 = decryptData(encryptedIdentityDoc4);
       const decryptedIdentityDoc5 = decryptData(encryptedIdentityDoc5);
       const decryptedCitizenship = decryptArrayEntries(encryptedCitizenship);
-
-      // const decryptedIdentityDoc6 = decryptData(encryptedCitizenship);
 
       console.log(
         "Decrypted Identity Doc:",
@@ -356,14 +361,7 @@ const FormTabs = () => {
       handleNext();
     }
   };
-  const readBlobAsBase64 = (blob) => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onloadend = () => resolve(reader.result);
-      reader.onerror = reject;
-      reader.readAsDataURL(blob);
-    });
-  };
+
   const handleMoreDetailsSubmit = async () => {
     console.log("More Details Submitted", formData);
 
