@@ -270,7 +270,7 @@ const FormTabs = () => {
   };
 
   const encryptArrayEntries = (array) => {
-    return array.map(entry => encryptData(entry));
+    return array.map((entry) => encryptData(entry));
   };
 
   const encryptBlob = async (blob) => {
@@ -287,11 +287,10 @@ const FormTabs = () => {
     const encryptedArrayBuffer = base64ToArrayBuffer(encryptedBase64String);
     // return new Blob([encryptedArrayBuffer], { type: blob.type });
     return new Uint8Array(encryptedArrayBuffer);
-
   };
 
   const decryptArrayEntries = (encryptedArray) => {
-    return encryptedArray.map(entry => decryptData(entry));
+    return encryptedArray.map((entry) => decryptData(entry));
   };
 
   const handlePersonalDetailsSubmit = async () => {
@@ -306,7 +305,7 @@ const FormTabs = () => {
       const encryptedIdentityDoc3 = encryptData(formData.phone);
       const encryptedIdentityDoc4 = encryptData(formData.identityNumber);
       const encryptedIdentityDoc5 = encryptData(formData.residency);
-      const encryptedIdentityDoc7 = await encryptBlob(formData.identityDoc);
+      // const encryptedIdentityDoc7 = await encryptBlob(formData.identityDoc);
       const encryptedCitizenship = encryptArrayEntries(formData.citizenship);
 
       // const encryptedIdentityDoc7 = encryptData(identityDocBase64);
@@ -325,7 +324,7 @@ const FormTabs = () => {
         encryptData(formData.birth_date),
         encryptData(formData.phone),
         encryptData(formData.identityNumber),
-        encryptedIdentityDoc7,
+        encryptData(formData.identityDoc),
         encryptedCitizenship,
         encryptData(formData.residency)
       );
