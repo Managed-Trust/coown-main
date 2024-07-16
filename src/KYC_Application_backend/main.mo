@@ -58,7 +58,7 @@ actor KYC_Canister {
     residency : Text;
     phone : Text;
     identityNumber : Text;
-    identityDoc : Blob;
+    identityDoc : Text;
     verified : Bool;
     //Live image with CNIC
     image : ?Text;
