@@ -4,7 +4,7 @@ import ChatListing from './ChatListing';
 
 const drawerWidth = 320;
 
-const ChatSidebar = ({ isMobileSidebarOpen, onSidebarClose }) => {
+const ChatSidebar = ({ isMobileSidebarOpen, onSidebarClose, onSelectGroup }) => {
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up('lg'));
 
   return (
@@ -19,7 +19,7 @@ const ChatSidebar = ({ isMobileSidebarOpen, onSidebarClose }) => {
         [`& .MuiDrawer-paper`]: { position: 'relative' },
       }}
     >
-      <ChatListing />
+      <ChatListing onSelectGroup={onSelectGroup} />
     </Drawer>
   );
 };

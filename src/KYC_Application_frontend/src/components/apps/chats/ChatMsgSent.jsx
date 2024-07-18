@@ -1,55 +1,52 @@
 import React from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { IconButton, InputBase, Box, Popover } from '@mui/material';
+import { IconButton, InputBase, Box, Popover, CircularProgress } from '@mui/material';
 import Picker from 'emoji-picker-react';
 import { IconMoodSmile, IconPaperclip, IconPhoto, IconSend } from '@tabler/icons';
-import { sendMsg } from '../../../store/apps/chat/ChatSlice';
 
-const ChatMsgSent = () => {
+const ChatMsgSent = ({ selectedGroup, onSendMessage, disabled }) => {
   const [msg, setMsg] = React.useState('');
-  const dispatch = useDispatch();
   const [anchorEl, setAnchorEl] = React.useState(null);
-  const [chosenEmoji, setChosenEmoji] = React.useState();
+  const [chosenEmoji, setChosenEmoji] = React.useState(null);
 
   const onEmojiClick = (_event, emojiObject) => {
     setChosenEmoji(emojiObject);
-    setMsg(emojiObject.emoji);
+    setMsg((prevMsg) => prevMsg + emojiObject.emoji);
   };
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
+
   const handleClose = () => {
     setAnchorEl(null);
   };
-
-  const id = useSelector((state) => state.chatReducer.chatContent);
 
   const handleChatMsgChange = (e) => {
     setMsg(e.target.value);
   };
 
-  const newMsg = { id, msg };
-
   const onChatMsgSubmit = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    dispatch(sendMsg(newMsg));
-    setMsg('');
+    if (selectedGroup && msg.trim()) {
+      const newMsg = { groupId: selectedGroup.adminId, msg, senderId: 'currentUserId', createdAt: new Date() }; // Ensure to replace 'currentUserId' with actual user id
+      console.log("Message:", newMsg);
+      onSendMessage(newMsg);
+      setMsg('');
+    }
   };
 
   return (
-    <Box p={2}>
-      {/* ------------------------------------------- */}
-      {/* sent chat */}
-      {/* ------------------------------------------- */}
+    <Box p={2} position="relative">
+      {disabled && (
+        <Box position="absolute" top={0} bottom={0} left={0} right={0} display="flex" justifyContent="center" alignItems="center" bgcolor="rgba(255,255,255,0.7)" zIndex={1}>
+          <CircularProgress />
+        </Box>
+      )}
       <form
         onSubmit={onChatMsgSubmit}
-        style={{ display: 'flex', gap: '10px', alignItems: 'center' }}
+        style={{ display: 'flex', gap: '10px', alignItems: 'center', opacity: disabled ? 0.5 : 1 }}
       >
-        {/* ------------------------------------------- */}
-        {/* Emoji picker */}
-        {/* ------------------------------------------- */}
         <IconButton
           aria-label="more"
           id="long-button"
@@ -57,6 +54,7 @@ const ChatMsgSent = () => {
           aria-expanded="true"
           aria-haspopup="true"
           onClick={handleClick}
+          disabled={disabled}
         >
           <IconMoodSmile />
         </IconButton>
@@ -80,23 +78,21 @@ const ChatMsgSent = () => {
           size="small"
           type="text"
           inputProps={{ 'aria-label': 'Type a Message' }}
-          onChange={handleChatMsgChange.bind(null)}
+          onChange={handleChatMsgChange}
+          disabled={disabled}
         />
         <IconButton
-          aria-label="delete"
-          onClick={() => {
-            dispatch(sendMsg(newMsg));
-            setMsg('');
-          }}
-          disabled={!msg}
+          aria-label="send"
+          type="submit"
+          disabled={!msg.trim() || disabled}
           color="primary"
         >
           <IconSend stroke={1.5} size="20" />
         </IconButton>
-        <IconButton aria-label="delete">
+        <IconButton aria-label="photo" disabled={disabled}>
           <IconPhoto stroke={1.5} size="20" />
         </IconButton>
-        <IconButton aria-label="delete">
+        <IconButton aria-label="attachment" disabled={disabled}>
           <IconPaperclip stroke={1.5} size="20" />
         </IconButton>
       </form>

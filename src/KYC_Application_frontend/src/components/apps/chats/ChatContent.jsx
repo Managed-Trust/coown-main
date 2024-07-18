@@ -12,25 +12,17 @@ import {
   Badge,
   useMediaQuery,
 } from '@mui/material';
-import { IconDotsVertical, IconMenu2, IconPhone, IconVideo } from '@tabler/icons';
-import { useSelector } from 'react-redux';
-
-import { formatDistanceToNowStrict } from 'date-fns';
-import ChatInsideSidebar from './ChatInsideSidebar';
+import { IconDotsVertical, IconMenu2, IconPhone, IconVideo, IconMessageCircle } from '@tabler/icons';
 import Scrollbar from '../../../components/custom-scroll/Scrollbar';
 
-const ChatContent = ({ toggleChatSidebar }) => {
+const ChatContent = ({ group, messages, toggleChatSidebar }) => {
   const [open, setOpen] = React.useState(true);
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up('lg'));
 
-  const chatDetails = useSelector(
-    (state) => state.chatReducer.chats[state.chatReducer.chatContent - 1],
-  );
-
   return (
-    <Box>
-      {chatDetails ? (
-        <Box>
+    <Box flexGrow={1} display="flex" flexDirection="column">
+      {group ? (
+        <Box display="flex" flexDirection="column" height="100%">
           {/* ------------------------------------------- */}
           {/* Header Part */}
           {/* ------------------------------------------- */}
@@ -44,18 +36,10 @@ const ChatContent = ({ toggleChatSidebar }) => {
               >
                 <IconMenu2 stroke={1.5} onClick={toggleChatSidebar} />
               </Box>
-              <ListItem key={chatDetails.id} dense disableGutters>
+              <ListItem key={group.adminId} dense disableGutters>
                 <ListItemAvatar>
                   <Badge
-                    color={
-                      chatDetails.status === 'online'
-                        ? 'success'
-                        : chatDetails.status === 'busy'
-                        ? 'error'
-                        : chatDetails.status === 'away'
-                        ? 'warning'
-                        : 'secondary'
-                    }
+                    color="secondary"
                     variant="dot"
                     anchorOrigin={{
                       vertical: 'bottom',
@@ -63,22 +47,22 @@ const ChatContent = ({ toggleChatSidebar }) => {
                     }}
                     overlap="circular"
                   >
-                    <Avatar alt={chatDetails.name} src={chatDetails.thumb} />
+                    <Avatar alt={group.name} src={group.groupImage} />
                   </Badge>
                 </ListItemAvatar>
                 <ListItemText
-                  primary={<Typography variant="h5">{chatDetails.name}</Typography>}
-                  secondary={chatDetails.status}
+                  primary={<Typography variant="h5">{group.name}</Typography>}
+                  secondary={group.groupDescription}
                 />
               </ListItem>
               <Stack direction={'row'}>
-                <IconButton aria-label="delete">
+                <IconButton aria-label="call">
                   <IconPhone stroke={1.5} />
                 </IconButton>
-                <IconButton aria-label="delete">
+                <IconButton aria-label="video call">
                   <IconVideo stroke={1.5} />
                 </IconButton>
-                <IconButton aria-label="delete" onClick={() => setOpen(!open)}>
+                <IconButton aria-label="menu" onClick={() => setOpen(!open)}>
                   <IconDotsVertical stroke={1.5} />
                 </IconButton>
               </Stack>
@@ -88,76 +72,50 @@ const ChatContent = ({ toggleChatSidebar }) => {
           {/* ------------------------------------------- */}
           {/* Chat Content */}
           {/* ------------------------------------------- */}
-
-          <Box display="flex">
+          <Box display="flex" flexGrow={1} height="0">
             {/* ------------------------------------------- */}
-            {/* Chat msges */}
+            {/* Chat Messages */}
             {/* ------------------------------------------- */}
-
             <Box width="100%">
-              <Scrollbar sx={{ height: '650px', overflow: 'auto', maxHeight: '800px' }}>
+              <Scrollbar sx={{ height: '400px', overflow: 'auto', maxHeight: '400px' }}>
                 <Box p={3}>
-                  {chatDetails.messages.map((chat) => {
-                    return (
-                      <Box key={chat.id + chat.msg + chat.createdAt}>
-                        {chatDetails.id === chat.senderId ? (
-                          <>
+                  {messages && messages.length > 0 ? (
+                    messages.map((message, index) => (
+                      <Box key={index}>
+                        {message.Messages && message.Messages.SenderUserId ? (
+                          group.adminId === message.Messages.SenderUserId ? (
                             <Box display="flex">
                               <ListItemAvatar>
                                 <Avatar
-                                  alt={chatDetails.name}
-                                  src={chatDetails.thumb}
+                                  alt={group.name}
+                                  src={group.groupImage}
                                   sx={{ width: 40, height: 40 }}
                                 />
                               </ListItemAvatar>
                               <Box>
-                                {chat.createdAt ? (
-                                  <Typography variant="body2" color="grey.400" mb={1}>
-                                    {chatDetails.name},{' '}
-                                    {formatDistanceToNowStrict(new Date(chat.createdAt), {
-                                      addSuffix: false,
-                                    })}{' '}
-                                    ago
-                                  </Typography>
-                                ) : null}
-                                {chat.type === 'text' ? (
-                                  <Box
-                                    mb={2}
-                                    sx={{
-                                      p: 1,
-                                      backgroundColor: 'grey.100',
-                                      mr: 'auto',
-                                      maxWidth: '320px',
-                                    }}
-                                  >
-                                    {chat.msg}
-                                  </Box>
-                                ) : null}
-                                {chat.type === 'image' ? (
-                                  <Box mb={1} sx={{ overflow: 'hidden', lineHeight: '0px' }}>
-                                    <img src={chat.msg} alt="attach" width="150" />
-                                  </Box>
-                                ) : null}
+                                <Box
+                                  mb={2}
+                                  sx={{
+                                    p: 1,
+                                    backgroundColor: 'grey.100',
+                                    mr: 'auto',
+                                    maxWidth: '320px',
+                                  }}
+                                >
+                                  {message.Messages.Description}
+                                </Box>
                               </Box>
                             </Box>
-                          </>
-                        ) : (
-                          <Box
-                            mb={1}
-                            display="flex"
-                            alignItems="flex-end"
-                            flexDirection="row-reverse"
-                          >
-                            <Box alignItems="flex-end" display="flex" flexDirection={'column'}>
-                              {chat.createdAt ? (
-                                <Typography variant="body2" color="grey.400" mb={1}>
-                                  ago
-                                </Typography>
-                              ) : null}
-                              {chat.type === 'text' ? (
+                          ) : (
+                            <Box
+                              mb={1}
+                              display="flex"
+                              alignItems="flex-end"
+                              flexDirection="row-reverse"
+                            >
+                              <Box alignItems="flex-end" display="flex" flexDirection={'column'}>
                                 <Box
                                   mb={1}
-                                  key={chat.id}
                                   sx={{
                                     p: 1,
                                     backgroundColor: 'primary.light',
@@ -165,44 +123,43 @@ const ChatContent = ({ toggleChatSidebar }) => {
                                     maxWidth: '320px',
                                   }}
                                 >
-                                  {chat.msg}
+                                  {message.Messages.Description}
                                 </Box>
-                              ) : null}
-                              {chat.type === 'image' ? (
-                                <Box mb={1} sx={{ overflow: 'hidden', lineHeight: '0px' }}>
-                                  <img src={chat.msg} alt="attach" width="250" />
-                                </Box>
-                              ) : null}
+                              </Box>
                             </Box>
-                          </Box>
+                          )
+                        ) : (
+                          <Typography variant="body2" color="error">
+                            Invalid message format
+                          </Typography>
                         )}
                       </Box>
-                    );
-                  })}
+                    ))
+                  ) : (
+                    <Typography>No messages in this group</Typography>
+                  )}
                 </Box>
               </Scrollbar>
             </Box>
-
-            {/* ------------------------------------------- */}
-            {/* Chat right sidebar Content */}
-            {/* ------------------------------------------- */}
-            <ChatInsideSidebar isInSidebar={lgUp ? open : !open} chat={chatDetails} />
           </Box>
         </Box>
       ) : (
-        <Box display="flex" alignItems="center" p={2} pb={1} pt={1}>
-          {/* ------------------------------------------- */}
-          {/* if No Chat Content */}
-          {/* ------------------------------------------- */}
-          <Box
-            sx={{
-              display: { xs: 'flex', md: 'flex', lg: 'none' },
-              mr: '10px',
-            }}
-          >
-            <IconMenu2 stroke={1.5} onClick={toggleChatSidebar} />
-          </Box>
-          <Typography variant="h4">Select Chat</Typography>
+        <Box
+          display="flex"
+          flexDirection="column"
+          alignItems="center"
+          justifyContent="center"
+          flexGrow={1}
+          textAlign="center"
+          p={2}
+        >
+          <IconMessageCircle stroke={1.5} size={60} color="gray" />
+          <Typography variant="h4" color="textSecondary" mt={2}>
+            Select a Group to Start Chatting
+          </Typography>
+          <Typography variant="body1" color="textSecondary" mt={1}>
+            Choose a group from the sidebar to view and send messages.
+          </Typography>
         </Box>
       )}
     </Box>

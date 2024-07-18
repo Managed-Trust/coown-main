@@ -33,7 +33,7 @@ const ChatInsideSidebar = ({ isInSidebar, chat }) => {
 
   return (
     <>
-      {isInSidebar ? (
+      {/* {isInSidebar ? (
         <Box
           sx={{
             width: isInSidebar === true ? drawerWidth : 0,
@@ -119,7 +119,7 @@ const ChatInsideSidebar = ({ isInSidebar, chat }) => {
             {totalAttachment === 0 ? <Alert severity="error">No Attachment Found!</Alert> : null}
           </Box>
         </Box>
-      ) : null}
+      ) : null} */}
     </>
   );
 };
