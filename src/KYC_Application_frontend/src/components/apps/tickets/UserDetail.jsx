@@ -5,7 +5,7 @@ import { useConnect } from '@connect2ic/react';
 import ic from 'ic0';
 import CryptoJS from "crypto-js";
 
-const ledger = ic.local("bkyz2-fmaaa-aaaaa-qaaaq-cai"); // Ledger canister
+const ledger = ic.local("bd3sg-teaaa-aaaaa-qaaba-cai"); // Ledger canister
 
 const secretKey = "your-secret-key"; // Use a strong secret key
 
@@ -72,11 +72,11 @@ const UserDetail = ({ user, onClose }) => {
         </Grid>
         <Grid item xs={12} sm={6} md={4}>
           <Typography variant="h6">Birth City</Typography>
-          <Typography variant="body1">{user.birth_city[0]}</Typography>
+          <Typography variant="body1">{decryptData(user.birth_city[0])}</Typography>
         </Grid>
         <Grid item xs={12} sm={6} md={4}>
           <Typography variant="h6">Birth Country</Typography>
-          <Typography variant="body1">{user.birth_country[0]}</Typography>
+          <Typography variant="body1">{decryptData(user.birth_country[0])}</Typography>
         </Grid>
         <Grid item xs={12}>
           <Divider />
@@ -85,7 +85,7 @@ const UserDetail = ({ user, onClose }) => {
           <Typography variant="h6">Identity Document</Typography>
           {user.identityDoc && (
             <img
-              src={`data:image/jpeg;base64,${user.identityDoc}`}
+              src={`data:image/jpeg;base64,${decryptData(user.identityDoc)}`}
               alt="Identity Document"
               style={{ maxWidth: '100%',width:'150px', height: 'auto', marginTop: 10 }}
             />

@@ -42,12 +42,13 @@ actor KYC_Canister {
     birth_city : ?Text;
     resident_address : ?Text;
     resident_country : ?Text;
-    resident_state : ?Text;
-    resident_city : ?Text;
-    resident_postal_code : ?Text;
-    resident_street : ?Text;
+    resident_state : ?Text; //make it generic
+    resident_city : ?Text; //make it generic
+    resident_postal_code : ?Text; //make it generic
+    resident_street : ?Text; //make it generic
     gender : ?Nat; // 0, 1, 2 for unspecified, male, female
     nationality : ?Text; // ISO Alpha-2 code
+    //allow multiple
     issuance_date : ?Text; // ISO format
     expiry_date : ?Text; // ISO format
     issuing_authority : ?Text;
@@ -749,7 +750,6 @@ actor KYC_Canister {
     name : Text;
     adminId : Text;
     defaultGroup : Bool;
-    personalRecords : [PersonalRecord]; // New field to store personal records
     addressOfLegalEntity : ?Text;
     residencyOfGroup : ?Text;
     groupDescription : ?Text;
@@ -758,6 +758,8 @@ actor KYC_Canister {
     publicLawEntity : ?PublicLawEntity;
     isPublicLawEntity : ?Bool;
     company : ?Company;
+    //===============================================================================//
+    personalRecords : [PersonalRecord]; // New field to store personal records
   };
 
   public type PublicLawEntity = {
@@ -945,24 +947,30 @@ actor KYC_Canister {
 
   // // Helper function to find the index of a user in a group
 
-  public func updateGroupUserStatus(groupId : Text, email : Text, newStatus : PersonalRecordStatus) : async Text {
+  public func updateGroupUserStatus(groupId : Text, email : Text, newStatus : PersonalRecordStatus, encryptedEmail : Text) : async Text {
     switch (groups.get(groupId)) {
       case (null) {
         "Group does not exist.";
       };
+
       case (?group) {
+        Debug.print(debug_show ("=============="));
+
         var updated = false;
         // Correctly map over the groupUsers to update the status
         var userSetId = ?"";
         let updatedUsers = Array.map(
           group.personalRecords,
           func(user : PersonalRecord) : PersonalRecord {
+            // Debug.print(debug_show (user.email));
+            // Debug.print(debug_show (email));
+            // Debug.print(debug_show ("email"));
             if (user.email == email) {
               updated := true;
               userSetId := user.userId;
               return {
                 userId = user.userId; // Optional user ID
-                email = user.email;
+                email = encryptedEmail;
                 contactDetails = user.contactDetails;
                 recordType = user.recordType;
                 recordStatus = newStatus;
@@ -1021,8 +1029,11 @@ actor KYC_Canister {
       case (null) { "Group does not exist." };
 
       case (?group) {
+        Debug.print(debug_show (group.adminId));
+        Debug.print(debug_show (caller));
 
         if (group.adminId != caller) {
+
           return "Only the group admin can declare the group as a public law entity.";
         } else {
           let newPublicLawEntity : PublicLawEntity = {
@@ -1097,12 +1108,12 @@ actor KYC_Canister {
               phoneNumber = phoneNumber;
             };
           };
-          // let updatedGroup = {
-          //   group with
-          //   company = ?newCompany;
-          //   isRegisteredCompany = ?true;
-          // };
-          // groups.put(groupId, updatedGroup);
+          let updatedGroup = {
+            group with
+            company = ?newCompany;
+            isRegisteredCompany = ?true;
+          };
+          groups.put(groupId, updatedGroup);
           return "Company registered successfully within group: ";
         };
       };

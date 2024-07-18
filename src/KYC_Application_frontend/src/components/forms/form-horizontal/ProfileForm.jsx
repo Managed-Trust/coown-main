@@ -11,60 +11,81 @@ import {
   FormControlLabel,
   Select,
   MenuItem,
-  Chip
-} from '@mui/material';
+  Chip,
+} from "@mui/material";
 import TabContext from "@mui/lab/TabContext";
 import TabPanel from "@mui/lab/TabPanel";
-import CustomFormLabel from '../theme-elements/CustomFormLabel';
-import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
-import ParentCard from '../../../components/shared/ParentCard';
-import PageContainer from '../../../components/container/PageContainer';
+import CustomFormLabel from "../theme-elements/CustomFormLabel";
+import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
+import ParentCard from "../../../components/shared/ParentCard";
+import PageContainer from "../../../components/container/PageContainer";
 import { useConnect } from "@connect2ic/react";
-import ic from "ic0";
 
-const ledger = ic.local("bkyz2-fmaaa-aaaaa-qaaaq-cai"); // Ledger canister
+import ic from "ic0";
+import CryptoJS from "crypto-js";
+
+const secretKey = "your-secret-key"; // Use a strong secret key
+
+const hashData = (data) => {
+  return CryptoJS.SHA256(data).toString(CryptoJS.enc.Hex);
+};
+
+const encryptData = (data) => {
+  return CryptoJS.AES.encrypt(data, secretKey).toString();
+};
+
+const decryptData = (ciphertext) => {
+  const bytes = CryptoJS.AES.decrypt(ciphertext, secretKey);
+  return bytes.toString(CryptoJS.enc.Utf8);
+};
+const ledger = ic.local("bd3sg-teaaa-aaaaa-qaaba-cai"); // Ledger canister
 
 const countries = [
-  { value: 'IN', label: 'India' },
-  { value: 'UK', label: 'United Kingdom' },
-  { value: 'SL', label: 'Sri Lanka' },
+  { value: "IN", label: "India" },
+  { value: "UK", label: "United Kingdom" },
+  { value: "SL", label: "Sri Lanka" },
 ];
 
 const initialState = {
-  family_name: '',
-  email: '',
-  given_name: '',
-  birth_date: '',
+  family_name: "",
+  email: "",
+  given_name: "",
+  birth_date: "",
   age_over_18: true,
-  gender: '',
-  issuance_date: '',
-  expiry_date: '',
-  resident_address: '',
-  resident_country: '',
-  nationality: '',
-  document_number: '',
-  issuing_country: '',
-  phone: '',
-  openchat_id: '',
+  gender: "",
+  issuance_date: "",
+  expiry_date: "",
+  resident_address: "",
+  resident_country: "",
+  nationality: "",
+  document_number: "",
+  issuing_country: "",
+  phone: "",
+  openchat_id: "",
   document_file: null,
-  role: '',
-  identityNumber: '',
+  role: "",
+  identityNumber: "",
   citizenship: [],
-  residency: '',
+  residency: "",
   verified: false,
-  birth_place: '',
-  birth_country: '',
-  birth_state: '',
-  birth_city: '',
-  resident_state: '',
-  resident_city: '',
-  resident_postal_code: '',
-  resident_street: '',
-  issuing_authority: '',
-  issuing_jurisdiction: ''
+  birth_place: "",
+  birth_country: "",
+  birth_state: "",
+  birth_city: "",
+  resident_state: "",
+  resident_city: "",
+  resident_postal_code: "",
+  resident_street: "",
+  issuing_authority: "",
+  issuing_jurisdiction: "",
 };
 
-const steps = ['Personal Details', 'More Details', 'Address Details', 'Document Details'];
+const steps = [
+  "Personal Details",
+  "More Details",
+  "Address Details",
+  "Document Details",
+];
 
 const ProfileForm = () => {
   const [activeTab, setActiveTab] = useState(0);
@@ -87,7 +108,7 @@ const ProfileForm = () => {
         setFormData({
           ...formData,
           ...profileData,
-          citizenship: profileData.citizenship || []
+          citizenship: profileData.citizenship || [],
         });
       } catch (e) {
         console.log("Error Fetching Profile:", e);
@@ -125,7 +146,9 @@ const ProfileForm = () => {
         ...prevData,
         document_file: uint8Array,
       }));
-      setDocumentPreview(URL.createObjectURL(new Blob([uint8Array], { type: file.type })));
+      setDocumentPreview(
+        URL.createObjectURL(new Blob([uint8Array], { type: file.type }))
+      );
     };
 
     fileReader.readAsArrayBuffer(file);
@@ -156,49 +179,90 @@ const ProfileForm = () => {
   };
 
   const handleSubmitPersonalDetails = async () => {
-    console.log('Personal Details Submitted', formData);
+    console.log("Personal Details Submitted", formData);
     try {
-      const response = await ledger.call("addBasicInfoCustomer", principal, formData.family_name, formData.given_name, formData.birth_date, formData.age_over_18, formData.role, formData.phone, formData.identityNumber, formData.document_file, false, formData.citizenship, formData.residency);
-      console.log('Response:', response);
+      const response = await ledger.call(
+        "addBasicInfoCustomer",
+        principal,
+        formData.family_name,
+        formData.given_name,
+        formData.birth_date,
+        formData.age_over_18,
+        formData.role,
+        formData.phone,
+        formData.identityNumber,
+        formData.document_file,
+        false,
+        formData.citizenship,
+        formData.residency
+      );
+      console.log("Response:", response);
       alert(response);
     } catch (e) {
-      console.error('Error submitting personal details:', e);
+      console.error("Error submitting personal details:", e);
     }
     setActiveTab((prev) => prev + 1);
   };
 
   const handleSubmitMoreDetails = async () => {
-    console.log('More Details Submitted', formData);
+    console.log("More Details Submitted", formData);
     try {
-      const response = await ledger.call("addFamilyCustomer", principal, formData.birth_place, formData.birth_country, formData.birth_state, formData.birth_city);
-      console.log('Response:', response);
+      const response = await ledger.call(
+        "addFamilyCustomer",
+        principal,
+        encryptData(formData.birth_place),
+        encryptData(formData.birth_country),
+        encryptData(formData.birth_state),
+        encryptData(formData.birth_city)
+      );
+      console.log("Response:", response);
       alert(response);
     } catch (e) {
-      console.error('Error submitting More details:', e);
+      console.error("Error submitting More details:", e);
     }
     setActiveTab((prev) => prev + 1);
   };
 
   const handleSubmitAddressDetails = async () => {
-    console.log('Address Details Submitted', formData);
+    console.log("Address Details Submitted", formData);
     try {
-      const response = await ledger.call("addResidencyCustomer", principal, formData.resident_address, formData.resident_country, formData.resident_state, formData.resident_city, formData.resident_postal_code, formData.resident_street);
-      console.log('Response:', response);
+      const response = await ledger.call(
+        "addResidencyCustomer",
+        principal,
+        encryptData(formData.resident_address),
+        encryptData(formData.resident_country),
+        encryptData(formData.resident_state),
+        encryptData(formData.resident_city),
+        encryptData(formData.resident_postal_code),
+        encryptData(formData.resident_street)
+      );
+      console.log("Response:", response);
       alert(response);
     } catch (e) {
-      console.error('Error submitting More details:', e);
+      console.error("Error submitting More details:", e);
     }
     setActiveTab((prev) => prev + 1);
   };
 
   const handleSubmitDocumentDetails = async () => {
-    console.log('Document Details Submitted', formData);
+    console.log("Document Details Submitted", formData);
     try {
-      const response = await ledger.call("addOtherInfoCustomer", principal, Number(formData.gender), formData.nationality, formData.issuance_date, formData.expiry_date, formData.issuing_authority, formData.document_number, formData.issuing_country, formData.issuing_jurisdiction);
-      console.log('Response:', response);
+      const response = await ledger.call(
+        "addOtherInfoCustomer",
+        principal,
+        Number(formData.gender),
+        encryptData(formData.nationality),
+        encryptData(formData.issuance_date),
+        encryptData(formData.expiry_date),
+        encryptData(formData.issuing_authority),
+        encryptData(formData.document_number),
+        encryptData(formData.issuing_country),
+        encryptData(formData.issuing_jurisdiction)
+      );
+      console.log("Response:", response);
       alert(response);
     } catch (e) {
-      console.error('Error submitting More details:', e);
+      console.error("Error submitting More details:", e);
     }
   };
 
@@ -212,55 +276,128 @@ const ProfileForm = () => {
           <Box>
             <Grid container spacing={3}>
               <Grid item xs={12} lg={6}>
-                <CustomFormLabel htmlFor="given_name" sx={{ mt: 2 }} className="center">
+                <CustomFormLabel
+                  htmlFor="given_name"
+                  sx={{ mt: 2 }}
+                  className="center"
+                >
                   Given Name
-                  <Tooltip title="Given and middle names" placement="top" cursor="pointer">
+                  <Tooltip
+                    title="Given and middle names"
+                    placement="top"
+                    cursor="pointer"
+                  >
                     <ErrorOutlineIcon />
                   </Tooltip>
                 </CustomFormLabel>
-                <TextField id="given_name" placeholder="John" fullWidth onChange={handleInputChange} value={formData.given_name} />
+                <TextField
+                  id="given_name"
+                  placeholder="John"
+                  fullWidth
+                  onChange={handleInputChange}
+                  value={decryptData(formData.given_name)}
+                />
 
                 <Grid container spacing={3}>
                   <Grid item xs={12}>
-                    <CustomFormLabel htmlFor="birth_date" sx={{ mt: 2 }} className="center">
+                    <CustomFormLabel
+                      htmlFor="birth_date"
+                      sx={{ mt: 2 }}
+                      className="center"
+                    >
                       Date of Birth
-                      <Tooltip title="Day, month, and year on which the PID User was born." placement="top" cursor="pointer">
+                      <Tooltip
+                        title="Day, month, and year on which the PID User was born."
+                        placement="top"
+                        cursor="pointer"
+                      >
                         <ErrorOutlineIcon />
                       </Tooltip>
                     </CustomFormLabel>
-                    <TextField type="date" id="birth_date" fullWidth onChange={handleInputChange} value={formData.birth_date} />
+                    <TextField
+                      type="date"
+                      id="birth_date"
+                      fullWidth
+                      onChange={handleInputChange}
+                      value={decryptData(formData.birth_date)}
+                    />
                   </Grid>
                 </Grid>
 
-                <CustomFormLabel htmlFor="phone" sx={{ mt: 2 }} className="center">
+                <CustomFormLabel
+                  htmlFor="phone"
+                  sx={{ mt: 2 }}
+                  className="center"
+                >
                   Phone
-                  <Tooltip title="User's Phone Number" placement="top" cursor="pointer">
+                  <Tooltip
+                    title="User's Phone Number"
+                    placement="top"
+                    cursor="pointer"
+                  >
                     <ErrorOutlineIcon />
                   </Tooltip>
                 </CustomFormLabel>
-                <TextField id="phone" placeholder="+123456789" fullWidth onChange={handleInputChange} value={formData.phone} />
+                <TextField
+                  id="phone"
+                  placeholder="+123456789"
+                  fullWidth
+                  onChange={handleInputChange}
+                  value={decryptData(formData.phone)}
+                />
 
-                <CustomFormLabel htmlFor="identityNumber" sx={{ mt: 2 }} className="center">
+                <CustomFormLabel
+                  htmlFor="identityNumber"
+                  sx={{ mt: 2 }}
+                  className="center"
+                >
                   Identity Number
-                  <Tooltip title="User's Identity Number" placement="top" cursor="pointer">
+                  <Tooltip
+                    title="User's Identity Number"
+                    placement="top"
+                    cursor="pointer"
+                  >
                     <ErrorOutlineIcon />
                   </Tooltip>
                 </CustomFormLabel>
-                <TextField id="identityNumber" placeholder="Identity Number" fullWidth onChange={handleInputChange} value={formData.identityNumber} />
-
+                <TextField
+                  id="identityNumber"
+                  placeholder="Identity Number"
+                  fullWidth
+                  onChange={handleInputChange}
+                  value={decryptData(formData.identityNumber)}
+                />
               </Grid>
               <Grid item xs={12} lg={6}>
                 <CustomFormLabel htmlFor="family_name" className="center">
                   Family Name
-                  <Tooltip title="Current last name(s) or surname(s) of the PID User." placement="top" cursor="pointer">
+                  <Tooltip
+                    title="Current last name(s) or surname(s) of the PID User."
+                    placement="top"
+                    cursor="pointer"
+                  >
                     <ErrorOutlineIcon />
                   </Tooltip>
                 </CustomFormLabel>
-                <TextField id="family_name" placeholder="Doe" fullWidth onChange={handleInputChange} value={formData.family_name} />
+                <TextField
+                  id="family_name"
+                  placeholder="Doe"
+                  fullWidth
+                  onChange={handleInputChange}
+                  value={decryptData(formData.family_name)}
+                />
 
-                <CustomFormLabel htmlFor="citizenship" sx={{ mt: 2 }} className="center">
+                <CustomFormLabel
+                  htmlFor="citizenship"
+                  sx={{ mt: 2 }}
+                  className="center"
+                >
                   Citizenship
-                  <Tooltip title="User's Citizenship" placement="top" cursor="pointer">
+                  <Tooltip
+                    title="User's Citizenship"
+                    placement="top"
+                    cursor="pointer"
+                  >
                     <ErrorOutlineIcon />
                   </Tooltip>
                 </CustomFormLabel>
@@ -271,10 +408,15 @@ const ProfileForm = () => {
                   onChange={handleCitizenshipAdd}
                   displayEmpty
                 >
-                  <MenuItem value="" disabled>Select Citizenship</MenuItem>
+                  <MenuItem value="" disabled>
+                    Select Citizenship
+                  </MenuItem>
                   {countries.map((option) => (
-                    <MenuItem key={option.value} value={option.value}>
-                      {option.label}
+                    <MenuItem
+                      key={option.value}
+                      value={decryptData(option.value)}
+                    >
+                      {decryptData(option.label)}
                     </MenuItem>
                   ))}
                 </Select>
@@ -282,36 +424,69 @@ const ProfileForm = () => {
                   {formData.citizenship.map((citizenship) => (
                     <Chip
                       key={citizenship}
-                      label={citizenship}
+                      label={decryptData(citizenship)}
                       onDelete={() => handleCitizenshipRemove(citizenship)}
                       sx={{ marginRight: 1, marginBottom: 1 }}
                     />
                   ))}
                 </Box>
 
-                <CustomFormLabel htmlFor="residency" sx={{ mt: 2 }} className="center">
+                <CustomFormLabel
+                  htmlFor="residency"
+                  sx={{ mt: 2 }}
+                  className="center"
+                >
                   Residency
-                  <Tooltip title="User's Residency" placement="top" cursor="pointer">
+                  <Tooltip
+                    title="User's Residency"
+                    placement="top"
+                    cursor="pointer"
+                  >
                     <ErrorOutlineIcon />
                   </Tooltip>
                 </CustomFormLabel>
-                <TextField id="residency" placeholder="Residency" fullWidth onChange={handleInputChange} value={formData.residency} />
+                <TextField
+                  id="residency"
+                  placeholder="Residency"
+                  fullWidth
+                  onChange={handleInputChange}
+                  value={decryptData(formData.residency)}
+                />
 
-                <CustomFormLabel htmlFor="document_file" sx={{ mt: 2 }} className="center">
+                <CustomFormLabel
+                  htmlFor="document_file"
+                  sx={{ mt: 2 }}
+                  className="center"
+                >
                   Identity Document
-                  <Tooltip title="Upload your identity document" placement="top" cursor="pointer">
+                  <Tooltip
+                    title="Upload your identity document"
+                    placement="top"
+                    cursor="pointer"
+                  >
                     <ErrorOutlineIcon />
                   </Tooltip>
                 </CustomFormLabel>
-                <TextField id="document_file" type="file" fullWidth onChange={handleFileChange} />
-                {documentPreview && <img src={documentPreview} alt="Document Preview" style={{ marginTop: '10px', maxHeight: '200px' }} />}
+                <TextField
+                  id="document_file"
+                  type="file"
+                  fullWidth
+                  onChange={handleFileChange}
+                />
+                {documentPreview && (
+                  <img
+                    src={documentPreview}
+                    alt="Document Preview"
+                    style={{ marginTop: "10px", maxHeight: "200px" }}
+                  />
+                )}
               </Grid>
             </Grid>
             <Box display="flex" justifyContent="flex-end" mt={3}>
               <Button
                 onClick={handleSubmitPersonalDetails}
                 variant="contained"
-                color='secondary'
+                color="secondary"
               >
                 Save
               </Button>
@@ -323,38 +498,62 @@ const ProfileForm = () => {
           <Box>
             <Grid container spacing={3}>
               <Grid item xs={12} lg={6}>
-                <CustomFormLabel htmlFor="birth_place" sx={{ mt: 2 }} className="center">
+                <CustomFormLabel
+                  htmlFor="birth_place"
+                  sx={{ mt: 2 }}
+                  className="center"
+                >
                   Birth Place
-                  <Tooltip title="The place where the PID User was born." placement="top" cursor="pointer">
+                  <Tooltip
+                    title="The place where the PID User was born."
+                    placement="top"
+                    cursor="pointer"
+                  >
                     <ErrorOutlineIcon />
                   </Tooltip>
                 </CustomFormLabel>
-                <TextField id="birth_place" placeholder="Enter Birth Place" fullWidth onChange={handleInputChange} value={formData.birth_place} />
+                <TextField
+                  id="birth_place"
+                  placeholder="Enter Birth Place"
+                  fullWidth
+                  onChange={handleInputChange}
+                  value={decryptData(formData.birth_place[0])}
+                />
 
                 <CustomFormLabel htmlFor="birth_country" className="center">
                   Birth Country
-                  <Tooltip title="The country where the PID User was born." placement="top" cursor="pointer">
+                  <Tooltip
+                    title="The country where the PID User was born."
+                    placement="top"
+                    cursor="pointer"
+                  >
                     <ErrorOutlineIcon />
                   </Tooltip>
                 </CustomFormLabel>
                 <Select
                   id="birth_country"
                   fullWidth
-                  onChange={handleSelectChange('birth_country')}
-                  value={formData.birth_country}
+                  onChange={handleSelectChange("birth_country")}
+                  value={decryptData(formData.birth_country[0])}
                 >
                   {countries.map((option) => (
-                    <MenuItem key={option.value} value={option.value}>
+                    <MenuItem
+                      key={option.value}
+                      value={option.value}
+                    >
                       {option.label}
                     </MenuItem>
                   ))}
                 </Select>
-
               </Grid>
               <Grid item xs={12} lg={6}>
                 <CustomFormLabel htmlFor="birth_city" className="center">
                   Birth City
-                  <Tooltip title="The city where the PID User was born." placement="top" cursor="pointer">
+                  <Tooltip
+                    title="The city where the PID User was born."
+                    placement="top"
+                    cursor="pointer"
+                  >
                     <ErrorOutlineIcon />
                   </Tooltip>
                 </CustomFormLabel>
@@ -363,12 +562,16 @@ const ProfileForm = () => {
                   placeholder="Enter Birth City"
                   fullWidth
                   onChange={handleInputChange}
-                  value={formData.birth_city}
+                  value={decryptData(formData.birth_city[0])}
                 />
 
                 <CustomFormLabel htmlFor="birth_state" className="center">
                   Birth State
-                  <Tooltip title="The state where the PID User was born." placement="top" cursor="pointer">
+                  <Tooltip
+                    title="The state where the PID User was born."
+                    placement="top"
+                    cursor="pointer"
+                  >
                     <ErrorOutlineIcon />
                   </Tooltip>
                 </CustomFormLabel>
@@ -377,7 +580,7 @@ const ProfileForm = () => {
                   placeholder="Enter Birth State"
                   fullWidth
                   onChange={handleInputChange}
-                  value={formData.birth_state}
+                  value={decryptData(formData.birth_state[0])}
                 />
               </Grid>
             </Grid>
@@ -385,7 +588,7 @@ const ProfileForm = () => {
               <Button
                 onClick={handleSubmitMoreDetails}
                 variant="contained"
-                color='secondary'
+                color="secondary"
               >
                 Save
               </Button>
@@ -399,7 +602,11 @@ const ProfileForm = () => {
               <Grid item xs={12} lg={6}>
                 <CustomFormLabel htmlFor="resident_address" className="center">
                   Resident Address
-                  <Tooltip title="The full address of the place where the PID User currently resides and/or can be contacted." placement="top" cursor="pointer">
+                  <Tooltip
+                    title="The full address of the place where the PID User currently resides and/or can be contacted."
+                    placement="top"
+                    cursor="pointer"
+                  >
                     <ErrorOutlineIcon />
                   </Tooltip>
                 </CustomFormLabel>
@@ -408,20 +615,24 @@ const ProfileForm = () => {
                   placeholder="123 Main St"
                   fullWidth
                   onChange={handleInputChange}
-                  value={formData.resident_address}
+                  value={decryptData(formData.resident_address)}
                 />
 
                 <CustomFormLabel htmlFor="resident_country" className="center">
                   Resident Country
-                  <Tooltip title="The country where the PID User currently resides." placement="top" cursor="pointer">
+                  <Tooltip
+                    title="The country where the PID User currently resides."
+                    placement="top"
+                    cursor="pointer"
+                  >
                     <ErrorOutlineIcon />
                   </Tooltip>
                 </CustomFormLabel>
                 <Select
                   id="resident_country"
                   fullWidth
-                  onChange={handleSelectChange('resident_country')}
-                  value={formData.resident_country}
+                  onChange={handleSelectChange("resident_country")}
+                  value={decryptData(formData.resident_country)}
                 >
                   {countries.map((option) => (
                     <MenuItem key={option.value} value={option.value}>
@@ -432,7 +643,11 @@ const ProfileForm = () => {
 
                 <CustomFormLabel htmlFor="resident_state" className="center">
                   Resident State
-                  <Tooltip title="The state where the PID User currently resides." placement="top" cursor="pointer">
+                  <Tooltip
+                    title="The state where the PID User currently resides."
+                    placement="top"
+                    cursor="pointer"
+                  >
                     <ErrorOutlineIcon />
                   </Tooltip>
                 </CustomFormLabel>
@@ -441,13 +656,17 @@ const ProfileForm = () => {
                   placeholder="Enter Resident State"
                   fullWidth
                   onChange={handleInputChange}
-                  value={formData.resident_state}
+                  value={decryptData(formData.resident_state)}
                 />
               </Grid>
               <Grid item xs={12} lg={6}>
                 <CustomFormLabel htmlFor="resident_city" className="center">
                   Resident City
-                  <Tooltip title="The city where the PID User currently resides." placement="top" cursor="pointer">
+                  <Tooltip
+                    title="The city where the PID User currently resides."
+                    placement="top"
+                    cursor="pointer"
+                  >
                     <ErrorOutlineIcon />
                   </Tooltip>
                 </CustomFormLabel>
@@ -456,12 +675,16 @@ const ProfileForm = () => {
                   placeholder="Enter Resident City"
                   fullWidth
                   onChange={handleInputChange}
-                  value={formData.resident_city}
+                  value={decryptData(formData.resident_city)}
                 />
 
                 <CustomFormLabel htmlFor="resident_street" className="center">
                   Resident Street
-                  <Tooltip title="The street where the PID User currently resides." placement="top" cursor="pointer">
+                  <Tooltip
+                    title="The street where the PID User currently resides."
+                    placement="top"
+                    cursor="pointer"
+                  >
                     <ErrorOutlineIcon />
                   </Tooltip>
                 </CustomFormLabel>
@@ -470,12 +693,19 @@ const ProfileForm = () => {
                   placeholder="Enter Resident Street"
                   fullWidth
                   onChange={handleInputChange}
-                  value={formData.resident_street}
+                  value={decryptData(formData.resident_street)}
                 />
 
-                <CustomFormLabel htmlFor="resident_postal_code" className="center">
+                <CustomFormLabel
+                  htmlFor="resident_postal_code"
+                  className="center"
+                >
                   Resident Postal Code
-                  <Tooltip title="The postal code of the place where the PID User currently resides." placement="top" cursor="pointer">
+                  <Tooltip
+                    title="The postal code of the place where the PID User currently resides."
+                    placement="top"
+                    cursor="pointer"
+                  >
                     <ErrorOutlineIcon />
                   </Tooltip>
                 </CustomFormLabel>
@@ -484,7 +714,7 @@ const ProfileForm = () => {
                   placeholder="Enter Postal Code"
                   fullWidth
                   onChange={handleInputChange}
-                  value={formData.resident_postal_code}
+                  value={decryptData(formData.resident_postal_code)}
                 />
               </Grid>
             </Grid>
@@ -492,7 +722,7 @@ const ProfileForm = () => {
               <Button
                 onClick={handleSubmitAddressDetails}
                 variant="contained"
-                color='secondary'
+                color="secondary"
               >
                 Save
               </Button>
@@ -506,11 +736,20 @@ const ProfileForm = () => {
               <Grid item xs={12} lg={6}>
                 <CustomFormLabel htmlFor="gender" className="center">
                   Gender
-                  <Tooltip title="PID User's gender, using a value as defined in ISO/IEC 5218." placement="top" cursor="pointer">
+                  <Tooltip
+                    title="PID User's gender, using a value as defined in ISO/IEC 5218."
+                    placement="top"
+                    cursor="pointer"
+                  >
                     <ErrorOutlineIcon />
                   </Tooltip>
                 </CustomFormLabel>
-                <Select id="gender" fullWidth onChange={handleSelectChange('gender')} value={formData.gender}>
+                <Select
+                  id="gender"
+                  fullWidth
+                  onChange={handleSelectChange("gender")}
+                  value={decryptData(formData.gender)}
+                >
                   <MenuItem value="0">Not specified</MenuItem>
                   <MenuItem value="1">Male</MenuItem>
                   <MenuItem value="2">Female</MenuItem>
@@ -518,11 +757,20 @@ const ProfileForm = () => {
 
                 <CustomFormLabel htmlFor="nationality" className="center">
                   Nationality
-                  <Tooltip title="ISO Alpha-2 code for nationality" placement="top" cursor="pointer">
+                  <Tooltip
+                    title="ISO Alpha-2 code for nationality"
+                    placement="top"
+                    cursor="pointer"
+                  >
                     <ErrorOutlineIcon />
                   </Tooltip>
                 </CustomFormLabel>
-                <Select id="nationality" fullWidth onChange={handleSelectChange('nationality')} value={formData.nationality}>
+                <Select
+                  id="nationality"
+                  fullWidth
+                  onChange={handleSelectChange("nationality")}
+                  value={decryptData(formData.nationality)}
+                >
                   {countries.map((option) => (
                     <MenuItem key={option.value} value={option.value}>
                       {option.label}
@@ -532,7 +780,11 @@ const ProfileForm = () => {
 
                 <CustomFormLabel htmlFor="issuance_date" className="center">
                   Issuance Date
-                  <Tooltip title="Date when the document was issued (ISO format)" placement="top" cursor="pointer">
+                  <Tooltip
+                    title="Date when the document was issued (ISO format)"
+                    placement="top"
+                    cursor="pointer"
+                  >
                     <ErrorOutlineIcon />
                   </Tooltip>
                 </CustomFormLabel>
@@ -541,12 +793,16 @@ const ProfileForm = () => {
                   id="issuance_date"
                   fullWidth
                   onChange={handleInputChange}
-                  value={formData.issuance_date}
+                  value={decryptData(formData.issuance_date)}
                 />
 
                 <CustomFormLabel htmlFor="expiry_date" className="center">
                   Expiry Date
-                  <Tooltip title="Date when the document will expire (ISO format)" placement="top" cursor="pointer">
+                  <Tooltip
+                    title="Date when the document will expire (ISO format)"
+                    placement="top"
+                    cursor="pointer"
+                  >
                     <ErrorOutlineIcon />
                   </Tooltip>
                 </CustomFormLabel>
@@ -555,13 +811,17 @@ const ProfileForm = () => {
                   id="expiry_date"
                   fullWidth
                   onChange={handleInputChange}
-                  value={formData.expiry_date}
+                  value={decryptData(formData.expiry_date)}
                 />
               </Grid>
               <Grid item xs={12} lg={6}>
                 <CustomFormLabel htmlFor="document_number" className="center">
                   Document Number
-                  <Tooltip title="The number assigned to the document" placement="top" cursor="pointer">
+                  <Tooltip
+                    title="The number assigned to the document"
+                    placement="top"
+                    cursor="pointer"
+                  >
                     <ErrorOutlineIcon />
                   </Tooltip>
                 </CustomFormLabel>
@@ -570,16 +830,25 @@ const ProfileForm = () => {
                   placeholder="Enter Document Number"
                   fullWidth
                   onChange={handleInputChange}
-                  value={formData.document_number}
+                  value={decryptData(formData.document_number)}
                 />
 
                 <CustomFormLabel htmlFor="issuing_country" className="center">
                   Issuing Country
-                  <Tooltip title="The country where the document was issued" placement="top" cursor="pointer">
+                  <Tooltip
+                    title="The country where the document was issued"
+                    placement="top"
+                    cursor="pointer"
+                  >
                     <ErrorOutlineIcon />
                   </Tooltip>
                 </CustomFormLabel>
-                <Select id="issuing_country" fullWidth onChange={handleSelectChange('issuing_country')} value={formData.issuing_country}>
+                <Select
+                  id="issuing_country"
+                  fullWidth
+                  onChange={handleSelectChange("issuing_country")}
+                  value={decryptData(formData.issuing_country)}
+                >
                   {countries.map((option) => (
                     <MenuItem key={option.value} value={option.value}>
                       {option.label}
@@ -587,9 +856,16 @@ const ProfileForm = () => {
                   ))}
                 </Select>
 
-                <CustomFormLabel htmlFor="issuing_jurisdiction" className="center">
+                <CustomFormLabel
+                  htmlFor="issuing_jurisdiction"
+                  className="center"
+                >
                   Issuing Jurisdiction
-                  <Tooltip title="The jurisdiction where the document was issued" placement="top" cursor="pointer">
+                  <Tooltip
+                    title="The jurisdiction where the document was issued"
+                    placement="top"
+                    cursor="pointer"
+                  >
                     <ErrorOutlineIcon />
                   </Tooltip>
                 </CustomFormLabel>
@@ -598,12 +874,16 @@ const ProfileForm = () => {
                   placeholder="Enter Issuing Jurisdiction"
                   fullWidth
                   onChange={handleInputChange}
-                  value={formData.issuing_jurisdiction}
+                  value={decryptData(formData.issuing_jurisdiction)}
                 />
 
                 <CustomFormLabel htmlFor="issuing_authority" className="center">
                   Issuing Authority
-                  <Tooltip title="The authority that issued the document" placement="top" cursor="pointer">
+                  <Tooltip
+                    title="The authority that issued the document"
+                    placement="top"
+                    cursor="pointer"
+                  >
                     <ErrorOutlineIcon />
                   </Tooltip>
                 </CustomFormLabel>
@@ -612,7 +892,7 @@ const ProfileForm = () => {
                   placeholder="Enter Issuing Authority"
                   fullWidth
                   onChange={handleInputChange}
-                  value={formData.issuing_authority}
+                  value={decryptData(formData.issuing_authority)}
                 />
               </Grid>
             </Grid>
@@ -620,7 +900,7 @@ const ProfileForm = () => {
               <Button
                 onClick={handleSubmitDocumentDetails}
                 variant="contained"
-                color='secondary'
+                color="secondary"
               >
                 Submit
               </Button>
@@ -634,10 +914,14 @@ const ProfileForm = () => {
 
   return (
     <PageContainer>
-      <ParentCard title='Profile Information'>
+      <ParentCard title="Profile Information">
         <Box width="100%">
           <TabContext value={activeTab.toString()}>
-            <Tabs value={activeTab} onChange={handleTabChange} aria-label="form tabs">
+            <Tabs
+              value={activeTab}
+              onChange={handleTabChange}
+              aria-label="form tabs"
+            >
               {steps.map((label, index) => (
                 <Tab key={label} label={label} value={index} />
               ))}

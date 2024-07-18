@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import QRCode from 'qrcode.react';
+import React, { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
+import QRCode from "qrcode.react";
 import {
   Container,
   Card,
@@ -33,50 +33,66 @@ import {
   Select,
   MenuItem,
   FormControl,
-} from '@mui/material';
-import { alpha, styled } from '@mui/material/styles';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
-import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-import { visuallyHidden } from '@mui/utils';
-import { IconTrash, IconFilter } from '@tabler/icons';
+} from "@mui/material";
+import { alpha, styled } from "@mui/material/styles";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import { visuallyHidden } from "@mui/utils";
+import { IconTrash, IconFilter } from "@tabler/icons";
 import emailjs from "@emailjs/browser";
-import CustomFormLabel from '../../../forms/theme-elements/CustomFormLabel';
-import { useConnect } from '@connect2ic/react';
-import ic from 'ic0';
+import CustomFormLabel from "../../../forms/theme-elements/CustomFormLabel";
+import { useConnect } from "@connect2ic/react";
+import ic from "ic0";
+const ledger = ic.local("bd3sg-teaaa-aaaaa-qaaba-cai"); // Ledger canister
+import CryptoJS from "crypto-js";
 
-const ledger = ic.local("bkyz2-fmaaa-aaaaa-qaaaq-cai"); // Ledger canister
+
+const secretKey = "your-secret-key"; // Use a strong secret key
+
+const hashData = (data) => {
+  return CryptoJS.SHA256(data).toString(CryptoJS.enc.Hex);
+};
+
+const encryptData = (data) => {
+  return CryptoJS.AES.encrypt(data, secretKey).toString();
+};
+
+const decryptData = (ciphertext) => {
+  const bytes = CryptoJS.AES.decrypt(ciphertext, secretKey);
+  return bytes.toString(CryptoJS.enc.Utf8);
+};
 
 const initialState = {
-  email: '',
-  entityType: '',
+  email: "",
+  entityType: "",
   registerCompany: false,
-  companyName: '',
-  registrationNumber: '',
-  legalStructure: '',
-  registeredAddress: '',
-  taxID: '',
+  companyName: "",
+  registrationNumber: "",
+  legalStructure: "",
+  registeredAddress: "",
+  taxID: "",
   incorporationCertificate: [],
   memorandumAndArticles: [],
-  representativeFullName: '',
-  position: '',
-  idDocumentType: '',
-  idDocumentNumber: '',
+  representativeFullName: "",
+  position: "",
+  idDocumentType: "",
+  idDocumentNumber: "",
   idDocument: [],
   proofOfAuthority: [],
-  emailRep: '',
-  phoneNumber: '',
-  beneficialOwner: '',
+  emailRep: "",
+  phoneNumber: "",
+  beneficialOwner: "",
   publicLawEntity: false,
-  entityName: '',
-  jurisdiction: '',
-  establishmentDate: '',
-  function: '',
-  address: '',
-  phone: '',
-  caller: '',
-  contactDetails: '',
-  recordType: '',
+  entityName: "",
+  jurisdiction: "",
+  establishmentDate: "",
+  function: "",
+  address: "",
+  phone: "",
+  caller: "",
+  contactDetails: "",
+  recordType: "",
 };
 
 const PersonalRecordType = {
@@ -88,39 +104,87 @@ const PersonalRecordType = {
 };
 
 const groupDetails = {
-  name: 'Group Title',
-  description: 'Description of the group.',
-  imageUrl: 'https://as2.ftcdn.net/v2/jpg/03/18/25/19/1000_F_318251936_EukIhmw8bEqECFwhePbp11c6gWJ1ChNG.jpg',
+  name: "Group Title",
+  description: "Description of the group.",
+  imageUrl:
+    "https://as2.ftcdn.net/v2/jpg/03/18/25/19/1000_F_318251936_EukIhmw8bEqECFwhePbp11c6gWJ1ChNG.jpg",
   balances: [
-    { currency: 'Bitcoin', amount: 1.5, symbol: 'ckBTC', address: '1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa' },
-    { currency: 'USD', amount: 10, symbol: 'ckUSDC', address: '0x742d35Cc6634C0532925a3b844Bc454e4438f44e' },
-    { currency: 'Gold', amount: 25, symbol: 'GLDT', address: 'LcWoJ66bmxL1fycdGp81uYgG9cXRxE7eS3' },
+    {
+      currency: "Bitcoin",
+      amount: 1.5,
+      symbol: "ckBTC",
+      address: "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa",
+    },
+    {
+      currency: "USD",
+      amount: 10,
+      symbol: "ckUSDC",
+      address: "0x742d35Cc6634C0532925a3b844Bc454e4438f44e",
+    },
+    {
+      currency: "Gold",
+      amount: 25,
+      symbol: "GLDT",
+      address: "LcWoJ66bmxL1fycdGp81uYgG9cXRxE7eS3",
+    },
   ],
   isAdmin: true,
   users: [
-    { name: 'John Doe', avatarUrl: 'https://static.vecteezy.com/system/resources/previews/002/318/271/non_2x/user-profile-icon-free-vector.jpg', role: 'Member', status: 'Inactive', limitPerTransaction: 100, dailyLimitation: 1000, monthlyLimitation: 30000, limitationPercentage: 5 },
-    { name: 'Jane Smith', avatarUrl: 'https://static.vecteezy.com/system/resources/previews/002/318/271/non_2x/user-profile-icon-free-vector.jpg', role: 'Admin', status: 'Active', limitPerTransaction: 200, dailyLimitation: 2000, monthlyLimitation: 60000, limitationPercentage: 10 },
-    { name: 'Sam Wilson', avatarUrl: 'https://static.vecteezy.com/system/resources/previews/002/318/271/non_2x/user-profile-icon-free-vector.jpg', role: 'Moderator', status: 'Pending', limitPerTransaction: 150, dailyLimitation: 1500, monthlyLimitation: 45000, limitationPercentage: 7 },
+    {
+      name: "John Doe",
+      avatarUrl:
+        "https://static.vecteezy.com/system/resources/previews/002/318/271/non_2x/user-profile-icon-free-vector.jpg",
+      role: "Member",
+      status: "Inactive",
+      limitPerTransaction: 100,
+      dailyLimitation: 1000,
+      monthlyLimitation: 30000,
+      limitationPercentage: 5,
+    },
+    {
+      name: "Jane Smith",
+      avatarUrl:
+        "https://static.vecteezy.com/system/resources/previews/002/318/271/non_2x/user-profile-icon-free-vector.jpg",
+      role: "Admin",
+      status: "Active",
+      limitPerTransaction: 200,
+      dailyLimitation: 2000,
+      monthlyLimitation: 60000,
+      limitationPercentage: 10,
+    },
+    {
+      name: "Sam Wilson",
+      avatarUrl:
+        "https://static.vecteezy.com/system/resources/previews/002/318/271/non_2x/user-profile-icon-free-vector.jpg",
+      role: "Moderator",
+      status: "Pending",
+      limitPerTransaction: 150,
+      dailyLimitation: 1500,
+      monthlyLimitation: 45000,
+      limitationPercentage: 7,
+    },
   ],
 };
 
 const StyledPaper = styled(Paper)(({ theme, selected }) => ({
-  padding: '16px',
-  textAlign: 'center',
-  cursor: 'pointer',
-  backgroundColor: selected ? theme.palette.action.selected : theme.palette.background.paper,
-  transition: 'background-color 0.3s ease, maxHeight 0.3s ease',
-  maxHeight: selected ? '250px' : '100px',
-  overflow: 'hidden',
-  '&:hover': {
+  padding: "16px",
+  textAlign: "center",
+  cursor: "pointer",
+  backgroundColor: selected
+    ? theme.palette.action.selected
+    : theme.palette.background.paper,
+  transition: "background-color 0.3s ease, maxHeight 0.3s ease",
+  maxHeight: selected ? "250px" : "100px",
+  overflow: "hidden",
+  "&:hover": {
     backgroundColor: theme.palette.action.hover,
   },
 }));
 
 const headCells = [
-  { id: 'member', label: 'Member' },
-  { id: 'email', label: 'Emaik' },
-  { id: 'contact ', label: 'Contact' }
+  { id: "member", label: "Member" },
+  { id: "email", label: "Emaik" },
+  { id: "contact ", label: "Contact" },
 ];
 
 const EnhancedTableHead = (props) => {
@@ -135,11 +199,13 @@ const EnhancedTableHead = (props) => {
         <TableCell padding="checkbox">
           <Checkbox
             color="primary"
-            indeterminate={props.numSelected > 0 && props.numSelected < props.rowCount}
+            indeterminate={
+              props.numSelected > 0 && props.numSelected < props.rowCount
+            }
             checked={props.rowCount > 0 && props.numSelected === props.rowCount}
             onChange={props.onSelectAllClick}
             inputProps={{
-              'aria-label': 'select all users',
+              "aria-label": "select all users",
             }}
           />
         </TableCell>
@@ -147,18 +213,20 @@ const EnhancedTableHead = (props) => {
           <TableCell
             key={headCell.id}
             align="left"
-            padding={headCell.disablePadding ? 'none' : 'normal'}
+            padding={headCell.disablePadding ? "none" : "normal"}
             sortDirection={props.orderBy === headCell.id ? props.order : false}
           >
             <TableSortLabel
               active={props.orderBy === headCell.id}
-              direction={props.orderBy === headCell.id ? props.order : 'asc'}
+              direction={props.orderBy === headCell.id ? props.order : "asc"}
               onClick={createSortHandler(headCell.id)}
             >
               {headCell.label}
               {props.orderBy === headCell.id ? (
                 <Box component="span" sx={visuallyHidden}>
-                  {props.order === 'desc' ? 'sorted descending' : 'sorted ascending'}
+                  {props.order === "desc"
+                    ? "sorted descending"
+                    : "sorted ascending"}
                 </Box>
               ) : null}
             </TableSortLabel>
@@ -179,16 +247,29 @@ const EnhancedTableToolbar = (props) => {
         pr: { xs: 1, sm: 1 },
         ...(numSelected > 0 && {
           bgcolor: (theme) =>
-            alpha(theme.palette.primary.main, theme.palette.action.activatedOpacity),
+            alpha(
+              theme.palette.primary.main,
+              theme.palette.action.activatedOpacity
+            ),
         }),
       }}
     >
       {numSelected > 0 ? (
-        <Typography sx={{ flex: '1 1 100%' }} color="inherit" variant="subtitle2" component="div">
+        <Typography
+          sx={{ flex: "1 1 100%" }}
+          color="inherit"
+          variant="subtitle2"
+          component="div"
+        >
           {numSelected} selected
         </Typography>
       ) : (
-        <Typography sx={{ flex: '1 1 100%' }} variant="h6" id="tableTitle" component="div">
+        <Typography
+          sx={{ flex: "1 1 100%" }}
+          variant="h6"
+          id="tableTitle"
+          component="div"
+        >
           Group Members
         </Typography>
       )}
@@ -213,8 +294,8 @@ const EnhancedTableToolbar = (props) => {
 const GroupDetailPage = () => {
   const { groupId } = useParams();
   const [selectedBalance, setSelectedBalance] = useState(null);
-  const [order, setOrder] = useState('asc');
-  const [orderBy, setOrderBy] = useState('name');
+  const [order, setOrder] = useState("asc");
+  const [orderBy, setOrderBy] = useState("name");
   const [selected, setSelected] = useState([]);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -227,8 +308,8 @@ const GroupDetailPage = () => {
   const [fetchingGroup, setFetchingGroup] = useState(true);
 
   const { isConnected, principal } = useConnect({
-    onConnect: () => { },
-    onDisconnect: () => { },
+    onConnect: () => {},
+    onDisconnect: () => {},
   });
 
   const formatId = (id) => {
@@ -251,7 +332,9 @@ const GroupDetailPage = () => {
     if (id === "groupImage") {
       const reader = new FileReader();
       reader.onloadend = () => {
-        const base64String = reader.result.replace("data:", "").replace(/^.+,/, "");
+        const base64String = reader.result
+          .replace("data:", "")
+          .replace(/^.+,/, "");
         setFormData((prevData) => ({
           ...prevData,
           [id]: base64String,
@@ -277,12 +360,12 @@ const GroupDetailPage = () => {
 
   const handleCopyAddress = (address) => {
     navigator.clipboard.writeText(address);
-    alert('Wallet address copied to clipboard');
+    alert("Wallet address copied to clipboard");
   };
 
   const handleRequestSort = (event, property) => {
-    const isAsc = orderBy === property && order === 'asc';
-    setOrder(isAsc ? 'desc' : 'asc');
+    const isAsc = orderBy === property && order === "asc";
+    setOrder(isAsc ? "desc" : "asc");
     setOrderBy(property);
   };
 
@@ -308,7 +391,7 @@ const GroupDetailPage = () => {
     } else if (selectedIndex > 0) {
       newSelected = newSelected.concat(
         selected.slice(0, selectedIndex),
-        selected.slice(selectedIndex + 1),
+        selected.slice(selectedIndex + 1)
       );
     }
 
@@ -326,17 +409,51 @@ const GroupDetailPage = () => {
 
   const isSelected = (name) => selected.indexOf(name) !== -1;
 
-  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - groupDetails.users.length) : 0;
+  const emptyRows =
+    page > 0
+      ? Math.max(0, (1 + page) * rowsPerPage - groupDetails.users.length)
+      : 0;
 
   const handleCreateGroup = async () => {
     console.log("Create Group Data:", formData);
-    console.log("GroupId:",groupId);
+    console.log("GroupId:", groupId);
     try {
-      if (formData.entityType === 'registerCompany') {
-        const responseCompany = await ledger.call("declareGroupAsCompany", groupId, principal, formData.companyName, formData.registrationNumber, formData.legalStructure, formData.registeredAddress, formData.taxID, formData.beneficialOwner, formData.incorporationCertificate, formData.memorandumAndArticles, formData.representativeFullName, formData.position, formData.idDocumentType, formData.idDocumentNumber, formData.idDocument, formData.proofOfAuthority, formData.email, formData.phoneNumber);
+      if (formData.entityType === "registerCompany") {
+        const responseCompany = await ledger.call(
+          "declareGroupAsCompany",
+          groupId,
+          principal,
+          encryptData(formData.companyName),
+          encryptData(formData.registrationNumber),
+          encryptData(formData.legalStructure),
+          encryptData(formData.registeredAddress),
+          encryptData(formData.taxID),
+          encryptData(formData.beneficialOwner),
+          formData.incorporationCertificate,
+          formData.memorandumAndArticles,
+          encryptData(formData.representativeFullName),
+          encryptData(formData.position),
+          encryptData(formData.idDocumentType),
+          encryptData(formData.idDocumentNumber),
+          formData.idDocument,
+          formData.proofOfAuthority,
+          encryptData(formData.email),
+          encryptData(formData.phoneNumber)
+        );
         alert(responseCompany);
-      } else if (formData.entityType === 'publicLawEntity') {
-        const responsePublicLawEntity = await ledger.call("declareGroupAsPublicLawEntity", groupId, formData.entityName, formData.jurisdiction, formData.establishmentDate, formData.function, formData.address, formData.phoneNumber, formData.email, formData.caller);
+      } else if (formData.entityType === "publicLawEntity") {
+        const responsePublicLawEntity = await ledger.call(
+          "declareGroupAsPublicLawEntity",
+          groupId,
+          encryptData(formData.entityName),
+          encryptData(formData.jurisdiction),
+          encryptData(formData.establishmentDate),
+          encryptData(formData.function),
+          encryptData(formData.address),
+          encryptData(formData.phoneNumber),
+          encryptData(formData.email),
+          principal
+        );
         alert(responsePublicLawEntity);
       }
     } catch (e) {
@@ -347,14 +464,14 @@ const GroupDetailPage = () => {
   };
 
   const handleInviteUser = async () => {
-    console.log("Invite User Data:", formData);
+    console.log("Invite User Data:", encryptData(formData.email));
     try {
       const response = await ledger.call(
         "addPersonalRecordToGroup",
         groupId,
-        principal, // Replace with actual principal ID or set as null if not available
+        "principal", // Replace with actual principal ID or set as null if not available
         formData.email,
-        formData.contactDetails,
+        encryptData(formData.contactDetails),
         { [formData.recordType]: null }
       );
       console.log("Invite User Response:", response);
@@ -365,17 +482,22 @@ const GroupDetailPage = () => {
         to_email: formData.email,
         contactDetails: formData.contactDetails,
         recordType: formData.recordType,
-        groupId: groupId
+        groupId: groupId,
       };
 
       emailjs
-        .send('service_idh0h15', 'template_d21fhkr', emailParams, 'Y4QJDpwjrsdi3tQAR')
+        .send(
+          "service_idh0h15",
+          "template_d21fhkr",
+          emailParams,
+          "Y4QJDpwjrsdi3tQAR"
+        )
         .then(
           () => {
-            console.log('SUCCESS!');
+            console.log("SUCCESS!");
           },
           (error) => {
-            console.log('FAILED...', error.text);
+            console.log("FAILED...", error.text);
           }
         )
         .catch((error) => {
@@ -394,13 +516,13 @@ const GroupDetailPage = () => {
   const fetchGroup = async () => {
     setFetchingGroup(true);
     try {
-      if (principal) {          
-          const groupDetailResponse = await ledger.call('getGroup', groupId);          
-          setGroup(groupDetailResponse);
-          console.log('Group',groupDetailResponse);
-        }
+      if (principal) {
+        const groupDetailResponse = await ledger.call("getGroup", groupId);
+        setGroup(groupDetailResponse);
+        console.log("Group", groupDetailResponse);
+      }
     } catch (e) {
-      console.log('Error fetching groups:', e);
+      console.log("Error fetching groups:", e);
     } finally {
       setFetchingGroup(false);
     }
@@ -408,7 +530,7 @@ const GroupDetailPage = () => {
 
   const renderFormContent = () => {
     switch (formType) {
-      case 'createGroup':
+      case "createGroup":
         return (
           <Grid container spacing={3} mt={3}>
             <Grid item xs={12} md={6}>
@@ -427,34 +549,70 @@ const GroupDetailPage = () => {
                 </Select>
               </FormControl>
             </Grid>
-            {formData.entityType === 'registerCompany' && (
+            {formData.entityType === "registerCompany" && (
               <>
                 <Grid item xs={12} md={6}>
-                  <CustomFormLabel htmlFor="companyName">Company Name</CustomFormLabel>
-                  <TextField id="companyName" fullWidth onChange={handleInputChange} />
+                  <CustomFormLabel htmlFor="companyName">
+                    Company Name
+                  </CustomFormLabel>
+                  <TextField
+                    id="companyName"
+                    fullWidth
+                    onChange={handleInputChange}
+                  />
                 </Grid>
                 <Grid item xs={12} md={6}>
-                  <CustomFormLabel htmlFor="registrationNumber">Registration Number</CustomFormLabel>
-                  <TextField id="registrationNumber" fullWidth onChange={handleInputChange} />
+                  <CustomFormLabel htmlFor="registrationNumber">
+                    Registration Number
+                  </CustomFormLabel>
+                  <TextField
+                    id="registrationNumber"
+                    fullWidth
+                    onChange={handleInputChange}
+                  />
                 </Grid>
                 <Grid item xs={12} md={6}>
-                  <CustomFormLabel htmlFor="legalStructure">Legal Structure</CustomFormLabel>
-                  <TextField id="legalStructure" fullWidth onChange={handleInputChange} />
+                  <CustomFormLabel htmlFor="legalStructure">
+                    Legal Structure
+                  </CustomFormLabel>
+                  <TextField
+                    id="legalStructure"
+                    fullWidth
+                    onChange={handleInputChange}
+                  />
                 </Grid>
                 <Grid item xs={12} md={6}>
-                  <CustomFormLabel htmlFor="registeredAddress">Registered Address</CustomFormLabel>
-                  <TextField id="registeredAddress" fullWidth onChange={handleInputChange} />
+                  <CustomFormLabel htmlFor="registeredAddress">
+                    Registered Address
+                  </CustomFormLabel>
+                  <TextField
+                    id="registeredAddress"
+                    fullWidth
+                    onChange={handleInputChange}
+                  />
                 </Grid>
                 <Grid item xs={12} md={6}>
                   <CustomFormLabel htmlFor="taxID">Tax ID</CustomFormLabel>
-                  <TextField id="taxID" fullWidth onChange={handleInputChange} />
+                  <TextField
+                    id="taxID"
+                    fullWidth
+                    onChange={handleInputChange}
+                  />
                 </Grid>
                 <Grid item xs={12} md={6}>
-                  <CustomFormLabel htmlFor="beneficialOwner">Beneficial Owner</CustomFormLabel>
-                  <TextField id="beneficialOwner" fullWidth onChange={handleInputChange} />
+                  <CustomFormLabel htmlFor="beneficialOwner">
+                    Beneficial Owner
+                  </CustomFormLabel>
+                  <TextField
+                    id="beneficialOwner"
+                    fullWidth
+                    onChange={handleInputChange}
+                  />
                 </Grid>
                 <Grid item xs={12} md={6}>
-                  <CustomFormLabel htmlFor="incorporationCertificate">Incorporation Certificate</CustomFormLabel>
+                  <CustomFormLabel htmlFor="incorporationCertificate">
+                    Incorporation Certificate
+                  </CustomFormLabel>
                   <TextField
                     id="incorporationCertificate"
                     type="file"
@@ -462,13 +620,26 @@ const GroupDetailPage = () => {
                     onChange={handleFileChange}
                   />
                   {filePreviews.incorporationCertificate && (
-                    <Paper elevation={3} sx={{ mt: 2, width: 100, height: 100 }}>
-                      <img src={filePreviews.incorporationCertificate} alt="Incorporation Certificate" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    <Paper
+                      elevation={3}
+                      sx={{ mt: 2, width: 100, height: 100 }}
+                    >
+                      <img
+                        src={filePreviews.incorporationCertificate}
+                        alt="Incorporation Certificate"
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                        }}
+                      />
                     </Paper>
                   )}
                 </Grid>
                 <Grid item xs={12} md={6}>
-                  <CustomFormLabel htmlFor="memorandumAndArticles">Memorandum And Articles</CustomFormLabel>
+                  <CustomFormLabel htmlFor="memorandumAndArticles">
+                    Memorandum And Articles
+                  </CustomFormLabel>
                   <TextField
                     id="memorandumAndArticles"
                     type="file"
@@ -476,29 +647,66 @@ const GroupDetailPage = () => {
                     onChange={handleFileChange}
                   />
                   {filePreviews.memorandumAndArticles && (
-                    <Paper elevation={3} sx={{ mt: 2, width: 100, height: 100 }}>
-                      <img src={filePreviews.memorandumAndArticles} alt="Memorandum And Articles" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    <Paper
+                      elevation={3}
+                      sx={{ mt: 2, width: 100, height: 100 }}
+                    >
+                      <img
+                        src={filePreviews.memorandumAndArticles}
+                        alt="Memorandum And Articles"
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                        }}
+                      />
                     </Paper>
                   )}
                 </Grid>
                 <Grid item xs={12} md={6}>
-                  <CustomFormLabel htmlFor="representativeFullName">Representative Full Name</CustomFormLabel>
-                  <TextField id="representativeFullName" fullWidth onChange={handleInputChange} />
+                  <CustomFormLabel htmlFor="representativeFullName">
+                    Representative Full Name
+                  </CustomFormLabel>
+                  <TextField
+                    id="representativeFullName"
+                    fullWidth
+                    onChange={handleInputChange}
+                  />
                 </Grid>
                 <Grid item xs={12} md={6}>
-                  <CustomFormLabel htmlFor="position">Representative Position</CustomFormLabel>
-                  <TextField id="position" fullWidth onChange={handleInputChange} />
+                  <CustomFormLabel htmlFor="position">
+                    Representative Position
+                  </CustomFormLabel>
+                  <TextField
+                    id="position"
+                    fullWidth
+                    onChange={handleInputChange}
+                  />
                 </Grid>
                 <Grid item xs={12} md={6}>
-                  <CustomFormLabel htmlFor="idDocumentType">ID Document Type</CustomFormLabel>
-                  <TextField id="idDocumentType" fullWidth onChange={handleInputChange} />
+                  <CustomFormLabel htmlFor="idDocumentType">
+                    ID Document Type
+                  </CustomFormLabel>
+                  <TextField
+                    id="idDocumentType"
+                    fullWidth
+                    onChange={handleInputChange}
+                  />
                 </Grid>
                 <Grid item xs={12} md={6}>
-                  <CustomFormLabel htmlFor="idDocumentNumber">ID Document Number</CustomFormLabel>
-                  <TextField id="idDocumentNumber" fullWidth onChange={handleInputChange} />
+                  <CustomFormLabel htmlFor="idDocumentNumber">
+                    ID Document Number
+                  </CustomFormLabel>
+                  <TextField
+                    id="idDocumentNumber"
+                    fullWidth
+                    onChange={handleInputChange}
+                  />
                 </Grid>
                 <Grid item xs={12} md={6}>
-                  <CustomFormLabel htmlFor="idDocument">ID Document</CustomFormLabel>
+                  <CustomFormLabel htmlFor="idDocument">
+                    ID Document
+                  </CustomFormLabel>
                   <TextField
                     id="idDocument"
                     type="file"
@@ -506,13 +714,26 @@ const GroupDetailPage = () => {
                     onChange={handleFileChange}
                   />
                   {filePreviews.idDocument && (
-                    <Paper elevation={3} sx={{ mt: 2, width: 100, height: 100 }}>
-                      <img src={filePreviews.idDocument} alt="ID Document" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    <Paper
+                      elevation={3}
+                      sx={{ mt: 2, width: 100, height: 100 }}
+                    >
+                      <img
+                        src={filePreviews.idDocument}
+                        alt="ID Document"
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                        }}
+                      />
                     </Paper>
                   )}
                 </Grid>
                 <Grid item xs={12} md={6}>
-                  <CustomFormLabel htmlFor="proofOfAuthority">Proof Of Authority</CustomFormLabel>
+                  <CustomFormLabel htmlFor="proofOfAuthority">
+                    Proof Of Authority
+                  </CustomFormLabel>
                   <TextField
                     id="proofOfAuthority"
                     type="file"
@@ -520,25 +741,48 @@ const GroupDetailPage = () => {
                     onChange={handleFileChange}
                   />
                   {filePreviews.proofOfAuthority && (
-                    <Paper elevation={3} sx={{ mt: 2, width: 100, height: 100 }}>
-                      <img src={filePreviews.proofOfAuthority} alt="Proof Of Authority" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    <Paper
+                      elevation={3}
+                      sx={{ mt: 2, width: 100, height: 100 }}
+                    >
+                      <img
+                        src={filePreviews.proofOfAuthority}
+                        alt="Proof Of Authority"
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                        }}
+                      />
                     </Paper>
                   )}
                 </Grid>
                 <Grid item xs={12} md={6}>
                   <CustomFormLabel htmlFor="emailRep">Email</CustomFormLabel>
-                  <TextField id="emailRep" fullWidth onChange={handleInputChange} />
+                  <TextField
+                    id="emailRep"
+                    fullWidth
+                    onChange={handleInputChange}
+                  />
                 </Grid>
                 <Grid item xs={12} md={6}>
-                  <CustomFormLabel htmlFor="phoneNumber">Phone Number</CustomFormLabel>
-                  <TextField id="phoneNumber" fullWidth onChange={handleInputChange} />
+                  <CustomFormLabel htmlFor="phoneNumber">
+                    Phone Number
+                  </CustomFormLabel>
+                  <TextField
+                    id="phoneNumber"
+                    fullWidth
+                    onChange={handleInputChange}
+                  />
                 </Grid>
               </>
             )}
-            {formData.entityType === 'publicLawEntity' && (
+            {formData.entityType === "publicLawEntity" && (
               <>
                 <Grid item xs={12} md={6}>
-                  <CustomFormLabel htmlFor="entityName">Entity Name</CustomFormLabel>
+                  <CustomFormLabel htmlFor="entityName">
+                    Entity Name
+                  </CustomFormLabel>
                   <TextField
                     id="entityName"
                     fullWidth
@@ -548,7 +792,9 @@ const GroupDetailPage = () => {
                   />
                 </Grid>
                 <Grid item xs={12} md={6}>
-                  <CustomFormLabel htmlFor="jurisdiction">Jurisdiction</CustomFormLabel>
+                  <CustomFormLabel htmlFor="jurisdiction">
+                    Jurisdiction
+                  </CustomFormLabel>
                   <TextField
                     id="jurisdiction"
                     fullWidth
@@ -558,7 +804,9 @@ const GroupDetailPage = () => {
                   />
                 </Grid>
                 <Grid item xs={12} md={6}>
-                  <CustomFormLabel htmlFor="establishmentDate">Establishment Date</CustomFormLabel>
+                  <CustomFormLabel htmlFor="establishmentDate">
+                    Establishment Date
+                  </CustomFormLabel>
                   <TextField
                     id="establishmentDate"
                     fullWidth
@@ -571,39 +819,74 @@ const GroupDetailPage = () => {
                 </Grid>
                 <Grid item xs={12} md={6}>
                   <CustomFormLabel htmlFor="function">Function</CustomFormLabel>
-                  <TextField id="function" fullWidth onChange={handleInputChange} />
+                  <TextField
+                    id="function"
+                    fullWidth
+                    onChange={handleInputChange}
+                  />
                 </Grid>
                 <Grid item xs={12} md={6}>
                   <CustomFormLabel htmlFor="address">Address</CustomFormLabel>
-                  <TextField id="address" fullWidth onChange={handleInputChange} />
+                  <TextField
+                    id="address"
+                    fullWidth
+                    onChange={handleInputChange}
+                  />
                 </Grid>
                 <Grid item xs={12} md={6}>
-                  <CustomFormLabel htmlFor="phoneNumber">Phone Number</CustomFormLabel>
-                  <TextField id="phoneNumber" fullWidth onChange={handleInputChange} />
+                  <CustomFormLabel htmlFor="phoneNumber">
+                    Phone Number
+                  </CustomFormLabel>
+                  <TextField
+                    id="phoneNumber"
+                    fullWidth
+                    onChange={handleInputChange}
+                  />
                 </Grid>
                 <Grid item xs={12} md={6}>
                   <CustomFormLabel htmlFor="email">Email</CustomFormLabel>
-                  <TextField id="email" fullWidth onChange={handleInputChange} />
+                  <TextField
+                    id="email"
+                    fullWidth
+                    onChange={handleInputChange}
+                  />
                 </Grid>
                 <Grid item xs={12} md={6}>
                   <CustomFormLabel htmlFor="caller">Caller</CustomFormLabel>
-                  <TextField id="caller" fullWidth onChange={handleInputChange} />
+                  <TextField
+                    id="caller"
+                    fullWidth
+                    onChange={handleInputChange}
+                  />
                 </Grid>
               </>
             )}
             <Grid item xs={12} md={12} lg={12}>
-              <Stack direction="row" spacing={2} justifyContent="flex-end" mt={3}>
-                <Button variant="contained" color="primary" onClick={handleCreateGroup}>
+              <Stack
+                direction="row"
+                spacing={2}
+                justifyContent="flex-end"
+                mt={3}
+              >
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={handleCreateGroup}
+                >
                   Create Group
                 </Button>
-                <Button variant="outlined" color="secondary" onClick={() => setShowForm(false)}>
+                <Button
+                  variant="outlined"
+                  color="secondary"
+                  onClick={() => setShowForm(false)}
+                >
                   Cancel
                 </Button>
               </Stack>
             </Grid>
           </Grid>
         );
-      case 'inviteUser':
+      case "inviteUser":
         return (
           <Grid container spacing={3} mt={3}>
             <Grid item xs={12} md={6}>
@@ -611,11 +894,19 @@ const GroupDetailPage = () => {
               <TextField id="email" fullWidth onChange={handleInputChange} />
             </Grid>
             <Grid item xs={12} md={6}>
-              <CustomFormLabel htmlFor="contactDetails">Contact Details</CustomFormLabel>
-              <TextField id="contactDetails" fullWidth onChange={handleInputChange} />
+              <CustomFormLabel htmlFor="contactDetails">
+                Contact Details
+              </CustomFormLabel>
+              <TextField
+                id="contactDetails"
+                fullWidth
+                onChange={handleInputChange}
+              />
             </Grid>
             <Grid item xs={12} md={6}>
-              <CustomFormLabel htmlFor="recordType">Record Type</CustomFormLabel>
+              <CustomFormLabel htmlFor="recordType">
+                Record Type
+              </CustomFormLabel>
               <FormControl fullWidth>
                 <Select
                   labelId="recordType-label"
@@ -625,7 +916,9 @@ const GroupDetailPage = () => {
                   onChange={handleInputChange}
                 >
                   <MenuItem value="">Select Record Type</MenuItem>
-                  <MenuItem value="EconomicBeneficiary">Economic Beneficiary</MenuItem>
+                  <MenuItem value="EconomicBeneficiary">
+                    Economic Beneficiary
+                  </MenuItem>
                   <MenuItem value="ExecutiveMember">Executive Member</MenuItem>
                   <MenuItem value="InvitedViewer">Invited Viewer</MenuItem>
                   <MenuItem value="LeadOperator">Lead Operator</MenuItem>
@@ -634,11 +927,24 @@ const GroupDetailPage = () => {
               </FormControl>
             </Grid>
             <Grid item xs={12} md={12} lg={12}>
-              <Stack direction="row" spacing={2} justifyContent="flex-end" mt={3}>
-                <Button variant="contained" color="primary" onClick={handleInviteUser}>
+              <Stack
+                direction="row"
+                spacing={2}
+                justifyContent="flex-end"
+                mt={3}
+              >
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={handleInviteUser}
+                >
                   Invite User
                 </Button>
-                <Button variant="outlined" color="secondary" onClick={() => setShowForm(false)}>
+                <Button
+                  variant="outlined"
+                  color="secondary"
+                  onClick={() => setShowForm(false)}
+                >
                   Cancel
                 </Button>
               </Stack>
@@ -680,7 +986,11 @@ const GroupDetailPage = () => {
                       <StyledPaper
                         elevation={3}
                         selected={selectedBalance === index}
-                        onClick={() => setSelectedBalance(selectedBalance === index ? null : index)}
+                        onClick={() =>
+                          setSelectedBalance(
+                            selectedBalance === index ? null : index
+                          )
+                        }
                       >
                         <Typography variant="h6" color="text.primary">
                           {balance.currency}
@@ -689,13 +999,33 @@ const GroupDetailPage = () => {
                           {balance.amount} {balance.symbol}
                         </Typography>
                         {selectedBalance === index && (
-                          <Box mt={1} display="flex" flexDirection="column" alignItems="center" justifyContent="center">
-                            <Typography variant="body2" color="text.primary" style={{ wordBreak: 'break-all', fontWeight: 'bold' }}>
+                          <Box
+                            mt={1}
+                            display="flex"
+                            flexDirection="column"
+                            alignItems="center"
+                            justifyContent="center"
+                          >
+                            <Typography
+                              variant="body2"
+                              color="text.primary"
+                              style={{
+                                wordBreak: "break-all",
+                                fontWeight: "bold",
+                              }}
+                            >
                               {balance.address}
                             </Typography>
                             <Tooltip title="Copy Address">
-                              <IconButton onClick={() => handleCopyAddress(balance.address)}>
-                                <ContentCopyIcon fontSize="small" color="primary" />
+                              <IconButton
+                                onClick={() =>
+                                  handleCopyAddress(balance.address)
+                                }
+                              >
+                                <ContentCopyIcon
+                                  fontSize="small"
+                                  color="primary"
+                                />
                               </IconButton>
                             </Tooltip>
                             <Box mt={1}>
@@ -715,69 +1045,83 @@ const GroupDetailPage = () => {
 
       {groupDetails.isAdmin && (
         <Box mt={2} display="flex" justifyContent="flex-end" gap={2}>
-          <Button variant="contained" color="primary" onClick={() => { setFormType('createGroup'); setShowForm(true); }}>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => {
+              setFormType("createGroup");
+              setShowForm(true);
+            }}
+          >
             Create Group
           </Button>
-          <Button variant="contained" color="secondary" onClick={() => { setFormType('inviteUser'); setShowForm(true); }}>
+          <Button
+            variant="contained"
+            color="secondary"
+            onClick={() => {
+              setFormType("inviteUser");
+              setShowForm(true);
+            }}
+          >
             Invite User
           </Button>
         </Box>
       )}
 
-      {showForm && (
-        <Box mt={2}>
-          {renderFormContent()}
-        </Box>
-      )}
+      {showForm && <Box mt={2}>{renderFormContent()}</Box>}
 
       <Box mt={2}>
         <Paper>
-          {group && <>
-            <TableContainer>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>
-                    <Typography variant="h6">Id</Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant="h6">Email</Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant="h6">Contact</Typography>
-                  </TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {group && group[0].personalRecords.length > 0 ? (
-                  group[0].personalRecords.map((user) => (
-                    <TableRow hover>
-                      
+          {group && (
+            <>
+              <TableContainer>
+                <Table>
+                  <TableHead>
+                    <TableRow>
                       <TableCell>
-                        <Typography variant="h6">{formatId(user.userId[0])}</Typography>
+                        <Typography variant="h6">Id</Typography>
                       </TableCell>
-                      
                       <TableCell>
-                        <Typography >{user.email}</Typography>
+                        <Typography variant="h6">Email</Typography>
                       </TableCell>
-                      
                       <TableCell>
-                        <Typography >{user.contactDetails}</Typography>
-                      </TableCell>                      
+                        <Typography variant="h6">Contact</Typography>
+                      </TableCell>
                     </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell colSpan={6} align="center">
-                      <Typography variant="h6">No users available</Typography>
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </TableContainer>
-          </>
-        }
+                  </TableHead>
+                  <TableBody>
+                    {group && group[0].personalRecords.length > 0 ? (
+                      group[0].personalRecords.map((user) => (
+                        <TableRow hover>
+                          <TableCell>
+                            <Typography variant="h6">
+                              {formatId(user.userId[0])}
+                            </Typography>
+                          </TableCell>
+
+                          <TableCell>
+                            <Typography>{user.email}</Typography>
+                          </TableCell>
+
+                          <TableCell>
+                            <Typography>{user.contactDetails}</Typography>
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    ) : (
+                      <TableRow>
+                        <TableCell colSpan={6} align="center">
+                          <Typography variant="h6">
+                            No users available
+                          </Typography>
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </>
+          )}
         </Paper>
       </Box>
     </Container>
@@ -797,7 +1141,7 @@ function descendingComparator(a, b, orderBy) {
 }
 
 function getComparator(order, orderBy) {
-  return order === 'desc'
+  return order === "desc"
     ? (a, b) => descendingComparator(a, b, orderBy)
     : (a, b) => -descendingComparator(a, b, orderBy);
 }

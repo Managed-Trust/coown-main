@@ -51,7 +51,7 @@ const decryptData = (ciphertext) => {
   return bytes.toString(CryptoJS.enc.Utf8);
 };
 
-const ledger = ic.local("bkyz2-fmaaa-aaaaa-qaaaq-cai"); // Ledger canister
+const ledger = ic.local("bd3sg-teaaa-aaaaa-qaaba-cai"); // Ledger canister
 
 const countries = [
   { value: "IN", label: "India" },
@@ -249,7 +249,7 @@ const FormTabs = () => {
   const readFileAsBase64 = (file) => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
-      reader.onloadend = () => resolve(reader.result.split(',')[1]);
+      reader.onloadend = () => resolve(reader.result.split(",")[1]);
       reader.onerror = reject;
       reader.readAsDataURL(file);
     });
@@ -315,7 +315,7 @@ const FormTabs = () => {
       const encryptedCitizenship = encryptArrayEntries(formData.citizenship);
 
       console.log("Encrypted Identity Doc:", encryptedCitizenship);
-            // const encryptedIdentityDoc7 = encryptData(identityDocBase64);
+      // const encryptedIdentityDoc7 = encryptData(identityDocBase64);
       // console.log("EnCrypted Identity Doc:", encryptedIdentityDoc7);
 
       // const encryptedCitizenship = encryptData(
@@ -331,7 +331,7 @@ const FormTabs = () => {
         encryptData(formData.birth_date),
         encryptData(formData.phone),
         encryptData(formData.identityNumber),
-        encryptedIdentityDoc6,
+        encryptData(encryptedIdentityDoc6),
         encryptedCitizenship,
         encryptData(formData.residency)
       );
@@ -369,10 +369,10 @@ const FormTabs = () => {
       const response = await ledger.call(
         "addFamilyCustomer",
         principal,
-        formData.birth_place,
-        formData.birth_country,
-        formData.birth_state,
-        formData.birth_city
+        encryptData(formData.birth_place),
+        encryptData(formData.birth_country),
+        encryptData(formData.birth_state),
+        encryptData(formData.birth_city)
       );
       alert(response);
     } catch (e) {
@@ -389,12 +389,12 @@ const FormTabs = () => {
       const response = await ledger.call(
         "addResidencyCustomer",
         principal,
-        formData.resident_address,
-        formData.resident_country,
-        formData.resident_state,
-        formData.resident_city,
-        formData.resident_postal_code,
-        formData.resident_street
+        encryptData(formData.resident_address),
+        encryptData(formData.resident_country),
+        encryptData(formData.resident_state),
+        encryptData(formData.resident_city),
+        encryptData(formData.resident_postal_code),
+        encryptData(formData.resident_street)
       );
       alert(response);
     } catch (e) {
@@ -410,14 +410,14 @@ const FormTabs = () => {
       const response = await ledger.call(
         "addOtherInfoCustomer",
         principal,
-        formData.gender,
-        formData.nationality,
-        formData.issuance_date,
-        formData.expiry_date,
-        formData.issuing_authority,
-        formData.document_number,
-        formData.issuing_country,
-        formData.issuing_jurisdiction
+        Number(formData.gender),
+        encryptData(formData.nationality),
+        encryptData(formData.issuance_date),
+        encryptData(formData.expiry_date),
+        encryptData(formData.issuing_authority),
+        encryptData(formData.document_number),
+        encryptData(formData.issuing_country),
+        encryptData(formData.issuing_jurisdiction)
       );
       alert(response);
     } catch (e) {
@@ -431,7 +431,11 @@ const FormTabs = () => {
     console.log("Image Captured", image);
 
     try {
-      const response = await ledger.call("addImage", principal, image);
+      const response = await ledger.call(
+        "addImage",
+        principal,
+        encryptData(image)
+      );
       alert(response);
     } catch (e) {
       console.log("Error adding image:", e);
