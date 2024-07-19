@@ -27,6 +27,7 @@ import emailjs from "@emailjs/browser";
 import { useConnect } from "@connect2ic/react";
 import ic from "ic0";
 const ledger = ic.local("bd3sg-teaaa-aaaaa-qaaba-cai"); // Ledger canister
+// const ledger = ic("sifoc-qqaaa-aaaap-ahorq-cai"); // Production canister
 
 import CryptoJS from "crypto-js";
 
@@ -159,7 +160,7 @@ const GalleryCard = () => {
               })
             );
             setGroups(groupDetails.filter((group) => group !== null));
-            console.log("Groups:", groupDetails[0][0]);
+            console.log("Groups:", groupDetails);
           }
         }
       } catch (e) {
@@ -351,6 +352,8 @@ const GalleryCard = () => {
               </Grid>
             ) : (
               groups.map((group) => (
+                group[0].name === "defaultGroup" ? 
+                (
                 <Grid item xs={12} lg={4} key={group[0].adminId}>
                   <Link
                     to={`/group/${group[0].adminId}`}
@@ -371,10 +374,10 @@ const GalleryCard = () => {
                         <Stack direction="row" gap={1}>
                           <Box>
                             <Typography variant="h6" color="textPrimary">
-                              {group[0].name}
+                            {group[0].name} 
                             </Typography>
                             <Typography variant="caption" color="textSecondary">
-                              {group.description}
+                              {group.groupDescription}   
                             </Typography>
                           </Box>
                           <Box ml={"auto"}>
@@ -404,6 +407,61 @@ const GalleryCard = () => {
                     </BlankCard>
                   </Link>
                 </Grid>
+                ):(
+                <Grid item xs={12} lg={4} key={group[0].adminId}>
+                  <Link
+                    to={`/group/${group[0].adminId}`}
+                    style={{ textDecoration: "none" }}
+                  >
+                    <BlankCard className="hoverCard cursor-pointer">
+                      <CardMedia
+                        component={"img"}
+                        height="220"
+                        alt="Group Image"
+                        src={
+                          group[0].groupImage && group[0].groupImage.length > 0
+                            ? "data:image/png;base64," + decryptData(group[0].groupImage[0])
+                            : "https://via.placeholder.com/150"
+                        }
+                      />
+                      <Box p={3}>
+                        <Stack direction="row" gap={1}>
+                          <Box>
+                            <Typography variant="h6" color="textPrimary">
+                              {decryptData(group[0].name)}
+                            </Typography>
+                            <Typography variant="h6" color="textPrimary">
+                              {decryptData(group[0].groupDescription[0])}  
+                            </Typography>
+                          </Box>
+                          <Box ml={"auto"}>
+                            <IconButton onClick={handleMenuClick}>
+                              <IconDotsVertical size="16" />
+                            </IconButton>
+                            <Menu
+                              anchorEl={anchorEl}
+                              open={open}
+                              onClose={handleMenuClose}
+                              anchorOrigin={{
+                                vertical: "top",
+                                horizontal: "right",
+                              }}
+                              transformOrigin={{
+                                vertical: "top",
+                                horizontal: "right",
+                              }}
+                            >
+                              <MenuItem onClick={handleMenuClose}>
+                                Invite User to Group
+                              </MenuItem>
+                            </Menu>
+                          </Box>
+                        </Stack>
+                      </Box>
+                    </BlankCard>
+                  </Link>
+                </Grid>
+                )
               ))
             )}
           </Grid>

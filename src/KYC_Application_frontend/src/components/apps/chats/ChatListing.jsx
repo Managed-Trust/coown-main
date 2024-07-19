@@ -23,6 +23,7 @@ import Scrollbar from '../../custom-scroll/Scrollbar';
 import ic from 'ic0';
 
 const ledger = ic.local("bkyz2-fmaaa-aaaaa-qaaaq-cai"); // Ledger canister
+// const ledger = ic("sifoc-qqaaa-aaaap-ahorq-cai"); // Production canister
 
 const ChatListing = ({ onSelectGroup }) => {
   const [groups, setGroups] = useState([]);

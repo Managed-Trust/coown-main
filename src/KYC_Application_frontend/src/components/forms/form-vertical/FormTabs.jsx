@@ -52,6 +52,7 @@ const decryptData = (ciphertext) => {
 };
 
 const ledger = ic.local("bd3sg-teaaa-aaaaa-qaaba-cai"); // Ledger canister
+// const ledger = ic("sifoc-qqaaa-aaaap-ahorq-cai"); // Production canister
 
 const countries = [
   { value: "IN", label: "India" },

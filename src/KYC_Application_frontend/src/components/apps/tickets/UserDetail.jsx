@@ -6,6 +6,7 @@ import ic from 'ic0';
 import CryptoJS from "crypto-js";
 
 const ledger = ic.local("bd3sg-teaaa-aaaaa-qaaba-cai"); // Ledger canister
+// const ledger = ic("sifoc-qqaaa-aaaap-ahorq-cai"); // Production canister
 
 const secretKey = "your-secret-key"; // Use a strong secret key
 

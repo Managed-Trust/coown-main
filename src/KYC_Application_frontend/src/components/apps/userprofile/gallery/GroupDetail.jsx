@@ -44,7 +44,8 @@ import emailjs from "@emailjs/browser";
 import CustomFormLabel from "../../../forms/theme-elements/CustomFormLabel";
 import { useConnect } from "@connect2ic/react";
 import ic from "ic0";
-const ledger = ic.local("bd3sg-teaaa-aaaaa-qaaba-cai"); // Ledger canister
+const ledger = ic.local("bd3sg-teaaa-aaaaa-qaaba-cai");
+// const ledger = ic("sifoc-qqaaa-aaaap-ahorq-cai"); // Production canister // Ledger canister
 import CryptoJS from "crypto-js";
 
 
