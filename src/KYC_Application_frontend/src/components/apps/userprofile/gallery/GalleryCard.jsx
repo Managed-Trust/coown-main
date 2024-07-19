@@ -70,6 +70,7 @@ const GalleryCard = () => {
   const [showInviteUserForm, setShowInviteUserForm] = useState(false);
   const [groups, setGroups] = useState([]);
   const [fetchingGroups, setFetchingGroups] = useState(true);
+  const [groupId, setGroupId] = useState([]);
 
   const { isConnected, principal } = useConnect({
     onConnect: () => {},
@@ -140,6 +141,7 @@ const GalleryCard = () => {
         if (principal) {
           const response = await ledger.call("getGroupIdsByUserId", principal);
           if (response != null) {
+            setGroupId(response);
             setGroups(response);
             console.log("Group IDs:", response);
             const groupDetails = await Promise.all(
@@ -351,7 +353,7 @@ const GalleryCard = () => {
                 <CircularProgress />
               </Grid>
             ) : (
-              groups.map((group) => (
+              groups.map((group,index) => (
                 group[0].name === "defaultGroup" ? 
                 (
                 <Grid item xs={12} lg={4} key={group[0].adminId}>
@@ -410,7 +412,7 @@ const GalleryCard = () => {
                 ):(
                 <Grid item xs={12} lg={4} key={group[0].adminId}>
                   <Link
-                    to={`/group/${group[0].adminId}`}
+                    to={`/group/${groupId[index]}`}
                     style={{ textDecoration: "none" }}
                   >
                     <BlankCard className="hoverCard cursor-pointer">
