@@ -471,8 +471,15 @@ const ProfileForm = () => {
                   id="document_file"
                   type="file"
                   fullWidth
-                  onChange={handleFileChange}
+                  disabled
                 />
+                {formData.identityDoc && (
+                  <img
+                    src={`data:image/jpeg;base64,${decryptData(formData.identityDoc)}`}
+                    alt="Document Preview"
+                    style={{ marginTop: "10px", maxHeight: "200px" }}
+                  />
+                )}
                 {documentPreview && (
                   <img
                     src={documentPreview}
@@ -482,15 +489,6 @@ const ProfileForm = () => {
                 )}
               </Grid>
             </Grid>
-            <Box display="flex" justifyContent="flex-end" mt={3}>
-              <Button
-                onClick={handleSubmitPersonalDetails}
-                variant="contained"
-                color="secondary"
-              >
-                Save
-              </Button>
-            </Box>
           </Box>
         );
       case 1:
@@ -584,15 +582,7 @@ const ProfileForm = () => {
                 />
               </Grid>
             </Grid>
-            <Box display="flex" justifyContent="flex-end" mt={3}>
-              <Button
-                onClick={handleSubmitMoreDetails}
-                variant="contained"
-                color="secondary"
-              >
-                Save
-              </Button>
-            </Box>
+
           </Box>
         );
       case 2:
@@ -615,7 +605,7 @@ const ProfileForm = () => {
                   placeholder="123 Main St"
                   fullWidth
                   onChange={handleInputChange}
-                  value={decryptData(formData.resident_address)}
+                  value={decryptData(formData.resident_address[0])}
                 />
 
                 <CustomFormLabel htmlFor="resident_country" className="center">
@@ -632,7 +622,7 @@ const ProfileForm = () => {
                   id="resident_country"
                   fullWidth
                   onChange={handleSelectChange("resident_country")}
-                  value={decryptData(formData.resident_country)}
+                  value={decryptData(formData.resident_country[0])}
                 >
                   {countries.map((option) => (
                     <MenuItem key={option.value} value={option.value}>
@@ -656,7 +646,7 @@ const ProfileForm = () => {
                   placeholder="Enter Resident State"
                   fullWidth
                   onChange={handleInputChange}
-                  value={decryptData(formData.resident_state)}
+                  value={decryptData(formData.resident_state[0])}
                 />
               </Grid>
               <Grid item xs={12} lg={6}>
@@ -675,7 +665,7 @@ const ProfileForm = () => {
                   placeholder="Enter Resident City"
                   fullWidth
                   onChange={handleInputChange}
-                  value={decryptData(formData.resident_city)}
+                  value={decryptData(formData.resident_city[0])}
                 />
 
                 <CustomFormLabel htmlFor="resident_street" className="center">
@@ -693,7 +683,7 @@ const ProfileForm = () => {
                   placeholder="Enter Resident Street"
                   fullWidth
                   onChange={handleInputChange}
-                  value={decryptData(formData.resident_street)}
+                  value={decryptData(formData.resident_street[0])}
                 />
 
                 <CustomFormLabel
@@ -714,19 +704,11 @@ const ProfileForm = () => {
                   placeholder="Enter Postal Code"
                   fullWidth
                   onChange={handleInputChange}
-                  value={decryptData(formData.resident_postal_code)}
+                  value={decryptData(formData.resident_postal_code[0])}
                 />
               </Grid>
             </Grid>
-            <Box display="flex" justifyContent="flex-end" mt={3}>
-              <Button
-                onClick={handleSubmitAddressDetails}
-                variant="contained"
-                color="secondary"
-              >
-                Save
-              </Button>
-            </Box>
+
           </Box>
         );
       case 3:
@@ -748,7 +730,7 @@ const ProfileForm = () => {
                   id="gender"
                   fullWidth
                   onChange={handleSelectChange("gender")}
-                  value={decryptData(formData.gender)}
+                  value={Number(formData.gender)}
                 >
                   <MenuItem value="0">Not specified</MenuItem>
                   <MenuItem value="1">Male</MenuItem>
@@ -765,18 +747,12 @@ const ProfileForm = () => {
                     <ErrorOutlineIcon />
                   </Tooltip>
                 </CustomFormLabel>
-                <Select
+                <TextField
                   id="nationality"
                   fullWidth
-                  onChange={handleSelectChange("nationality")}
-                  value={decryptData(formData.nationality)}
-                >
-                  {countries.map((option) => (
-                    <MenuItem key={option.value} value={option.value}>
-                      {option.label}
-                    </MenuItem>
-                  ))}
-                </Select>
+                  onChange={handleInputChange}
+                  value={decryptData(formData.nationality[0])}
+                />
 
                 <CustomFormLabel htmlFor="issuance_date" className="center">
                   Issuance Date
@@ -793,7 +769,7 @@ const ProfileForm = () => {
                   id="issuance_date"
                   fullWidth
                   onChange={handleInputChange}
-                  value={decryptData(formData.issuance_date)}
+                  value={decryptData(formData.issuance_date[0])}
                 />
 
                 <CustomFormLabel htmlFor="expiry_date" className="center">
@@ -811,7 +787,7 @@ const ProfileForm = () => {
                   id="expiry_date"
                   fullWidth
                   onChange={handleInputChange}
-                  value={decryptData(formData.expiry_date)}
+                  value={decryptData(formData.expiry_date[0])}
                 />
               </Grid>
               <Grid item xs={12} lg={6}>
@@ -830,7 +806,7 @@ const ProfileForm = () => {
                   placeholder="Enter Document Number"
                   fullWidth
                   onChange={handleInputChange}
-                  value={decryptData(formData.document_number)}
+                  value={decryptData(formData.document_number[0])}
                 />
 
                 <CustomFormLabel htmlFor="issuing_country" className="center">
@@ -843,19 +819,12 @@ const ProfileForm = () => {
                     <ErrorOutlineIcon />
                   </Tooltip>
                 </CustomFormLabel>
-                <Select
+                <TextField
                   id="issuing_country"
                   fullWidth
-                  onChange={handleSelectChange("issuing_country")}
-                  value={decryptData(formData.issuing_country)}
-                >
-                  {countries.map((option) => (
-                    <MenuItem key={option.value} value={option.value}>
-                      {option.label}
-                    </MenuItem>
-                  ))}
-                </Select>
-
+                  onChange={handleInputChange}
+                  value={decryptData(formData.issuing_country[0])}
+                />
                 <CustomFormLabel
                   htmlFor="issuing_jurisdiction"
                   className="center"
@@ -874,7 +843,7 @@ const ProfileForm = () => {
                   placeholder="Enter Issuing Jurisdiction"
                   fullWidth
                   onChange={handleInputChange}
-                  value={decryptData(formData.issuing_jurisdiction)}
+                  value={decryptData(formData.issuing_jurisdiction[0])}
                 />
 
                 <CustomFormLabel htmlFor="issuing_authority" className="center">
@@ -892,19 +861,10 @@ const ProfileForm = () => {
                   placeholder="Enter Issuing Authority"
                   fullWidth
                   onChange={handleInputChange}
-                  value={decryptData(formData.issuing_authority)}
+                  value={decryptData(formData.issuing_authority[0])}
                 />
               </Grid>
             </Grid>
-            <Box display="flex" justifyContent="flex-end" mt={3}>
-              <Button
-                onClick={handleSubmitDocumentDetails}
-                variant="contained"
-                color="secondary"
-              >
-                Submit
-              </Button>
-            </Box>
           </Box>
         );
       default:
@@ -944,7 +904,18 @@ const ProfileForm = () => {
               </Button>
             )}
             <Box flex="1 1 auto" />
+            {activeTab < 4 - 1 && (
+              <Button
+                color="inherit"
+                variant="contained"
+                onClick={() => setActiveTab((prev) => prev + 1)}
+                sx={{ ml: 1 }}
+              >
+                Next
+              </Button>
+            )}
           </Box>
+
         </Box>
       </ParentCard>
     </PageContainer>

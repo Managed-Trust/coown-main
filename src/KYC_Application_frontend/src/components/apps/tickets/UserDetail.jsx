@@ -44,7 +44,7 @@ const UserDetail = ({ user, onClose }) => {
         <CloseIcon />
       </IconButton>
       <Stack direction="row" spacing={2} alignItems="center" mb={2}>
-        <Avatar src={user.image[0]} alt={user.name} sx={{ width: 80, height: 80, boxShadow: 3 }} />
+        <Avatar src={decryptData(user.image[0])} alt={user.name} sx={{ width: 80, height: 80, boxShadow: 3 }} />
         <Typography variant="h4" component="div" sx={{ flexGrow: 1 }}>
           {decryptData(user.given_name)} {decryptData(user.family_name)}
         </Typography>

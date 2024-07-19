@@ -96,7 +96,7 @@ const UserListing = ({ Users }) => {
                       <TableCell>
                         <Stack direction="row" gap="10px" alignItems="center">
                           <Avatar
-                            src={user.image[0]}
+                            src={decryptData(user.image[0])}
                             alt={user.name}
                             width="35"
                             sx={{

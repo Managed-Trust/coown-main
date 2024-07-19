@@ -1095,16 +1095,16 @@ const GroupDetailPage = () => {
                         <TableRow hover>
                           <TableCell>
                             <Typography variant="h6">
-                              {formatId(user.userId[0])}
+                              {user.userId[0]}
                             </Typography>
                           </TableCell>
 
                           <TableCell>
-                            <Typography>{user.email}</Typography>
+                            <Typography>{decryptData(user.email)}</Typography>
                           </TableCell>
 
                           <TableCell>
-                            <Typography>{user.contactDetails}</Typography>
+                            <Typography>{decryptData(user.contactDetails)}</Typography>
                           </TableCell>
                         </TableRow>
                       ))

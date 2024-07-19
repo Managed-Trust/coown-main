@@ -9,7 +9,7 @@ import AppCard from '../../../components/shared/AppCard';
 import { useConnect } from '@connect2ic/react';
 import ic from 'ic0';
 
-const ledger = ic.local("bkyz2-fmaaa-aaaaa-qaaaq-cai"); // Ledger canister
+const ledger = ic.local("bd3sg-teaaa-aaaaa-qaaba-cai"); // Ledger canister
 
 const Chats = () => {
   const [isMobileSidebarOpen, setMobileSidebarOpen] = useState(false);
