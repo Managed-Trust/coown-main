@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useState ,useEffect } from 'react';
 import {
   Grid,
   Box,
@@ -24,6 +24,28 @@ import {
 } from '@tabler/icons';
 import ProfileTab from './ProfileTab';
 import BlankCard from '../../../shared/BlankCard';
+import { useConnect } from "@connect2ic/react";
+import ic from "ic0";
+
+const ledger = ic.local("bd3sg-teaaa-aaaaa-qaaba-cai"); // Ledger canister
+// const ledger = ic("sifoc-qqaaa-aaaap-ahorq-cai"); // Production canister
+
+import CryptoJS from "crypto-js";
+
+const secretKey = "your-secret-key"; // Use a strong secret key
+
+const hashData = (data) => {
+  return CryptoJS.SHA256(data).toString(CryptoJS.enc.Hex);
+};
+
+const encryptData = (data) => {
+  return CryptoJS.AES.encrypt(data, secretKey).toString();
+};
+
+const decryptData = (ciphertext) => {
+  const bytes = CryptoJS.AES.decrypt(ciphertext, secretKey);
+  return bytes.toString(CryptoJS.enc.Utf8);
+};
 
 const ProfileBanner = () => {
   const ProfileImage = styled(Box)(() => ({
@@ -37,6 +59,7 @@ const ProfileBanner = () => {
     margin: '0 auto',
   }));
   const [isLoading, setLoading] = React.useState(true);
+  const [profile, setProfile] = useState(null);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -44,6 +67,25 @@ const ProfileBanner = () => {
     }, 500);
     return () => clearTimeout(timer);
   }, []);
+
+  const { principal } = useConnect();
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const response = await ledger.call("getCustomer", principal);
+        console.log("Profile:", response);
+        const profileData = response[0];
+        setProfile(profileData);
+        
+      } catch (e) {
+        console.log("Error Fetching Profile:", e);
+      }
+    };
+    if (principal) {
+      fetchProfile();
+    }
+  }, [principal]);
 
   return (
     <>
@@ -55,6 +97,7 @@ const ProfileBanner = () => {
         ) : (
           <CardMedia component="img" image={profilecover} alt={profilecover} width="100%" />
         )}
+        {profile &&(
         <Grid container spacing={0} justifyContent="space-between" alignItems="center">
           {/* Post | Followers | Following */}
           <Grid
@@ -133,8 +176,8 @@ const ProfileBanner = () => {
               <Box>
                 <ProfileImage>
                   <Avatar
-                    src={userimg}
-                    alt={userimg}
+                    src={decryptData(profile.image[0])}
+                    alt={decryptData(profile.given_name)}
                     sx={{
                       borderRadius: '50%',
                       width: '100px',
@@ -145,10 +188,10 @@ const ProfileBanner = () => {
                 </ProfileImage>
                 <Box mt={1}>
                   <Typography fontWeight={600} variant="h5">
-                    Mathew Anderson
+                  {decryptData(profile.given_name)}
                   </Typography>
                   <Typography color="textSecondary" variant="h6" fontWeight={400}>
-                    Designer
+                  {(profile.role)}
                   </Typography>
                 </Box>
               </Box>
@@ -186,7 +229,7 @@ const ProfileBanner = () => {
               </Button> */}
             </Stack>
           </Grid>
-        </Grid>
+        </Grid>)}
         {/**TabbingPart**/}
         <ProfileTab />
       </BlankCard>

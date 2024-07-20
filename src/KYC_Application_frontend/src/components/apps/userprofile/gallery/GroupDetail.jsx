@@ -33,6 +33,7 @@ import {
   Select,
   MenuItem,
   FormControl,
+  CircularProgress,
 } from "@mui/material";
 import { alpha, styled } from "@mui/material/styles";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
@@ -959,19 +960,39 @@ const GroupDetailPage = () => {
 
   return (
     <Container>
+      {fetchingGroup ? (
+              <Grid
+                item
+                xs={12}
+                display="flex"
+                justifyContent="center"
+                alignItems="center"
+              >
+                <CircularProgress />
+              </Grid>
+            ) : (
+              <>
+    {group && (
+      group[0].name === "defaultGroup" ? 
+      (
+      <>
       <Card>
         <CardMedia
           component="img"
           height="300"
-          image={groupDetails.imageUrl}
+          image={
+            group[0].groupImage && group[0].groupImage.length > 0
+              ? "data:image/png;base64," + group[0].groupImage[0]
+              : "https://via.placeholder.com/150"
+          }
           alt={groupDetails.name}
         />
         <CardContent>
           <Typography gutterBottom variant="h2" component="div">
-            {groupDetails.name}
+            {group[0].name}
           </Typography>
           <Typography variant="body1" color="text.secondary">
-            {groupDetails.description}
+            {group[0].groupDescription[0]}
           </Typography>
           <Box mt={2}>
             <Accordion>
@@ -1043,7 +1064,99 @@ const GroupDetailPage = () => {
           </Box>
         </CardContent>
       </Card>
-
+      </>):
+      (
+        <>
+        <Card>
+          <CardMedia
+            component="img"
+            height="300"
+            image={
+              group[0].groupImage && group[0].groupImage.length > 0
+                ? "data:image/png;base64," + decryptData(group[0].groupImage[0])
+                : "https://via.placeholder.com/150"
+            }
+            alt={groupDetails.name}
+          />
+          <CardContent>
+            <Typography gutterBottom variant="h2" component="div">
+            {decryptData(group[0].name)}
+            </Typography>
+            <Typography variant="body1" color="text.secondary">
+            {decryptData(group[0].groupDescription[0])} 
+            </Typography>
+            <Box mt={2}>
+              <Accordion>
+                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                  <Typography variant="h6" color="text.primary">
+                    <AccountBalanceWalletIcon /> Balances
+                  </Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <Grid container spacing={2}>
+                    {groupDetails.balances.map((balance, index) => (
+                      <Grid item xs={12} sm={6} md={4} key={index}>
+                        <StyledPaper
+                          elevation={3}
+                          selected={selectedBalance === index}
+                          onClick={() =>
+                            setSelectedBalance(
+                              selectedBalance === index ? null : index
+                            )
+                          }
+                        >
+                          <Typography variant="h6" color="text.primary">
+                            {balance.currency}
+                          </Typography>
+                          <Typography variant="body1" color="text.secondary">
+                            {balance.amount} {balance.symbol}
+                          </Typography>
+                          {selectedBalance === index && (
+                            <Box
+                              mt={1}
+                              display="flex"
+                              flexDirection="column"
+                              alignItems="center"
+                              justifyContent="center"
+                            >
+                              <Typography
+                                variant="body2"
+                                color="text.primary"
+                                style={{
+                                  wordBreak: "break-all",
+                                  fontWeight: "bold",
+                                }}
+                              >
+                                {balance.address}
+                              </Typography>
+                              <Tooltip title="Copy Address">
+                                <IconButton
+                                  onClick={() =>
+                                    handleCopyAddress(balance.address)
+                                  }
+                                >
+                                  <ContentCopyIcon
+                                    fontSize="small"
+                                    color="primary"
+                                  />
+                                </IconButton>
+                              </Tooltip>
+                              <Box mt={1}>
+                                <QRCode value={balance.address} size={64} />
+                              </Box>
+                            </Box>
+                          )}
+                        </StyledPaper>
+                      </Grid>
+                    ))}
+                  </Grid>
+                </AccordionDetails>
+              </Accordion>
+            </Box>
+          </CardContent>
+        </Card>
+        </>)
+    )}
       {groupDetails.isAdmin && (
         <Box mt={2} display="flex" justifyContent="flex-end" gap={2}>
           <Button
@@ -1125,6 +1238,8 @@ const GroupDetailPage = () => {
           )}
         </Paper>
       </Box>
+      </>
+      )}
     </Container>
   );
 };
