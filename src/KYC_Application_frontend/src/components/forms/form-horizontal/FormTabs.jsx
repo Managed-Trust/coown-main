@@ -3,20 +3,20 @@ import {
   Box,
   Button,
   Grid,
-  Tab,
   TextField,
   Stack,
-  MenuItem,
-  FormControl,
-  Select,
-  Paper,
+  Tab,
+  CircularProgress,
 } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 import TabContext from "@mui/lab/TabContext";
 import TabList from "@mui/lab/TabList";
 import TabPanel from "@mui/lab/TabPanel";
 import BlankCard from "../../shared/BlankCard";
 import CustomFormLabel from "../theme-elements/CustomFormLabel";
 import emailjs from "@emailjs/browser";
+import swal from 'sweetalert';
+
 import {
   ConnectButton,
   ConnectDialog,
@@ -80,6 +80,9 @@ const FormTabs = () => {
   const [isEmailDisabled, setIsEmailDisabled] = useState(false);
   const [generatedOtp, setGeneratedOtp] = useState("");
   const [filePreviews, setFilePreviews] = useState({});
+  const [loading, setLoading] = useState(false);
+  
+  const navigate = useNavigate();
 
   const { isConnected, principal, activeProvider } = useConnect({
     onConnect: () => {
@@ -92,7 +95,7 @@ const FormTabs = () => {
 
   const handleChange = (event, newValue) => {
     if ((newValue === "2" || newValue === "3") && !isEmailDisabled) {
-      alert("Please submit your email first");
+      swal("Info",'Please Enter Your Email', "info");
       return;
     }
     setValue(newValue);
@@ -129,9 +132,10 @@ const FormTabs = () => {
         encryptData(formData.email)
       );
       console.log("User created:", formData.email);
-      alert(response);
+      swal("User created Successfully!", formData.email, "success");
     } catch (e) {
       console.log("Error creating user:", e);
+      swal("Error", e, "error");
     }
   };
 
@@ -170,9 +174,10 @@ const FormTabs = () => {
         )
         .catch((error) => {
           console.log("Error sending OTP:", error);
+          swal("Error Sending OTP", error, "error");
         })
         .finally(() => {
-          alert("OTP sent to your email " + formData.email);
+          swal("OTP sent to your email!", formData.email, "success");
           setValue("3");
         });
     }
@@ -180,35 +185,46 @@ const FormTabs = () => {
 
   const handleEmailSubmit = async () => {
     if (formData.email.trim() === "") {
-      alert("Email cannot be empty");
+      swal("Info","Email Cannot be Empty", "info");
       return;
     }
+    setLoading(true);
     await createUser();
     setIsEmailDisabled(true);
+    setLoading(false);
     setValue("2");
   };
 
   const handleOtpSubmit = async () => {
     if (formData.otp === generatedOtp) {
       try {
+        setLoading(true);
         const response = await ledger.call(
           "verifyOTP",
           principal,
           formData.otp
         );
         if (response) {
-          alert("Email address verified...");
+          swal("Success!","Email Verified", "success");
+          navigate("/dashboards/modern?canisterId=bd3sg-teaaa-aaaaa-qaaba-cai"); // Redirect after successful verification
         } else {
-          alert("Invalid OTP");
+          swal("Warning!","Invalid OTP", "warning");
         }
       } catch (e) {
         console.log("Error Verifying:", e);
+        swal("Error!",e, "error");
       } finally {
-        console.log("end verification");
+        setLoading(false);
       }
     } else {
-      alert("Invalid OTP");
+      swal("Warning!","Invalid OTP", "warning");
     }
+  };
+
+  const handleSendOTP = async () => {
+    setLoading(true);
+    await sendOTP();
+    setLoading(false);
   };
 
   return (
@@ -266,8 +282,9 @@ const FormTabs = () => {
                 variant="contained"
                 color="primary"
                 onClick={handleEmailSubmit}
+                disabled={loading}
               >
-                Create User
+                {loading ? <CircularProgress size={24} /> : "Create User"}
               </Button>
             </Stack>
           </TabPanel>
@@ -296,8 +313,13 @@ const FormTabs = () => {
               mt={3}
               mb={5}
             >
-              <Button variant="contained" color="primary" onClick={sendOTP}>
-                Send OTP
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handleSendOTP}
+                disabled={loading}
+              >
+                {loading ? <CircularProgress size={24} /> : "Send OTP"}
               </Button>
             </Stack>
           </TabPanel>
@@ -324,8 +346,9 @@ const FormTabs = () => {
                 variant="contained"
                 color="primary"
                 onClick={handleOtpSubmit}
+                disabled={loading}
               >
-                Verify OTP
+                {loading ? <CircularProgress size={24} /> : "Verify OTP"}
               </Button>
             </Stack>
           </TabPanel>

@@ -19,6 +19,7 @@ import GroupDetailPage from '../../components/apps/userprofile/gallery/GroupDeta
 import Chats from '../../views/apps/chat/Chat.jsx';
 import GroupInvitation from '../../views/pages/group-invitation/group-invitation.jsx';
 import Tickets from '../../views/apps/tickets/Tickets.jsx';
+import Faq from '../../views/pages/faq/Faq.jsx';
 
 import {
   ConnectDialog,
@@ -80,6 +81,7 @@ const FullLayout = () => {
                 <Route path="/apps/chats" element={<Chats />} />
                 <Route path="/group-invitation/:groupId/:email" element={<GroupInvitation />} />
                 <Route path="/apps/tickets" element={<Tickets />} />
+                <Route path="/pages/faq" element={<Faq />} />
               </Routes>
             </Box>
           </Container>

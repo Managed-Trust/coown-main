@@ -76,6 +76,11 @@ actor KYC_Canister {
   // Storage for customer data
   // stable var customers : [Customer] = [];
 
+  // Check if user is available
+  public func getUser(userId : Text) : async ?User {
+    return users.get(userId);
+  };
+
   // Function to add a new customer
   public func addCustomer(newCustomer : Customer) : async Text {
 

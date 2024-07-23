@@ -21,7 +21,8 @@ const Navigation = () => {
             maxWidth: customizer.isLayout === 'boxed' ? 'lg' : '100%!important',
           }}
         >
-          <NavListing />
+          <NavList
+          ing />
         </Container>
       </Box>
     );

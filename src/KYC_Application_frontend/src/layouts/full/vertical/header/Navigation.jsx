@@ -32,6 +32,7 @@ const AppDD = () => {
     const checkUserProfile = async () => {
       if (isConnected && principal) {
         try {
+          console.log("Principal:",principal);
           const profileResponse = await ledger.call("getUser", principal);
           const hasProfile = profileResponse[0];
           console.log("Profile:", profileResponse);
@@ -57,7 +58,7 @@ const AppDD = () => {
   return (
     <>
       <Box>
-        <Button
+        {/* <Button
           aria-label="show 11 new notifications"
           color="inherit"
           variant="text"
@@ -78,7 +79,7 @@ const AppDD = () => {
           }
         >
           Apps
-        </Button>
+        </Button> */}
         {/* ------------------------------------------- */}
         {/* Message Dropdown */}
         {/* ------------------------------------------- */}
@@ -144,7 +145,7 @@ const AppDD = () => {
           </Grid>
         </Menu>
       </Box>
-      <Button
+      {/* <Button
         color="inherit"
         sx={{ color: (theme) => theme.palette.text.secondary }}
         variant="text"
@@ -152,8 +153,8 @@ const AppDD = () => {
         component={Link}
       >
         Chat
-      </Button>
-      <Button
+      </Button> */}
+      {/* <Button
         color="inherit"
         sx={{ color: (theme) => theme.palette.text.secondary }}
         variant="text"
@@ -170,7 +171,7 @@ const AppDD = () => {
         component={Link}
       >
         Email
-      </Button>
+      </Button> */}
 
       {/* <div
         color="inherit"

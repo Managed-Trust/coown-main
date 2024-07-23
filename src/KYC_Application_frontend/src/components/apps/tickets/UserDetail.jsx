@@ -4,7 +4,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import { useConnect } from '@connect2ic/react';
 import ic from 'ic0';
 import CryptoJS from "crypto-js";
-
+import swal from 'sweetalert';
 const ledger = ic.local("bkyz2-fmaaa-aaaaa-qaaaq-cai"); // Ledger canister
 // const ledger = ic("sifoc-qqaaa-aaaap-ahorq-cai"); // Production canister
 
@@ -24,7 +24,7 @@ const UserDetail = ({ user, onClose }) => {
   const handleVerify = async () => {
     try {
       const response = await ledger.call("verifyCustomer", user.id);
-      alert(response);
+      swal("Success",'User Verified Successfully!', "success");
     } catch (e) {
       console.log("Error Verifying:", e);
     }

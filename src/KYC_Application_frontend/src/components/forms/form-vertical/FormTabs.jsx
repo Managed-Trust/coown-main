@@ -12,21 +12,19 @@ import {
   MenuItem,
   TextField,
   Tooltip,
-  Checkbox,
-  FormControlLabel,
-  OutlinedInput,
-  Alert,
   Chip,
-  IconButton,
+  CircularProgress,
+  Alert,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
+import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import ic from "ic0";
 import WebcamCapture from "../../../WebCapture";
 import CustomFormLabel from "../theme-elements/CustomFormLabel";
-import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import ParentCard from "../../../components/shared/ParentCard";
 import PageContainer from "../../../components/container/PageContainer";
 import Breadcrumb from "../../../layouts/full/shared/breadcrumb/Breadcrumb";
+import swal from 'sweetalert';
 
 import {
   ConnectButton,
@@ -109,6 +107,7 @@ const FormTabs = () => {
   const [documentPreview, setDocumentPreview] = useState(null);
   const [image, setImage] = useState(null);
   const [skipped, setSkipped] = useState(new Set());
+  const [loading, setLoading] = useState(false);
 
   const isStepOptional = (step) => false;
   const isStepSkipped = (step) => skipped.has(step);
@@ -146,14 +145,6 @@ const FormTabs = () => {
     setFormData((prevData) => ({
       ...prevData,
       [id]: value,
-    }));
-  };
-
-  const handleCheckboxChange = (e) => {
-    const { id, checked } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [id]: checked,
     }));
   };
 
@@ -280,50 +271,14 @@ const FormTabs = () => {
     return array.map((entry) => encryptData(entry));
   };
 
-  const encryptBlob = async (blob) => {
-    // console.log("1", blob);
-    // const arrayBuffer = await blob.arrayBuffer();
-    // console.log("2",arrayBuffer);
-
-    const base64String = arrayBufferToBase64(blob);
-    // console.log("2", base64String);
-
-    const encryptedBase64String = encryptData(base64String);
-    // console.log("3", encryptedBase64String);
-
-    const encryptedArrayBuffer = base64ToArrayBuffer(encryptedBase64String);
-    // return new Blob([encryptedArrayBuffer], { type: blob.type });
-    return new Uint8Array(encryptedArrayBuffer);
-  };
-
-  const decryptArrayEntries = (encryptedArray) => {
-    return encryptedArray.map((entry) => decryptData(entry));
-  };
-
   const handlePersonalDetailsSubmit = async () => {
     console.log("Personal Details Submitted", formData);
+    setLoading(true);
 
     try {
-      const hashedIdentityNumber = hashData(formData.identityNumber);
-      console.log("Hash Identity Doc:", hashedIdentityNumber);
-      const encryptedIdentityDoc = encryptData(formData.family_name);
-      const encryptedIdentityDoc1 = encryptData(formData.given_name);
-      const encryptedIdentityDoc2 = encryptData(formData.birth_date);
-      const encryptedIdentityDoc3 = encryptData(formData.phone);
-      const encryptedIdentityDoc4 = encryptData(formData.identityNumber);
-      const encryptedIdentityDoc5 = encryptData(formData.residency);
       const encryptedIdentityDoc6 = formData.identityDoc;
       const encryptedCitizenship = encryptArrayEntries(formData.citizenship);
 
-      console.log("Encrypted Identity Doc:", encryptedCitizenship);
-      // const encryptedIdentityDoc7 = encryptData(identityDocBase64);
-      // console.log("EnCrypted Identity Doc:", encryptedIdentityDoc7);
-
-      // const encryptedCitizenship = encryptData(
-      //   JSON.stringify(formData.citizenship)
-      // );
-
-      console.log("EnCrypted Identity Doc:", encryptedCitizenship);
       const response = await ledger.call(
         "addBasicInfoCustomer",
         principal,
@@ -337,34 +292,19 @@ const FormTabs = () => {
         encryptData(formData.residency)
       );
 
-      const decryptedIdentityDoc = decryptData(encryptedIdentityDoc);
-      const decryptedIdentityDoc1 = decryptData(encryptedIdentityDoc1);
-      const decryptedIdentityDoc2 = decryptData(encryptedIdentityDoc2);
-      const decryptedIdentityDoc3 = decryptData(encryptedIdentityDoc3);
-      const decryptedIdentityDoc4 = decryptData(encryptedIdentityDoc4);
-      const decryptedIdentityDoc5 = decryptData(encryptedIdentityDoc5);
-      const decryptedCitizenship = decryptArrayEntries(encryptedCitizenship);
-
-      console.log(
-        "Decrypted Identity Doc:",
-        decryptedIdentityDoc,
-        decryptedIdentityDoc1,
-        decryptedIdentityDoc2,
-        decryptedIdentityDoc3,
-        decryptedIdentityDoc4,
-        decryptedIdentityDoc5,
-        decryptedCitizenship
-      );
-      alert(response);
+      swal("Success",'Personal Recored Stored Successfully!', "success");
     } catch (e) {
-      console.log("Error creating user:", e);
+      // console.log("Error creating user:", e);
+      swal("Error",e, "error");
     } finally {
+      setLoading(false);
       handleNext();
     }
   };
 
   const handleMoreDetailsSubmit = async () => {
     console.log("More Details Submitted", formData);
+    setLoading(true);
 
     try {
       const response = await ledger.call(
@@ -375,16 +315,18 @@ const FormTabs = () => {
         encryptData(formData.birth_state),
         encryptData(formData.birth_city)
       );
-      alert(response);
+      swal("Success",'Details Stored Successfully!', "success");
     } catch (e) {
-      console.log("Error adding family details:", e);
+      swal("Error",e, "error");
     } finally {
+      setLoading(false);
       handleNext();
     }
   };
 
   const handleAddressDetailsSubmit = async () => {
     console.log("Address Details Submitted", formData);
+    setLoading(true);
 
     try {
       const response = await ledger.call(
@@ -397,16 +339,19 @@ const FormTabs = () => {
         encryptData(formData.resident_postal_code),
         encryptData(formData.resident_street)
       );
-      alert(response);
+      swal("Success",'Details Stored Successfully!', "success");
     } catch (e) {
-      console.log("Error adding residency details:", e);
+      swal("Error",e, "error");
     } finally {
+      setLoading(false);
       handleNext();
     }
   };
 
   const handleDocumentDetailsSubmit = async () => {
     console.log("Document Details Submitted", formData);
+    setLoading(true);
+
     try {
       const response = await ledger.call(
         "addOtherInfoCustomer",
@@ -420,16 +365,18 @@ const FormTabs = () => {
         encryptData(formData.issuing_country),
         encryptData(formData.issuing_jurisdiction)
       );
-      alert(response);
+      swal("Success",'Details Stored Successfully!', "success");
     } catch (e) {
-      console.log("Error adding document details:", e);
+      swal("Error",e, "error");
     } finally {
+      setLoading(false);
       handleNext();
     }
   };
 
   const handleCaptureImageSubmit = async () => {
     console.log("Image Captured", image);
+    setLoading(true);
 
     try {
       const response = await ledger.call(
@@ -437,10 +384,11 @@ const FormTabs = () => {
         principal,
         encryptData(image)
       );
-      alert(response);
+      swal("Success",'Details Stored Successfully!', "success");
     } catch (e) {
-      console.log("Error adding image:", e);
+      swal("Error",e, "error");
     } finally {
+      setLoading(false);
       handleNext();
     }
   };
@@ -702,9 +650,9 @@ const FormTabs = () => {
                 variant="contained"
                 color="primary"
                 onClick={handlePersonalDetailsSubmit}
-                disabled={!isFormValid(0)}
+                disabled={!isFormValid(0) || loading}
               >
-                Next
+                {loading ? <CircularProgress size={24} /> : "Next"}
               </Button>
             </Box>
           </Box>
@@ -817,9 +765,9 @@ const FormTabs = () => {
                 variant="contained"
                 color="primary"
                 onClick={handleMoreDetailsSubmit}
-                disabled={!isFormValid(1)}
+                disabled={!isFormValid(1) || loading}
               >
-                Next
+                {loading ? <CircularProgress size={24} /> : "Next"}
               </Button>
             </Box>
           </Box>
@@ -974,9 +922,9 @@ const FormTabs = () => {
                 variant="contained"
                 color="primary"
                 onClick={handleAddressDetailsSubmit}
-                disabled={!isFormValid(2)}
+                disabled={!isFormValid(2) || loading}
               >
-                Next
+                {loading ? <CircularProgress size={24} /> : "Next"}
               </Button>
             </Box>
           </Box>
@@ -1148,9 +1096,9 @@ const FormTabs = () => {
                 variant="contained"
                 color="primary"
                 onClick={handleDocumentDetailsSubmit}
-                disabled={!isFormValid(3)}
+                disabled={!isFormValid(3) || loading}
               >
-                Next
+                {loading ? <CircularProgress size={24} /> : "Next"}
               </Button>
             </Box>
           </Box>
@@ -1177,9 +1125,9 @@ const FormTabs = () => {
                 variant="contained"
                 color="primary"
                 onClick={handleCaptureImageSubmit}
-                disabled={!isFormValid(4)}
+                disabled={!isFormValid(4) || loading}
               >
-                Finish
+                {loading ? <CircularProgress size={24} /> : "Finish"}
               </Button>
             </Box>
           </Box>
@@ -1217,7 +1165,7 @@ const FormTabs = () => {
             <>
               <Stack spacing={2} mt={3}>
                 <Alert severity="success" mt={2}>
-                  All steps completed - you&apos;re finished
+                  All steps completed - you&apos;re record will be reviewed by the AML Officer within 24 hours.
                 </Alert>
 
                 <Box textAlign="right">
@@ -1226,7 +1174,7 @@ const FormTabs = () => {
                     variant="contained"
                     color="success"
                   >
-                    Move to Home Page
+                    Move to Dashboard
                   </Button>
                 </Box>
               </Stack>
