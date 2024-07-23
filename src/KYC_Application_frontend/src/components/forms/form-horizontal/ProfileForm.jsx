@@ -38,7 +38,7 @@ const decryptData = (ciphertext) => {
   const bytes = CryptoJS.AES.decrypt(ciphertext, secretKey);
   return bytes.toString(CryptoJS.enc.Utf8);
 };
-const ledger = ic.local("bd3sg-teaaa-aaaaa-qaaba-cai"); // Ledger canister
+const ledger = ic.local("bkyz2-fmaaa-aaaaa-qaaaq-cai"); // Ledger canister
 // const ledger = ic("sifoc-qqaaa-aaaap-ahorq-cai"); // Production canister
 
 const countries = [

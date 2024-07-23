@@ -15,7 +15,7 @@ import { useConnect } from "@connect2ic/react";
 import ic from "ic0";
 import { Principal } from "@dfinity/principal";
 
-const ledger = ic.local("bd3sg-teaaa-aaaaa-qaaba-cai"); // Ledger canister
+const ledger = ic.local("bkyz2-fmaaa-aaaaa-qaaaq-cai"); // Ledger canister
 // const ledger = ic("sifoc-qqaaa-aaaap-ahorq-cai"); // Production canister
 
 import CryptoJS from "crypto-js";
