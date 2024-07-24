@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import QRCode from "qrcode.react";
 import {
   Container,
@@ -310,8 +310,8 @@ const GroupDetailPage = () => {
   const [fetchingGroup, setFetchingGroup] = useState(true);
 
   const { isConnected, principal } = useConnect({
-    onConnect: () => {},
-    onDisconnect: () => {},
+    onConnect: () => { },
+    onDisconnect: () => { },
   });
 
   const formatId = (id) => {
@@ -870,6 +870,7 @@ const GroupDetailPage = () => {
                 justifyContent="flex-end"
                 mt={3}
               >
+
                 <Button
                   variant="contained"
                   color="primary"
@@ -961,284 +962,293 @@ const GroupDetailPage = () => {
   return (
     <Container>
       {fetchingGroup ? (
-              <Grid
-                item
-                xs={12}
-                display="flex"
-                justifyContent="center"
-                alignItems="center"
-              >
-                <CircularProgress />
-              </Grid>
-            ) : (
-              <>
-    {group && (
-      group[0].name === "defaultGroup" ? 
-      (
-      <>
-      <Card>
-        <CardMedia
-          component="img"
-          height="300"
-          image={
-            group[0].groupImage && group[0].groupImage.length > 0
-              ? "data:image/png;base64," + group[0].groupImage[0]
-              : "https://via.placeholder.com/150"
-          }
-          alt={groupDetails.name}
-        />
-        <CardContent>
-          <Typography gutterBottom variant="h2" component="div">
-            {group[0].name}
-          </Typography>
-          <Typography variant="body1" color="text.secondary">
-            {group[0].groupDescription[0]}
-          </Typography>
-          <Box mt={2}>
-            <Accordion>
-              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography variant="h6" color="text.primary">
-                  <AccountBalanceWalletIcon /> Balances
-                </Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                <Grid container spacing={2}>
-                  {groupDetails.balances.map((balance, index) => (
-                    <Grid item xs={12} sm={6} md={4} key={index}>
-                      <StyledPaper
-                        elevation={3}
-                        selected={selectedBalance === index}
-                        onClick={() =>
-                          setSelectedBalance(
-                            selectedBalance === index ? null : index
-                          )
-                        }
-                      >
-                        <Typography variant="h6" color="text.primary">
-                          {balance.currency}
-                        </Typography>
-                        <Typography variant="body1" color="text.secondary">
-                          {balance.amount} {balance.symbol}
-                        </Typography>
-                        {selectedBalance === index && (
-                          <Box
-                            mt={1}
-                            display="flex"
-                            flexDirection="column"
-                            alignItems="center"
-                            justifyContent="center"
-                          >
-                            <Typography
-                              variant="body2"
-                              color="text.primary"
-                              style={{
-                                wordBreak: "break-all",
-                                fontWeight: "bold",
-                              }}
-                            >
-                              {balance.address}
-                            </Typography>
-                            <Tooltip title="Copy Address">
-                              <IconButton
-                                onClick={() =>
-                                  handleCopyAddress(balance.address)
-                                }
-                              >
-                                <ContentCopyIcon
-                                  fontSize="small"
-                                  color="primary"
-                                />
-                              </IconButton>
-                            </Tooltip>
-                            <Box mt={1}>
-                              <QRCode value={balance.address} size={64} />
-                            </Box>
-                          </Box>
-                        )}
-                      </StyledPaper>
-                    </Grid>
-                  ))}
-                </Grid>
-              </AccordionDetails>
-            </Accordion>
-          </Box>
-        </CardContent>
-      </Card>
-      </>):
-      (
+        <Grid
+          item
+          xs={12}
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+        >
+          <CircularProgress />
+        </Grid>
+      ) : (
         <>
-        <Card>
-          <CardMedia
-            component="img"
-            height="300"
-            image={
-              group[0].groupImage && group[0].groupImage.length > 0
-                ? "data:image/png;base64," + decryptData(group[0].groupImage[0])
-                : "https://via.placeholder.com/150"
-            }
-            alt={groupDetails.name}
-          />
-          <CardContent>
-            <Typography gutterBottom variant="h2" component="div">
-            {decryptData(group[0].name)}
-            </Typography>
-            <Typography variant="body1" color="text.secondary">
-            {decryptData(group[0].groupDescription[0])} 
-            </Typography>
-            <Box mt={2}>
-              <Accordion>
-                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                  <Typography variant="h6" color="text.primary">
-                    <AccountBalanceWalletIcon /> Balances
-                  </Typography>
-                </AccordionSummary>
-                <AccordionDetails>
-                  <Grid container spacing={2}>
-                    {groupDetails.balances.map((balance, index) => (
-                      <Grid item xs={12} sm={6} md={4} key={index}>
-                        <StyledPaper
-                          elevation={3}
-                          selected={selectedBalance === index}
-                          onClick={() =>
-                            setSelectedBalance(
-                              selectedBalance === index ? null : index
-                            )
-                          }
-                        >
-                          <Typography variant="h6" color="text.primary">
-                            {balance.currency}
-                          </Typography>
-                          <Typography variant="body1" color="text.secondary">
-                            {balance.amount} {balance.symbol}
-                          </Typography>
-                          {selectedBalance === index && (
-                            <Box
-                              mt={1}
-                              display="flex"
-                              flexDirection="column"
-                              alignItems="center"
-                              justifyContent="center"
-                            >
-                              <Typography
-                                variant="body2"
-                                color="text.primary"
-                                style={{
-                                  wordBreak: "break-all",
-                                  fontWeight: "bold",
-                                }}
-                              >
-                                {balance.address}
-                              </Typography>
-                              <Tooltip title="Copy Address">
-                                <IconButton
-                                  onClick={() =>
-                                    handleCopyAddress(balance.address)
-                                  }
-                                >
-                                  <ContentCopyIcon
-                                    fontSize="small"
-                                    color="primary"
-                                  />
-                                </IconButton>
-                              </Tooltip>
-                              <Box mt={1}>
-                                <QRCode value={balance.address} size={64} />
-                              </Box>
-                            </Box>
-                          )}
-                        </StyledPaper>
-                      </Grid>
-                    ))}
-                  </Grid>
-                </AccordionDetails>
-              </Accordion>
-            </Box>
-          </CardContent>
-        </Card>
-        </>)
-    )}
-      {groupDetails.isAdmin && (
-        <Box mt={2} display="flex" justifyContent="flex-end" gap={2}>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={() => {
-              setFormType("createGroup");
-              setShowForm(true);
-            }}
-          >
-            Create Group
-          </Button>
-          <Button
-            variant="contained"
-            color="secondary"
-            onClick={() => {
-              setFormType("inviteUser");
-              setShowForm(true);
-            }}
-          >
-            Invite User
-          </Button>
-        </Box>
-      )}
-
-      {showForm && <Box mt={2}>{renderFormContent()}</Box>}
-
-      <Box mt={2}>
-        <Paper>
           {group && (
-            <>
-              <TableContainer>
-                <Table>
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>
-                        <Typography variant="h6">Id</Typography>
-                      </TableCell>
-                      <TableCell>
-                        <Typography variant="h6">Email</Typography>
-                      </TableCell>
-                      <TableCell>
-                        <Typography variant="h6">Contact</Typography>
-                      </TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {group && group[0].personalRecords.length > 0 ? (
-                      group[0].personalRecords.map((user) => (
-                        <TableRow hover>
-                          <TableCell>
-                            <Typography variant="h6">
-                              {user.userId[0]}
+            group[0].name === "defaultGroup" ?
+              (
+                <>
+                  <Card>
+                    <CardMedia
+                      component="img"
+                      height="300"
+                      image={
+                        group[0].groupImage && group[0].groupImage.length > 0
+                          ? "data:image/png;base64," + group[0].groupImage[0]
+                          : "https://via.placeholder.com/150"
+                      }
+                      alt={groupDetails.name}
+                    />
+                    <CardContent>
+                      <Typography gutterBottom variant="h2" component="div">
+                        {group[0].name}
+                      </Typography>
+                      <Typography variant="body1" color="text.secondary">
+                        {group[0].groupDescription[0]}
+                      </Typography>
+                      <Box mt={2}>
+                        <Accordion>
+                          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                            <Typography variant="h6" color="text.primary">
+                              <AccountBalanceWalletIcon /> Balances
                             </Typography>
-                          </TableCell>
+                          </AccordionSummary>
+                          <AccordionDetails>
+                            <Grid container spacing={2}>
+                              {groupDetails.balances.map((balance, index) => (
+                                <Grid item xs={12} sm={6} md={4} key={index}>
+                                  <StyledPaper
+                                    elevation={3}
+                                    selected={selectedBalance === index}
+                                    onClick={() =>
+                                      setSelectedBalance(
+                                        selectedBalance === index ? null : index
+                                      )
+                                    }
+                                  >
+                                    <Typography variant="h6" color="text.primary">
+                                      {balance.currency}
+                                    </Typography>
+                                    <Typography variant="body1" color="text.secondary">
+                                      {balance.amount} {balance.symbol}
+                                    </Typography>
+                                    {selectedBalance === index && (
+                                      <Box
+                                        mt={1}
+                                        display="flex"
+                                        flexDirection="column"
+                                        alignItems="center"
+                                        justifyContent="center"
+                                      >
+                                        <Typography
+                                          variant="body2"
+                                          color="text.primary"
+                                          style={{
+                                            wordBreak: "break-all",
+                                            fontWeight: "bold",
+                                          }}
+                                        >
+                                          {balance.address}
+                                        </Typography>
+                                        <Tooltip title="Copy Address">
+                                          <IconButton
+                                            onClick={() =>
+                                              handleCopyAddress(balance.address)
+                                            }
+                                          >
+                                            <ContentCopyIcon
+                                              fontSize="small"
+                                              color="primary"
+                                            />
+                                          </IconButton>
+                                        </Tooltip>
+                                        <Box mt={1}>
+                                          <QRCode value={balance.address} size={64} />
+                                        </Box>
+                                      </Box>
+                                    )}
+                                  </StyledPaper>
+                                </Grid>
+                              ))}
+                            </Grid>
+                          </AccordionDetails>
+                        </Accordion>
+                      </Box>
+                    </CardContent>
+                  </Card>
+                </>) :
+              (
+                <>
+                  <Card>
+                    <CardMedia
+                      component="img"
+                      height="300"
+                      image={
+                        group[0].groupImage && group[0].groupImage.length > 0
+                          ? "data:image/png;base64," + decryptData(group[0].groupImage[0])
+                          : "https://via.placeholder.com/150"
+                      }
+                      alt={groupDetails.name}
+                    />
+                    <CardContent>
+                      <Typography gutterBottom variant="h2" component="div">
+                        {decryptData(group[0].name)}
+                      </Typography>
+                      <Typography variant="body1" color="text.secondary">
+                        {decryptData(group[0].groupDescription[0])}
+                      </Typography>
+                      <Box mt={2}>
+                        <Accordion>
+                          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                            <Typography variant="h6" color="text.primary">
+                              <AccountBalanceWalletIcon /> Balances
+                            </Typography>
+                          </AccordionSummary>
+                          <AccordionDetails>
+                            <Grid container spacing={2}>
+                              {groupDetails.balances.map((balance, index) => (
+                                <Grid item xs={12} sm={6} md={4} key={index}>
+                                  <StyledPaper
+                                    elevation={3}
+                                    selected={selectedBalance === index}
+                                    onClick={() =>
+                                      setSelectedBalance(
+                                        selectedBalance === index ? null : index
+                                      )
+                                    }
+                                  >
+                                    <Typography variant="h6" color="text.primary">
+                                      {balance.currency}
+                                    </Typography>
+                                    <Typography variant="body1" color="text.secondary">
+                                      {balance.amount} {balance.symbol}
+                                    </Typography>
+                                    {selectedBalance === index && (
+                                      <Box
+                                        mt={1}
+                                        display="flex"
+                                        flexDirection="column"
+                                        alignItems="center"
+                                        justifyContent="center"
+                                      >
+                                        <Typography
+                                          variant="body2"
+                                          color="text.primary"
+                                          style={{
+                                            wordBreak: "break-all",
+                                            fontWeight: "bold",
+                                          }}
+                                        >
+                                          {balance.address}
+                                        </Typography>
+                                        <Tooltip title="Copy Address">
+                                          <IconButton
+                                            onClick={() =>
+                                              handleCopyAddress(balance.address)
+                                            }
+                                          >
+                                            <ContentCopyIcon
+                                              fontSize="small"
+                                              color="primary"
+                                            />
+                                          </IconButton>
+                                        </Tooltip>
+                                        <Box mt={1}>
+                                          <QRCode value={balance.address} size={64} />
+                                        </Box>
+                                      </Box>
+                                    )}
+                                  </StyledPaper>
+                                </Grid>
+                              ))}
+                            </Grid>
+                          </AccordionDetails>
+                        </Accordion>
+                      </Box>
+                    </CardContent>
+                  </Card>
+                </>)
+          )}
+          {groupDetails.isAdmin && (
+            <Box mt={2} display="flex" justifyContent="flex-end" gap={2}>
+              <Button
+                variant="contained"
+                color="primary"
+                style={{ color: 'white' }}
+              >
+                <Link to={`/group/${groupId}/add-stakeholder`} style={{ color: 'white', textDecoration: 'none' }}>
+                  Add StakeHolder
+                </Link>
+              </Button>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={() => {
+                  setFormType("createGroup");
+                  setShowForm(true);
+                }}
+              >
+                Create Group
+              </Button>
+              <Button
+                variant="contained"
+                color="secondary"
+                onClick={() => {
+                  setFormType("inviteUser");
+                  setShowForm(true);
+                }}
+              >
+                Invite User
+              </Button>
+            </Box>
+          )}
 
-                          <TableCell>
-                            <Typography>{decryptData(user.email)}</Typography>
-                          </TableCell>
+          {showForm && <Box mt={2}>{renderFormContent()}</Box>}
 
+          <Box mt={2}>
+            <Paper>
+              {group && (
+                <>
+                  <TableContainer>
+                    <Table>
+                      <TableHead>
+                        <TableRow>
                           <TableCell>
-                            <Typography>{decryptData(user.contactDetails)}</Typography>
+                            <Typography variant="h6">Id</Typography>
+                          </TableCell>
+                          <TableCell>
+                            <Typography variant="h6">Email</Typography>
+                          </TableCell>
+                          <TableCell>
+                            <Typography variant="h6">Contact</Typography>
                           </TableCell>
                         </TableRow>
-                      ))
-                    ) : (
-                      <TableRow>
-                        <TableCell colSpan={6} align="center">
-                          <Typography variant="h6">
-                            No users available
-                          </Typography>
-                        </TableCell>
-                      </TableRow>
-                    )}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </>
-          )}
-        </Paper>
-      </Box>
-      </>
+                      </TableHead>
+                      <TableBody>
+                        {group && group[0].personalRecords.length > 0 ? (
+                          group[0].personalRecords.map((user) => (
+                            <TableRow hover>
+                              <TableCell>
+                                <Typography variant="h6">
+                                  {user.userId[0]}
+                                </Typography>
+                              </TableCell>
+
+                              <TableCell>
+                                <Typography>{decryptData(user.email)}</Typography>
+                              </TableCell>
+
+                              <TableCell>
+                                <Typography>{decryptData(user.contactDetails)}</Typography>
+                              </TableCell>
+                            </TableRow>
+                          ))
+                        ) : (
+                          <TableRow>
+                            <TableCell colSpan={6} align="center">
+                              <Typography variant="h6">
+                                No users available
+                              </Typography>
+                            </TableCell>
+                          </TableRow>
+                        )}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                </>
+              )}
+            </Paper>
+          </Box>
+        </>
       )}
     </Container>
   );
