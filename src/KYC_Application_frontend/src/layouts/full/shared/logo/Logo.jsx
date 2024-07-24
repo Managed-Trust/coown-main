@@ -1,9 +1,10 @@
+import React from 'react';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { LogoDark } from '../../../../assets/images/logos/dark-logo.svg';
-import { LogoDarkRTL } from '../../../../assets/images/logos/dark-rtl-logo.svg';
-import { LogoLight } from '../../../../assets/images/logos/light-logo.svg';
-import { LogoLightRTL } from '../../../../assets/images/logos/light-logo-rtl.svg';
+import LogoDark from '../../../../assets/images/logos/dark-logo.svg';
+import LogoDarkRTL from '../../../../assets/images/logos/dark-rtl-logo.svg';
+import LogoLight from '../../../../assets/images/logos/light-logo.svg';
+import LogoLightRTL from '../../../../assets/images/logos/light-logo-rtl.svg';
 import { styled } from '@mui/material';
 
 const Logo = () => {
@@ -22,9 +23,9 @@ const Logo = () => {
         alignItems: 'center',
       }}>
         {customizer.activeMode === 'dark' ? (
-          <img src='../../../../assets/images/logos/light-logo.svg' />
+          <img src={LogoLight} alt="Logo" />
         ) : (
-          <img src='../../../../assets/images/logos/dark-logo.svg'/>
+          <img src={LogoDark} alt="Logo" />
         )}
       </LinkStyled>
     );
@@ -35,9 +36,9 @@ const Logo = () => {
       alignItems: 'center',
     }}>
       {customizer.activeMode === 'dark' ? (
-        <img src='../../../../assets/images/logos/dark-rtl-logo.svg' />
+        <img src={LogoDarkRTL} alt="Logo" />
       ) : (
-        <img src='../../../../assets/images/logos/light-logo-rtl.svg' />
+        <img src={LogoLightRTL} alt="Logo" />
       )}
     </LinkStyled>
   );
