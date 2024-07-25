@@ -21,6 +21,7 @@ const WebcamCapture = ({ onCapture }) => {
         videoConstraints={{
           facingMode: "user",
         }}
+        style={{borderRadius:'15px'}}
       />
       <Button onClick={capture}>Capture Photo</Button>
     </div>
