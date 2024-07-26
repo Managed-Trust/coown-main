@@ -60,39 +60,20 @@ const countries = [
 
 const initialState = {
   family_name: "",
-  email: "",
   given_name: "",
   birth_date: "",
-  age_over_18: true,
-  gender: "",
-  issuance_date: "",
-  expiry_date: "",
+  birth_country: "",
+  phone: "",
   resident_address: "",
   resident_country: "",
-  nationality: "",
+  addressVerificationDoc: null, // Store address verification file as base64 string
+  document_type: "",
+  citizenship: [],
   document_number: "",
   issuing_country: "",
-  phone_number: "",
-  openchat_id: "",
-  document_file: null,
-  role: "",
-  phone: "",
-  identityNumber: "",
+  issuance_date: "",
+  expiry_date: "",
   identityDoc: null, // Store file as base64 string
-  addressVerificationDoc: null, // Store address verification file as base64 string
-  citizenship: [],
-  residency: "",
-  resident_state: "",
-  resident_city: "",
-  resident_postal_code: "",
-  resident_street: "",
-  issuing_authority: "",
-  issuing_jurisdiction: "",
-  birth_place: "",
-  birth_country: "",
-  birth_state: "",
-  birth_city: "",
-  documet_type: "",
 };
 
 const steps = [

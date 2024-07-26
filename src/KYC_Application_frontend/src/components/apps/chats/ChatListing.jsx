@@ -54,7 +54,7 @@ const ChatListing = ({ onSelectGroup }) => {
               })
             );
             const validGroups = groupDetails.filter(group => group !== null);
-            setGroups(validGroups[0]);
+            setGroups(validGroups);
             console.log("Groups:", validGroups);
           }
         }
