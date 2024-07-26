@@ -26,6 +26,7 @@ import {
   ConnectDialog,
 
 } from "@connect2ic/react";
+import CreateGroup from '../../views/apps/Group/CreateGroup.jsx';
 
 const MainWrapper = styled('div')(() => ({
   display: 'flex',
@@ -80,6 +81,7 @@ const FullLayout = () => {
                 <Route path="/forms/form-horizontal" element={<FormHorizontal />} />
                 <Route path="/group/:groupId" element={<GroupDetailPage />} />
                 <Route path="/group/:groupId/add-stakeholder" element={<AddStakeHolder/>} />
+                <Route path="/group/create-group" element={<CreateGroup/>} />
                 <Route path="/apps/chats" element={<Chats />} />
                 <Route path="/group-invitation/:groupId/:email" element={<GroupInvitation />} />
                 <Route path="/apps/tickets" element={<Tickets />} />
