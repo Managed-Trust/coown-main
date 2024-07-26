@@ -79,6 +79,7 @@ const initialState = {
   phone: "",
   identityNumber: "",
   identityDoc: null, // Store file as base64 string
+  addressVerificationDoc: null, // Store address verification file as base64 string
   citizenship: [],
   residency: "",
   resident_state: "",
@@ -106,6 +107,7 @@ const FormTabs = () => {
   const [activeStep, setActiveStep] = useState(0);
   const [formData, setFormData] = useState(initialState);
   const [documentPreview, setDocumentPreview] = useState(null);
+  const [addressDocumentPreview, setAddressDocumentPreview] = useState(null);
   const [image, setImage] = useState(null);
   const [skipped, setSkipped] = useState(new Set());
   const [loading, setLoading] = useState(false);
@@ -160,6 +162,17 @@ const FormTabs = () => {
     setDocumentPreview(URL.createObjectURL(file));
   };
 
+  const handleAddressFileChange = async (e) => {
+    const file = e.target.files[0];
+    const base64String = await readFileAsBase64(file);
+
+    setFormData((prevData) => ({
+      ...prevData,
+      addressVerificationDoc: base64String,
+    }));
+    setAddressDocumentPreview(URL.createObjectURL(file));
+  };
+
   const handleSelectChange = (id) => (event) => {
     setFormData((prevData) => ({
       ...prevData,
@@ -197,7 +210,8 @@ const FormTabs = () => {
       case 1:
         return (
           formData.resident_address &&
-          formData.resident_country
+          formData.resident_country &&
+          formData.addressVerificationDoc // Ensure address document upload is valid
         );
       case 2:
         return (
@@ -280,9 +294,8 @@ const FormTabs = () => {
         encryptData(formData.residency)
       );
 
-      swal("Success", "Personal Recored Stored Successfully!", "success");
+      swal("Success", "Personal Record Stored Successfully!", "success");
     } catch (e) {
-      // console.log("Error creating user:", e);
       swal("Error", e, "error");
     } finally {
       setLoading(false);
@@ -325,7 +338,8 @@ const FormTabs = () => {
         encryptData(formData.resident_state),
         encryptData(formData.resident_city),
         encryptData(formData.resident_postal_code),
-        encryptData(formData.resident_street)
+        encryptData(formData.resident_street),
+        encryptData(formData.addressVerificationDoc) // Add address verification document
       );
       swal("Success", "Details Stored Successfully!", "success");
     } catch (e) {
@@ -607,6 +621,63 @@ const FormTabs = () => {
                       ))}
                     </Select>
                   </Grid>
+
+                  <Grid item xs={12} lg={12}>
+                    <CustomFormLabel
+                      htmlFor="address-upload"
+                      className="center"
+                      sx={{ mt: 0 }}
+                    >
+                      Address Verification
+                      <Tooltip
+                        title="Please upload one of these documents, issued within the last 3 months"
+                        placement="top"
+                        cursor="pointer"
+                      >
+                        <InfoOutlined />
+                      </Tooltip>
+                    </CustomFormLabel>
+                    <Typography variant="body2" mb={1}>
+                      Please upload one of these documents, issued within the last 3 months:
+                    </Typography>
+                    <ul style={{ listStyle: 'none', paddingLeft: 0 }}>
+                      <li>✓ Utility bill.</li>
+                      <li>✓ Bank statement.</li>
+                      <li>✓ Government correspondence.</li>
+                      <li>✓ Rental agreement.</li>
+                      <li>✓ Insurance statement.</li>
+                    </ul>
+                    <Box
+                      sx={{
+                        border: '2px dashed #ccc',
+                        borderRadius: '10px',
+                        padding: '20px',
+                        textAlign: 'center',
+                        cursor: 'pointer',
+                        transition: 'border 0.3s',
+                        '&:hover': {
+                          borderColor: '#666',
+                        },
+                      }}
+                    >
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleAddressFileChange}
+                        id="address-upload"
+                        style={{ display: 'none' }}
+                      />
+                      <label htmlFor="address-upload" style={{ cursor: 'pointer', fontWeight: 'bold' }}>
+                        Drag and drop file OR &nbsp;<span style={{ color: '#1976d2', textDecoration: 'underline' }}>SELECT</span>
+                      </label>
+                      {addressDocumentPreview && (
+                        <Box mt={2}>
+                          <img src={addressDocumentPreview} alt="Address Document Preview" style={{ width: '100%', maxWidth: '150px', maxHeight: '150px', height: 'auto', borderRadius: '10px', border: '1px solid #ccc' }} />
+                        </Box>
+                      )}
+                    </Box>
+                  </Grid>
+
                 </Grid>
               </Grid>
             </Grid>
@@ -617,7 +688,7 @@ const FormTabs = () => {
               <Button
                 variant="contained"
                 color="primary"
-                onClick={handleMoreDetailsSubmit}
+                onClick={handleAddressDetailsSubmit}
                 disabled={!isFormValid(1) || loading}
               >
                 {loading ? <CircularProgress size={24} /> : "Next"}
