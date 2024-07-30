@@ -25,85 +25,45 @@ actor KYC_Canister {
 
   type Customer = {
     id : Text;
-    given_name : Text;
     family_name : Text;
-    birth_date : Text;
-    birth_country : Text;
-    phone : Text;
-    resident_address : Text;
-    resident_country : Text;
-    document_type : Text;
-    citizenship : Text;
-    document_number : Text;
-    issuing_country : Text;
-    issuance_date : Text;
-    expiry_date : Text;
-    residency_doc : ?Text;
-    document_photo : ?Text; // Optional Blob for document photo
-    live_photo : ?Text; // Optional Blob for live verification photo
-    document_verified : Bool; // Boolean to track if the document has been verified
-    identity_verified : Bool; // Boolean to track if the identity has been verified
-    verified : Bool;
+    given_name : Text;
+    birth_date : Text; // ISO format
+    age_over_18 : Bool;
     role : Text;
-  };
-
-  public func addBasicInfoCustomer(
-    id : Text,
-    family_name : Text,
-    given_name : Text,
-    birth_date : Text, // ISO format
-    birth_country : Text,
-    phone : Text
-  ) : async Text {
-    // Checking if the user exists and is verified
-    switch (users.get(id)) {
-      case (null) {
-        return "User not verified";
-      };
-      case (?user) {
-        if (user.emailAuth == "verified") {
-          // Checking if the customer already exists in the system
-          switch (map.get(id)) {
-            case (null) {
-              // Create a new customer record if all necessary data is provided
-              if (phone == "") {
-                return "Phone number cannot be empty.";
-              };
-              let newCustomer : Customer = {
-                id = id;
-                family_name = family_name;
-                given_name = given_name;
-                birth_date = birth_date;
-                birth_country = birth_country;
-                phone = phone;
-                resident_address = ""; // Assume default or null since not provided
-                resident_country = ""; // Assuming `residency` corresponds to this field
-                document_type = ""; // Default or null if not provided
-                citizenship = "";
-                document_number = ""; // Default or null if not provided
-                issuing_country = ""; // Default or null if not provided
-                issuance_date = ""; // Default or null if not provided
-                expiry_date = ""; // Default or null if not provided
-                residency_doc = null;
-                document_photo = null;
-                live_photo = null;
-                document_verified = false;
-                identity_verified = false;
-                verified = false;
-                role = "";
-              };
-              map.put(id, newCustomer);
-              return "Customer added successfully.";
-            };
-            case (?existingCustomer) {
-              return "Customer with this ID already exists.";
-            };
-          };
-        } else {
-          return "Email not verified.";
-        };
-      };
-    };
+    // Optional fields
+    age_over_NN : ?Bool;
+    age_in_years : ?Nat;
+    age_birth_year : ?Nat;
+    family_name_birth : ?Text;
+    given_name_birth : ?Text;
+    birth_place : ?Text;
+    birth_country : ?Text;
+    birth_state : ?Text;
+    birth_city : ?Text;
+    resident_address : ?Text;
+    resident_country : ?Text;
+    resident_state : ?Text; //make it generic
+    resident_city : ?Text; //make it generic
+    resident_postal_code : ?Text; //make it generic
+    resident_street : ?Text; //make it generic
+    gender : ?Nat; // 0, 1, 2 for unspecified, male, female
+    nationality : ?Text; // ISO Alpha-2 code
+    //allow multiple
+    issuance_date : ?Text; // ISO format
+    expiry_date : ?Text; // ISO format
+    issuing_authority : ?Text;
+    document_number : ?Text;
+    issuing_country : ?Text;
+    issuing_jurisdiction : ?Text;
+    citizenship : [Text];
+    residency : Text;
+    phone : Text;
+    identityNumber : Text;
+    identityDoc : Text;
+    verified : Bool;
+    //Live image with CNIC
+    image : ?Text;
+    status : ?Text;
   };
 
   private stable var mapEntries : [(Text, Customer)] = [];
@@ -113,92 +73,225 @@ actor KYC_Canister {
   var users = HashMap.HashMap<Text, User>(0, Text.equal, Text.hash);
   //==================================================================================
 
+  // Storage for customer data
+  // stable var customers : [Customer] = [];
+
   // Check if user is available
   public func getUser(userId : Text) : async ?User {
     return users.get(userId);
   };
 
   // Function to add a new customer
+  public func addCustomer(newCustomer : Customer) : async Text {
 
-  public func addDocumentDetailsCustomer(
+    switch (map.get(newCustomer.id)) {
+      case (null) {
+        if (newCustomer.role == "") {
+          return "Role cannot be empty.";
+        };
+        if (newCustomer.phone == "" or newCustomer.identityNumber == "") {
+          return "Phone number and identity number cannot be empty.";
+        };
+        map.put(newCustomer.id, newCustomer);
+        return "Customer added successfully.";
+      };
+      case (?value) {
+
+        return "Customer with this ID already exists.";
+
+      };
+    };
+
+  };
+
+  public func addBasicInfoCustomer(
     id : Text,
-    document_type : Text,
-    citizenship : Text,
-    document_number : Text,
-    issuing_country : Text,
-    issuance_date : Text, // ISO format
-    expiry_date : Text // ISO format
+    family_name : Text,
+    given_name : Text,
+    birth_date : Text, // ISO format
+    phone : Text,
+    identityNumber : Text,
+    identityDoc : Text,
+    citizenship : [Text],
+    residency : Text,
+  ) : async Text {
+    switch (users.get(id)) {
+      case (null) {
+        return "Not verifid";
+      };
+      case (?user) {
+        if (user.emailAuth == "verified") {
+          switch (map.get(id)) {
+            case (null) {
+              // if (true) {
+              //   return "Role cannot be empty.";
+              // };
+              if (phone == "" or identityNumber == "") {
+                return "Phone number and identity number cannot be empty.";
+              };
+              var newCustomer : Customer = {
+                id = id;
+                family_name = family_name;
+                given_name = given_name;
+                birth_date = birth_date;
+                age_over_18 = false;
+                role = "user";
+                phone = phone;
+                //================================
+                age_over_NN = null;
+                age_in_years = null;
+                age_birth_year = null;
+                family_name_birth = null;
+                given_name_birth = null;
+                birth_place = null;
+                birth_country = null;
+                birth_state = null;
+                birth_city = null;
+                //===============================
+                resident_address = null;
+                resident_country = null;
+                resident_state = null;
+                resident_city = null;
+                resident_postal_code = null;
+                resident_street = null;
+                //================================
+                gender = null; // 0, 1, 2 for unspecified, male, female
+                nationality = null; // ISO Alpha-2 code
+                issuance_date = null; // ISO format
+                expiry_date = null; // ISO format
+                issuing_authority = null;
+                document_number = null;
+                issuing_country = null;
+                issuing_jurisdiction = null;
+                image = null;
+                status = null;
+                identityNumber = identityNumber;
+                identityDoc = identityDoc;
+                verified = false;
+                citizenship = citizenship;
+                residency = residency;
+              };
+              map.put(id, newCustomer);
+              return "Customer added successfully.";
+            };
+            case (?value) {
+
+              return "Customer with this ID already exists.";
+
+            };
+          };
+
+        } else {
+          return "email not verified";
+        };
+      };
+    };
+
+  };
+
+  public func addFamilyCustomer(
+    id : Text,
+    birth_place : Text,
+    birth_country : Text,
+    birth_state : Text,
+    birth_city : Text,
   ) : async Text {
 
     switch (map.get(id)) {
       case (null) {
-        "Customer does not exist.";
+
+        return "Customer doesnot exsist.";
       };
-      case (?customer) {
-        let updatedCustomer = {
-          customer with
-          document_type = document_type;
-          citizenship = citizenship;
-          document_number = document_number;
-          issuing_country = issuing_country;
-          issuance_date = issuance_date;
-          expiry_date = expiry_date;
+      case (?value) {
+        let updatedProfile = {
+          value with
+          age_over_NN = ?false;
+          age_in_years = ?18;
+          birth_place = ?birth_place;
+          birth_country = ?birth_country;
+          birth_state = ?birth_state;
+          birth_city = ?birth_city;
         };
-        map.put(id, updatedCustomer);
-        return "Document details updated successfully.";
+        map.put(id, updatedProfile);
+        return "Customer updated successfully.";
+
       };
     };
+
+  };
+
+  public func addOtherInfoCustomer(
+    id : Text,
+    gender : Nat, // 0, 1, 2 for unspecified, male, female
+    nationality : Text, // ISO Alpha-2 code
+    issuance_date : Text, // ISO format
+    expiry_date : Text, // ISO format
+    issuing_authority : Text,
+    document_number : Text,
+    issuing_country : Text,
+    issuing_jurisdiction : Text,
+  ) : async Text {
+
+    switch (map.get(id)) {
+      case (null) {
+
+        return "Customer doesnot exsist.";
+      };
+      case (?value) {
+        let updatedProfile = {
+          value with
+          gender = ?gender;
+          nationality = ?nationality;
+          issuance_date = ?issuance_date; // ISO format
+          expiry_date = ?expiry_date; // ISO format
+          issuing_authority = ?issuing_authority;
+          document_number = ?document_number;
+          issuing_country = ?issuing_country;
+          issuing_jurisdiction = ?issuing_jurisdiction;
+        };
+        map.put(id, updatedProfile);
+        return "Customer updated successfully.";
+
+      };
+    };
+
   };
 
   public func addResidencyCustomer(
     id : Text,
     resident_address : Text,
     resident_country : Text,
-    verification_documents : Text // Assuming you handle the document uploads separately and pass them as Blobs
+    resident_state : Text,
+    resident_city : Text,
+    resident_postal_code : Text,
+    resident_street : Text,
   ) : async Text {
 
     switch (map.get(id)) {
       case (null) {
-        "Customer does not exist.";
-      };
-      case (?customer) {
-        // Updating only the fields provided in the "Residency Information" section
-        let updatedCustomer = {
-          customer with
-          resident_address = resident_address;
-          resident_country = resident_country;
-          residency_doc = ?verification_documents;
-          // Optionally, handle document uploads here or elsewhere in your application logic
-          // document_verification_status could be updated based on document verification logic
-        };
-        map.put(id, updatedCustomer);
-        return "Residency information updated successfully.";
-      };
-    };
-  };
 
-  public func uploadDocumentPhoto(
-    id : Text,
-    documentPhoto : Text // Assuming the photo is uploaded as a Blob
-  ) : async Text {
-    switch (map.get(id)) {
-      case (null) {
-        "Customer does not exist.";
+        return "Customer doesnot exsist.";
       };
-      case (?customer) {
-        let updatedCustomer = {
-          customer with
-          document_photo = ?documentPhoto; // Storing the photo
-          document_verified = false; // Initial state before verification
+      case (?value) {
+        let updatedProfile = {
+          value with
+          resident_address = ?resident_address;
+          resident_country = ?resident_country;
+          resident_state = ?resident_state;
+          resident_city = ?resident_city;
+          resident_postal_code = ?resident_postal_code;
+          resident_street = ?resident_street;
         };
-        map.put(id, updatedCustomer);
-        // You might want to trigger an asynchronous verification process here
-        return "Document photo uploaded successfully, pending verification.";
+        map.put(id, updatedProfile);
+        return "Customer updated successfully.";
 
       };
     };
-  };
 
+  };
+  //owns account
+  //beneficicary
+  //executive
   public func addImage(
     id : Text,
     image : Text,
@@ -212,7 +305,7 @@ actor KYC_Canister {
       case (?value) {
         let updatedProfile = {
           value with
-          live_photo = ?image;
+          image = ?image;
         };
         map.put(id, updatedProfile);
         return "Customer updated successfully.";
@@ -361,7 +454,7 @@ actor KYC_Canister {
     };
   };
 
-  // Function to check if the customer is a registered user
+  // // Function to check if the customer is a registered user
   public query func isRegisteredUser(id : Text) : async Bool {
     switch (map.get(id)) {
       case (null) {
@@ -1032,6 +1125,33 @@ actor KYC_Canister {
     };
   };
 
+  // Function to join an existing group
+  // public func joinGroup(groupId : Text, userId : Text) : async Text {
+  //   switch (groups.get(groupId)) {
+  //     case (null) {
+  //       return "Group does not exist.";
+  //     };
+  //     case (?group) {
+  //       switch (groupIds.get(groupId)) {
+  //         case (?buffer) {
+  //           if (Buffer.find(buffer, func(x) { x == userId }) != null) {
+  //             return "User already in the group.";
+  //           } else {
+  //             buffer.add(userId);
+  //             groupIds.put(groupId, buffer);
+  //             return "User added to the group.";
+  //           };
+  //         };
+  //         case (null) {
+  //           var newBuffer = Buffer.Buffer<Text>(0);
+  //           newBuffer.add(userId);
+  //           groupIds.put(groupId, newBuffer);
+  //           return "User added to the group.";
+  //         };
+  //       };
+  //     };
+  //   };
+  // };
   //================================================================================//
   private stable var groupIdEntries : [(Text, [Text])] = [];
   var groupIds = HashMap.HashMap<Text, Buffer.Buffer<Text>>(0, Text.equal, Text.hash);
