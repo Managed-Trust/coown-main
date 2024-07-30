@@ -33,7 +33,7 @@ actor KYC_Canister {
     resident_address : Text;
     resident_country : Text;
     document_type : Text;
-    citizenship : Text;
+    citizenship : [Text];
     document_number : Text;
     issuing_country : Text;
     issuance_date : Text;
@@ -79,7 +79,7 @@ actor KYC_Canister {
                 resident_address = ""; // Assume default or null since not provided
                 resident_country = ""; // Assuming `residency` corresponds to this field
                 document_type = ""; // Default or null if not provided
-                citizenship = "";
+                citizenship = [];
                 document_number = ""; // Default or null if not provided
                 issuing_country = ""; // Default or null if not provided
                 issuance_date = ""; // Default or null if not provided
@@ -93,7 +93,7 @@ actor KYC_Canister {
                 role = "";
               };
               map.put(id, newCustomer);
-              return "Customer added successfully.";
+              return "Success";
             };
             case (?existingCustomer) {
               return "Customer with this ID already exists.";
@@ -123,7 +123,7 @@ actor KYC_Canister {
   public func addDocumentDetailsCustomer(
     id : Text,
     document_type : Text,
-    citizenship : Text,
+    citizenship : [Text],
     document_number : Text,
     issuing_country : Text,
     issuance_date : Text, // ISO format
@@ -145,7 +145,7 @@ actor KYC_Canister {
           expiry_date = expiry_date;
         };
         map.put(id, updatedCustomer);
-        return "Document details updated successfully.";
+        return "Success";
       };
     };
   };
@@ -172,7 +172,7 @@ actor KYC_Canister {
           // document_verification_status could be updated based on document verification logic
         };
         map.put(id, updatedCustomer);
-        return "Residency information updated successfully.";
+        return "Success";
       };
     };
   };
@@ -193,7 +193,7 @@ actor KYC_Canister {
         };
         map.put(id, updatedCustomer);
         // You might want to trigger an asynchronous verification process here
-        return "Document photo uploaded successfully, pending verification.";
+        return "Success";
 
       };
     };
@@ -215,7 +215,7 @@ actor KYC_Canister {
           live_photo = ?image;
         };
         map.put(id, updatedProfile);
-        return "Customer updated successfully.";
+        return "Success";
 
       };
     };
@@ -262,7 +262,7 @@ actor KYC_Canister {
             groupIds.put(id, newBuffer);
           };
         };
-        return "Profile updated";
+        return "Success";
       };
     };
   };
