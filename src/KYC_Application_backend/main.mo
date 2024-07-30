@@ -236,6 +236,7 @@ actor KYC_Canister {
         };
         map.put(id, updatedProfile);
         let defaultGroup : Group = {
+          adminId = id;
           groupName = "DefaultGroup";
           groupType = "Default";
           companyDetails = null;
@@ -663,6 +664,7 @@ actor KYC_Canister {
   };
 
   type Group = {
+    adminId : Text;
     groupName : Text;
     groupType : Text;
     companyDetails : ?CompanyDetails;
@@ -670,11 +672,17 @@ actor KYC_Canister {
     personalRecords : [PersonalRecord];
   };
 
-  public func createGroup(groupId : Text, groupName : Text, groupType : Text) : async Text {
-
+  public func createGroup(
+    adminId : Text,
+    rand : Text,
+    groupName : Text,
+    groupType : Text,
+  ) : async Text {
+    let groupId = Text.concat(adminId, rand);
     switch (groups.get(groupId)) {
       case (null) {
         let newGroup : Group = {
+          adminId = adminId;
           groupName = groupName;
           groupType = groupType;
           companyDetails = null;
@@ -682,6 +690,18 @@ actor KYC_Canister {
           personalRecords = [];
         };
         groups.put(groupId, newGroup);
+
+        switch (groupIds.get(adminId)) {
+          case (?buffer) {
+            buffer.add(groupId);
+            groupIds.put(adminId, buffer);
+          };
+          case (null) {
+            var newBuffer = Buffer.Buffer<Text>(0);
+            newBuffer.add(groupId);
+            groupIds.put(adminId, newBuffer);
+          };
+        };
         return "Group created successfully.";
       };
       case (?val) {
@@ -786,8 +806,16 @@ actor KYC_Canister {
     };
   };
 
+  public func getGroup(groupId : Text) : async ?Group {
+    return groups.get(groupId);
+  };
+  public func getAllGroups() : async [Group] {
+    let allGroups = Iter.toArray(groups.vals());
+    return allGroups;
+  };
+
   //==============================================================
-  //Group logic
+  //Personal Record logic
   //==============================================================
   public type PersonalRecordType = {
     #EconomicBeneficiary;
@@ -839,14 +867,6 @@ actor KYC_Canister {
         return "Personal record added successfully.";
       };
     };
-  };
-
-  public func getGroup(groupId : Text) : async ?Group {
-    return groups.get(groupId);
-  };
-  public func getAllGroups() : async [Group] {
-    let allGroups = Iter.toArray(groups.vals());
-    return allGroups;
   };
 
   public func updateGroupUserStatus(groupId : Text, email : Text, newStatus : PersonalRecordStatus, encryptedEmail : Text) : async Text {
@@ -918,7 +938,7 @@ actor KYC_Canister {
 
   //==============================================================
   //Group ids logic
-  //================================================================================//
+  //==============================================================//
   private stable var groupIdEntries : [(Text, [Text])] = [];
   var groupIds = HashMap.HashMap<Text, Buffer.Buffer<Text>>(0, Text.equal, Text.hash);
   //user to group ids
@@ -945,6 +965,7 @@ actor KYC_Canister {
       };
     };
   };
+  // Get funcyoon
   public func getGroupIdsByUserId(userId : Text) : async [Text] {
     let groupIdsBuffer = groupIds.get(userId);
     switch (groupIdsBuffer) {
