@@ -96,8 +96,8 @@ const UserListing = ({ Users }) => {
                       <TableCell>
                         <Stack direction="row" gap="10px" alignItems="center">
                           <Avatar
-                            src={decryptData(user.image[0])}
-                            alt={user.name}
+                            src={user.live_photo[0]}
+                            alt="user image"
                             width="35"
                             sx={{
                               borderRadius: '100%',
@@ -107,7 +107,7 @@ const UserListing = ({ Users }) => {
                         </Stack>
                       </TableCell>
                       <TableCell>
-                        <Typography variant="h6">{decryptData(user.residency)}</Typography>
+                        <Typography variant="h6">{decryptData(user.resident_address)}</Typography>
                       </TableCell>
                       <TableCell>
                         <Typography variant="h6">{user.role}</Typography>

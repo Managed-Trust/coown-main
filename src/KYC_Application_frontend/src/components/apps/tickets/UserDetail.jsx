@@ -1,10 +1,11 @@
-import React, { useEffect } from 'react';
-import { Box, Typography, Avatar, Divider, IconButton, Button, Grid, Stack } from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import { Box, Typography, Avatar, Divider, IconButton, Button, Grid, Stack, CircularProgress } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { useConnect } from '@connect2ic/react';
 import ic from 'ic0';
 import CryptoJS from "crypto-js";
 import swal from 'sweetalert';
+
 const ledger = ic.local("bkyz2-fmaaa-aaaaa-qaaaq-cai"); // Ledger canister
 // const ledger = ic("sifoc-qqaaa-aaaap-ahorq-cai"); // Production canister
 
@@ -21,21 +22,19 @@ const UserDetail = ({ user, onClose }) => {
     onDisconnect: () => {},
   });
 
+  const [loading, setLoading] = useState(false);
+
   const handleVerify = async () => {
+    setLoading(true);
     try {
       const response = await ledger.call("verifyCustomer", user.id);
-      swal("Success",'User Verified Successfully!', "success");
+      swal("Success", 'User Verified Successfully!', "success");
     } catch (e) {
       console.log("Error Verifying:", e);
+    } finally {
+      setLoading(false);
     }
   };
-
-  useEffect(() => {
-    if (user && user.identityDoc) {
-      console.log(user.identityDoc);
-      console.log("Birth City:",user.birth_city[0]);
-    }
-  }, [user]);
 
   if (!user) return null;
 
@@ -45,7 +44,7 @@ const UserDetail = ({ user, onClose }) => {
         <CloseIcon />
       </IconButton>
       <Stack direction="row" spacing={2} alignItems="center" mb={2}>
-        <Avatar src={decryptData(user.image[0])} alt={user.name} sx={{ width: 80, height: 80, boxShadow: 3 }} />
+        <Avatar src={user.live_photo[0]} alt="user image" sx={{ width: 80, height: 80, boxShadow: 3 }} />
         <Typography variant="h4" component="div" sx={{ flexGrow: 1 }}>
           {decryptData(user.given_name)} {decryptData(user.family_name)}
         </Typography>
@@ -54,7 +53,7 @@ const UserDetail = ({ user, onClose }) => {
       <Grid container spacing={2}>
         <Grid item xs={12} sm={6} md={4}>
           <Typography variant="h6">Residency</Typography>
-          <Typography variant="body1">{decryptData(user.residency)}</Typography>
+          <Typography variant="body1">{decryptData(user.resident_address)}</Typography>
         </Grid>
         <Grid item xs={12} sm={6} md={4}>
           <Typography variant="h6">Role</Typography>
@@ -72,29 +71,29 @@ const UserDetail = ({ user, onClose }) => {
           <Typography variant="body1">{decryptData(user.birth_date)}</Typography>
         </Grid>
         <Grid item xs={12} sm={6} md={4}>
-          <Typography variant="h6">Birth City</Typography>
-          <Typography variant="body1">{decryptData(user.birth_city[0])}</Typography>
+          <Typography variant="h6">Birth Country</Typography>
+          <Typography variant="body1">{decryptData(user.birth_country)}</Typography>
         </Grid>
         <Grid item xs={12} sm={6} md={4}>
-          <Typography variant="h6">Birth Country</Typography>
-          <Typography variant="body1">{decryptData(user.birth_country[0])}</Typography>
+          <Typography variant="h6">Resident Country</Typography>
+          <Typography variant="body1">{decryptData(user.resident_country)}</Typography>
         </Grid>
         <Grid item xs={12}>
           <Divider />
         </Grid>
         <Grid item xs={12} sm={6} md={6}>
           <Typography variant="h6">Identity Document</Typography>
-          {user.identityDoc && (
+          {user.document_photo[0] && (
             <img
-              src={`data:image/jpeg;base64,${decryptData(user.identityDoc)}`}
+              src={`data:image/jpeg;base64,${user.document_photo[0]}`}
               alt="Identity Document"
-              style={{ maxWidth: '100%',width:'150px', height: 'auto', marginTop: 10 }}
+              style={{ maxWidth: '100%', width: '150px', height: 'auto', marginTop: 10 }}
             />
           )}
         </Grid>
         <Grid item xs={12}>
-          <Button variant="contained" color="primary" onClick={handleVerify}>
-            Verify User
+          <Button variant="contained" color="primary" onClick={handleVerify} disabled={loading}>
+            {loading ? <CircularProgress size={24} /> : "Verify User"}
           </Button>
         </Grid>
       </Grid>

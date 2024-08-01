@@ -260,7 +260,7 @@ const FormTabs = () => {
 
     try {
       const encryptedIdentityDoc6 = formData.identityDoc;
-      const encryptedCitizenship = encryptArrayEntries(formData.citizenship);
+
 
       const response = await ledger.call(
         "addBasicInfoCustomer",
@@ -268,21 +268,21 @@ const FormTabs = () => {
         encryptData(formData.family_name),
         encryptData(formData.given_name),
         encryptData(formData.birth_date),
-        encryptData(formData.phone),
-        encryptData(formData.identityNumber),
-        encryptData(encryptedIdentityDoc6),
-        encryptedCitizenship,
-        encryptData(formData.residency)
+        encryptData(formData.birth_country),
+        encryptData(formData.phone)
       );
+
+      console.log("Personal Detail Result:",response);
 
       swal("Success", "Personal Record Stored Successfully!", "success");
     } catch (e) {
-      swal("Error", e, "error");
+      swal("Error", e.message || e.toString(), "error");
     } finally {
       setLoading(false);
       handleNext();
     }
   };
+
 
   const handleMoreDetailsSubmit = async () => {
     console.log("More Details Submitted", formData);
@@ -290,16 +290,15 @@ const FormTabs = () => {
 
     try {
       const response = await ledger.call(
-        "addFamilyCustomer",
+        "addResidencyCustomer",
         principal,
-        encryptData(formData.birth_place),
-        encryptData(formData.birth_country),
-        encryptData(formData.birth_state),
-        encryptData(formData.birth_city)
+        encryptData(formData.resident_address),
+        encryptData(formData.resident_country),
+        formData.addressVerificationDoc,
       );
-      swal("Success", "Details Stored Successfully!", "success");
+      swal("Success", "Address Details Successfully!", "success");
     } catch (e) {
-      swal("Error", e, "error");
+      swal("Error", e.message || e.toString(), "error");
     } finally {
       setLoading(false);
       handleNext();
@@ -316,15 +315,12 @@ const FormTabs = () => {
         principal,
         encryptData(formData.resident_address),
         encryptData(formData.resident_country),
-        encryptData(formData.resident_state),
-        encryptData(formData.resident_city),
-        encryptData(formData.resident_postal_code),
-        encryptData(formData.resident_street),
-        encryptData(formData.addressVerificationDoc) // Add address verification document
+        formData.addressVerificationDoc,
       );
-      swal("Success", "Details Stored Successfully!", "success");
+      console.log("Address details response:",response);
+      swal("Success", "Address Details Stored Successfully!", "success");
     } catch (e) {
-      swal("Error", e, "error");
+      swal("Error", e.message || e.toString(), "error");
     } finally {
       setLoading(false);
       handleNext();
@@ -332,30 +328,51 @@ const FormTabs = () => {
   };
 
   const handleDocumentDetailsSubmit = async () => {
+
     console.log("Document Details Submitted", formData);
+    const encryptedCitizenship = encryptArrayEntries(formData.citizenship);
     setLoading(true);
 
     try {
       const response = await ledger.call(
-        "addOtherInfoCustomer",
+        "addDocumentDetailsCustomer",
         principal,
-        Number(formData.gender),
-        encryptData(formData.nationality),
-        encryptData(formData.issuance_date),
-        encryptData(formData.expiry_date),
-        encryptData(formData.issuing_authority),
+        encryptData(formData.document_type),
+        encryptedCitizenship,
         encryptData(formData.document_number),
         encryptData(formData.issuing_country),
-        encryptData(formData.issuing_jurisdiction)
+        encryptData(formData.issuance_date),
+        encryptData(formData.expiry_date),
       );
-      swal("Success", "Details Stored Successfully!", "success");
+      swal("Success", "Document Details Stored Successfully!", "success");
+    } catch (e) {
+      swal("Error", e.message || e.toString(), "error");
+    } finally {
+      setLoading(false);
+      handleNext();
+    }
+
+
+  };
+
+  const handleDocumentUploadeSubmit = async() => {
+    console.log("Document Image Submitted", formData);
+    setLoading(true);
+    try {
+      const response = await ledger.call(
+        "uploadDocumentPhoto",
+        principal,
+        formData.identityDoc
+      );
+      console.log("Document Upload Response:",response);
+      swal("Success", "Identity Details Stored Successfully", "success");
     } catch (e) {
       swal("Error", e, "error");
     } finally {
       setLoading(false);
       handleNext();
     }
-  };
+  }
 
   const handleCaptureImageSubmit = async () => {
     console.log("Image Captured", image);
@@ -365,9 +382,9 @@ const FormTabs = () => {
       const response = await ledger.call(
         "addImage",
         principal,
-        encryptData(image)
+        image
       );
-      swal("Success", "Details Stored Successfully!", "success");
+      swal("Success", "Image Stored Successfully!", "success");
     } catch (e) {
       swal("Error", e, "error");
     } finally {
@@ -924,7 +941,7 @@ const FormTabs = () => {
               <Button
                 variant="contained"
                 color="primary"
-                onClick={handleDocumentDetailsSubmit}
+                onClick={handleDocumentUploadeSubmit}
                 disabled={!isFormValid(3) || loading}
               >
                 {loading ? <CircularProgress size={24} /> : "Next"}

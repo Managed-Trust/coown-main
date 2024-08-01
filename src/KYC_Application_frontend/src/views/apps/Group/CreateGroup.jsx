@@ -10,7 +10,9 @@ import {
   Box,
   MenuItem,
   Select,
-  FormControl,Button 
+  FormControl,
+  Button,
+  Paper
 } from "@mui/material";
 
 const BCrumb = [
@@ -22,6 +24,7 @@ const BCrumb = [
     title: 'Create New Group',
   },
 ];
+
 const initialState = {
   groupName: "",
   groupId: "",
@@ -33,6 +36,7 @@ const initialState = {
   entityType: "",
   registerCompany: false,
   companyName: "",
+  industrySector: "", // Added industry sector
   registrationNumber: "",
   legalStructure: "",
   registeredAddress: "",
@@ -68,11 +72,10 @@ const initialState = {
   legislation:""
 };
 
-
 const CreateGroup = () => {
-
   const [formData, setFormData] = useState(initialState);
   const [filePreviews, setFilePreviews] = useState({});
+  const [isSubmitted, setIsSubmitted] = useState(false);
 
   const handleChange = (event) => {
     const { name, value, type, checked } = event.target;
@@ -124,15 +127,27 @@ const CreateGroup = () => {
     }
   };
 
-  const handleSubmit = (event) => {
+  const handleRegisterCompanySubmit = (event) => {
     event.preventDefault();
-    console.log('Form Data:', formData);
+    console.log('Register Company Data:', formData);
+    // Add your register company logic here
+  };
+
+  const handlePublicLawEntitySubmit = (event) => {
+    event.preventDefault();
+    console.log('Public Law Entity Data:', formData);
+    // Add your public law entity logic here
+  };
+
+  const handleInitialSubmit = (event) => {
+    event.preventDefault();
+    setIsSubmitted(true);
   };
 
   return (
     <PageContainer title="Create New Group" description="this is Note page">
       <Breadcrumb title="Create New Group" items={BCrumb} />
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleInitialSubmit}>
         <Box p={2}>
           <ChildCard>
             <Box p={2}>
@@ -140,7 +155,8 @@ const CreateGroup = () => {
                 <Grid item xs={12} sm={12} md={4}>
                   <Typography variant="h6" gutterBottom>
                     Group Information
-                  </Typography></Grid>
+                  </Typography>
+                </Grid>
                 <Grid item xs={12} sm={12} md={8}>
                   <Grid container spacing={2}>
                     <Grid item xs={12}>
@@ -151,6 +167,7 @@ const CreateGroup = () => {
                         placeholder='Group name'
                         value={formData.groupName}
                         onChange={handleInputChange}
+                        disabled={isSubmitted}
                       />
                     </Grid>
                     <Grid item xs={12}>
@@ -162,6 +179,7 @@ const CreateGroup = () => {
                           name="entityType"
                           value={formData.entityType}
                           onChange={handleInputChange}
+                          disabled={isSubmitted}
                         >
                           <MenuItem value="">Select Group Type</MenuItem>
                           <MenuItem value="registerCompany">Register Company</MenuItem>
@@ -170,11 +188,12 @@ const CreateGroup = () => {
                       </FormControl>
                     </Grid>
                   </Grid>
-                </Grid></Grid>
+                </Grid>
+              </Grid>
             </Box>
           </ChildCard>
         </Box>
-        {formData.entityType === "registerCompany" && (
+        {isSubmitted && formData.entityType === "registerCompany" && (
           <>
             <Box p={2}>
               <ChildCard>
@@ -197,6 +216,28 @@ const CreateGroup = () => {
                             placeholder='Company Name'
                             onChange={handleInputChange}
                           />
+                        </Grid>
+                        <Grid item xs={12}>
+                          <CustomFormLabel htmlFor="industrySector">
+                            Industry Sector
+                          </CustomFormLabel>
+                          <FormControl fullWidth>
+                            <Select
+                              labelId="industrySector-label"
+                              id="industrySector"
+                              name="industrySector"
+                              value={formData.industrySector}
+                              onChange={handleInputChange}
+                            >
+                              <MenuItem value="">Select Industry Sector</MenuItem>
+                              <MenuItem value="technology">Technology</MenuItem>
+                              <MenuItem value="finance">Finance</MenuItem>
+                              <MenuItem value="healthcare">Healthcare</MenuItem>
+                              <MenuItem value="education">Education</MenuItem>
+                              <MenuItem value="manufacturing">Manufacturing</MenuItem>
+                              {/* Add more sectors as needed */}
+                            </Select>
+                          </FormControl>
                         </Grid>
                         <Grid item xs={12}>
                           <CustomFormLabel htmlFor="registrationNumber">
@@ -338,12 +379,12 @@ const CreateGroup = () => {
                           </CustomFormLabel>
                           <TextField
                             id="position"
-                            placeholder='Representative Postion'
+                            placeholder='Representative Position'
                             fullWidth
                             onChange={handleInputChange}
                           />
                         </Grid>
-                        <Grid item xs={12} >
+                        <Grid item xs={12}>
                           <CustomFormLabel htmlFor="idDocumentType">
                             ID Document Type
                           </CustomFormLabel>
@@ -356,13 +397,13 @@ const CreateGroup = () => {
                               onChange={handleInputChange}
                             >
                               <MenuItem value="">Select document type</MenuItem>
-                              <MenuItem value="registerCompany">Image</MenuItem>
-                              <MenuItem value="publicLawEntity">Other</MenuItem>
+                              <MenuItem value="image">Image</MenuItem>
+                              <MenuItem value="other">Other</MenuItem>
                             </Select>
                           </FormControl>
                         </Grid>
 
-                        <Grid item xs={12} >
+                        <Grid item xs={12}>
                           <CustomFormLabel htmlFor="idDocumentNumber">
                             ID Document Number
                           </CustomFormLabel>
@@ -373,7 +414,7 @@ const CreateGroup = () => {
                             onChange={handleInputChange}
                           />
                         </Grid>
-                        <Grid item xs={12} >
+                        <Grid item xs={12}>
                           <CustomFormLabel htmlFor="idDocument">
                             ID Document
                           </CustomFormLabel>
@@ -400,7 +441,7 @@ const CreateGroup = () => {
                             </Paper>
                           )}
                         </Grid>
-                        <Grid item xs={12} >
+                        <Grid item xs={12}>
                           <CustomFormLabel htmlFor="proofOfAuthority">
                             Proof of Authority 
                           </CustomFormLabel>
@@ -410,14 +451,14 @@ const CreateGroup = () => {
                             fullWidth
                             onChange={handleFileChange}
                           />
-                          {filePreviews.idDocument && (
+                          {filePreviews.proofOfAuthority && (
                             <Paper
                               elevation={3}
                               sx={{ mt: 2, width: 100, height: 100 }}
                             >
                               <img
-                                src={filePreviews.idDocument}
-                                alt="proofOfAuthority"
+                                src={filePreviews.proofOfAuthority}
+                                alt="Proof of Authority"
                                 style={{
                                   width: "100%",
                                   height: "100%",
@@ -428,17 +469,17 @@ const CreateGroup = () => {
                           )}
                         </Grid>
                         <Grid item xs={12}>
-                          <CustomFormLabel htmlFor="emailRep">Representive email</CustomFormLabel>
+                          <CustomFormLabel htmlFor="emailRep">Representative Email</CustomFormLabel>
                           <TextField
                             id="emailRep"
                             fullWidth
-                            placeholder='Representive email'
+                            placeholder='Representative Email'
                             onChange={handleInputChange}
                           />
                         </Grid>
                         <Grid item xs={12}>
                           <CustomFormLabel htmlFor="phoneNumber">
-                            Representive Phone Number
+                            Representative Phone Number
                           </CustomFormLabel>
                           <TextField
                             id="phoneNumber"
@@ -453,46 +494,15 @@ const CreateGroup = () => {
                 </Box>
               </ChildCard>
             </Box>
-            <Box p={2}>
-              <ChildCard>
-                <Box p={2}>
-                  <Grid container spacing={2}>
-                    <Grid item xs={12} sm={12} md={4}>
-                      <Typography variant="h6" gutterBottom>
-                        OwnerShip Information
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={12} sm={12} md={8}>
-
-                      <Grid item xs={12}>
-                        <CustomFormLabel htmlFor="economicOwner">Economic Owner</CustomFormLabel>
-                        <TextField
-                          id="economicOwner"
-                          fullWidth
-                          placeholder='Economic Owner'
-                          onChange={handleInputChange}
-                        />
-                      </Grid>
-                      <Grid item xs={12}>
-                        <CustomFormLabel htmlFor="beneficialOwner">
-                          Beneficial Owner
-                        </CustomFormLabel>
-                        <TextField
-                          id="beneficialOwner"
-                          fullWidth
-                          placeholder='Beneficial Owner'
-                          onChange={handleInputChange}
-                        />
-                      </Grid>
-                    </Grid>
-                  </Grid>          </Box>
-              </ChildCard>
+            <Box p={3} display="flex" justifyContent="flex-start">
+              <Button type="button" variant="contained" color="primary" onClick={handleRegisterCompanySubmit}>
+                Register Company
+              </Button>
             </Box>
           </>
         )}
-        {formData.entityType === "publicLawEntity" && (
+        {isSubmitted && formData.entityType === "publicLawEntity" && (
           <>
-
             <Box p={2}>
               <ChildCard>
                 <Box p={2}>
@@ -541,7 +551,7 @@ const CreateGroup = () => {
                         </Grid>
                         <Grid item xs={12}>
                           <CustomFormLabel htmlFor="cpEmail">
-                            Contact Person email
+                            Contact Person Email
                           </CustomFormLabel>
                           <TextField
                             id="cpEmail"
@@ -577,8 +587,8 @@ const CreateGroup = () => {
                     <Grid item xs={12} sm={12} md={8}>
                       <Grid container spacing={2}>
                         <Grid item xs={12}>
-                            <CustomFormLabel htmlFor="emailGJ">
-                              Group owner job title
+                          <CustomFormLabel htmlFor="emailGJ">
+                            Group Owner Job Title
                           </CustomFormLabel>
                           <TextField
                             id="emailGJ"
@@ -589,7 +599,7 @@ const CreateGroup = () => {
                         </Grid>
                         <Grid item xs={12}>
                           <CustomFormLabel htmlFor="emailGB">
-                          Group owner business email
+                            Group Owner Business Email
                           </CustomFormLabel>
                           <TextField
                             id="emailGB"
@@ -610,25 +620,24 @@ const CreateGroup = () => {
                   <Grid container spacing={2}>
                     <Grid item xs={12} sm={12} md={4}>
                       <Typography variant="h6" gutterBottom>
-                        Legal FrameWork 
+                        Legal Framework 
                       </Typography>
                     </Grid>
                     <Grid item xs={12} sm={12} md={8}>
-
                       <Grid item xs={12}>
-                        <CustomFormLabel htmlFor="economicOwner">Description of purpose</CustomFormLabel>
+                        <CustomFormLabel htmlFor="economicOwner">Description of Purpose</CustomFormLabel>
                         <TextField
                           id="economicOwner"
                           fullWidth
                           multiline
-                          row={4}
+                          rows={4}
                           placeholder='Economic Owner'
                           onChange={handleInputChange}
                         />
                       </Grid>
                       <Grid item xs={12}>
                         <CustomFormLabel htmlFor="legislation">
-                          Link to constituting legislation
+                          Link to Constituting Legislation
                         </CustomFormLabel>
                         <TextField
                           id="legislation"
@@ -637,10 +646,9 @@ const CreateGroup = () => {
                           onChange={handleInputChange}
                         />
                       </Grid>
-                      
                       <Grid item xs={12}>
                         <CustomFormLabel htmlFor="supervisoryBody">
-                          Link to supervisory body
+                          Link to Supervisory Body
                         </CustomFormLabel>
                         <TextField
                           id="supervisoryBody"
@@ -650,19 +658,28 @@ const CreateGroup = () => {
                         />
                       </Grid>
                     </Grid>
-                  </Grid>          
-                  </Box>
+                  </Grid>
+                </Box>
               </ChildCard>
+            </Box>
+            <Box p={3} display="flex" justifyContent="flex-start">
+              <Button type="button" variant="contained" color="primary" onClick={handlePublicLawEntitySubmit}>
+                Submit Public Law Entity
+              </Button>
             </Box>
           </>
         )}
         <Box p={3} display="flex" justifyContent="flex-start">
-          <Button type="submit" variant="contained" color="primary" style={{ marginRight: '8px' }}>
-           Create Group
-          </Button>
-          <Button variant="outlined" color="secondary">
-            Cancel
-          </Button>
+          {!isSubmitted && (
+            <>
+              <Button type="submit" variant="contained" color="primary" style={{ marginRight: '8px' }}>
+                Create Group
+              </Button>
+              <Button variant="outlined" color="secondary">
+                Cancel
+              </Button>
+            </>
+          )}
         </Box>
       </form>
     </PageContainer>
