@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
-import QRCode from "qrcode.react";
 import {
   Container,
   Card,
@@ -14,41 +13,39 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  TablePagination,
-  TableSortLabel,
   Toolbar,
   Paper,
   IconButton,
   Tooltip,
   Box,
-  Avatar,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
   Button,
-  Checkbox,
-  Badge,
-  Stack,
   TextField,
+  CircularProgress,
+  FormControl,
   Select,
   MenuItem,
-  FormControl,
-  CircularProgress,
+  Stack,
+  Tabs,
+  Tab,
+  TablePagination,
+  TableFooter,
+  Avatar,
+  Chip,
 } from "@mui/material";
-import { alpha, styled } from "@mui/material/styles";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
-import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import { alpha, styled, useTheme } from "@mui/material/styles";
 import { visuallyHidden } from "@mui/utils";
 import { IconTrash, IconFilter } from "@tabler/icons";
 import emailjs from "@emailjs/browser";
 import CustomFormLabel from "../../../forms/theme-elements/CustomFormLabel";
 import { useConnect } from "@connect2ic/react";
 import ic from "ic0";
-const ledger = ic.local("bkyz2-fmaaa-aaaaa-qaaaq-cai");
-// const ledger = ic("sifoc-qqaaa-aaaap-ahorq-cai"); // Production canister // Ledger canister
 import CryptoJS from "crypto-js";
+import FirstPageIcon from '@mui/icons-material/FirstPage';
+import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft';
+import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
+import LastPageIcon from '@mui/icons-material/LastPage';
 
+const ledger = ic.local("bkyz2-fmaaa-aaaaa-qaaaq-cai");
 
 const secretKey = "your-secret-key"; // Use a strong secret key
 
@@ -67,32 +64,6 @@ const decryptData = (ciphertext) => {
 
 const initialState = {
   email: "",
-  entityType: "",
-  registerCompany: false,
-  companyName: "",
-  registrationNumber: "",
-  legalStructure: "",
-  registeredAddress: "",
-  taxID: "",
-  incorporationCertificate: [],
-  memorandumAndArticles: [],
-  representativeFullName: "",
-  position: "",
-  idDocumentType: "",
-  idDocumentNumber: "",
-  idDocument: [],
-  proofOfAuthority: [],
-  emailRep: "",
-  phoneNumber: "",
-  beneficialOwner: "",
-  publicLawEntity: false,
-  entityName: "",
-  jurisdiction: "",
-  establishmentDate: "",
-  function: "",
-  address: "",
-  phone: "",
-  caller: "",
   contactDetails: "",
   recordType: "",
 };
@@ -106,28 +77,37 @@ const PersonalRecordType = {
 };
 
 const groupDetails = {
-  name: "Group Title",
-  description: "Description of the group.",
-  imageUrl:
-    "https://as2.ftcdn.net/v2/jpg/03/18/25/19/1000_F_318251936_EukIhmw8bEqECFwhePbp11c6gWJ1ChNG.jpg",
+  name: "Tech Innovators Inc.",
   balances: [
     {
-      currency: "Bitcoin",
-      amount: 1.5,
-      symbol: "ckBTC",
-      address: "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa",
+      currency: "ckBTC",
+      amount: 1.715156,
+      usd: 11193.91,
+      change: 7.11,
     },
     {
-      currency: "USD",
-      amount: 10,
-      symbol: "ckUSDC",
-      address: "0x742d35Cc6634C0532925a3b844Bc454e4438f44e",
+      currency: "ckUSDC",
+      amount: 25458,
+      usd: 25458,
+      change: -3.64,
     },
     {
-      currency: "Gold",
-      amount: 25,
-      symbol: "GLDT",
-      address: "LcWoJ66bmxL1fycdGp81uYgG9cXRxE7eS3",
+      currency: "GLDT",
+      amount: 120,
+      usd: 9512.4,
+      change: 7.11,
+    },
+    {
+      currency: "ICP",
+      amount: 120,
+      usd: 9512.4,
+      change: 7.11,
+    },
+    {
+      currency: "$COOWN",
+      amount: 120,
+      usd: 9512.4,
+      change: 7.11,
     },
   ],
   isAdmin: true,
@@ -185,7 +165,7 @@ const StyledPaper = styled(Paper)(({ theme, selected }) => ({
 
 const headCells = [
   { id: "member", label: "Member" },
-  { id: "email", label: "Emaik" },
+  { id: "email", label: "Email" },
   { id: "contact ", label: "Contact" },
 ];
 
@@ -293,6 +273,184 @@ const EnhancedTableToolbar = (props) => {
   );
 };
 
+function TablePaginationActions(props) {
+  const theme = useTheme();
+  const { count, page, rowsPerPage, onPageChange } = props;
+
+  const handleFirstPageButtonClick = (event) => {
+    onPageChange(event, 0);
+  };
+
+  const handleBackButtonClick = (event) => {
+    onPageChange(event, page - 1);
+  };
+
+  const handleNextButtonClick = (event) => {
+    onPageChange(event, page + 1);
+  };
+
+  const handleLastPageButtonClick = (event) => {
+    onPageChange(event, Math.max(0, Math.ceil(count / rowsPerPage) - 1));
+  };
+
+  return (
+    <Box sx={{ flexShrink: 0, ml: 2.5 }}>
+      <IconButton
+        onClick={handleFirstPageButtonClick}
+        disabled={page === 0}
+        aria-label="first page"
+      >
+        {theme.direction === 'rtl' ? <LastPageIcon /> : <FirstPageIcon />}
+      </IconButton>
+      <IconButton onClick={handleBackButtonClick} disabled={page === 0} aria-label="previous page">
+        {theme.direction === 'rtl' ? <KeyboardArrowRight /> : <KeyboardArrowLeft />}
+      </IconButton>
+      <IconButton
+        onClick={handleNextButtonClick}
+        disabled={page >= Math.ceil(count / rowsPerPage) - 1}
+        aria-label="next page"
+      >
+        {theme.direction === 'rtl' ? <KeyboardArrowLeft /> : <KeyboardArrowRight />}
+      </IconButton>
+      <IconButton
+        onClick={handleLastPageButtonClick}
+        disabled={page >= Math.ceil(count / rowsPerPage) - 1}
+        aria-label="last page"
+      >
+        {theme.direction === 'rtl' ? <FirstPageIcon /> : <LastPageIcon />}
+      </IconButton>
+    </Box>
+  );
+}
+
+const StyledTableCell = styled(TableCell)(({ theme }) => ({
+  borderBottom: "1px solid",
+  padding: "16px",
+  color: theme.palette.text.primary,
+  fontSize: "1rem",
+}));
+
+const PaginationTable = ({ rows }) => {
+  const [page, setPage] = React.useState(0);
+  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+
+  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
+
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+
+  return (
+    <Paper variant="outlined" sx={{ p: 2, borderRadius: 3 }}>
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+        <Typography variant="h6" color="text.primary">Balance</Typography>
+        <Button variant="contained" color="primary">Create New</Button>
+      </Box>
+      <TableContainer>
+        <Table
+          aria-label="custom pagination table"
+          sx={{
+            whiteSpace: 'nowrap',
+          }}
+        >
+          <TableHead>
+            <TableRow>
+              <StyledTableCell>Account name</StyledTableCell>
+              <StyledTableCell>ckBTC</StyledTableCell>
+              <StyledTableCell>ckUSDC</StyledTableCell>
+              <StyledTableCell>GLDT</StyledTableCell>
+              <StyledTableCell>Estimated Value (USD)</StyledTableCell>
+              <StyledTableCell></StyledTableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {(rowsPerPage > 0
+              ? rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+              : rows
+            ).map((row, index) => (
+              <TableRow key={index} hover>
+                <StyledTableCell>{row.accountName}</StyledTableCell>
+                <StyledTableCell>{row.ckBTC}</StyledTableCell>
+                <StyledTableCell>{row.ckUSDC}</StyledTableCell>
+                <StyledTableCell>{row.GLDT}</StyledTableCell>
+                <StyledTableCell>{row.estimatedValueUSD}</StyledTableCell>
+              </TableRow>
+            ))}
+            {emptyRows > 0 && (
+              <TableRow style={{ height: 53 * emptyRows }}>
+                <TableCell colSpan={6} />
+              </TableRow>
+            )}
+          </TableBody>
+          <TableFooter>
+            <TableRow>
+              <TablePagination
+                rowsPerPageOptions={[5, 10, 25]}
+                colSpan={6}
+                count={rows.length}
+                rowsPerPage={rowsPerPage}
+                page={page}
+                SelectProps={{
+                  inputProps: {
+                    'aria-label': 'rows per page',
+                  },
+                  native: true,
+                }}
+                onPageChange={handleChangePage}
+                onRowsPerPageChange={handleChangeRowsPerPage}
+                ActionsComponent={TablePaginationActions}
+              />
+            </TableRow>
+          </TableFooter>
+        </Table>
+      </TableContainer>
+    </Paper>
+  );
+};
+
+const rows = [
+  {
+    accountName: 'Operations Fund',
+    ckBTC: '0.963248 ckBTC',
+    ckUSDC: '0.963248 ckBTC',
+    GLDT: '0.963248 ckBTC',
+    estimatedValueUSD: '56556.06 USD'
+  },
+  {
+    accountName: 'Research & Development Fund',
+    ckBTC: '0.963248 ckBTC',
+    ckUSDC: '0.963248 ckBTC',
+    GLDT: '0.963248 ckBTC',
+    estimatedValueUSD: '56556.06 USD'
+  },
+  {
+    accountName: 'Office Daily Needs',
+    ckBTC: '0.963248 ckBTC',
+    ckUSDC: '0.963248 ckBTC',
+    GLDT: '0.963248 ckBTC',
+    estimatedValueUSD: '56556.06 USD'
+  },
+  {
+    accountName: 'Marketing Budget',
+    ckBTC: '0.963248 ckBTC',
+    ckUSDC: '0.963248 ckBTC',
+    GLDT: '0.963248 ckBTC',
+    estimatedValueUSD: '56556.06 USD'
+  },
+  {
+    accountName: 'Cool Monkey Images',
+    ckBTC: '0.963248 ckBTC',
+    ckUSDC: '0.963248 ckBTC',
+    GLDT: '0.963248 ckBTC',
+    estimatedValueUSD: '56556.06 USD'
+  },
+];
+
 const GroupDetailPage = () => {
   const { groupId } = useParams();
   const [selectedBalance, setSelectedBalance] = useState(null);
@@ -308,6 +466,7 @@ const GroupDetailPage = () => {
   const [formType, setFormType] = useState(null);
   const [group, setGroup] = useState(null);
   const [fetchingGroup, setFetchingGroup] = useState(true);
+  const [tabValue, setTabValue] = useState(0);
 
   const { isConnected, principal } = useConnect({
     onConnect: () => { },
@@ -416,55 +575,6 @@ const GroupDetailPage = () => {
       ? Math.max(0, (1 + page) * rowsPerPage - groupDetails.users.length)
       : 0;
 
-  const handleCreateGroup = async () => {
-    console.log("Create Group Data:", formData);
-    console.log("GroupId:", groupId);
-    try {
-      if (formData.entityType === "registerCompany") {
-        const responseCompany = await ledger.call(
-          "declareGroupAsCompany",
-          groupId,
-          principal,
-          encryptData(formData.companyName),
-          encryptData(formData.registrationNumber),
-          encryptData(formData.legalStructure),
-          encryptData(formData.registeredAddress),
-          encryptData(formData.taxID),
-          encryptData(formData.beneficialOwner),
-          formData.incorporationCertificate,
-          formData.memorandumAndArticles,
-          encryptData(formData.representativeFullName),
-          encryptData(formData.position),
-          encryptData(formData.idDocumentType),
-          encryptData(formData.idDocumentNumber),
-          formData.idDocument,
-          formData.proofOfAuthority,
-          encryptData(formData.email),
-          encryptData(formData.phoneNumber)
-        );
-        alert(responseCompany);
-      } else if (formData.entityType === "publicLawEntity") {
-        const responsePublicLawEntity = await ledger.call(
-          "declareGroupAsPublicLawEntity",
-          groupId,
-          encryptData(formData.entityName),
-          encryptData(formData.jurisdiction),
-          encryptData(formData.establishmentDate),
-          encryptData(formData.function),
-          encryptData(formData.address),
-          encryptData(formData.phoneNumber),
-          encryptData(formData.email),
-          principal
-        );
-        alert(responsePublicLawEntity);
-      }
-    } catch (e) {
-      console.log("Error Creating Group:", e);
-    } finally {
-      setShowForm(false);
-    }
-  };
-
   const handleInviteUser = async () => {
     console.log("Invite User Data:", encryptData(formData.email));
     try {
@@ -530,365 +640,12 @@ const GroupDetailPage = () => {
     }
   };
 
+  const handleTabChange = (event, newValue) => {
+    setTabValue(newValue);
+  };
+
   const renderFormContent = () => {
     switch (formType) {
-      case "createGroup":
-        return (
-          <Grid container spacing={3} mt={3}>
-            <Grid item xs={12} md={6}>
-              <CustomFormLabel htmlFor="entityType">Group Type</CustomFormLabel>
-              <FormControl fullWidth>
-                <Select
-                  labelId="entityType-label"
-                  id="entityType"
-                  name="entityType"
-                  value={formData.entityType}
-                  onChange={handleInputChange}
-                >
-                  <MenuItem value="">Select Group Type</MenuItem>
-                  <MenuItem value="registerCompany">Register Company</MenuItem>
-                  <MenuItem value="publicLawEntity">Public Law Entity</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-            {formData.entityType === "registerCompany" && (
-              <>
-                <Grid item xs={12} md={6}>
-                  <CustomFormLabel htmlFor="companyName">
-                    Company Name
-                  </CustomFormLabel>
-                  <TextField
-                    id="companyName"
-                    fullWidth
-                    onChange={handleInputChange}
-                  />
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <CustomFormLabel htmlFor="registrationNumber">
-                    Registration Number
-                  </CustomFormLabel>
-                  <TextField
-                    id="registrationNumber"
-                    fullWidth
-                    onChange={handleInputChange}
-                  />
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <CustomFormLabel htmlFor="legalStructure">
-                    Legal Structure
-                  </CustomFormLabel>
-                  <TextField
-                    id="legalStructure"
-                    fullWidth
-                    onChange={handleInputChange}
-                  />
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <CustomFormLabel htmlFor="registeredAddress">
-                    Registered Address
-                  </CustomFormLabel>
-                  <TextField
-                    id="registeredAddress"
-                    fullWidth
-                    onChange={handleInputChange}
-                  />
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <CustomFormLabel htmlFor="taxID">Tax ID</CustomFormLabel>
-                  <TextField
-                    id="taxID"
-                    fullWidth
-                    onChange={handleInputChange}
-                  />
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <CustomFormLabel htmlFor="beneficialOwner">
-                    Beneficial Owner
-                  </CustomFormLabel>
-                  <TextField
-                    id="beneficialOwner"
-                    fullWidth
-                    onChange={handleInputChange}
-                  />
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <CustomFormLabel htmlFor="incorporationCertificate">
-                    Incorporation Certificate
-                  </CustomFormLabel>
-                  <TextField
-                    id="incorporationCertificate"
-                    type="file"
-                    fullWidth
-                    onChange={handleFileChange}
-                  />
-                  {filePreviews.incorporationCertificate && (
-                    <Paper
-                      elevation={3}
-                      sx={{ mt: 2, width: 100, height: 100 }}
-                    >
-                      <img
-                        src={filePreviews.incorporationCertificate}
-                        alt="Incorporation Certificate"
-                        style={{
-                          width: "100%",
-                          height: "100%",
-                          objectFit: "cover",
-                        }}
-                      />
-                    </Paper>
-                  )}
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <CustomFormLabel htmlFor="memorandumAndArticles">
-                    Memorandum And Articles
-                  </CustomFormLabel>
-                  <TextField
-                    id="memorandumAndArticles"
-                    type="file"
-                    fullWidth
-                    onChange={handleFileChange}
-                  />
-                  {filePreviews.memorandumAndArticles && (
-                    <Paper
-                      elevation={3}
-                      sx={{ mt: 2, width: 100, height: 100 }}
-                    >
-                      <img
-                        src={filePreviews.memorandumAndArticles}
-                        alt="Memorandum And Articles"
-                        style={{
-                          width: "100%",
-                          height: "100%",
-                          objectFit: "cover",
-                        }}
-                      />
-                    </Paper>
-                  )}
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <CustomFormLabel htmlFor="representativeFullName">
-                    Representative Full Name
-                  </CustomFormLabel>
-                  <TextField
-                    id="representativeFullName"
-                    fullWidth
-                    onChange={handleInputChange}
-                  />
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <CustomFormLabel htmlFor="position">
-                    Representative Position
-                  </CustomFormLabel>
-                  <TextField
-                    id="position"
-                    fullWidth
-                    onChange={handleInputChange}
-                  />
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <CustomFormLabel htmlFor="idDocumentType">
-                    ID Document Type
-                  </CustomFormLabel>
-                  <TextField
-                    id="idDocumentType"
-                    fullWidth
-                    onChange={handleInputChange}
-                  />
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <CustomFormLabel htmlFor="idDocumentNumber">
-                    ID Document Number
-                  </CustomFormLabel>
-                  <TextField
-                    id="idDocumentNumber"
-                    fullWidth
-                    onChange={handleInputChange}
-                  />
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <CustomFormLabel htmlFor="idDocument">
-                    ID Document
-                  </CustomFormLabel>
-                  <TextField
-                    id="idDocument"
-                    type="file"
-                    fullWidth
-                    onChange={handleFileChange}
-                  />
-                  {filePreviews.idDocument && (
-                    <Paper
-                      elevation={3}
-                      sx={{ mt: 2, width: 100, height: 100 }}
-                    >
-                      <img
-                        src={filePreviews.idDocument}
-                        alt="ID Document"
-                        style={{
-                          width: "100%",
-                          height: "100%",
-                          objectFit: "cover",
-                        }}
-                      />
-                    </Paper>
-                  )}
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <CustomFormLabel htmlFor="proofOfAuthority">
-                    Proof Of Authority
-                  </CustomFormLabel>
-                  <TextField
-                    id="proofOfAuthority"
-                    type="file"
-                    fullWidth
-                    onChange={handleFileChange}
-                  />
-                  {filePreviews.proofOfAuthority && (
-                    <Paper
-                      elevation={3}
-                      sx={{ mt: 2, width: 100, height: 100 }}
-                    >
-                      <img
-                        src={filePreviews.proofOfAuthority}
-                        alt="Proof Of Authority"
-                        style={{
-                          width: "100%",
-                          height: "100%",
-                          objectFit: "cover",
-                        }}
-                      />
-                    </Paper>
-                  )}
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <CustomFormLabel htmlFor="emailRep">Email</CustomFormLabel>
-                  <TextField
-                    id="emailRep"
-                    fullWidth
-                    onChange={handleInputChange}
-                  />
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <CustomFormLabel htmlFor="phoneNumber">
-                    Phone Number
-                  </CustomFormLabel>
-                  <TextField
-                    id="phoneNumber"
-                    fullWidth
-                    onChange={handleInputChange}
-                  />
-                </Grid>
-              </>
-            )}
-            {formData.entityType === "publicLawEntity" && (
-              <>
-                <Grid item xs={12} md={6}>
-                  <CustomFormLabel htmlFor="entityName">
-                    Entity Name
-                  </CustomFormLabel>
-                  <TextField
-                    id="entityName"
-                    fullWidth
-                    onChange={handleInputChange}
-                    multiline
-                    rows={4}
-                  />
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <CustomFormLabel htmlFor="jurisdiction">
-                    Jurisdiction
-                  </CustomFormLabel>
-                  <TextField
-                    id="jurisdiction"
-                    fullWidth
-                    onChange={handleInputChange}
-                    multiline
-                    rows={4}
-                  />
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <CustomFormLabel htmlFor="establishmentDate">
-                    Establishment Date
-                  </CustomFormLabel>
-                  <TextField
-                    id="establishmentDate"
-                    fullWidth
-                    onChange={handleInputChange}
-                    type="date"
-                    InputLabelProps={{
-                      shrink: true,
-                    }}
-                  />
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <CustomFormLabel htmlFor="function">Function</CustomFormLabel>
-                  <TextField
-                    id="function"
-                    fullWidth
-                    onChange={handleInputChange}
-                  />
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <CustomFormLabel htmlFor="address">Address</CustomFormLabel>
-                  <TextField
-                    id="address"
-                    fullWidth
-                    onChange={handleInputChange}
-                  />
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <CustomFormLabel htmlFor="phoneNumber">
-                    Phone Number
-                  </CustomFormLabel>
-                  <TextField
-                    id="phoneNumber"
-                    fullWidth
-                    onChange={handleInputChange}
-                  />
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <CustomFormLabel htmlFor="email">Email</CustomFormLabel>
-                  <TextField
-                    id="email"
-                    fullWidth
-                    onChange={handleInputChange}
-                  />
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <CustomFormLabel htmlFor="caller">Caller</CustomFormLabel>
-                  <TextField
-                    id="caller"
-                    fullWidth
-                    onChange={handleInputChange}
-                  />
-                </Grid>
-              </>
-            )}
-            <Grid item xs={12} md={12} lg={12}>
-              <Stack
-                direction="row"
-                spacing={2}
-                justifyContent="flex-end"
-                mt={3}
-              >
-
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={handleCreateGroup}
-                >
-                  Create Group
-                </Button>
-                <Button
-                  variant="outlined"
-                  color="secondary"
-                  onClick={() => setShowForm(false)}
-                >
-                  Cancel
-                </Button>
-              </Stack>
-            </Grid>
-          </Grid>
-        );
       case "inviteUser":
         return (
           <Grid container spacing={3} mt={3}>
@@ -974,280 +731,223 @@ const GroupDetailPage = () => {
       ) : (
         <>
           {group && (
-            group[0].name === "defaultGroup" ?
-              (
-                <>
+            <>
+              <Card style={{ padding: "0px" }}>
+                <CardMedia
+                  component="img"
+                  height="300"
+                  image="/images/groupCover/default.svg"
+                  alt={groupDetails.name}
+                />
+                <CardContent
+                  sx={{
+                    position: "relative",
+                    top: -140,
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "15px",
+                  }}
+                >
                   <Card>
-                    <CardMedia
-                      component="img"
-                      height="300"
-                      image={
-                        group[0].groupImage && group[0].groupImage.length > 0
-                          ? "data:image/png;base64," + group[0].groupImage[0]
-                          : "https://via.placeholder.com/150"
-                      }
-                      alt={groupDetails.name}
-                    />
-                    <CardContent>
-                      <Typography gutterBottom variant="h2" component="div">
-                        {group[0].name}
-                      </Typography>
-                      <Typography variant="body1" color="text.secondary">
-                        {group[0].groupDescription[0]}
-                      </Typography>
-                      <Box mt={2}>
-                        <Accordion>
-                          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                            <Typography variant="h6" color="text.primary">
-                              <AccountBalanceWalletIcon /> Balances
-                            </Typography>
-                          </AccordionSummary>
-                          <AccordionDetails>
-                            <Grid container spacing={2}>
-                              {groupDetails.balances.map((balance, index) => (
-                                <Grid item xs={12} sm={6} md={4} key={index}>
-                                  <StyledPaper
-                                    elevation={3}
-                                    selected={selectedBalance === index}
-                                    onClick={() =>
-                                      setSelectedBalance(
-                                        selectedBalance === index ? null : index
-                                      )
-                                    }
-                                  >
-                                    <Typography variant="h6" color="text.primary">
-                                      {balance.currency}
-                                    </Typography>
-                                    <Typography variant="body1" color="text.secondary">
-                                      {balance.amount} {balance.symbol}
-                                    </Typography>
-                                    {selectedBalance === index && (
-                                      <Box
-                                        mt={1}
-                                        display="flex"
-                                        flexDirection="column"
-                                        alignItems="center"
-                                        justifyContent="center"
-                                      >
-                                        <Typography
-                                          variant="body2"
-                                          color="text.primary"
-                                          style={{
-                                            wordBreak: "break-all",
-                                            fontWeight: "bold",
-                                          }}
-                                        >
-                                          {balance.address}
-                                        </Typography>
-                                        <Tooltip title="Copy Address">
-                                          <IconButton
-                                            onClick={() =>
-                                              handleCopyAddress(balance.address)
-                                            }
-                                          >
-                                            <ContentCopyIcon
-                                              fontSize="small"
-                                              color="primary"
-                                            />
-                                          </IconButton>
-                                        </Tooltip>
-                                        <Box mt={1}>
-                                          <QRCode value={balance.address} size={64} />
-                                        </Box>
-                                      </Box>
-                                    )}
-                                  </StyledPaper>
-                                </Grid>
-                              ))}
-                            </Grid>
-                          </AccordionDetails>
-                        </Accordion>
+                    <CardContent
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                      }}
+                    >
+                      <Box
+                        display="flex"
+                        flexDirection="column"
+                        alignItems="start"
+                        mb={2}
+                        gap={0.5}
+                      >
+                        <Typography variant="body2" color="textSecondary">
+                          Groups • {groupDetails.name}
+                        </Typography>
+                        <Typography gutterBottom variant="h2" component="div">
+                          {groupDetails.name}
+                        </Typography>
+                        <Button
+                          variant="contained"
+                          color="primary"
+                          size="small"
+                          style={{
+                            borderRadius: "12px",
+                            textTransform: "none",
+                            backgroundColor: "#E0E7FF",
+                            color: "#3B82F6",
+                          }}
+                        >
+                          Incorporation
+                        </Button>
+                      </Box>
+                      <Box display="flex" justifyContent="flex-end">
+                        <Button
+                          variant="outlined"
+                          color="primary"
+                          style={{ marginRight: "8px", height: "fit-content" }}
+                        >
+                          Edit details
+                        </Button>
+                        <Button
+                          variant="outlined"
+                          color="primary"
+                          style={{ height: "fit-content" }}
+                        >
+                          Edit cover
+                        </Button>
                       </Box>
                     </CardContent>
                   </Card>
-                </>) :
-              (
-                <>
-                  <Card>
-                    <CardMedia
-                      component="img"
-                      height="300"
-                      image={
-                        group[0].groupImage && group[0].groupImage.length > 0
-                          ? "data:image/png;base64," + decryptData(group[0].groupImage[0])
-                          : "https://via.placeholder.com/150"
-                      }
-                      alt={groupDetails.name}
-                    />
-                    <CardContent>
-                      <Typography gutterBottom variant="h2" component="div">
-                        {decryptData(group[0].name)}
-                      </Typography>
-                      <Typography variant="body1" color="text.secondary">
-                        {decryptData(group[0].groupDescription[0])}
-                      </Typography>
-                      <Box mt={2}>
-                        <Accordion>
-                          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                            <Typography variant="h6" color="text.primary">
-                              <AccountBalanceWalletIcon /> Balances
-                            </Typography>
-                          </AccordionSummary>
-                          <AccordionDetails>
-                            <Grid container spacing={2}>
-                              {groupDetails.balances.map((balance, index) => (
-                                <Grid item xs={12} sm={6} md={4} key={index}>
-                                  <StyledPaper
-                                    elevation={3}
-                                    selected={selectedBalance === index}
-                                    onClick={() =>
-                                      setSelectedBalance(
-                                        selectedBalance === index ? null : index
-                                      )
-                                    }
-                                  >
-                                    <Typography variant="h6" color="text.primary">
-                                      {balance.currency}
-                                    </Typography>
-                                    <Typography variant="body1" color="text.secondary">
-                                      {balance.amount} {balance.symbol}
-                                    </Typography>
-                                    {selectedBalance === index && (
-                                      <Box
-                                        mt={1}
-                                        display="flex"
-                                        flexDirection="column"
-                                        alignItems="center"
-                                        justifyContent="center"
-                                      >
-                                        <Typography
-                                          variant="body2"
-                                          color="text.primary"
-                                          style={{
-                                            wordBreak: "break-all",
-                                            fontWeight: "bold",
-                                          }}
-                                        >
-                                          {balance.address}
-                                        </Typography>
-                                        <Tooltip title="Copy Address">
-                                          <IconButton
-                                            onClick={() =>
-                                              handleCopyAddress(balance.address)
-                                            }
-                                          >
-                                            <ContentCopyIcon
-                                              fontSize="small"
-                                              color="primary"
-                                            />
-                                          </IconButton>
-                                        </Tooltip>
-                                        <Box mt={1}>
-                                          <QRCode value={balance.address} size={64} />
-                                        </Box>
-                                      </Box>
-                                    )}
-                                  </StyledPaper>
-                                </Grid>
-                              ))}
-                            </Grid>
-                          </AccordionDetails>
-                        </Accordion>
-                      </Box>
-                    </CardContent>
+
+                  <Card style={{ marginTop: "16px", paddingBottom: "0px" }}>
+                    <Box mt={0}>
+                      <Tabs
+                        value={tabValue}
+                        onChange={handleTabChange}
+                        aria-label="group detail tabs"
+                      >
+                        <Tab label="Entities" />
+                        <Tab label="Upgrade" />
+                        <Tab label="$COOWN" />
+                        <Tab label="NFT" />
+                        <Tab label="Account" />
+                        <Tab label="Stakeholders" />
+                        <Tab label="Chat" />
+                        <Tab label="Details" />
+                      </Tabs>
+                    </Box>
                   </Card>
-                </>)
-          )}
-          {groupDetails.isAdmin && (
-            <Box mt={2} display="flex" justifyContent="flex-end" gap={2}>
-              <Button
-                variant="contained"
-                color="primary"
-                style={{ color: 'white' }}
-              >
-                <Link to={`/group/${groupId}/add-stakeholder`} style={{ color: 'white', textDecoration: 'none' }}>
-                  Add StakeHolder
-                </Link>
-              </Button>
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={() => {
-                  setFormType("createGroup");
-                  setShowForm(true);
-                }}
-              >
-                Create Group
-              </Button>
-              <Button
-                variant="contained"
-                color="secondary"
-                onClick={() => {
-                  setFormType("inviteUser");
-                  setShowForm(true);
-                }}
-              >
-                Invite User
-              </Button>
-            </Box>
-          )}
-
-          {showForm && <Box mt={2}>{renderFormContent()}</Box>}
-
-          <Box mt={2}>
-            <Paper>
-              {group && (
-                <>
-                  <TableContainer>
-                    <Table>
-                      <TableHead>
-                        <TableRow>
-                          <TableCell>
-                            <Typography variant="h6">Id</Typography>
-                          </TableCell>
-                          <TableCell>
-                            <Typography variant="h6">Email</Typography>
-                          </TableCell>
-                          <TableCell>
-                            <Typography variant="h6">Contact</Typography>
-                          </TableCell>
-                        </TableRow>
-                      </TableHead>
-                      <TableBody>
-                        {group && group[0].personalRecords.length > 0 ? (
-                          group[0].personalRecords.map((user) => (
-                            <TableRow hover>
-                              <TableCell>
-                                <Typography variant="h6">
-                                  {user.userId[0]}
-                                </Typography>
-                              </TableCell>
-
-                              <TableCell>
-                                <Typography>{decryptData(user.email)}</Typography>
-                              </TableCell>
-
-                              <TableCell>
-                                <Typography>{decryptData(user.contactDetails)}</Typography>
-                              </TableCell>
-                            </TableRow>
-                          ))
-                        ) : (
-                          <TableRow>
-                            <TableCell colSpan={6} align="center">
-                              <Typography variant="h6">
-                                No users available
-                              </Typography>
-                            </TableCell>
-                          </TableRow>
+                  <Card style={{ marginTop: "6px" }}>
+                    <Box>
+                      <CardContent>
+                        {tabValue === 0 && (
+                          <Box>
+                            {/* Entities Component */}
+                            <Typography>Entities Component</Typography>
+                          </Box>
                         )}
-                      </TableBody>
-                    </Table>
-                  </TableContainer>
-                </>
-              )}
-            </Paper>
-          </Box>
+                        {tabValue === 1 && (
+                          <Box>
+                            {/* Upgrade Component */}
+                            <Typography>Upgrade Component</Typography>
+                          </Box>
+                        )}
+                        {tabValue === 2 && (
+                          <Box>
+                            {/* $COOWN Component */}
+                            <Typography>$COOWN Component</Typography>
+                          </Box>
+                        )}
+                        {tabValue === 3 && (
+                          <Box>
+                            {/* NFT Component */}
+                            <Typography>NFT Component</Typography>
+                          </Box>
+                        )}
+                        {tabValue === 4 && (
+                          <Box>
+                            <Grid container spacing={2} mb={2}>
+                              {groupDetails.balances.map((balance, index) => (
+                                <Grid item xs={12} sm={6} md={3} key={index}>
+                                  <StyledPaper
+                                    style={{
+                                      display: "flex",
+                                      flexDirection: "column",
+                                      gap: "7px",
+                                      justifyContent: "start",
+                                      alignItems: "start",
+                                      maxHeight: "unset",
+                                      width: "100%",
+                                    }}
+                                  >
+                                    <Typography variant="h6" color="text.primary">
+                                      {balance.currency}
+                                    </Typography>
+                                    <Typography variant="h2" color="text.secondary">
+                                      {balance.amount} {balance.symbol}
+                                    </Typography>
+                                    <Typography
+                                      variant="body2"
+                                      color="text.secondary"
+                                      style={{ fontSize: "16px", color: "gray" }}
+                                    >
+                                      {balance.usd} USD
+                                    </Typography>
+                                    <Typography
+                                      variant="body2"
+                                      color={
+                                        balance.change > 0
+                                          ? "success.main"
+                                          : "error.main"
+                                      }
+                                      style={{ fontSize: "12px" }}
+                                    >
+                                      {balance.change > 0 ? "+" : ""}
+                                      {balance.change}%
+                                    </Typography>
+                                  </StyledPaper>
+                                </Grid>
+                              ))}
+                            </Grid>
+
+                            <PaginationTable rows={rows} />
+                          </Box>
+                        )}
+                        {tabValue === 5 && (
+                          <Box>
+                            {/* Stakeholders Component */}
+                            <Typography>Stakeholders Component</Typography>
+                          </Box>
+                        )}
+                        {tabValue === 6 && (
+                          <Box>
+                            {/* Chat Component */}
+                            <Typography>Chat Component</Typography>
+                          </Box>
+                        )}
+                        {tabValue === 7 && (
+                          <Box>
+                            {/* Details Component */}
+                            <Typography>Details Component</Typography>
+                          </Box>
+                        )}
+                      </CardContent>
+                    </Box>
+                  </Card>
+                  {groupDetails.isAdmin && (
+                    <Box mt={2} display="flex" justifyContent="flex-end" gap={2}>
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        style={{ color: "white" }}
+                      >
+                        <Link
+                          to={`/group/${groupId}/add-stakeholder`}
+                          style={{ color: "white", textDecoration: "none" }}
+                        >
+                          Add StakeHolder
+                        </Link>
+                      </Button>
+                      <Button
+                        variant="contained"
+                        color="secondary"
+                        onClick={() => {
+                          setFormType("inviteUser");
+                          setShowForm(true);
+                        }}
+                      >
+                        Invite User
+                      </Button>
+                    </Box>
+                  )}
+                  {showForm && <Box mt={2}>{renderFormContent()}</Box>}
+
+                </CardContent>
+              </Card>
+            </>
+          )}
         </>
       )}
     </Container>
