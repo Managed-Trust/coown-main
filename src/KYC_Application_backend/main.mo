@@ -110,6 +110,49 @@ actor KYC_Canister {
     };
   };
 
+  public func verifyDocument(id : Text, isVerified : Bool) : async Text {
+    switch (map.get(id)) {
+      case (null) { return "Customer does not exist." };
+      case (?customer) {
+        let updatedCustomer = {
+          customer with document_verified = isVerified
+        };
+        map.put(id, updatedCustomer);
+        return "Document verification status updated successfully.";
+      };
+    };
+  };
+
+  public query func isDocumentVerified(id : Text) : async ?Bool {
+    switch (map.get(id)) {
+      case (null) { return null }; // Customer does not exist
+      case (?customer) { return ?customer.document_verified }; // Return the document verification status
+    };
+  };
+  public query func isIdentityVerified(id : Text) : async ?Bool {
+    switch (map.get(id)) {
+      case (null) {
+        return null;
+      }; // Customer does not exist
+      case (?customer) {
+        return ?customer.identity_verified;
+      }; // Return the identity verification status
+    };
+  };
+
+  public func verifyIdentity(id : Text, isVerified : Bool) : async Text {
+    switch (map.get(id)) {
+      case (null) { return "Customer does not exist." };
+      case (?customer) {
+        let updatedCustomer = {
+          customer with identity_verified = isVerified
+        };
+        map.put(id, updatedCustomer);
+        return "Identity verification status updated successfully.";
+      };
+    };
+  };
+
   private stable var mapEntries : [(Text, Customer)] = [];
   var map = HashMap.HashMap<Text, Customer>(0, Text.equal, Text.hash);
 
