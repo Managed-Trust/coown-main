@@ -44,6 +44,8 @@ actor KYC_Canister {
     document_verified : Bool; // Boolean to track if the document has been verified
     identity_verified : Bool; // Boolean to track if the identity has been verified
     verified : Bool;
+    decline_reason : ?Text;
+    limitation_reason : ?Text;
     role : Text;
   };
 
@@ -89,6 +91,8 @@ actor KYC_Canister {
                 live_photo = null;
                 document_verified = false;
                 identity_verified = false;
+                decline_reason = null;
+                limitation_reason = null;
                 verified = false;
                 role = "";
               };
@@ -108,15 +112,6 @@ actor KYC_Canister {
 
   private stable var mapEntries : [(Text, Customer)] = [];
   var map = HashMap.HashMap<Text, Customer>(0, Text.equal, Text.hash);
-
-  private stable var userEntries : [(Text, User)] = [];
-  var users = HashMap.HashMap<Text, User>(0, Text.equal, Text.hash);
-  //==================================================================================
-
-  // Check if user is available
-  public func getUser(userId : Text) : async ?User {
-    return users.get(userId);
-  };
 
   // Function to add a new customer
 
@@ -235,6 +230,56 @@ actor KYC_Canister {
           verified = true;
         };
         map.put(id, updatedProfile);
+        let defaultGroup : Group = {
+          adminId = id;
+          groupName = "DefaultGroup";
+          groupType = "Default";
+          companyDetails = null;
+          publicLawEntityDetails = null;
+          personalRecords = [];
+        };
+        groups.put(id, defaultGroup);
+
+        switch (groupIds.get(id)) {
+          case (?buffer) {
+            buffer.add(id);
+            groupIds.put(id, buffer);
+          };
+          case (null) {
+            var newBuffer = Buffer.Buffer<Text>(0);
+            newBuffer.add(id);
+            groupIds.put(id, newBuffer);
+          };
+        };
+        return "Success";
+      };
+    };
+  };
+
+  public func declineCustomer(id : Text, reason : Text) : async Text {
+    switch (map.get(id)) {
+      case (null) { "Customer does not exist." };
+      case (?customer) {
+        let updatedCustomer = {
+          customer with decline_reason = ?reason;
+          verified = false; // Ensure customer status is updated
+        };
+        map.put(id, updatedCustomer);
+        "Customer declined successfully.";
+      };
+    };
+  };
+
+  public func limitCustomer(id : Text, reason : Text) : async Text {
+    switch (map.get(id)) {
+      case (null) { "Customer does not exist." };
+      case (?customer) {
+        let updatedCustomer = {
+          customer with limitation_reason = ?reason;
+          verified = true; // Assuming limitation doesn't revoke verification
+        };
+        map.put(id, updatedCustomer);
+
         let defaultGroup : Group = {
           adminId = id;
           groupName = "DefaultGroup";
@@ -524,6 +569,14 @@ actor KYC_Canister {
     otp : ?Text;
     otpExpiry : ?Int;
   };
+  private stable var userEntries : [(Text, User)] = [];
+  var users = HashMap.HashMap<Text, User>(0, Text.equal, Text.hash);
+  //==================================================================================
+
+  // Check if user is available
+  public func getUser(userId : Text) : async ?User {
+    return users.get(userId);
+  };
 
   public func createUser(
     userId : Text,
@@ -667,9 +720,9 @@ actor KYC_Canister {
     adminId : Text;
     groupName : Text;
     groupType : Text;
-    companyDetails : ?CompanyDetails;
+    companyDetails : ?CompanyDetails; //null
     publicLawEntityDetails : ?PublicLawEntityDetails;
-    personalRecords : [PersonalRecord];
+    personalRecords : [PersonalRecord]; //empty
   };
 
   public func createGroup(
