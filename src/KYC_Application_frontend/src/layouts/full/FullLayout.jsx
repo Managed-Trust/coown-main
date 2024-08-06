@@ -10,6 +10,7 @@ import Navigation from './horizontal/navbar/Navbar';
 import Modern from '../../views/dashboard/Modern';
 import EcommerceDash from '../../views/dashboard/Ecommerce.jsx';
 import UserProfile from "../../views/apps/user-profile/UserProfile.jsx";
+import Account from "../../views/apps/account/Account.jsx";
 import Followers from "../../views/apps/user-profile/Followers.jsx";
 import Friends from "../../views/apps/user-profile/Friends.jsx";
 import Gallery from "../../views/apps/user-profile/Gallery.jsx";
@@ -21,6 +22,7 @@ import GroupInvitation from '../../views/pages/group-invitation/group-invitation
 import Tickets from '../../views/apps/tickets/Tickets.jsx';
 import AddStakeHolder from '../../views/apps/stakeholder/AddStakeHolder.jsx';
 import Faq from '../../views/pages/faq/Faq.jsx';
+import UserApproval from '../../components/apps/tickets/UserApproval.jsx';
 
 import {
   ConnectDialog,
@@ -77,6 +79,7 @@ const FullLayout = () => {
                 <Route path="/apps/friends" element={<Friends />} />
                 <Route path="/apps/gallery" element={<Gallery />} />
                 <Route path="/user-profile" element={<UserProfile />} />
+                <Route path="/account" element={<Account />} />
                 <Route path="/user-profile/Settings" element={<Settings />} />
                 <Route path="/forms/form-horizontal" element={<FormHorizontal />} />
                 <Route path="/group/:groupId" element={<GroupDetailPage />} />
@@ -85,6 +88,7 @@ const FullLayout = () => {
                 <Route path="/apps/chats" element={<Chats />} />
                 <Route path="/group-invitation/:groupId/:email" element={<GroupInvitation />} />
                 <Route path="/apps/tickets" element={<Tickets />} />
+                <Route path="/apps/tickets/user-detail/:id" element={<UserApproval />} />
                 <Route path="/pages/faq" element={<Faq />} />
               </Routes>
             </Box>

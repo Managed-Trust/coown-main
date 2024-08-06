@@ -1,0 +1,16 @@
+.btn-decline {
+    background-color: red !important;
+    border-color: red !important;
+    color: white;
+    float: left;
+}
+
+.btn-decline:hover {
+    background-color: rgb(223, 26, 26) !important;
+    border-color: rgb(223, 26, 26) !important;
+}
+
+.btn-cancel {
+    float: right;
+    margin-left: 10px;
+}
