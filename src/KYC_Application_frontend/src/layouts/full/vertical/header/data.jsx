@@ -73,9 +73,9 @@ const profile = [
     icon: icon1,
   },
   {
-    href: '/apps/email',
-    title: 'My Inbox',
-    subtitle: 'Messages & Emails',
+    href: '/account',
+    title: 'My Account',
+    subtitle: 'Account detail',
     icon: icon2,
   },
   {

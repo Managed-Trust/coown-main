@@ -1,9 +1,10 @@
+
 import Breadcrumb from '../../../layouts/full/shared/breadcrumb/Breadcrumb';
 import PageContainer from '../../../components/container/PageContainer';
 import ChildCard from '../../../components/shared/ChildCard';
-import Swal from 'sweetalert';
+import Swal from 'sweetalert2';
 import React, { useState, useEffect } from 'react';
-import { Link, useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useConnect } from '@connect2ic/react';
 import ic from 'ic0';
 import './style.css';
@@ -12,7 +13,7 @@ const ledger = ic.local("bkyz2-fmaaa-aaaaa-qaaaq-cai"); // Ledger canister
 import {
     Grid,
     Typography,
-    Box, Switch, TextField, Button, Skeleton
+    Box, Switch, TextField, Button, Skeleton, CircularProgress
 } from "@mui/material";
 import CryptoJS from "crypto-js";
 
@@ -34,111 +35,114 @@ const BCrumb = [
         title: 'Approval',
     },
 ];
-//  const showDeclineReasonAlert = () => {
-//     swal({
-//         title: "Decline reason",
-//         content: {
-//             element: "input",
-//             attributes: {
-//                 placeholder: "Add decline reason",
-//             },
-//         },
-//         buttons: {
-//             cancel: {
-//                 text: "Cancel",
-//                 value: null,
-//                 visible: true,
-//                 className: "",
-//                 closeModal: true,
-//             },
-//             confirm: {
-//                 text: "Decline",
-//                 value: true,
-//                 visible: true,
-//                 className: "btn btn-danger", // You can add your custom class for styling
-//                 closeModal: true,
-//             },
-//         },
-//     });
-// };
-
-// showDeclineReasonAlert();
 
 const UserApproval = () => {
     const { id } = useParams();
-
+    const navigate = useNavigate();
     const [profile, setProfile] = useState(null);
     const [isLoading, setLoading] = useState(false);
-    const [loading, setLoadinng] = useState(false);
+    const [documentLoader, setDocumentLoader] = useState(false);
+    const [identityLoader, setIdentityLoader] = useState(false);
+    const [approving, setApproving] = useState(false);
+    const [document, setDocument] = useState(false);
+    const [identity, setIdentity] = useState(false);
     const { isConnected, principal } = useConnect({
         onConnect: () => { },
         onDisconnect: () => { },
     });
 
     useEffect(() => {
-            fetchProfile();
+        fetchProfile();
+        checkDocumentStatus();
+        checkIdentityStatus();
     }, [principal]);
 
-    
+
     const showDeclineReasonAlert = () => {
-        swal({
-            title: "Decline reason",
-            content: {
-                element: "textarea",
-                attributes: {
-                    placeholder: "Add decline reason",
-                    rows: 4,
-                },
+        Swal.fire({
+            title: 'Decline reason',
+            input: 'textarea',
+            inputPlaceholder: 'Add decline reason',
+            inputAttributes: {
+                rows: 4,
             },
-            buttons: {
-                confirm: {
-                text: "Decline",
-                value: true,
-                visible: true,
-                className: "btn btn-decline", // Custom class for styling decline button
-                closeModal: true,
+            showCancelButton: true,
+            confirmButtonText: 'Decline',
+            cancelButtonText: 'Cancel',
+            customClass: {
+                confirmButton: 'swal2-confirm'
             },
-                cancel: {
-                    text: "Cancel",
-                    value: null,
-                    visible: true,
-                    className: "btn btn-cancel", // Custom class for styling cancel button
-                    closeModal: true,
-                },
-               
+            preConfirm: (reason) => {
+                if (!reason) {
+                    Swal.showValidationMessage('Please enter a decline reason');
+                }
+                return reason;
             },
-        }); 
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    const responseDecline = await ledger.call("declineCustomer", id, result.value);
+                    console.log('Response of decline:', responseDecline);
+                    await Swal.fire('Success', 'User Request Declined Successfully!', 'success');
+                } catch (e) {
+                    console.log("Error Verifying:", e);
+                    await Swal.fire('Error', 'There was an error declining the request', 'error');
+                } finally {
+                    navigate(-1);
+                }
+            }
+        });
     };
-    
+
     const showApproveReasonAlert = () => {
-        swal({
-            title: "Limitation reason",
-            content: {
-                element: "textarea",
-                attributes: {
-                    placeholder: "Add Limitation reason",
-                    rows: 4,
-                },
+        Swal.fire({
+            title: 'Limitation reason',
+            input: 'textarea',
+            inputPlaceholder: 'Add Limitation reason',
+            inputAttributes: {
+                rows: 4,
             },
-            buttons: {
-                confirm: {
-                text: "Approve",
-                value: true,
-                visible: true,
-                className: "", 
-                closeModal: true,
+            showCancelButton: true,
+            confirmButtonText: 'Approve',
+            cancelButtonText: 'Cancel',
+            preConfirm: (reason) => {
+                if (!reason) {
+                    Swal.showValidationMessage('Please enter a limitation reason');
+                }
+                return reason;
             },
-                cancel: {
-                    text: "Cancel",
-                    value: null,
-                    visible: true,
-                    className: "", 
-                    closeModal: true,
-                },
-               
-            },
-        }); 
-    };
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    const responseLimit = await ledger.call("limitCustomer", id, result.value);
+                    console.log('Response of limit:', responseLimit, '', result.value);
+                    await Swal.fire('Success', 'User Request Verified Successfully!', 'success');
+                } catch (e) {
+                    console.log("Error Verifying:", e);
+                    await Swal.fire('Error', 'There was an error approving the request', 'error');
+                } finally {
+                    navigate(-1);
+                }
+            }
+        });
+    }
+
+
+    const handleVerify = async () => {
+        setApproving(true);
+        try {
+            const response = await ledger.call("verifyCustomer", id);
+            console.log('respose', response);
+            Swal.fire("Success", 'User Verified Successfully!', "success");
+        } catch (e) {
+            console.log("Error Verifying:", e);
+            Swal.fire("Error", 'There was an error verifying the user', "error");
+        } finally {
+            setApproving(false);
+            navigate(-1);
+        }
+    }
+
     const isBase64Image = (base64) => {
         return base64.startsWith('/9j/') || base64.startsWith('iVBORw0KGgo'); // JPEG or PNG
     }
@@ -154,17 +158,6 @@ const UserApproval = () => {
             );
         }
     }
-    const handleVerify = async () => {
-        setLoadinng(true);
-        try {
-            const response = await ledger.call("verifyCustomer", id);
-            swal("Success", 'User Verified Successfully!', "success");
-        } catch (e) {
-            console.log("Error Verifying:", e);
-        } finally {
-            setLoadinng(false);
-        }
-    };
     const fetchProfile = async () => {
         setLoading(true);
         try {
@@ -179,6 +172,50 @@ const UserApproval = () => {
         }
         setLoading(false);
     };
+
+    const checkDocumentStatus = async () => {
+        try {
+            const result = await ledger.call("isDocumentVerified", id);
+            console.log('result document', result);
+            setDocument(result[0]);
+        } catch (e) {
+            console.log("Error checking document verified:", e);
+        }
+    };
+    const checkIdentityStatus = async () => {
+        try {
+            const result = await ledger.call("isIdentityVerified", id);
+            console.log('result identity', result);
+            setIdentity(result[0]);
+        } catch (e) {
+            console.log("Error checking identity:", e);
+        }
+    }
+
+    const toggleDocument = async () => {
+        setDocumentLoader(true);
+        try {
+            const newDocumentState = !document;
+            const result = await ledger.call("verifyDocument", id, newDocumentState);
+            console.log('result newDocumentState', newDocumentState);
+            setDocument(newDocumentState);
+        } catch (e) {
+            console.log("Error toggling Document:", e);
+        }
+        setDocumentLoader(false);
+    };
+    const toggleIdentity = async () => {
+        setIdentityLoader(true);
+        try {
+            const newIdentityState = !identity;
+            const result = await ledger.call("verifyIdentity", id, newIdentityState);
+            console.log('result newIdentityState', newIdentityState);
+            setIdentity(newIdentityState);
+        } catch (e) {
+            console.log("Error toggling Document:", e);
+        }
+        setIdentityLoader(false);
+    }
     return (
         <PageContainer title="Create New Group" description="this is Note page">
             <Breadcrumb title="Request ID-156165" items={BCrumb} />
@@ -398,13 +435,14 @@ const UserApproval = () => {
                                             <Typography variant='body2' m={0.2} >Proceed with Verification steps and approve or decline the user's request</Typography>
                                             <Grid container spacing={2}>
                                                 <Grid item xs={12} display={'flex'}>
-                                                    <Switch defaultChecked /> <Typography variant="body1" p={0.2}>Address matches user's data</Typography>
+                                                    <Switch /> <Typography variant="body1" p={0.2}>Address matches user's data</Typography>
                                                 </Grid>
                                                 <Grid item xs={12} display={'flex'}>
-                                                    <Switch defaultChecked /> <Typography variant="body1" p={0.2}>Document matches user's data</Typography>
+                                                {documentLoader ? <CircularProgress style={{ color: 'black' }} size={24} /> : <Switch checked={document} onClick={toggleDocument} /> }  <Typography variant="body1" p={0.2}>Document matches user's data</Typography>
                                                 </Grid>
                                                 <Grid item xs={12} display={'flex'}>
-                                                    <Switch defaultChecked /> <Typography variant="body1" p={0.2}>Face matches document</Typography>
+                                                {identityLoader ? <CircularProgress style={{ color: 'black' }} size={24} /> : <Switch checked={identity} onClick={toggleIdentity} /> }
+                                                     <Typography variant="body1" p={0.2}>Face matches document</Typography>
                                                 </Grid>
                                                 <Grid item xs={12}>
                                                     <Box mt={2} p={2} bgcolor="#fce4ec">
@@ -453,13 +491,17 @@ const UserApproval = () => {
                                                 />
                                             </Grid>
                                             <Box pt={3} display="flex" justifyContent="flex-start">
-                                            <Button onClick={() => showApproveReasonAlert()} variant="contained" color="primary" style={{ marginRight: '10px' }}>
-                                                Approve
-                                            </Button>
-                                            <Button onClick={() => showDeclineReasonAlert()} className="btn-decline" variant="contained" sx={{ color: 'white', backgroundColor: 'red' }}>
-                                                Reject
-                                            </Button>
-                                                
+                                                <Button onClick={() => handleVerify()} variant="contained" color="primary" style={{ marginRight: '10px' }}>
+                                                    {approving ? <CircularProgress style={{ color: 'white' }} size={24} /> : "Approve"}
+                                                </Button>
+                                                <Button onClick={() => showDeclineReasonAlert()} className="btn-decline" variant="contained" sx={{ color: 'white', backgroundColor: 'red' }}>
+                                                    Reject
+                                                </Button>
+                                            </Box>
+                                            <Box pt={3} display="flex" justifyContent="flex-start">
+                                                <Button onClick={() => showApproveReasonAlert()} variant="contained" color="primary" style={{ marginRight: '10px' }}>
+                                                    Approve with limitations
+                                                </Button>
                                             </Box>
                                         </Grid>
                                     </Grid>
