@@ -44,7 +44,7 @@ import FirstPageIcon from '@mui/icons-material/FirstPage';
 import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
 import LastPageIcon from '@mui/icons-material/LastPage';
-
+import DetailComponent from "./DetailComponent";
 const ledger = ic.local("bkyz2-fmaaa-aaaaa-qaaaq-cai");
 
 const secretKey = "your-secret-key"; // Use a strong secret key
@@ -910,7 +910,7 @@ const GroupDetailPage = () => {
                         {tabValue === 7 && (
                           <Box>
                             {/* Details Component */}
-                            <Typography>Details Component</Typography>
+                            <DetailComponent Group={group}/>
                           </Box>
                         )}
                       </CardContent>

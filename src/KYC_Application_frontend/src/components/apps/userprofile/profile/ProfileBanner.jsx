@@ -173,10 +173,11 @@ const ProfileBanner = () => {
                 mt: '-85px',
               }}
             >
+              {profile && 
               <Box>
                 <ProfileImage>
                   <Avatar
-                    src={decryptData(profile.image[0])}
+                    src={profile.live_photo[0]}
                     alt={decryptData(profile.given_name)}
                     sx={{
                       borderRadius: '50%',
@@ -195,6 +196,7 @@ const ProfileBanner = () => {
                   </Typography>
                 </Box>
               </Box>
+              }
             </Box>
           </Grid>
           {/* friends following buttons */}
