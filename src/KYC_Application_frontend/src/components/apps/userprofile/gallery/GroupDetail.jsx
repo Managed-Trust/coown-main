@@ -46,6 +46,7 @@ import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
 import LastPageIcon from '@mui/icons-material/LastPage';
 import DetailComponent from "./DetailComponent";
 import Overview from "./overviewComponent/overview";
+import ChatComponent from "./chatComponent/ChatComponent";
 const ledger = ic.local("bkyz2-fmaaa-aaaaa-qaaaq-cai");
 
 const secretKey = "your-secret-key"; // Use a strong secret key
@@ -891,8 +892,7 @@ const GroupDetailPage = () => {
                         )}
                         {tabValue === 4 && (
                           <Box>
-                          {/* Chat Component */}
-                          <Typography>Chat Component</Typography>
+                            <ChatComponent/>
                         </Box>
                         )}
                         {tabValue === 5 && (
