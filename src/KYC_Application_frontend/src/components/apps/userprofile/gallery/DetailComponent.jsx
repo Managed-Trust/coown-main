@@ -1,6 +1,6 @@
 import PageContainer from '../../../container/PageContainer';
 import ChildCard from '../../../shared/ChildCard';
-import React, { useState,useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     Grid,
     Typography,
@@ -11,16 +11,16 @@ import CryptoJS from "crypto-js";
 const secretKey = "your-secret-key"; // Use a strong secret key
 
 const hashData = (data) => {
-  return CryptoJS.SHA256(data).toString(CryptoJS.enc.Hex);
+    return CryptoJS.SHA256(data).toString(CryptoJS.enc.Hex);
 };
 
 const encryptData = (data) => {
-  return CryptoJS.AES.encrypt(data, secretKey).toString();
+    return CryptoJS.AES.encrypt(data, secretKey).toString();
 };
 
 const decryptData = (ciphertext) => {
-  const bytes = CryptoJS.AES.decrypt(ciphertext, secretKey);
-  return bytes.toString(CryptoJS.enc.Utf8);
+    const bytes = CryptoJS.AES.decrypt(ciphertext, secretKey);
+    return bytes.toString(CryptoJS.enc.Utf8);
 };
 const DetailComponent = (Group) => {
 
@@ -75,7 +75,7 @@ const DetailComponent = (Group) => {
 
                                                 </Grid>
                                                 <Grid item xs={6}>
-                                                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}>Emily</Typography>
+                                                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}>{decryptData(group.companyDetails[0].companyName)}</Typography>
 
                                                 </Grid>
                                             </Grid>
@@ -85,7 +85,7 @@ const DetailComponent = (Group) => {
 
                                                 </Grid>
                                                 <Grid item xs={6}>
-                                                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}>Johnson</Typography>
+                                                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}>{decryptData(group.companyDetails[0].registrationNumber)}</Typography>
 
                                                 </Grid>
                                             </Grid>
@@ -95,7 +95,7 @@ const DetailComponent = (Group) => {
 
                                                 </Grid>
                                                 <Grid item xs={6}>
-                                                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}>01.01.1900</Typography>
+                                                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}>{decryptData(group.companyDetails[0].legalStructure)}</Typography>
 
                                                 </Grid>
                                             </Grid>
@@ -105,7 +105,7 @@ const DetailComponent = (Group) => {
 
                                                 </Grid>
                                                 <Grid item xs={6}>
-                                                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}>Estoria</Typography>
+                                                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}>{decryptData(group.companyDetails[0].registeredAddress)}</Typography>
 
                                                 </Grid>
                                             </Grid>
@@ -115,7 +115,7 @@ const DetailComponent = (Group) => {
 
                                                 </Grid>
                                                 <Grid item xs={6}>
-                                                    <Typography variant="body1" sx={{ fontWeight: 'bold', color: 'blue' }}>+123 456 7890</Typography>
+                                                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}>{decryptData(group.companyDetails[0].taxId)}</Typography>
 
                                                 </Grid>
                                             </Grid>
@@ -141,7 +141,7 @@ const DetailComponent = (Group) => {
 
                                                 </Grid>
                                                 <Grid item xs={6}>
-                                                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}>Valge 1-10 Talien, 1011 Harjmaa</Typography>
+                                                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}>{decryptData(group.companyDetails[0].economicOwner)}</Typography>
 
                                                 </Grid>
                                             </Grid>
@@ -151,7 +151,7 @@ const DetailComponent = (Group) => {
 
                                                 </Grid>
                                                 <Grid item xs={6}>
-                                                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}>Estoria</Typography>
+                                                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}>{decryptData(group.companyDetails[0].beneficialOwner)}</Typography>
 
                                                 </Grid>
                                             </Grid>
@@ -176,7 +176,7 @@ const DetailComponent = (Group) => {
 
                                                 </Grid>
                                                 <Grid item xs={6}>
-                                                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}>Passport</Typography>
+                                                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}>Jana doe</Typography>
 
                                                 </Grid>
                                             </Grid>
@@ -186,7 +186,7 @@ const DetailComponent = (Group) => {
 
                                                 </Grid>
                                                 <Grid item xs={6}>
-                                                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}>Estoria</Typography>
+                                                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}>CEO </Typography>
 
                                                 </Grid>
                                             </Grid>
@@ -196,7 +196,7 @@ const DetailComponent = (Group) => {
 
                                                 </Grid>
                                                 <Grid item xs={6}>
-                                                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}>KE1234567890</Typography>
+                                                    <Typography variant="body1" sx={{ fontWeight: 'bold', color: 'blue' }}>janadoe@gmail.com</Typography>
 
                                                 </Grid>
                                             </Grid>
@@ -206,7 +206,7 @@ const DetailComponent = (Group) => {
 
                                                 </Grid>
                                                 <Grid item xs={6}>
-                                                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}>Estoria</Typography>
+                                                    <Typography variant="body1" sx={{ fontWeight: 'bold', color: 'blue' }}>+123 456 7890</Typography>
 
                                                 </Grid>
                                             </Grid>
@@ -237,7 +237,7 @@ const DetailComponent = (Group) => {
 
                                                 </Grid>
                                                 <Grid item xs={6}>
-                                                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}>Emily</Typography>
+                                                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}>{group.publicLawEntityDetails[0].entityInfo.entityName}</Typography>
 
                                                 </Grid>
                                             </Grid>
@@ -247,7 +247,7 @@ const DetailComponent = (Group) => {
 
                                                 </Grid>
                                                 <Grid item xs={6}>
-                                                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}>Johnson</Typography>
+                                                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}>{group.publicLawEntityDetails[0].entityInfo.address}</Typography>
 
                                                 </Grid>
                                             </Grid>
@@ -267,7 +267,7 @@ const DetailComponent = (Group) => {
 
                                                 </Grid>
                                                 <Grid item xs={6}>
-                                                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}>Estoria</Typography>
+                                                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}>{group.publicLawEntityDetails[0].entityInfo.businessEmail}</Typography>
 
                                                 </Grid>
                                             </Grid>
@@ -277,7 +277,7 @@ const DetailComponent = (Group) => {
 
                                                 </Grid>
                                                 <Grid item xs={6}>
-                                                    <Typography variant="body1" sx={{ fontWeight: 'bold', color: 'blue' }}>+123 456 7890</Typography>
+                                                    <Typography variant="body1" sx={{ fontWeight: 'bold', color: 'blue' }}>{group.publicLawEntityDetails[0].entityInfo.website}</Typography>
 
                                                 </Grid>
                                             </Grid>
@@ -303,7 +303,7 @@ const DetailComponent = (Group) => {
 
                                                 </Grid>
                                                 <Grid item xs={6}>
-                                                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}>Valge 1-10 Talien, 1011 Harjmaa</Typography>
+                                                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}>{group.publicLawEntityDetails[0].groupOwner[0].jobTitle}</Typography>
 
                                                 </Grid>
                                             </Grid>
@@ -313,7 +313,7 @@ const DetailComponent = (Group) => {
 
                                                 </Grid>
                                                 <Grid item xs={6}>
-                                                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}>Estoria</Typography>
+                                                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}>{group.publicLawEntityDetails[0].groupOwner[0].ownerBusinessEmail}</Typography>
 
                                                 </Grid>
                                             </Grid>
@@ -338,7 +338,7 @@ const DetailComponent = (Group) => {
 
                                                 </Grid>
                                                 <Grid item xs={6}>
-                                                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}>Passport</Typography>
+                                                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}>{group.publicLawEntityDetails[0].legalFramework.descriptionOfPurpose}</Typography>
 
                                                 </Grid>
                                             </Grid>
@@ -348,7 +348,7 @@ const DetailComponent = (Group) => {
 
                                                 </Grid>
                                                 <Grid item xs={6}>
-                                                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}>Estoria</Typography>
+                                                    <Typography variant="body1" sx={{ fontWeight: 'bold',color:'blue' }}>{group.publicLawEntityDetails[0].legalFramework.linkToConstitutingLegislation}</Typography>
 
                                                 </Grid>
                                             </Grid>
@@ -358,7 +358,7 @@ const DetailComponent = (Group) => {
 
                                                 </Grid>
                                                 <Grid item xs={6}>
-                                                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}>KE1234567890</Typography>
+                                                    <Typography variant="body1" sx={{ fontWeight: 'bold',color:'blue' }}>{group.publicLawEntityDetails[0].legalFramework.linkToSupervisoryBody}</Typography>
 
                                                 </Grid>
                                             </Grid>
