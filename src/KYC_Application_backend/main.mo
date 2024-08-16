@@ -1166,6 +1166,81 @@ actor KYC_Canister {
 
   //============================================================
 
+  type ReferralCode = {
+    code : Text;
+    ownerId : Text; // The user who generated the referral code
+    usageCount : Nat; // Number of times the code has been used successfully
+    createdAt : Int; // Timestamp of when the code was created
+  };
+
+  private stable var referralCodeEntries : [(Text, ReferralCode)] = [];
+  var referralCodes = HashMap.HashMap<Text, ReferralCode>(0, Text.equal, Text.hash);
+
+  public func generateReferralCode(ownerId : Text) : async Text {
+
+    let seed = await Random.blob();
+    let finiteRandom = Random.Finite(seed);
+    let randNatOpt = finiteRandom.range(255); // Generate number between 0 and 255 (Nat8)
+
+    switch (randNatOpt) {
+      case (null) {
+        return "000000"; // Fallback in case of random failure
+      };
+      case (?randNat) {
+        let rand = (randNat * 1000 + randNat) % 900000 + 100000; // Ensure it's a 6-digit number
+        let store = Nat.toText(rand);
+        let referralCode : ReferralCode = {
+          code = store;
+          ownerId = ownerId;
+          usageCount = 0;
+          createdAt = Time.now();
+        };
+
+        referralCodes.put(store, referralCode); // Store the referral code
+        return store;
+      };
+    };
+
+  };
+
+  public func redeemReferralCode(code : Text, userId : Text) : async Text {
+    switch (referralCodes.get(code)) {
+      case (null) {
+        return "Referral code not found.";
+      };
+      case (?referral) {
+        if (referral.ownerId == userId) {
+          return "You cannot use your own referral code.";
+        };
+
+        // Update the usage count
+        let updatedReferralCode = {
+          referral with
+          usageCount = referral.usageCount + 1
+        };
+
+        referralCodes.put(code, updatedReferralCode); // Update the referral code
+
+        // Optionally, you can add logic to reward the user or the code owner
+        return "Referral code redeemed successfully.";
+      };
+    };
+  };
+
+  public query func getReferralCodeDetails(code : Text) : async ?ReferralCode {
+    return referralCodes.get(code);
+  };
+
+  public query func getReferralCodesByUser(ownerId : Text) : async [ReferralCode] {
+    let codes = Iter.filter<ReferralCode>(
+      referralCodes.vals(),
+      func(referral) {
+        referral.ownerId == ownerId;
+      },
+    );
+    return Iter.toArray(codes);
+  };
+
   //============================================================
 
   system func preupgrade() {
@@ -1191,6 +1266,9 @@ actor KYC_Canister {
       data.put(x.0, Buffer.toArray<Text>(x.1));
     };
     groupIdEntries := Iter.toArray(data.entries());
+    //==============================================================
+    referralCodeEntries := Iter.toArray(referralCodes.entries());
+
     // groupIdEntries := Iter.toArray(groupIds.entries());
 
   };
@@ -1213,6 +1291,9 @@ actor KYC_Canister {
     for (x in Iter.fromArray(Entries)) {
       groupIds.put(x.0, Buffer.fromArray<Text>(x.1));
     };
+    //===========================================================
+    referralCodes := HashMap.fromIter<Text, ReferralCode>(referralCodeEntries.vals(), 1, Text.equal, Text.hash);
+
     // groupIds := HashMap.fromIter<Text, Buffer.Buffer<Text>>(groupIdEntries.vals(), 1, Text.equal, Text.hash);
 
   };
