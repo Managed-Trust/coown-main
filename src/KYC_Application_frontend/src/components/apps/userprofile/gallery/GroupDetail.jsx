@@ -45,6 +45,7 @@ import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
 import LastPageIcon from '@mui/icons-material/LastPage';
 import DetailComponent from "./DetailComponent";
+import GroupMembers from "./GroupMembers";
 import Overview from "./overviewComponent/overview";
 import ChatComponent from "./chatComponent/ChatComponent";
 const ledger = ic.local("bkyz2-fmaaa-aaaaa-qaaaq-cai");
@@ -470,6 +471,9 @@ const GroupDetailPage = () => {
   const [fetchingGroup, setFetchingGroup] = useState(true);
   const [tabValue, setTabValue] = useState(0);
 
+  const [stakeholders, setStakeholders] = useState([]);
+  const [newStakeholder, setNewStakeholder] = useState({ name: "", role: "" });
+
   const { isConnected, principal } = useConnect({
     onConnect: () => { },
     onDisconnect: () => { },
@@ -577,56 +581,10 @@ const GroupDetailPage = () => {
       ? Math.max(0, (1 + page) * rowsPerPage - groupDetails.users.length)
       : 0;
 
-  const handleInviteUser = async () => {
-    console.log("Invite User Data:", encryptData(formData.email));
-    try {
-      const response = await ledger.call(
-        "addPersonalRecordToGroup",
-        groupId,
-        "principal", // Replace with actual principal ID or set as null if not available
-        formData.email,
-        encryptData(formData.contactDetails),
-        { [formData.recordType]: null }
-      );
-      console.log("Invite User Response:", response);
-    } catch (e) {
-      console.log("Error Inviting User:", e);
-    } finally {
-      const emailParams = {
-        to_email: formData.email,
-        contactDetails: formData.contactDetails,
-        recordType: formData.recordType,
-        groupId: groupId,
-      };
-
-      emailjs
-        .send(
-          "service_idh0h15",
-          "template_d21fhkr",
-          emailParams,
-          "Y4QJDpwjrsdi3tQAR"
-        )
-        .then(
-          () => {
-            console.log("SUCCESS!");
-          },
-          (error) => {
-            console.log("FAILED...", error.text);
-          }
-        )
-        .catch((error) => {
-          console.log("Error sending Email:", error);
-        })
-        .finally(() => {
-          alert("Email sent to " + formData.email);
-          setShowForm(false);
-        });
-    }
-  };
-
   useEffect(() => {
     fetchGroup();
   }, [principal]);
+
   const fetchGroup = async () => {
     setFetchingGroup(true);
     try {
@@ -646,76 +604,14 @@ const GroupDetailPage = () => {
     setTabValue(newValue);
   };
 
-  const renderFormContent = () => {
-    switch (formType) {
-      case "inviteUser":
-        return (
-          <Grid container spacing={3} mt={3}>
-            <Grid item xs={12} md={6}>
-              <CustomFormLabel htmlFor="email">Email</CustomFormLabel>
-              <TextField id="email" fullWidth onChange={handleInputChange} />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <CustomFormLabel htmlFor="contactDetails">
-                Contact Details
-              </CustomFormLabel>
-              <TextField
-                id="contactDetails"
-                fullWidth
-                onChange={handleInputChange}
-              />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <CustomFormLabel htmlFor="recordType">
-                Record Type
-              </CustomFormLabel>
-              <FormControl fullWidth>
-                <Select
-                  labelId="recordType-label"
-                  id="recordType"
-                  name="recordType"
-                  value={formData.recordType}
-                  onChange={handleInputChange}
-                >
-                  <MenuItem value="">Select Record Type</MenuItem>
-                  <MenuItem value="EconomicBeneficiary">
-                    Economic Beneficiary
-                  </MenuItem>
-                  <MenuItem value="ExecutiveMember">Executive Member</MenuItem>
-                  <MenuItem value="InvitedViewer">Invited Viewer</MenuItem>
-                  <MenuItem value="LeadOperator">Lead Operator</MenuItem>
-                  <MenuItem value="StaffMember">Staff Member</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item xs={12} md={12} lg={12}>
-              <Stack
-                direction="row"
-                spacing={2}
-                justifyContent="flex-end"
-                mt={3}
-              >
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={handleInviteUser}
-                >
-                  Invite User
-                </Button>
-                <Button
-                  variant="outlined"
-                  color="secondary"
-                  onClick={() => setShowForm(false)}
-                >
-                  Cancel
-                </Button>
-              </Stack>
-            </Grid>
-          </Grid>
-        );
-      default:
-        return null;
-    }
+  const handleStakeholderInputChange = (e) => {
+    const { name, value } = e.target;
+    setNewStakeholder({ ...newStakeholder, [name]: value });
+  };
+
+  const handleAddStakeholder = () => {
+    setStakeholders([...stakeholders, newStakeholder]);
+    setNewStakeholder({ name: "", role: "" });
   };
 
   return (
@@ -818,6 +714,7 @@ const GroupDetailPage = () => {
                         <Tab label="Rewards" />
                         <Tab label="Settings" />
                         <Tab label="Details" />
+                        <Tab label="Stakeholders" />
                       </Tabs>
                     </Box>
                   </Card>
@@ -831,52 +728,52 @@ const GroupDetailPage = () => {
                         )}
                         {tabValue === 1 && (
                           <Box>
-                          <Grid container spacing={2} mb={2}>
-                            {groupDetails.balances.map((balance, index) => (
-                              <Grid item xs={12} sm={6} md={3} key={index}>
-                                <StyledPaper
-                                  style={{
-                                    display: "flex",
-                                    flexDirection: "column",
-                                    gap: "7px",
-                                    justifyContent: "start",
-                                    alignItems: "start",
-                                    maxHeight: "unset",
-                                    width: "100%",
-                                  }}
-                                >
-                                  <Typography variant="h6" color="text.primary">
-                                    {balance.currency}
-                                  </Typography>
-                                  <Typography variant="h2" color="text.secondary">
-                                    {balance.amount} {balance.symbol}
-                                  </Typography>
-                                  <Typography
-                                    variant="body2"
-                                    color="text.secondary"
-                                    style={{ fontSize: "16px", color: "gray" }}
+                            <Grid container spacing={2} mb={2}>
+                              {groupDetails.balances.map((balance, index) => (
+                                <Grid item xs={12} sm={6} md={3} key={index}>
+                                  <StyledPaper
+                                    style={{
+                                      display: "flex",
+                                      flexDirection: "column",
+                                      gap: "7px",
+                                      justifyContent: "start",
+                                      alignItems: "start",
+                                      maxHeight: "unset",
+                                      width: "100%",
+                                    }}
                                   >
-                                    {balance.usd} USD
-                                  </Typography>
-                                  <Typography
-                                    variant="body2"
-                                    color={
-                                      balance.change > 0
-                                        ? "success.main"
-                                        : "error.main"
-                                    }
-                                    style={{ fontSize: "12px" }}
-                                  >
-                                    {balance.change > 0 ? "+" : ""}
-                                    {balance.change}%
-                                  </Typography>
-                                </StyledPaper>
-                              </Grid>
-                            ))}
-                          </Grid>
+                                    <Typography variant="h6" color="text.primary">
+                                      {balance.currency}
+                                    </Typography>
+                                    <Typography variant="h2" color="text.secondary">
+                                      {balance.amount} {balance.symbol}
+                                    </Typography>
+                                    <Typography
+                                      variant="body2"
+                                      color="text.secondary"
+                                      style={{ fontSize: "16px", color: "gray" }}
+                                    >
+                                      {balance.usd} USD
+                                    </Typography>
+                                    <Typography
+                                      variant="body2"
+                                      color={
+                                        balance.change > 0
+                                          ? "success.main"
+                                          : "error.main"
+                                      }
+                                      style={{ fontSize: "12px" }}
+                                    >
+                                      {balance.change > 0 ? "+" : ""}
+                                      {balance.change}%
+                                    </Typography>
+                                  </StyledPaper>
+                                </Grid>
+                              ))}
+                            </Grid>
 
-                          <PaginationTable rows={rows} />
-                        </Box>
+                            <PaginationTable rows={rows} />
+                          </Box>
                         )}
                         {tabValue === 2 && (
                           <Box>
@@ -887,13 +784,13 @@ const GroupDetailPage = () => {
                         {tabValue === 3 && (
                           <Box>
                             {/* Member Component */}
-                            <Typography>Member Component</Typography>
+                            <GroupMembers />
                           </Box>
                         )}
                         {tabValue === 4 && (
                           <Box>
-                            <ChatComponent/>
-                        </Box>
+                            <ChatComponent />
+                          </Box>
                         )}
                         {tabValue === 5 && (
                           <Box>
@@ -913,37 +810,14 @@ const GroupDetailPage = () => {
                             <DetailComponent Group={group} />
                           </Box>
                         )}
+                        {tabValue === 8 && (
+                          <>
+                            <Box>Stakeholder</Box>
+                          </>
+                        )}
                       </CardContent>
                     </Box>
                   </Card>
-                  {groupDetails.isAdmin && (
-                    <Box mt={2} display="flex" justifyContent="flex-end" gap={2}>
-                      <Button
-                        variant="contained"
-                        color="primary"
-                        style={{ color: "white" }}
-                      >
-                        <Link
-                          to={`/group/${groupId}/add-stakeholder`}
-                          style={{ color: "white", textDecoration: "none" }}
-                        >
-                          Add StakeHolder
-                        </Link>
-                      </Button>
-                      <Button
-                        variant="contained"
-                        color="secondary"
-                        onClick={() => {
-                          setFormType("inviteUser");
-                          setShowForm(true);
-                        }}
-                      >
-                        Invite User
-                      </Button>
-                    </Box>
-                  )}
-                  {showForm && <Box mt={2}>{renderFormContent()}</Box>}
-
                 </CardContent>
               </Card>
             </>
@@ -969,7 +843,7 @@ function descendingComparator(a, b, orderBy) {
 function getComparator(order, orderBy) {
   return order === "desc"
     ? (a, b) => descendingComparator(a, b, orderBy)
-    : (a, b) => -descendingComparator(a, b, orderBy);
+    : (a, b) => -descendingComparator(a[0], b[0]);
 }
 
 function stableSort(array, comparator) {
