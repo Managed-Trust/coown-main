@@ -28,6 +28,7 @@ import {
   Grid,
 } from '@mui/material';
 import { visuallyHidden } from '@mui/utils';
+import CustomFormLabel from '../../../forms/theme-elements/CustomFormLabel';
 import { IconDotsVertical, IconPlus, IconMessageCircle } from '@tabler/icons';
 import { EnhancedTableData } from './tableData';
 import emailjs from '@emailjs/browser';
@@ -190,7 +191,7 @@ const GroupMembers = () => {
     try {
       const emailParams = {
         to_email: formData.email,
-        contactDetails: formData.contactDetails,
+        contactDetails: formData.firstName,
         recordType: formData.recordType,
       };
 
@@ -210,46 +211,82 @@ const GroupMembers = () => {
   };
 
   const renderFormContent = () => (
-    <Box mt={2}>
-      <Grid container spacing={3}>
-        <Grid item xs={12} md={6}>
-          <Typography>Email</Typography>
-          <TextField id="email" fullWidth onChange={handleInputChange} />
+    <>
+      <Box mt={2}>
+
+        <Grid container spacing={2}>
+          <Grid item xs={12} sm={12} md={4}>
+            <Typography variant="h6" gutterBottom>
+              Personal Details
+            </Typography>
+          </Grid>
+          <Grid item xs={12} sm={12} md={8}>
+            <Grid container>
+              <Grid item xs={12}>
+                <CustomFormLabel htmlFor="email">Email</CustomFormLabel>
+                <TextField
+                  id="email"
+                  placeholder='Enter email'
+                  fullWidth
+                  onChange={handleInputChange}
+                />
+              </Grid>
+            </Grid>
+            <Grid container spacing={2}>
+              <Grid item xs={12} md={6}>
+                <CustomFormLabel htmlFor="firstName">First Name</CustomFormLabel>
+                <TextField
+                  id="firstName"
+                  fullWidth
+                  placeholder='First Name'
+                  onChange={handleInputChange}
+                />
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <CustomFormLabel htmlFor="lastName">Last Name</CustomFormLabel>
+                <TextField
+                  id="lastName"
+                  fullWidth
+                  placeholder='Last Name'
+                  onChange={handleInputChange}
+                />
+              </Grid>
+            </Grid>
+            <Grid container>
+              <Grid item xs={12}>
+
+                <CustomFormLabel htmlFor="recordType">Role</CustomFormLabel>
+                <FormControl fullWidth>
+                  <Select
+                    labelId="recordType-label"
+                    id="recordType"
+                    value={formData.recordType}
+                    onChange={handleInputChange}
+                  >
+                    <MenuItem value="">Select Role</MenuItem>
+                    <MenuItem value="EconomicBeneficiary">Economic Beneficiary</MenuItem>
+                    <MenuItem value="ExecutiveMember">Executive Member</MenuItem>
+                    <MenuItem value="InvitedViewer">Invited Viewer</MenuItem>
+                    <MenuItem value="LeadOperator">Lead Operator</MenuItem>
+                    <MenuItem value="StaffMember">Staff Member</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+            </Grid>
+          </Grid>
         </Grid>
-        <Grid item xs={12} md={6}>
-          <Typography>Contact Details</Typography>
-          <TextField id="contactDetails" fullWidth onChange={handleInputChange} />
-        </Grid>
-        <Grid item xs={12} md={6}>
-          <Typography>Record Type</Typography>
-          <FormControl fullWidth>
-            <Select
-              labelId="recordType-label"
-              id="recordType"
-              value={formData.recordType}
-              onChange={handleInputChange}
-            >
-              <MenuItem value="">Select Record Type</MenuItem>
-              <MenuItem value="EconomicBeneficiary">Economic Beneficiary</MenuItem>
-              <MenuItem value="ExecutiveMember">Executive Member</MenuItem>
-              <MenuItem value="InvitedViewer">Invited Viewer</MenuItem>
-              <MenuItem value="LeadOperator">Lead Operator</MenuItem>
-              <MenuItem value="StaffMember">Staff Member</MenuItem>
-            </Select>
-          </FormControl>
-        </Grid>
-        <Grid item xs={12} md={12}>
-          <Stack direction="row" spacing={2} justifyContent="flex-end">
-            <Button variant="contained" color="primary" onClick={handleInviteUser}>
-              Invite User
-            </Button>
-            <Button variant="outlined" color="secondary" onClick={() => setShowForm(false)}>
-              Cancel
-            </Button>
-          </Stack>
-        </Grid>
+      </Box>
+      <Grid item xs={12}>
+        <Box p={3} display="flex" justifyContent="flex-start">
+          <Button type="button" variant="contained" color="primary" style={{ marginRight: '8px' }} onClick={handleInviteUser}>
+            Add group member
+          </Button>
+          <Button variant="outlined" color="secondary" onClick={() => setShowForm(false)}>
+            Cancel
+          </Button>
+        </Box>
       </Grid>
-    </Box>
+    </>
   );
 
   // Avoid a layout jump when reaching the last page with empty rows.
@@ -258,23 +295,25 @@ const GroupMembers = () => {
   return (
     <Paper variant="outlined">
       <Box p={2}>
-        <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
-          <Typography variant="h6" fontWeight="600">
-            {showForm ? 'Invite Member' : 'Group Members'}
-          </Typography>
-          <Button
-            variant="contained"
-            color="primary"
-            startIcon={showForm ? null : <IconPlus />}
-            onClick={() => setShowForm((prev) => !prev)}
-          >
-            {showForm ? 'Cancel' : 'Add Member'}
-          </Button>
-        </Stack>
         {showForm ? (
           renderFormContent()
         ) : (
           <>
+            <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
+              <Typography variant="h6" fontWeight="600">
+                Group Members
+              </Typography>
+              <Button
+                variant="contained"
+                color="primary"
+                startIcon={showForm ? null : <IconPlus />}
+                onClick={() => setShowForm((prev) => !prev)}
+              >
+                Add Member
+              </Button>
+
+            </Stack>
+
             <TableContainer>
               <Table sx={{ minWidth: 750 }} aria-labelledby="tableTitle" size={dense ? 'small' : 'medium'}>
                 <EnhancedTableHead
@@ -324,10 +363,10 @@ const GroupMembers = () => {
                                 row.status === 'Active'
                                   ? 'success'
                                   : row.status === 'Pending'
-                                  ? 'warning'
-                                  : row.status === 'Deactivated'
-                                  ? 'error'
-                                  : 'secondary'
+                                    ? 'warning'
+                                    : row.status === 'Deactivated'
+                                      ? 'error'
+                                      : 'secondary'
                               }
                               variant="dot"
                             ></Badge>

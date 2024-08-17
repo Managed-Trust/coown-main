@@ -31,6 +31,11 @@ const ProfileTab = () => {
       to: '/apps/friends',
     },
     {
+      label: 'Referral',
+      icon: <IconUserCircle size="20" />,
+      to: '/referral',
+    },
+    {
       label: 'Settings',
       icon: <IconSettings size="20" />,
       to: '/user-profile/Settings',

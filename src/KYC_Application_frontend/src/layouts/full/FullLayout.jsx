@@ -23,6 +23,7 @@ import Tickets from '../../views/apps/tickets/Tickets.jsx';
 import AddStakeHolder from '../../views/apps/stakeholder/AddStakeHolder.jsx';
 import Faq from '../../views/pages/faq/Faq.jsx';
 import UserApproval from '../../components/apps/tickets/UserApproval.jsx';
+import Galleryr from '../../views/apps/referrals/ReferralCode.jsx';
 
 import {
   ConnectDialog,
@@ -79,6 +80,7 @@ const FullLayout = () => {
                 <Route path="/apps/friends" element={<Friends />} />
                 <Route path="/apps/gallery" element={<Gallery />} />
                 <Route path="/user-profile" element={<UserProfile />} />
+                <Route path="/referral" element={<Galleryr/>}/>
                 <Route path="/account" element={<Account />} />
                 <Route path="/user-profile/Settings" element={<Settings />} />
                 <Route path="/forms/form-horizontal" element={<FormHorizontal />} />
