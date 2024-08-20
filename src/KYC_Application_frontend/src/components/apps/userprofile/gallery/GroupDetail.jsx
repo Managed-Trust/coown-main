@@ -48,6 +48,7 @@ import DetailComponent from "./DetailComponent";
 import GroupMembers from "./GroupMembers";
 import Overview from "./overviewComponent/overview";
 import ChatComponent from "./chatComponent/ChatComponent";
+import Setting from "./settingComponent/setting";
 const ledger = ic.local("bkyz2-fmaaa-aaaaa-qaaaq-cai");
 
 const secretKey = "your-secret-key"; // Use a strong secret key
@@ -801,7 +802,7 @@ const GroupDetailPage = () => {
                         {tabValue === 6 && (
                           <Box>
                             {/* Setting Component */}
-                            <Typography>Setting Component</Typography>
+                            <Setting/>
                           </Box>
                         )}
                         {tabValue === 7 && (

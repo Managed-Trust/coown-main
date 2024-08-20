@@ -64,9 +64,10 @@ const initialState = {
   birth_date: "",
   birth_country: "",
   phone: "",
+  referralCode:"",
   resident_address: "",
   resident_country: "",
-  addressVerificationDoc: null, // Store address verification file as base64 string
+  addressVerificationDoc: null, 
   document_type: "",
   citizenship: [],
   document_number: "",
@@ -259,9 +260,10 @@ const FormTabs = () => {
     setLoading(true);
 
     try {
+      
+      const referralCode = await ledger.call('redeemReferralCode',formData.referralCode,principal);
+      console.log('referralCode',referralCode);
       const encryptedIdentityDoc6 = formData.identityDoc;
-
-
       const response = await ledger.call(
         "addBasicInfoCustomer",
         principal,
@@ -507,7 +509,7 @@ const FormTabs = () => {
                       ))}
                     </Select>
                   </Grid>
-                  <Grid item xs={12} lg={12}>
+                  <Grid item xs={12} lg={6}>
                     <CustomFormLabel
                       htmlFor="phone"
                       sx={{ mt: 0 }}
@@ -528,6 +530,29 @@ const FormTabs = () => {
                       fullWidth
                       onChange={handleInputChange}
                       value={formData.phone}
+                    />
+                  </Grid>
+                  <Grid item xs={12} lg={6}>
+                    <CustomFormLabel
+                      htmlFor="referralCode"
+                      sx={{ mt: 0 }}
+                      className="center"
+                    >
+                      Referral Code 
+                      <Tooltip
+                        title="Referral Code"
+                        placement="top"
+                        cursor="pointer"
+                      >
+                        <InfoOutlined />
+                      </Tooltip>
+                    </CustomFormLabel>
+                    <TextField
+                      id="referralCode"
+                      placeholder="Enter referral code if any"
+                      fullWidth
+                      onChange={handleInputChange}
+                      value={formData.referralCode}
                     />
                   </Grid>
                 </Grid>
