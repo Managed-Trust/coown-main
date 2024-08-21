@@ -1,6 +1,12 @@
 import React from 'react';
-import { Tabs, Tab, Box } from '@mui/material';
-import { IconHeart, IconPhoto, IconUserCircle,IconLock, IconCash,IconSettings } from '@tabler/icons';
+import { Tabs, Tab, Box,Card } from '@mui/material';
+import { IconHeart, IconUserCircle,IconSettings,
+  IconAperture,
+  IconWallet,
+  IconUsers,
+  IconAddressBook,
+  
+ } from '@tabler/icons';
 import { Link, useLocation } from 'react-router-dom';
 
 const ProfileTab = () => {
@@ -11,40 +17,45 @@ const ProfileTab = () => {
   };
   const ProfileTabs = [
     {
+      label: 'Dashboard',
+      icon: <IconAperture size="20" />,
+      to: '/user-profile',
+    },
+    {
+      label: 'Personal Account',
+      icon: <IconWallet size="20" />,
+      to: '/apps/followers',
+    },
+    {
+      label: 'Groups',
+      icon: <IconUsers size="20" />,
+      to: '/apps/gallery',
+    },
+    {
+      label: 'Contact',
+      icon: <IconAddressBook size="20" />,
+      to: '/apps/friends',
+    },
+    {
       label: 'Profile',
       icon: <IconUserCircle size="20" />,
       to: '/user-profile',
     },
     {
-      label: 'Security',
-      icon: <IconLock size="20" />,
-      to: '/apps/followers',
-    },
-    {
-      label: 'Groups',
-      icon: <IconUserCircle size="20" />,
-      to: '/apps/gallery',
-    },
-    {
-      label: 'Financial',
-      icon: <IconCash size="20" />,
-      to: '/apps/friends',
-    },
-    {
       label: 'Referral',
-      icon: <IconUserCircle size="20" />,
-      to: '/referral',
+      icon: <IconHeart size="20" />,
+      to: '/user-referral',
     },
     {
       label: 'Settings',
       icon: <IconSettings size="20" />,
-      to: '/user-profile/Settings',
+      to: '/apps/settings',
     },
   ];
 
   return (
-    <Box mt={1} sx={{ mt: 1, backgroundColor: (theme) => theme.palette.grey[100] }}>
-      <Box justifyContent={'end'} display="flex" sx={{ overflow: 'auto', width: { xs: '333px', sm: 'auto' } }}>
+    <Box mt={1} sx={{ mt: 1, backgroundColor: 'white' }}>
+      <Card justifyContent={'start'} display="flex" sx={{ overflow: 'auto', width: { xs: '333px', sm: 'auto' } }}>
         <Tabs value={value} onChange={handleChange} aria-label="scrollable prevent tabs example" variant="scrollable"
           scrollButtons="auto">
           {ProfileTabs.map((tab) => {
@@ -62,7 +73,7 @@ const ProfileTab = () => {
             );
           })}
         </Tabs>
-      </Box>
+      </Card>
     </Box>
   );
 };

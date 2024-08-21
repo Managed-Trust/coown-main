@@ -699,126 +699,254 @@ const GroupDetailPage = () => {
                       </Box>
                     </CardContent>
                   </Card>
+                  {group[0] &&
+                    <>
+                      {group[0] && group[0].groupType === "Incorporation" ?
+                        <>
+                          <Card style={{ marginTop: "16px", paddingBottom: "0px" }}>
+                            <Box mt={0}>
 
-                  <Card style={{ marginTop: "16px", paddingBottom: "0px" }}>
-                    <Box mt={0}>
-                      <Tabs
-                        value={tabValue}
-                        onChange={handleTabChange}
-                        aria-label="group detail tabs"
-                      >
-                        <Tab label="Overview" />
-                        <Tab label="Account" />
-                        <Tab label="Assets" />
-                        <Tab label="Members" />
-                        <Tab label="Chats" />
-                        <Tab label="Rewards" />
-                        <Tab label="Settings" />
-                        <Tab label="Details" />
-                        <Tab label="Stakeholders" />
-                      </Tabs>
-                    </Box>
-                  </Card>
-                  <Card style={{ marginTop: "6px" }}>
-                    <Box>
-                      <CardContent>
-                        {tabValue === 0 && (
-                          <Box>
-                            <Overview />
-                          </Box>
-                        )}
-                        {tabValue === 1 && (
-                          <Box>
-                            <Grid container spacing={2} mb={2}>
-                              {groupDetails.balances.map((balance, index) => (
-                                <Grid item xs={12} sm={6} md={3} key={index}>
-                                  <StyledPaper
-                                    style={{
-                                      display: "flex",
-                                      flexDirection: "column",
-                                      gap: "7px",
-                                      justifyContent: "start",
-                                      alignItems: "start",
-                                      maxHeight: "unset",
-                                      width: "100%",
-                                    }}
-                                  >
-                                    <Typography variant="h6" color="text.primary">
-                                      {balance.currency}
-                                    </Typography>
-                                    <Typography variant="h2" color="text.secondary">
-                                      {balance.amount} {balance.symbol}
-                                    </Typography>
-                                    <Typography
-                                      variant="body2"
-                                      color="text.secondary"
-                                      style={{ fontSize: "16px", color: "gray" }}
-                                    >
-                                      {balance.usd} USD
-                                    </Typography>
-                                    <Typography
-                                      variant="body2"
-                                      color={
-                                        balance.change > 0
-                                          ? "success.main"
-                                          : "error.main"
-                                      }
-                                      style={{ fontSize: "12px" }}
-                                    >
-                                      {balance.change > 0 ? "+" : ""}
-                                      {balance.change}%
-                                    </Typography>
-                                  </StyledPaper>
-                                </Grid>
-                              ))}
-                            </Grid>
+                              <Tabs value={tabValue} onChange={handleTabChange} aria-label="group detail tabs" >
+                                <Tab label="Overview" />
+                                <Tab label="Account" />
+                                <Tab label="Assets" />
+                                <Tab label="Members" />
+                                <Tab label="Chats" />
+                                <Tab label="Stakeholders" />
+                                <Tab label="Subgroups" />
+                                <Tab label="Rewards" />
+                                <Tab label="Details" />
+                                <Tab label="Settings" />
+                                <Tab label="Rewards" />
+                                <Tab label="Details" />
+                                <Tab label="Settings" />
 
-                            <PaginationTable rows={rows} />
-                          </Box>
-                        )}
-                        {tabValue === 2 && (
-                          <Box>
-                            {/* Assets Component */}
-                            <Typography>Assets Component</Typography>
-                          </Box>
-                        )}
-                        {tabValue === 3 && (
-                          <Box>
-                            {/* Member Component */}
-                            <GroupMembers />
-                          </Box>
-                        )}
-                        {tabValue === 4 && (
-                          <Box>
-                            <ChatComponent />
-                          </Box>
-                        )}
-                        {tabValue === 5 && (
-                          <Box>
-                            {/* Reward Component */}
-                            <Typography>Reward Component</Typography>
-                          </Box>
-                        )}
-                        {tabValue === 6 && (
-                          <Box>
-                            {/* Setting Component */}
-                            <Setting/>
-                          </Box>
-                        )}
-                        {tabValue === 7 && (
-                          <Box>
-                            {/* Details Component */}
-                            <DetailComponent Group={group} />
-                          </Box>
-                        )}
-                        {tabValue === 8 && (
-                          <>
-                            <Box>Stakeholder</Box>
-                          </>
-                        )}
-                      </CardContent>
-                    </Box>
-                  </Card>
+                              </Tabs>
+                            </Box>
+                          </Card>
+
+                          <Card style={{ marginTop: "6px" }}>
+                            <Box>
+                              <CardContent>
+                                {tabValue === 0 && (
+                                  <Box>
+                                    <Overview />
+                                  </Box>
+                                )}
+                                {tabValue === 1 && (
+                                  <Box>
+                                    <Grid container spacing={2} mb={2}>
+                                      {groupDetails.balances.map((balance, index) => (
+                                        <Grid item xs={12} sm={6} md={3} key={index}>
+                                          <StyledPaper
+                                            style={{
+                                              display: "flex",
+                                              flexDirection: "column",
+                                              gap: "7px",
+                                              justifyContent: "start",
+                                              alignItems: "start",
+                                              maxHeight: "unset",
+                                              width: "100%",
+                                            }}
+                                          >
+                                            <Typography variant="h6" color="text.primary">
+                                              {balance.currency}
+                                            </Typography>
+                                            <Typography variant="h2" color="text.secondary">
+                                              {balance.amount} {balance.symbol}
+                                            </Typography>
+                                            <Typography
+                                              variant="body2"
+                                              color="text.secondary"
+                                              style={{ fontSize: "16px", color: "gray" }}
+                                            >
+                                              {balance.usd} USD
+                                            </Typography>
+                                            <Typography
+                                              variant="body2"
+                                              color={
+                                                balance.change > 0
+                                                  ? "success.main"
+                                                  : "error.main"
+                                              }
+                                              style={{ fontSize: "12px" }}
+                                            >
+                                              {balance.change > 0 ? "+" : ""}
+                                              {balance.change}%
+                                            </Typography>
+                                          </StyledPaper>
+                                        </Grid>
+                                      ))}
+                                    </Grid>
+
+                                    <PaginationTable rows={rows} />
+                                  </Box>
+                                )}
+                                {tabValue === 2 && (
+                                  <Box>
+                                    {/* Assets Component */}
+                                    <Typography>Assets Component</Typography>
+                                  </Box>
+                                )}
+                                {tabValue === 3 && (
+                                  <Box>
+                                    {/* Member Component */}
+                                    <GroupMembers />
+                                  </Box>
+                                )}
+                                {tabValue === 4 && (
+                                  <Box>
+                                    <ChatComponent />
+                                  </Box>
+                                )}
+                                {tabValue === 5 && (
+                                  <>
+                                    <Box>
+                                      <Typography>Stakeholder Component</Typography>
+                                    </Box>
+                                  </>
+                                )}
+                                {tabValue === 6 && (
+                                  <>
+                                    <Box>
+                                      <Typography>Subgroups Component</Typography>
+                                    </Box>
+                                  </>
+                                )}
+                                {tabValue === 7 && (
+                                  <Box>
+                                    {/* Reward Component */}
+                                    <Typography>Reward Component</Typography>
+                                  </Box>
+                                )}
+                                {tabValue === 8 && (
+                                  <Box>
+                                    {/* Details Component */}
+                                    <DetailComponent Group={group} />
+                                  </Box>
+                                )}
+                                {tabValue === 9 && (
+                                  <Box>
+                                    {/* Setting Component */}
+                                    <Setting />
+                                  </Box>
+                                )}
+                              </CardContent>
+                            </Box>
+                          </Card>
+                        </> : <>
+                          <Card style={{ marginTop: "16px", paddingBottom: "0px" }}>
+                            <Box mt={0}>
+
+                              <Tabs value={tabValue} onChange={handleTabChange} aria-label="group detail tabs" >
+                                <Tab label="Overview" />
+                                <Tab label="Account" />
+                                <Tab label="Assets" />
+                                <Tab label="Members" />
+                                <Tab label="Chats" />
+                                <Tab label="Rewards" />
+                                <Tab label="Details" />
+                                <Tab label="Settings" />
+                              </Tabs>
+                            </Box>
+                          </Card>
+                          <Card style={{ marginTop: "6px" }}>
+                            <Box>
+                              <CardContent>
+                                {tabValue === 0 && (
+                                  <Box>
+                                    <Overview />
+                                  </Box>
+                                )}
+                                {tabValue === 1 && (
+                                  <Box>
+                                    <Grid container spacing={2} mb={2}>
+                                      {groupDetails.balances.map((balance, index) => (
+                                        <Grid item xs={12} sm={6} md={3} key={index}>
+                                          <StyledPaper
+                                            style={{
+                                              display: "flex",
+                                              flexDirection: "column",
+                                              gap: "7px",
+                                              justifyContent: "start",
+                                              alignItems: "start",
+                                              maxHeight: "unset",
+                                              width: "100%",
+                                            }}
+                                          >
+                                            <Typography variant="h6" color="text.primary">
+                                              {balance.currency}
+                                            </Typography>
+                                            <Typography variant="h2" color="text.secondary">
+                                              {balance.amount} {balance.symbol}
+                                            </Typography>
+                                            <Typography
+                                              variant="body2"
+                                              color="text.secondary"
+                                              style={{ fontSize: "16px", color: "gray" }}
+                                            >
+                                              {balance.usd} USD
+                                            </Typography>
+                                            <Typography
+                                              variant="body2"
+                                              color={
+                                                balance.change > 0
+                                                  ? "success.main"
+                                                  : "error.main"
+                                              }
+                                              style={{ fontSize: "12px" }}
+                                            >
+                                              {balance.change > 0 ? "+" : ""}
+                                              {balance.change}%
+                                            </Typography>
+                                          </StyledPaper>
+                                        </Grid>
+                                      ))}
+                                    </Grid>
+
+                                    <PaginationTable rows={rows} />
+                                  </Box>
+                                )}
+                                {tabValue === 2 && (
+                                  <Box>
+                                    {/* Assets Component */}
+                                    <Typography>Assets Component</Typography>
+                                  </Box>
+                                )}
+                                {tabValue === 3 && (
+                                  <Box>
+                                    {/* Member Component */}
+                                    <GroupMembers />
+                                  </Box>
+                                )}
+                                {tabValue === 4 && (
+                                  <Box>
+                                    <ChatComponent />
+                                  </Box>
+                                )}
+                                {tabValue === 5 && (
+                                  <Box>
+                                    {/* Reward Component */}
+                                    <Typography>Reward Component</Typography>
+                                  </Box>
+                                )}
+                                {tabValue === 6 && (
+                                  <Box>
+                                    {/* Details Component */}
+                                    <DetailComponent Group={group} />
+                                  </Box>
+                                )}
+                                {tabValue === 7 && (
+                                  <Box>
+                                    {/* Setting Component */}
+                                    <Setting />
+                                  </Box>
+                                )}
+                              </CardContent>
+                            </Box>
+                          </Card>
+                        </>}
+                    </>}
                 </CardContent>
               </Card>
             </>
