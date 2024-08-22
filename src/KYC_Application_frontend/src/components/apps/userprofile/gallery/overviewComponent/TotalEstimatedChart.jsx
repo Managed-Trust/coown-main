@@ -7,9 +7,9 @@ const TotalEstimatedChart = () => {
 
   // chart colors
   const theme = useTheme();
-  const ckBTCColor = '#b388ff';
-  const GLDTColor = '#ffab40';
-  const ckUSDCColor = '#26c6da';
+  const ckBTCColor = '#9C80FF';
+  const GLDTColor = '#FFAA50';
+  const ckUSDCColor = '#1DCD9B';
   const EURColor = '#81d4fa';
   const ICPColor = '#512da8';
   const COOWNColor = '#b39ddb';

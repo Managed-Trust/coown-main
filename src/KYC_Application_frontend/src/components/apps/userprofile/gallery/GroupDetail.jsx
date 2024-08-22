@@ -29,9 +29,22 @@ import {
   Tab,
   TablePagination,
   TableFooter,
+  Input,
   Avatar,
   Chip,
+  InputBase,
 } from "@mui/material";
+// Tabler icons
+import {
+  IconCircle,
+  IconChartLine,
+  IconSend,
+  IconHeart, IconPhone, IconUser
+} from '@tabler/icons';
+import Chart from 'react-apexcharts';
+import { QRCodeCanvas } from 'qrcode.react';
+import BlankCard from '../../../shared/BlankCard';
+import ChildCard from '../../../shared/ChildCard';
 import { alpha, styled, useTheme } from "@mui/material/styles";
 import { visuallyHidden } from "@mui/utils";
 import { IconTrash, IconFilter } from "@tabler/icons";
@@ -480,6 +493,108 @@ const GroupDetailPage = () => {
     onDisconnect: () => { },
   });
 
+
+  const transactionData = [
+    {
+      id: '123456789',
+      account: 'Operations Fund',
+      amount: '0.0156 ckBTC',
+      usd: '1,000 USD',
+      type: 'Received',
+      dateTime: '15.08.2024 17:46',
+      counterparty: '1A1zp1...DivfNa',
+      fees: '10 USD',
+      member: '/path/to/avatar1.png', // Replace with actual avatar path
+    },
+    // ... Repeat for other transactions
+  ];
+
+
+
+
+  const ckBTCColor = '#9C80FF';
+  const USDColor = '#bdbdbd';
+
+  const optionsareachart = {
+    chart: {
+      id: 'area-chart',
+      fontFamily: "'Plus Jakarta Sans', sans-serif",
+      foreColor: '#adb0bb',
+      zoom: {
+        enabled: false,
+      },
+      toolbar: {
+        show: false,
+      },
+    },
+    dataLabels: {
+      enabled: false,
+    },
+    stroke: {
+      width: '2',
+      curve: 'smooth',
+    },
+    colors: [ckBTCColor, USDColor],
+    fill: {
+      type: 'solid',
+      opacity: 0,  // This removes the fill color under the line
+    },
+    xaxis: {
+      type: 'datetime',
+      categories: [
+        '2018-09-19T00:00:00',
+        '2018-09-19T01:30:00',
+        '2018-09-19T02:30:00',
+        '2018-09-19T03:30:00',
+        '2018-09-19T04:30:00',
+        '2018-09-19T05:30:00',
+        '2018-09-19T06:30:00',
+      ],
+      labels: {
+        show: true,
+        format: 'MMM',
+      },
+    },
+    yaxis: {
+      opposite: false,
+      labels: {
+        show: true,
+      },
+      title: {
+        text: 'ICP',
+        style: {
+          color: '#adb0bb',
+          fontWeight: 600,
+        },
+      },
+    },
+    legend: {
+      show: true,
+      position: 'top',
+      horizontalAlign: 'left',
+      offsetX: -10,
+    },
+    grid: {
+      show: true,
+      borderColor: '#e0e0e0',
+      strokeDashArray: 5,
+    },
+    tooltip: {
+      theme: 'dark',
+      fillSeriesColor: false,
+    },
+  };
+  const seriesareachart = [
+    {
+      name: 'ckBTC',
+      data: [31, 40, 28, 51, 42, 109, 100],
+    },
+    {
+      name: 'Value in USD',
+      data: [15, 30, 45, 55, 65, 75, 85],
+    },
+  ];
+
   const formatId = (id) => {
     if (id.length <= 12) return id;
     return `${id.slice(0, 6)}...${id.slice(-6)}`;
@@ -661,25 +776,36 @@ const GroupDetailPage = () => {
                         mb={2}
                         gap={0.5}
                       >
-                        <Typography variant="body2" color="textSecondary">
-                          Groups • {groupDetails.name}
-                        </Typography>
-                        <Typography gutterBottom variant="h2" component="div">
-                          {groupDetails.name}
-                        </Typography>
-                        <Button
-                          variant="contained"
-                          color="primary"
-                          size="small"
-                          style={{
-                            borderRadius: "12px",
-                            textTransform: "none",
-                            backgroundColor: "#E0E7FF",
-                            color: "#3B82F6",
-                          }}
-                        >
-                          Incorporation
-                        </Button>
+                        <Box display="flex" alignItems="center" gap={2}>
+                          <Avatar
+                            alt={groupDetails.name}
+                            src="/images/logos/appleLogo.svg" // Replace with the actual avatar URL or path
+                            style={{ width: 120, height: 120 }}
+                          />
+                          <Box display="flex" alignItems="start" flexDirection="column">
+                            <Typography variant="body2" color="textSecondary">
+                              Groups • {groupDetails.name}
+                            </Typography>
+                            <Typography gutterBottom variant="h2" component="div">
+                              {groupDetails.name}
+                            </Typography>
+                            <Button
+                              variant="contained"
+                              color="primary"
+                              size="small"
+                              style={{
+                                borderRadius: "12px",
+                                textTransform: "none",
+                                backgroundColor: "#E0E7FF",
+                                color: "#3B82F6",
+                              }}
+                            >
+                              Incorporation
+                            </Button>
+                          </Box>
+
+                        </Box>
+
                       </Box>
                       <Box display="flex" justifyContent="flex-end">
                         <Button
@@ -859,7 +985,51 @@ const GroupDetailPage = () => {
                                   </Box>
                                 )}
                                 {tabValue === 1 && (
-                                  <Box>
+                                  <Box display="flex" flexDirection="column" gap="30px">
+                                    <Box>
+                                      <Grid container spacing={2}>
+                                        <Grid item xs={12} md={6}>
+                                          <Card sx={{ background: 'linear-gradient(to right, #2A3547, #2A3547, #2A3547)', color: 'white' }} borderRadius="40px">
+                                            <CardContent>
+                                              <Box display="flex" justifyContent="start" alignItems="center" mb={2}>
+                                                <Box>
+                                                  <Typography variant="h2">1.715156 USD</Typography>
+                                                  <Typography variant="body1" display="flex" alignItems="flex-start" >Estimated Total</Typography>
+                                                </Box>
+                                              </Box>
+                                              <Box display="flex" alignItems="flex-start" mt={10}>
+                                                <Button variant="contained" sx={{ background: '#1A73E8', color: 'white' }} startIcon={<IconSend />}>
+                                                  Send
+                                                </Button>
+                                              </Box>
+                                            </CardContent>
+                                          </Card>
+                                        </Grid>
+                                        <Grid item xs={12} md={6}>
+                                          <Card>
+                                            <Box display="flex" justifyContent="space-between" mb={1}>
+                                              <Box display="flex" flexDirection="column" alignItems="start" mt={1}>
+                                                <Typography variant="h3" display="flex" alignItems="flex-start">Receive funds</Typography>
+                                                <Box display="flex" alignItems="center" justifyContent="center" mt={8} mb={3} position="relative">
+                                                  <Input
+                                                    placeholder="Network"
+                                                    style={{ width: 200, marginRight: 8 }}
+                                                    inputProps={{ 'aria-label': 'network' }}
+                                                  />
+                                                  <Typography variant="body2" style={{ position: 'absolute', right: 10 }}>IPC</Typography>
+                                                </Box>
+                                                <Button variant="contained" color="primary" style={{ marginTop: 10, width: '100%' }}>
+                                                  1A1zp1...DivfNa
+                                                </Button>
+                                              </Box>
+                                              <Box display="flex" alignItems="center" justifyContent="center">
+                                                <QRCodeCanvas value="1A1zp1eP5QGefi2DMPTfTL5SLmv7DivfNa" size={128} />
+                                              </Box>
+                                            </Box>
+                                          </Card>
+                                        </Grid>
+                                      </Grid>
+                                    </Box>
                                     <Grid container spacing={2} mb={2}>
                                       {groupDetails.balances.map((balance, index) => (
                                         <Grid item xs={12} sm={6} md={3} key={index}>
@@ -904,7 +1074,120 @@ const GroupDetailPage = () => {
                                       ))}
                                     </Grid>
 
-                                    <PaginationTable rows={rows} />
+                                    <Card title="Area Chart">
+                                      <Box display="flex" flexDirection="column" alignItems="start" p={2}>
+                                        <Typography variant="h5" color="textSecondary">
+                                          Balance History
+                                        </Typography>
+                                        <Box display="flex" alignItems="center" mt={1}>
+                                          <Typography variant="body1" color="textPrimary" mr={1}>
+                                            Overview of Profit
+                                          </Typography>
+                                        </Box>
+                                      </Box>
+                                      <Chart options={optionsareachart} series={seriesareachart} type="area" height="300px" />
+                                    </Card>
+
+                                    <Box mt={4}>
+                                      <Typography variant="h5" gutterBottom>
+                                        Transaction history
+                                      </Typography>
+                                      <Box display="flex" alignItems="center" mb={2}>
+                                        <InputBase
+                                          placeholder="Search for transaction"
+                                          sx={{
+                                            pl: 2,
+                                            flex: 1,
+                                            border: '1px solid #d0d7de',
+                                            borderRadius: '8px',
+                                            height: '40px',
+                                            backgroundColor: '#f6f8fa',
+                                          }}
+                                        />
+                                        <FormControl sx={{ ml: 2, minWidth: 120 }}>
+                                          <Select
+                                            defaultValue="All"
+                                            displayEmpty
+                                            sx={{
+                                              height: '40px',
+                                              backgroundColor: '#f6f8fa',
+                                              borderRadius: '8px',
+                                            }}
+                                          >
+                                            <MenuItem value="All">All</MenuItem>
+                                            <MenuItem value="Sent">Sent</MenuItem>
+                                            <MenuItem value="Received">Received</MenuItem>
+                                          </Select>
+                                        </FormControl>
+                                        <FormControl sx={{ ml: 2, minWidth: 120 }}>
+                                          <Select
+                                            defaultValue="All time"
+                                            displayEmpty
+                                            sx={{
+                                              height: '40px',
+                                              backgroundColor: '#f6f8fa',
+                                              borderRadius: '8px',
+                                            }}
+                                          >
+                                            <MenuItem value="All time">All time</MenuItem>
+                                            <MenuItem value="Last week">Last week</MenuItem>
+                                            <MenuItem value="Last month">Last month</MenuItem>
+                                          </Select>
+                                        </FormControl>
+                                      </Box>
+                                      <TableContainer component={Paper} sx={{ borderRadius: '12px', boxShadow: '0px 3px 6px rgba(0,0,0,0.1)' }}>
+                                        <Table sx={{ minWidth: 650 }} aria-label="transaction history table">
+                                          <TableHead>
+                                            <TableRow>
+                                              <TableCell sx={{ fontWeight: 'bold', color: '#555', backgroundColor: '#f6f8fa' }}>ID</TableCell>
+                                              <TableCell sx={{ fontWeight: 'bold', color: '#555', backgroundColor: '#f6f8fa' }}>Account</TableCell>
+                                              <TableCell sx={{ fontWeight: 'bold', color: '#555', backgroundColor: '#f6f8fa' }}>Amount</TableCell>
+                                              <TableCell sx={{ fontWeight: 'bold', color: '#555', backgroundColor: '#f6f8fa' }}>Type</TableCell>
+                                              <TableCell sx={{ fontWeight: 'bold', color: '#555', backgroundColor: '#f6f8fa' }}>Date and time</TableCell>
+                                              <TableCell sx={{ fontWeight: 'bold', color: '#555', backgroundColor: '#f6f8fa' }}>Counterparty</TableCell>
+                                              <TableCell sx={{ fontWeight: 'bold', color: '#555', backgroundColor: '#f6f8fa' }}>Fees</TableCell>
+                                              <TableCell sx={{ fontWeight: 'bold', color: '#555', backgroundColor: '#f6f8fa' }}>Member</TableCell>
+                                            </TableRow>
+                                          </TableHead>
+                                          <TableBody>
+                                            {transactionData.map((row) => (
+                                              <TableRow key={row.id} sx={{ '&:nth-of-type(odd)': { backgroundColor: '#f9f9f9' } }}>
+                                                <TableCell>{row.id}</TableCell>
+                                                <TableCell>{row.account}</TableCell>
+                                                <TableCell>
+                                                  {row.amount}
+                                                  <br />
+                                                  {row.usd}
+                                                </TableCell>
+                                                <TableCell>
+                                                  <Button
+                                                    variant="contained"
+                                                    size="small"
+                                                    sx={{
+                                                      borderRadius: '12px',
+                                                      backgroundColor: row.type === 'Received' ? '#E6FFFA' : '#E0E7FF',
+                                                      color: row.type === 'Received' ? '#2B8A3E' : '#1A73E8',
+                                                      textTransform: 'none',
+                                                    }}
+                                                  >
+                                                    {row.type}
+                                                  </Button>
+                                                </TableCell>
+                                                <TableCell>{row.dateTime}</TableCell>
+                                                <TableCell>
+                                                  {row.counterparty} <Button size="small">📋</Button>
+                                                </TableCell>
+                                                <TableCell>{row.fees}</TableCell>
+                                                <TableCell>
+                                                  <Avatar src={row.member} alt="Member Avatar" />
+                                                </TableCell>
+                                              </TableRow>
+                                            ))}
+                                          </TableBody>
+                                        </Table>
+                                      </TableContainer>
+                                    </Box>
+                                    {/* <PaginationTable rows={rows} /> */}
                                   </Box>
                                 )}
                                 {tabValue === 2 && (
