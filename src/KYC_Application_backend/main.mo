@@ -280,6 +280,10 @@ actor KYC_Canister {
           companyDetails = null;
           publicLawEntityDetails = null;
           personalRecords = [];
+          accoundId = "";
+          subGroups = [];
+          logo = "";
+
         };
         groups.put(id, defaultGroup);
 
@@ -330,6 +334,9 @@ actor KYC_Canister {
           companyDetails = null;
           publicLawEntityDetails = null;
           personalRecords = [];
+          subGroups = [];
+          accoundId = "";
+          logo = "";
         };
         groups.put(id, defaultGroup);
 
@@ -766,6 +773,10 @@ actor KYC_Canister {
     companyDetails : ?CompanyDetails; //null
     publicLawEntityDetails : ?PublicLawEntityDetails;
     personalRecords : [PersonalRecord]; //empty
+    accoundId : Text;
+    subGroups : [Text]; // IDs of subgroups for hierarchical structure
+    //============================================
+    logo : Text;
   };
 
   public func createGroup(
@@ -784,6 +795,10 @@ actor KYC_Canister {
           companyDetails = null;
           publicLawEntityDetails = null;
           personalRecords = [];
+          subGroups = [];
+          accoundId = "";
+          logo = "";
+
         };
         groups.put(groupId, newGroup);
 
@@ -1242,6 +1257,369 @@ actor KYC_Canister {
   };
 
   //============================================================
+
+  private stable var roleGroupEntries : [(Text, GroupRole)] = [];
+  var roleGroups = HashMap.HashMap<Text, GroupRole>(0, Text.equal, Text.hash);
+
+  type Role = {
+    #BasicUser;
+    #Admin;
+    #SuperAdmin;
+    #ITSupport;
+    #TechSupport;
+    #CRMOffice;
+    #ExecutiveCommittee;
+    #SteeringCommittee;
+
+  };
+
+  type SubgroupType = {
+    #SimpleGroup;
+    #SteeringCommittee;
+    #ExecutiveCommittee;
+    // You can add more specific subgroups here if needed
+  };
+
+  type FoundationType = {
+    #SimpleGroup;
+    #SteeringCommittee;
+    #ExecutiveCommittee;
+  };
+
+  type GroupTypeRole = {
+    #Foundation;
+    #ITDeveloper;
+    #Treasury;
+    #RegionalOperator;
+    #CertificationBodies;
+    #BankingPartners;
+    #SoftwarePartner;
+    #Advisor;
+    #Ambassador;
+  };
+
+  type GroupRole = {
+    id : Text;
+    name : Text;
+    groupType : GroupTypeRole;
+    roles : [Role];
+    privileges : [Text]; // List of specific privileges or metadata
+  };
+
+  // Define additional structures for specific functionalities
+  type AffiliatePrivileges = {
+    groupType : GroupTypeRole;
+    privileges : [Text];
+  };
+
+  // Function to create a subgroup within a specified parent group
+  // public func createSubGroup(parentGroupId : Text, groupId : Text, name : Text, subgroupType : SubgroupType, roles : [Role]) : async Text {
+  //   switch (roleGroups.get(parentGroupId)) {
+  //     case (null) {
+  //       return "Parent group does not exist";
+  //     };
+  //     // case (?parent) {
+  //     //   // Create the subgroup with specified type
+  //     //   let newGroup = {
+  //     //     id = groupId;
+  //     //     name = name;
+  //     //     groupType = subgroupType;
+  //     //     roles = roles;
+  //     //     privileges = [];
+  //     //     // subGroups = [];
+  //     //   };
+
+  //       // Add the new subgroup to the hashmap
+  //       // roleGroups.put(groupId, newGroup);
+
+  //       // Update the parent group with the new subgroup ID and type
+  //       // let updatedSubGroups = Array.append(parent.subGroups, (groupId, subgroupType));
+  //       // let updatedParent = {
+  //       //   parent with subGroups = updatedSubGroups
+  //       // };
+  //       // roleGroups.put(parentGroupId, updatedParent);
+
+  //       return "Subgroup created successfully under parent group ";
+  //     };
+  //   };
+  // };
+
+  public func createRoleGroup(groupId : Text, name : Text, groupType : GroupTypeRole, roles : [Role]) : async Text {
+    let newGroup = {
+      id = groupId;
+      name = name;
+      groupType = groupType;
+      roles = roles;
+      privileges = [];
+    };
+    roleGroups.put(groupId, newGroup);
+    return "Group created successfully";
+  };
+
+  public func assignRole(groupId : Text, role : Role) : async Bool {
+    switch (roleGroups.get(groupId)) {
+      case (null) { return false };
+      case (?group) {
+        let updatedRoles = Array.append(group.roles, [role]);
+        let updatedGroup = {
+          group with roles = updatedRoles
+        };
+        roleGroups.put(groupId, updatedGroup);
+        return true;
+      };
+    };
+  };
+
+  public func getGroupDetails(groupId : Text) : async ?GroupRole {
+    return roleGroups.get(groupId);
+  };
+
+  // Helper function to add a subgroup to a group
+  public func addSubGroup(parentGroupId : Text, childGroupId : Text) : async Bool {
+    let parentGroup = roleGroups.get(parentGroupId);
+    let childGroup = roleGroups.get(childGroupId);
+    switch (parentGroup, childGroup) {
+      case (null, _) { return false };
+      case (_, null) { return false };
+      case (?parent, ?child) {
+        // Logic to add child to parent's subgroup list
+        // This may require modifying the GroupRole type to include a list of subgroups
+        return true;
+      };
+    };
+  };
+
+  public func createSubGroup(parentGroupId : Text, groupId : Text, name : Text, groupType : GroupTypeRole, roles : [Role]) : async Text {
+    // Check if parent group exists and is of the correct type
+    switch (roleGroups.get(parentGroupId)) {
+      case (null) {
+        return "Parent group does not exist";
+      };
+      case (?parent) {
+        if (parent.groupType != #Foundation) {
+          return "Parent group is not of type Foundation";
+        };
+        // Create the new subgroup
+        let newGroup = {
+          id = groupId;
+          name = name;
+          groupType = groupType;
+          roles = roles;
+          privileges = [];
+          subGroups = [];
+          accoundId = "";
+          logo = "";
+
+        };
+        // Add the new subgroup to the hashmap
+        // roleGroups.put(groupId, newGroup);
+
+        // Update the parent group with the new subgroup ID
+        // let updatedSubGroups = Array.append(parent.subGroups, [groupId]);
+        // let updatedParent = {
+        //   parent with subGroups = updatedSubGroups
+        // };
+        // roleGroups.put(parentGroupId, updatedParent);
+
+        return "Subgroup created successfully and added to parent group";
+      };
+    };
+  };
+
+  // Helper function to remove a role or subgroup
+  // public func removeRole(groupId : Text, role : Role) : async Bool {
+  //   switch (roleGroups.get(groupId)) {
+  //     case (null) { return false };
+  //     case (?group) {
+  //       let remainingRoles = Array.filter(group.roles, func(r) { r != role });
+  //       let updatedGroup = {
+  //         group with roles = remainingRoles
+  //       };
+  //       roleGroups.put(groupId, updatedGroup);
+  //       return true;
+  //     };
+  //   };
+  // };
+
+  private stable var subGroupEntries : [(Text, SubGroup)] = [];
+  var subGroups = HashMap.HashMap<Text, SubGroup>(0, Text.equal, Text.hash);
+
+  type SubGroup = {
+    adminId : Text;
+    groupName : Text;
+    groupType : Text;
+    personalRecords : [PersonalRecord]; //empty
+    accoundId : Text;
+  };
+
+  public func createNewSubGroup(
+    parentGroupId : Text,
+    adminId : Text,
+    subGroupName : Text,
+    subGroupType : Text,
+  ) : async Text {
+    switch (groups.get(parentGroupId)) {
+      case (null) {
+        return "Parent group does not exist.";
+      };
+      case (?parentGroup) {
+        // Generate a unique ID for the subgroup
+        let subGroupId = Text.concat(parentGroupId, subGroupName);
+
+        switch (subGroups.get(subGroupId)) {
+          case (null) {
+            // Create a new SubGroup
+            let newSubGroup : SubGroup = {
+              adminId = adminId;
+              groupName = subGroupName;
+              groupType = subGroupType;
+              personalRecords = [];
+              accoundId = "";
+            };
+
+            // Add the new SubGroup to the subGroups HashMap
+            subGroups.put(subGroupId, newSubGroup);
+
+            // Optionally, add the SubGroup ID to the parent group's list of subGroups
+            let updatedSubGroups = Array.append(parentGroup.subGroups, [subGroupId]);
+            let updatedParentGroup = {
+              parentGroup with subGroups = updatedSubGroups
+            };
+            groups.put(parentGroupId, updatedParentGroup);
+
+            return "SubGroup created successfully.";
+          };
+          case (?existingSubGroup) {
+            return "SubGroup with this name already exists within the parent group.";
+          };
+        };
+      };
+    };
+  };
+
+  //=================================================================================//
+
+  var treasury : ?Treasury = null;
+  var foundation : ?Foundation = null;
+  var regionalOperators : ?RegionalOperators = null;
+  var itDevelopers : ?ITDevelopers = null;
+
+  type Treasury = {
+    owner : Principal;
+    admin : Principal;
+    basicUserGroup : [Principal];
+    initialTokenSupply : Nat;
+  };
+
+  type Foundation = {
+    superAdmin : Principal;
+    superAdminNo2 : Principal;
+    streamingCommittee : [Principal];
+    executiveCommittee : [Principal];
+    basicUserGroup : [Principal];
+    groupOwner : Principal;
+    groupAdmin : Principal;
+  };
+
+  type RegionalOperators = {
+    owner : Principal;
+    admin : Principal;
+    basicUserGroup : [Principal];
+    amlOffice : [Principal];
+    crmOffice : [Principal];
+    firstLevelSupportTickets : [Principal];
+  };
+
+  type ITDevelopers = {
+    owner : Principal;
+    admin : Principal;
+    basicUserGroup : [Principal];
+    nftMintingCustomSeries : Text; // or another appropriate type
+    secondLevelSupportTickets : [Principal];
+  };
+
+  // Treasury Functions
+  public func createTreasury(owner : Principal, admin : Principal, initialTokenSupply : Nat) : async Text {
+    if (treasury != null) {
+      return "Treasury already exists.";
+    };
+    treasury := ?{
+      owner = owner;
+      admin = admin;
+      basicUserGroup = [];
+      initialTokenSupply = initialTokenSupply;
+    };
+    return "Treasury created successfully.";
+  };
+
+  // Foundation Functions
+  public func createFoundation(superAdmin : Principal, superAdminNo2 : Principal, groupOwner : Principal, groupAdmin : Principal) : async Text {
+    if (foundation != null) {
+      return "Foundation already exists.";
+    };
+    foundation := ?{
+      superAdmin = superAdmin;
+      superAdminNo2 = superAdminNo2;
+      streamingCommittee = [];
+      executiveCommittee = [];
+      basicUserGroup = [];
+      groupOwner = groupOwner;
+      groupAdmin = groupAdmin;
+    };
+    return "Foundation created successfully.";
+  };
+
+  // Regional Operators Functions
+  public func createRegionalOperators(owner : Principal, admin : Principal) : async Text {
+    if (regionalOperators != null) {
+      return "Regional Operators already exist.";
+    };
+    regionalOperators := ?{
+      owner = owner;
+      admin = admin;
+      basicUserGroup = [];
+      amlOffice = [];
+      crmOffice = [];
+      firstLevelSupportTickets = [];
+    };
+    return "Regional Operators created successfully.";
+  };
+
+  // IT Developers Functions
+  public func createITDevelopers(owner : Principal, admin : Principal, nftMintingCustomSeries : Text) : async Text {
+    if (itDevelopers != null) {
+      return "IT Developers already exist.";
+    };
+    itDevelopers := ?{
+      owner = owner;
+      admin = admin;
+      basicUserGroup = [];
+      nftMintingCustomSeries = nftMintingCustomSeries;
+      secondLevelSupportTickets = [];
+    };
+    return "IT Developers created successfully.";
+  };
+
+  // Additional functions for managing groups, adding users, and handling specific group operations
+  public func addUserToTreasury(userId : Principal) : async Text {
+    switch (treasury) {
+      case (null) { return "Treasury not found." };
+      case (?t) {
+        treasury := ?{
+          t with basicUserGroup = Array.append(t.basicUserGroup, [userId])
+        };
+        return "User added to Treasury.";
+      };
+    };
+  };
+
+  // Similarly, implement addUser, manage operations for Foundation, Regional Operators, and IT Developers
+
+  public query func getOrganizationDetails() : async (?Treasury, ?Foundation, ?RegionalOperators, ?ITDevelopers) {
+    return (treasury, foundation, regionalOperators, itDevelopers);
+  };
+
+  //=================================================================================//
 
   system func preupgrade() {
     mapEntries := Iter.toArray(map.entries());
