@@ -41,6 +41,7 @@ import {
   IconSend,
   IconHeart, IconPhone, IconUser
 } from '@tabler/icons';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import Chart from 'react-apexcharts';
 import { QRCodeCanvas } from 'qrcode.react';
 import BlankCard from '../../../shared/BlankCard';
@@ -1147,7 +1148,7 @@ const GroupDetailPage = () => {
                                                   >
                                                     {row.counterparty}
                                                   </Typography>
-                                                  <Button size="small">📋</Button>
+                                                  <ContentCopyIcon fontSize="small" />
                                                 </TableCell>
                                                 <TableCell sx={{ color: 'gray', fontSize: '12px' }}>{row.fees}</TableCell>
                                                 <TableCell>
@@ -1496,7 +1497,7 @@ const GroupDetailPage = () => {
                                                   >
                                                     {row.counterparty}
                                                   </Typography>
-                                                  <Button size="small">📋</Button>
+                                                  <ContentCopyIcon fontSize="small" />
                                                 </TableCell>
                                                 <TableCell sx={{ color: 'gray', fontSize: '12px' }}>{row.fees}</TableCell>
                                                 <TableCell>
