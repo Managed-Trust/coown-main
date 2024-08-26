@@ -13,6 +13,7 @@ import {
   Select,
   Paper,
   CircularProgress,
+  Skeleton,
 } from "@mui/material";
 import { Link } from "react-router-dom";
 import BlankCard from "../../../../components/shared/BlankCard";
@@ -26,7 +27,10 @@ import PageContainer from '../../../../components/container/PageContainer';
 import ChildCard from '../../../../components/shared/ChildCard';
 import ic from "ic0";
 import swal from 'sweetalert';
-
+import mygroup1 from '../../../../assets/images/group/mygroup1.svg';
+import mygroup2 from '../../../../assets/images/group/mygroup2.svg';
+import mygroup3 from '../../../../assets/images/group/mygroup3.svg';
+import GroupTable from './GroupTable';
 const ledger = ic.local("bkyz2-fmaaa-aaaaa-qaaaq-cai"); // Ledger canister
 
 const secretKey = "your-secret-key"; // Use a strong secret key
@@ -93,9 +97,16 @@ const initialState = {
 const GalleryCard = () => {
   const dispatch = useDispatch();
 
+  const cardData = [
+    { title: "Set-up a private association", desc: "Add  here more user groups as informal private associations, where you are the sole economic beneficiary.", Icon: mygroup1, value: '19 USD', per: 'per group' },
+    { title: "Set-up a registered company", desc: "Setting up a registered company includes a KYC review of key stakeholder data by an AML Officer to ensure data quality and compliance.", Icon: mygroup2, value: '168 USD', per: 'per entity' },
+    { title: "Set-up a public law entitiy", desc: "The setup of a public law entity includes a review of the Know Your Customer (KYC) data by a legal expert to ensure legitimacy and data quality.", Icon: mygroup3, value: '680 USD', per: 'per entity' }
+  ];
+
   useEffect(() => {
     dispatch(fetchPhotos());
   }, [dispatch]);
+
 
   const [search, setSearch] = useState("");
   const [isLoading, setLoading] = useState(true);
@@ -221,6 +232,12 @@ const GalleryCard = () => {
     } finally {
       setIsSubmitted(true);
       setIsCreateGroupLoading(false);
+      if (formData.entityType == "Private Group") {
+        setIsSubmitted(false);
+        setShowCreateGroupForm(false);
+        setFormData(initialState);
+        fetchGroup(); // Fetch updated groups
+      }
     }
   };
 
@@ -358,7 +375,8 @@ const GalleryCard = () => {
                                     disabled={isSubmitted}
                                   >
                                     <MenuItem value="">Select Group Type</MenuItem>
-                                    <MenuItem value="Incorporation">Register Company</MenuItem>
+                                    <MenuItem value="Private Group">Private Group</MenuItem>
+                                    <MenuItem value="Registered Company">Register Company</MenuItem>
                                     <MenuItem value="Public Law Entity">Public Law Entity</MenuItem>
                                   </Select>
                                 </FormControl>
@@ -382,7 +400,7 @@ const GalleryCard = () => {
                     </Box>
                   </form>
                 </Grid>
-                {isSubmitted && formData.entityType === "Incorporation" && (
+                {isSubmitted && formData.entityType === "Registered Company" && (
                   <>
                     <Grid item xs={12}>
                       <ChildCard>
@@ -712,70 +730,42 @@ const GalleryCard = () => {
                 <CircularProgress />
               </Grid>
             ) : (
-              groups.map((group, index) => (
-                group[0].groupName === "defaultGroup" ?
-                  (
-                    <Grid item xs={12} lg={4} key={group[0].adminId}>
-                      <Link
-                        to={`/group/${group[0].adminId}`}
-                        style={{ textDecoration: "none" }}
-                      >
-                        <BlankCard className="hoverCard cursor-pointer">
-                          <CardMedia
-                            component={"img"}
-                            height="220"
-                            alt="Group Image"
-                            src={
-                              "https://via.placeholder.com/150"
-                            }
-                          />
-                          <Box p={3}>
+
+              <>
+                <Box p={3}>
+                  <Grid container spacing={3} sx={{ marginTop: '10px', marginBottom: '20px' }}>
+                    {cardData.map((card) => (
+                      <Grid item xs={12} lg={4} key={card.title}>
+                        <BlankCard className="hoverCard" sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+                          <CardMedia component={'img'} height="220" alt={card.title} src={card.Icon} />
+                          <Box p={3} sx={{ minHeight: '200px', flexGrow: 1 }}>
                             <Stack direction="row" gap={1}>
                               <Box>
-                                <Typography variant="h6" color="textPrimary">
-                                  {group[0].groupName}
+                                <Typography variant="h6">{card.title}</Typography>
+                                <Typography variant="caption" sx={{ minHeight: '60px', display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'normal', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical' }}>
+                                  {card.desc}
                                 </Typography>
-                                <Typography variant="caption" color="textSecondary">
-                                  {group[0].groupType}
-                                </Typography>
+                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 3 }}>
+                                  <Box>
+                                    <Typography variant="h5" sx={{ fontWeight: 'bold' }}>{card.value}</Typography>
+                                    <Typography variant="body1" sx={{ color: 'gray' }}>{card.per}</Typography>
+                                  </Box>
+                                  <Button variant="contained" sx={{ textTransform: 'none' }}>
+                                    Select
+                                  </Button>
+                                </Box>
                               </Box>
                             </Stack>
                           </Box>
                         </BlankCard>
-                      </Link>
-                    </Grid>
-                  ) : (
-                    <Grid item xs={12} lg={4} key={group[0].adminId}>
-                      <Link
-                        to={`/group/${groupId[index]}`}
-                        style={{ textDecoration: "none" }}
-                      >
-                        <BlankCard className="hoverCard cursor-pointer">
-                          <CardMedia
-                            component={"img"}
-                            height="220"
-                            alt="Group Image"
-                            src={
-                              "https://via.placeholder.com/150"
-                            }
-                          />
-                          <Box p={3}>
-                            <Stack direction="row" gap={1}>
-                              <Box>
-                                <Typography variant="h6" color="textPrimary">
-                                  {group[0].groupName}
-                                </Typography>
-                                <Typography variant="h6" color="textPrimary">
-                                  {group[0].groupType}
-                                </Typography>
-                              </Box>
-                            </Stack>
-                          </Box>
-                        </BlankCard>
-                      </Link>
-                    </Grid>
-                  )
-              ))
+                      </Grid>
+                    ))}
+                  </Grid>
+                </Box>
+
+
+                <GroupTable groups={groups} />
+              </>
             )}
           </Grid>
         )}

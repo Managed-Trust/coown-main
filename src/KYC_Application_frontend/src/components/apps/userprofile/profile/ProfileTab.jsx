@@ -55,7 +55,7 @@ const ProfileTab = () => {
 
   return (
     <Box mt={1} sx={{ mt: 1, backgroundColor: 'white' }}>
-      <Card justifyContent={'start'} display="flex" sx={{ overflow: 'auto', width: { xs: '333px', sm: 'auto' } }}>
+      <Card justifyContent={'start'} display="flex" style={{paddingBottom:"0px"}} sx={{ overflow: 'auto', width: { xs: '333px', sm: 'auto' } }}>
         <Tabs value={value} onChange={handleChange} aria-label="scrollable prevent tabs example" variant="scrollable"
           scrollButtons="auto">
           {ProfileTabs.map((tab) => {

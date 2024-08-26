@@ -62,6 +62,8 @@ import GroupMembers from "./GroupMembers";
 import Overview from "./overviewComponent/overview";
 import ChatComponent from "./chatComponent/ChatComponent";
 import Setting from "./settingComponent/setting";
+import Stakeholder from "./StakeHolder";
+
 const ledger = ic.local("bkyz2-fmaaa-aaaaa-qaaaq-cai");
 
 const secretKey = "your-secret-key"; // Use a strong secret key
@@ -107,12 +109,6 @@ const groupDetails = {
       amount: 25458,
       usd: 25458,
       change: -3.64,
-    },
-    {
-      currency: "GLDT",
-      amount: 120,
-      usd: 9512.4,
-      change: 7.11,
     },
     {
       currency: "ICP",
@@ -362,6 +358,14 @@ const PaginationTable = ({ rows }) => {
     setPage(0);
   };
 
+
+  const [tabValue, setTabValue] = React.useState(0);
+
+  const handleTabChange = (event, newValue) => {
+    setTabValue(newValue);
+  };
+
+
   return (
     <Paper variant="outlined" sx={{ p: 2, borderRadius: 3 }}>
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
@@ -497,16 +501,74 @@ const GroupDetailPage = () => {
   const transactionData = [
     {
       id: '123456789',
-      account: 'Operations Fund',
       amount: '0.0156 ckBTC',
-      usd: '1,000 USD',
+      usd: '1,000',
       type: 'Received',
       dateTime: '15.08.2024 17:46',
-      counterparty: '1A1zp1...DivfNa',
+      counterparty: '1A1zP1...DivFNa',
       fees: '10 USD',
-      member: '/path/to/avatar1.png', // Replace with actual avatar path
+      status: 'Complete',
+      member: {
+        avatar: 'https://via.placeholder.com/32',
+        name: 'Alice Johnson'
+      }
     },
-    // ... Repeat for other transactions
+    {
+      id: '987654321',
+      amount: '0.0050 ckBTC',
+      usd: '500',
+      type: 'Sent',
+      dateTime: '15.08.2024 15:30',
+      counterparty: '1Q2w3E...L4k5Mn',
+      fees: '5 USD',
+      status: 'Pending',
+      member: {
+        avatar: 'https://via.placeholder.com/32',
+        name: 'John Doe'
+      }
+    },
+    {
+      id: '112233445',
+      amount: '0.0200 ckBTC',
+      usd: '1,250',
+      type: 'Received',
+      dateTime: '14.08.2024 12:15',
+      counterparty: '1BvBMZ...7ZzXN',
+      fees: '8 USD',
+      status: 'Declined',
+      member: {
+        avatar: 'https://via.placeholder.com/32',
+        name: 'Emma Watson'
+      }
+    },
+    {
+      id: '998877665',
+      amount: '0.0300 ckBTC',
+      usd: '2,000',
+      type: 'Sent',
+      dateTime: '13.08.2024 08:22',
+      counterparty: '1P3RoW...Y4vGT',
+      fees: '12 USD',
+      status: 'Complete',
+      member: {
+        avatar: 'https://via.placeholder.com/32',
+        name: 'Michael Brown'
+      }
+    },
+    {
+      id: '445566778',
+      amount: '0.0100 ckBTC',
+      usd: '700',
+      type: 'Received',
+      dateTime: '12.08.2024 09:50',
+      counterparty: '1DnEpZ...L5kJ3',
+      fees: '6 USD',
+      status: 'Complete',
+      member: {
+        avatar: 'https://via.placeholder.com/32',
+        name: 'Sophia Davis'
+      }
+    }
   ];
 
 
@@ -800,7 +862,7 @@ const GroupDetailPage = () => {
                                 color: "#3B82F6",
                               }}
                             >
-                              Incorporation
+                              Registered Company
                             </Button>
                           </Box>
 
@@ -827,7 +889,7 @@ const GroupDetailPage = () => {
                   </Card>
                   {group[0] &&
                     <>
-                      {group[0] && group[0].groupType === "Incorporation" ?
+                      {group[0] && group[0].groupType === "Registered Company" ?
                         <>
                           <Card style={{ marginTop: "16px", paddingBottom: "0px" }}>
                             <Box mt={0}>
@@ -860,7 +922,51 @@ const GroupDetailPage = () => {
                                   </Box>
                                 )}
                                 {tabValue === 1 && (
-                                  <Box>
+                                  <Box display="flex" flexDirection="column" gap="30px">
+                                    <Box>
+                                      <Grid container spacing={2}>
+                                        <Grid item xs={12} md={6}>
+                                          <Card sx={{ background: 'linear-gradient(to right, #2A3547, #2A3547, #2A3547)', color: 'white' }} borderRadius="40px">
+                                            <CardContent>
+                                              <Box display="flex" justifyContent="start" alignItems="center" mb={2}>
+                                                <Box>
+                                                  <Typography variant="h2">1.715156 USD</Typography>
+                                                  <Typography variant="body1" display="flex" alignItems="flex-start" >Estimated Total</Typography>
+                                                </Box>
+                                              </Box>
+                                              <Box display="flex" alignItems="flex-start" mt={10}>
+                                                <Button variant="contained" sx={{ background: '#1A73E8', color: 'white' }} startIcon={<IconSend />}>
+                                                  Send
+                                                </Button>
+                                              </Box>
+                                            </CardContent>
+                                          </Card>
+                                        </Grid>
+                                        <Grid item xs={12} md={6}>
+                                          <Card>
+                                            <Box display="flex" justifyContent="space-between" mb={1}>
+                                              <Box display="flex" flexDirection="column" alignItems="start" mt={1}>
+                                                <Typography variant="h3" display="flex" alignItems="flex-start">Receive funds</Typography>
+                                                <Box display="flex" alignItems="center" justifyContent="center" mt={8} mb={3} position="relative">
+                                                  <Input
+                                                    placeholder="Network"
+                                                    style={{ width: 200, marginRight: 8 }}
+                                                    inputProps={{ 'aria-label': 'network' }}
+                                                  />
+                                                  <Typography variant="body2" style={{ position: 'absolute', right: 10 }}>IPC</Typography>
+                                                </Box>
+                                                <Button variant="contained" color="primary" style={{ marginTop: 10, width: '100%' }}>
+                                                  1A1zp1...DivfNa
+                                                </Button>
+                                              </Box>
+                                              <Box display="flex" alignItems="center" justifyContent="center">
+                                                <QRCodeCanvas value="1A1zp1eP5QGefi2DMPTfTL5SLmv7DivfNa" size={128} />
+                                              </Box>
+                                            </Box>
+                                          </Card>
+                                        </Grid>
+                                      </Grid>
+                                    </Box>
                                     <Grid container spacing={2} mb={2}>
                                       {groupDetails.balances.map((balance, index) => (
                                         <Grid item xs={12} sm={6} md={3} key={index}>
@@ -888,24 +994,203 @@ const GroupDetailPage = () => {
                                             >
                                               {balance.usd} USD
                                             </Typography>
-                                            <Typography
-                                              variant="body2"
-                                              color={
-                                                balance.change > 0
-                                                  ? "success.main"
-                                                  : "error.main"
-                                              }
-                                              style={{ fontSize: "12px" }}
-                                            >
-                                              {balance.change > 0 ? "+" : ""}
-                                              {balance.change}%
-                                            </Typography>
+                                            <Chip
+                                              label={`${balance.change > 0 ? '+' : ''}${balance.change}%`}
+                                              color={balance.change > 0 ? 'success' : 'error'}
+                                              size="small" // Makes the chip smaller
+                                              sx={{
+                                                fontSize: '12px',
+                                                fontWeight: 'bold',
+                                                margin: '2px', // Adjust margin around the chip
+                                              }}
+                                            />
                                           </StyledPaper>
                                         </Grid>
                                       ))}
                                     </Grid>
 
-                                    <PaginationTable rows={rows} />
+                                    <Card title="Area Chart">
+                                      <Box display="flex" flexDirection="column" alignItems="start" p={2}>
+                                        <Typography variant="h5" color="textSecondary">
+                                          Balance History
+                                        </Typography>
+                                        <Box display="flex" alignItems="center" mt={1}>
+                                          <Typography variant="body1" color="textPrimary" mr={1}>
+                                            Overview of Profit
+                                          </Typography>
+                                        </Box>
+                                      </Box>
+                                      <Chart options={optionsareachart} series={seriesareachart} type="area" height="300px" />
+                                    </Card>
+
+                                    <Box mt={2}>
+                                      <Typography variant="h5" gutterBottom>
+                                        Transaction history
+                                      </Typography>
+                                      <Box sx={{ backgroundColor: '#DFE5EF', p: 1, borderRadius: '8px', mb: 3 }}>
+                                        <Box display="flex" alignItems="center" gap={2}>
+                                          <InputBase
+                                            placeholder="Search for transaction"
+                                            sx={{
+                                              pl: 2,
+                                              flex: 1,
+                                              border: '1px solid #d0d7de',
+                                              borderRadius: '8px',
+                                              height: '48px',
+                                              fontSize: '16px',
+                                              backgroundColor: 'white',
+                                            }}
+                                          />
+                                          <FormControl sx={{ minWidth: 120 }}>
+                                            <Select
+                                              defaultValue="Status"
+                                              displayEmpty
+                                              sx={{
+                                                height: '48px',
+                                                fontSize: '16px',
+                                                backgroundColor: 'white',
+                                                borderRadius: '8px',
+                                              }}
+                                            >
+                                              <MenuItem value="Status">Status</MenuItem>
+                                              <MenuItem value="Complete">Complete</MenuItem>
+                                              <MenuItem value="Pending">Pending</MenuItem>
+                                              <MenuItem value="Declined">Declined</MenuItem>
+                                            </Select>
+                                          </FormControl>
+                                          <FormControl sx={{ minWidth: 120 }}>
+                                            <Select
+                                              defaultValue="Filter"
+                                              displayEmpty
+                                              sx={{
+                                                height: '48px',
+                                                fontSize: '16px',
+                                                backgroundColor: 'white',
+                                                borderRadius: '8px',
+                                              }}
+                                            >
+                                              <MenuItem value="Filter">Filter</MenuItem>
+                                              <MenuItem value="Sent">Sent</MenuItem>
+                                              <MenuItem value="Received">Received</MenuItem>
+                                            </Select>
+                                          </FormControl>
+                                          <FormControl sx={{ minWidth: 140 }}>
+                                            <Select
+                                              defaultValue="All time"
+                                              displayEmpty
+                                              sx={{
+                                                height: '48px',
+                                                fontSize: '16px',
+                                                backgroundColor: 'white',
+                                                borderRadius: '8px',
+                                              }}
+                                            >
+                                              <MenuItem value="All time">All time</MenuItem>
+                                              <MenuItem value="Last week">Last week</MenuItem>
+                                              <MenuItem value="Last month">Last month</MenuItem>
+                                            </Select>
+                                          </FormControl>
+                                        </Box>
+                                      </Box>
+                                      <TableContainer component={Paper} sx={{ borderRadius: '12px' }}>
+                                        <Table sx={{ minWidth: 650 }} aria-label="transaction history table">
+                                          <TableHead>
+                                            <TableRow>
+                                              <TableCell sx={{ fontWeight: 'bold', fontSize: '16px', color: 'gray' }}>ID</TableCell>
+                                              <TableCell sx={{ fontWeight: 'bold', fontSize: '16px', color: 'gray' }}>Amount</TableCell>
+                                              <TableCell sx={{ fontWeight: 'bold', fontSize: '16px', color: 'gray' }}>Type</TableCell>
+                                              <TableCell sx={{ fontWeight: 'bold', fontSize: '16px', color: 'gray' }}>Date and time</TableCell>
+                                              <TableCell sx={{ fontWeight: 'bold', fontSize: '16px', color: 'gray' }}>Counterparty</TableCell>
+                                              <TableCell sx={{ fontWeight: 'bold', fontSize: '16px', color: 'gray' }}>Fees</TableCell>
+                                              <TableCell sx={{ fontWeight: 'bold', fontSize: '16px', color: 'gray' }}>Status</TableCell>
+                                              <TableCell sx={{ fontWeight: 'bold', fontSize: '16px', color: 'gray' }}>Member</TableCell>
+                                            </TableRow>
+                                          </TableHead>
+                                          <TableBody>
+                                            {transactionData.map((row) => (
+                                              <TableRow key={row.id}>
+                                                <TableCell sx={{ color: 'gray', fontSize: '16px' }}>{row.id}</TableCell>
+                                                <TableCell>
+                                                  <Typography variant="body1" sx={{ fontWeight: 'bold', fontSize: '16px' }}>{row.amount}</Typography>
+                                                  <Typography variant="body2" sx={{ color: 'gray', fontSize: '12px' }}>{row.usd} USD</Typography>
+                                                </TableCell>
+                                                <TableCell>
+                                                  <Button
+                                                    variant="contained"
+                                                    size="small"
+                                                    sx={{
+                                                      borderRadius: '12px',
+                                                      backgroundColor: row.type === 'Received' ? '#E6FFFA' : '#E0E7FF',
+                                                      color: row.type === 'Received' ? '#2B8A3E' : '#1A73E8',
+                                                      textTransform: 'none',
+                                                      fontSize: '14px',
+                                                      '&:hover': {
+                                                        backgroundColor: row.type === 'Received' ? '#E6FFFA' : '#E0E7FF',
+                                                      },
+                                                    }}
+                                                  >
+                                                    {row.type}
+                                                  </Button>
+                                                </TableCell>
+                                                <TableCell sx={{ color: 'gray', fontSize: '16px' }}>{row.dateTime}</TableCell>
+                                                <TableCell>
+                                                  <Typography
+                                                    variant="body2"
+                                                    sx={{
+                                                      whiteSpace: 'nowrap',
+                                                      overflow: 'hidden',
+                                                      textOverflow: 'ellipsis',
+                                                      maxWidth: '160px',
+                                                      color: 'gray',
+                                                      fontSize: '12px',
+                                                    }}
+                                                  >
+                                                    {row.counterparty}
+                                                  </Typography>
+                                                  <Button size="small">📋</Button>
+                                                </TableCell>
+                                                <TableCell sx={{ color: 'gray', fontSize: '12px' }}>{row.fees}</TableCell>
+                                                <TableCell>
+                                                  <Button
+                                                    variant="contained"
+                                                    size="small"
+                                                    sx={{
+                                                      borderRadius: '12px',
+                                                      backgroundColor:
+                                                        row.status === 'Complete' ? '#E6FFFA' :
+                                                          row.status === 'Pending' ? '#FFF7E0' :
+                                                            '#FFE0E0',
+                                                      color:
+                                                        row.status === 'Complete' ? '#2B8A3E' :
+                                                          row.status === 'Pending' ? '#E6A800' :
+                                                            '#E60000',
+                                                      textTransform: 'none',
+                                                      fontSize: '14px',
+                                                      '&:hover': {
+                                                        backgroundColor:
+                                                          row.status === 'Complete' ? '#E6FFFA' :
+                                                            row.status === 'Pending' ? '#FFF7E0' :
+                                                              '#FFE0E0',
+                                                      }
+                                                    }}
+                                                  >
+                                                    {row.status}
+                                                  </Button>
+                                                </TableCell>
+                                                <TableCell>
+                                                  <Box display="flex" alignItems="center">
+                                                    <Avatar src={row.member.avatar} alt={row.member.name} sx={{ width: 36, height: 36 }} />
+                                                    <Typography sx={{ marginLeft: '8px', fontSize: '16px' }}>{row.member.name}</Typography>
+                                                  </Box>
+                                                </TableCell>
+                                              </TableRow>
+                                            ))}
+                                          </TableBody>
+                                        </Table>
+                                      </TableContainer>
+                                    </Box>
+
+                                    {/* <PaginationTable rows={rows} /> */}
                                   </Box>
                                 )}
                                 {tabValue === 2 && (
@@ -928,7 +1213,7 @@ const GroupDetailPage = () => {
                                 {tabValue === 5 && (
                                   <>
                                     <Box>
-                                      <Typography>Stakeholder Component</Typography>
+                                      <Stakeholder groupId={groupId} />
                                     </Box>
                                   </>
                                 )}
@@ -1053,22 +1338,20 @@ const GroupDetailPage = () => {
                                             <Typography
                                               variant="body2"
                                               color="text.secondary"
-                                              style={{ fontSize: "16px", color: "gray" }}
+                                              style={{ fontSize: "14px", color: "gray" }}
                                             >
                                               {balance.usd} USD
                                             </Typography>
-                                            <Typography
-                                              variant="body2"
-                                              color={
-                                                balance.change > 0
-                                                  ? "success.main"
-                                                  : "error.main"
-                                              }
-                                              style={{ fontSize: "12px" }}
-                                            >
-                                              {balance.change > 0 ? "+" : ""}
-                                              {balance.change}%
-                                            </Typography>
+                                            <Chip
+                                              label={`${balance.change > 0 ? '+' : ''}${balance.change}%`}
+                                              color={balance.change > 0 ? 'success' : 'error'}
+                                              size="small" // Makes the chip smaller
+                                              sx={{
+                                                fontSize: '12px',
+                                                fontWeight: 'bold',
+                                                margin: '2px', // Adjust margin around the chip
+                                              }}
+                                            />
                                           </StyledPaper>
                                         </Grid>
                                       ))}
@@ -1088,76 +1371,97 @@ const GroupDetailPage = () => {
                                       <Chart options={optionsareachart} series={seriesareachart} type="area" height="300px" />
                                     </Card>
 
-                                    <Box mt={4}>
+
+                                    <Box mt={2}>
                                       <Typography variant="h5" gutterBottom>
                                         Transaction history
                                       </Typography>
-                                      <Box display="flex" alignItems="center" mb={2}>
-                                        <InputBase
-                                          placeholder="Search for transaction"
-                                          sx={{
-                                            pl: 2,
-                                            flex: 1,
-                                            border: '1px solid #d0d7de',
-                                            borderRadius: '8px',
-                                            height: '40px',
-                                            backgroundColor: '#f6f8fa',
-                                          }}
-                                        />
-                                        <FormControl sx={{ ml: 2, minWidth: 120 }}>
-                                          <Select
-                                            defaultValue="All"
-                                            displayEmpty
+                                      <Box sx={{ backgroundColor: '#DFE5EF', p: 1, borderRadius: '8px', mb: 3 }}>
+                                        <Box display="flex" alignItems="center" gap={2}>
+                                          <InputBase
+                                            placeholder="Search for transaction"
                                             sx={{
-                                              height: '40px',
-                                              backgroundColor: '#f6f8fa',
+                                              pl: 2,
+                                              flex: 1,
+                                              border: '1px solid #d0d7de',
                                               borderRadius: '8px',
+                                              height: '48px',
+                                              fontSize: '16px',
+                                              backgroundColor: 'white',
                                             }}
-                                          >
-                                            <MenuItem value="All">All</MenuItem>
-                                            <MenuItem value="Sent">Sent</MenuItem>
-                                            <MenuItem value="Received">Received</MenuItem>
-                                          </Select>
-                                        </FormControl>
-                                        <FormControl sx={{ ml: 2, minWidth: 120 }}>
-                                          <Select
-                                            defaultValue="All time"
-                                            displayEmpty
-                                            sx={{
-                                              height: '40px',
-                                              backgroundColor: '#f6f8fa',
-                                              borderRadius: '8px',
-                                            }}
-                                          >
-                                            <MenuItem value="All time">All time</MenuItem>
-                                            <MenuItem value="Last week">Last week</MenuItem>
-                                            <MenuItem value="Last month">Last month</MenuItem>
-                                          </Select>
-                                        </FormControl>
+                                          />
+                                          <FormControl sx={{ minWidth: 120 }}>
+                                            <Select
+                                              defaultValue="Status"
+                                              displayEmpty
+                                              sx={{
+                                                height: '48px',
+                                                fontSize: '16px',
+                                                backgroundColor: 'white',
+                                                borderRadius: '8px',
+                                              }}
+                                            >
+                                              <MenuItem value="Status">Status</MenuItem>
+                                              <MenuItem value="Complete">Complete</MenuItem>
+                                              <MenuItem value="Pending">Pending</MenuItem>
+                                              <MenuItem value="Declined">Declined</MenuItem>
+                                            </Select>
+                                          </FormControl>
+                                          <FormControl sx={{ minWidth: 120 }}>
+                                            <Select
+                                              defaultValue="Filter"
+                                              displayEmpty
+                                              sx={{
+                                                height: '48px',
+                                                fontSize: '16px',
+                                                backgroundColor: 'white',
+                                                borderRadius: '8px',
+                                              }}
+                                            >
+                                              <MenuItem value="Filter">Filter</MenuItem>
+                                              <MenuItem value="Sent">Sent</MenuItem>
+                                              <MenuItem value="Received">Received</MenuItem>
+                                            </Select>
+                                          </FormControl>
+                                          <FormControl sx={{ minWidth: 140 }}>
+                                            <Select
+                                              defaultValue="All time"
+                                              displayEmpty
+                                              sx={{
+                                                height: '48px',
+                                                fontSize: '16px',
+                                                backgroundColor: 'white',
+                                                borderRadius: '8px',
+                                              }}
+                                            >
+                                              <MenuItem value="All time">All time</MenuItem>
+                                              <MenuItem value="Last week">Last week</MenuItem>
+                                              <MenuItem value="Last month">Last month</MenuItem>
+                                            </Select>
+                                          </FormControl>
+                                        </Box>
                                       </Box>
                                       <TableContainer component={Paper} sx={{ borderRadius: '12px', boxShadow: '0px 3px 6px rgba(0,0,0,0.1)' }}>
                                         <Table sx={{ minWidth: 650 }} aria-label="transaction history table">
                                           <TableHead>
                                             <TableRow>
-                                              <TableCell sx={{ fontWeight: 'bold', color: '#555', backgroundColor: '#f6f8fa' }}>ID</TableCell>
-                                              <TableCell sx={{ fontWeight: 'bold', color: '#555', backgroundColor: '#f6f8fa' }}>Account</TableCell>
-                                              <TableCell sx={{ fontWeight: 'bold', color: '#555', backgroundColor: '#f6f8fa' }}>Amount</TableCell>
-                                              <TableCell sx={{ fontWeight: 'bold', color: '#555', backgroundColor: '#f6f8fa' }}>Type</TableCell>
-                                              <TableCell sx={{ fontWeight: 'bold', color: '#555', backgroundColor: '#f6f8fa' }}>Date and time</TableCell>
-                                              <TableCell sx={{ fontWeight: 'bold', color: '#555', backgroundColor: '#f6f8fa' }}>Counterparty</TableCell>
-                                              <TableCell sx={{ fontWeight: 'bold', color: '#555', backgroundColor: '#f6f8fa' }}>Fees</TableCell>
-                                              <TableCell sx={{ fontWeight: 'bold', color: '#555', backgroundColor: '#f6f8fa' }}>Member</TableCell>
+                                              <TableCell sx={{ fontWeight: 'bold', fontSize: '16px', color: 'gray' }}>ID</TableCell>
+                                              <TableCell sx={{ fontWeight: 'bold', fontSize: '16px', color: 'gray' }}>Amount</TableCell>
+                                              <TableCell sx={{ fontWeight: 'bold', fontSize: '16px', color: 'gray' }}>Type</TableCell>
+                                              <TableCell sx={{ fontWeight: 'bold', fontSize: '16px', color: 'gray' }}>Date and time</TableCell>
+                                              <TableCell sx={{ fontWeight: 'bold', fontSize: '16px', color: 'gray' }}>Counterparty</TableCell>
+                                              <TableCell sx={{ fontWeight: 'bold', fontSize: '16px', color: 'gray' }}>Fees</TableCell>
+                                              <TableCell sx={{ fontWeight: 'bold', fontSize: '16px', color: 'gray' }}>Status</TableCell>
+                                              <TableCell sx={{ fontWeight: 'bold', fontSize: '16px', color: 'gray' }}>Member</TableCell>
                                             </TableRow>
                                           </TableHead>
                                           <TableBody>
                                             {transactionData.map((row) => (
-                                              <TableRow key={row.id} sx={{ '&:nth-of-type(odd)': { backgroundColor: '#f9f9f9' } }}>
-                                                <TableCell>{row.id}</TableCell>
-                                                <TableCell>{row.account}</TableCell>
+                                              <TableRow key={row.id}>
+                                                <TableCell sx={{ color: 'gray', fontSize: '16px' }}>{row.id}</TableCell>
                                                 <TableCell>
-                                                  {row.amount}
-                                                  <br />
-                                                  {row.usd}
+                                                  <Typography variant="body1" sx={{ fontWeight: 'bold', fontSize: '16px' }}>{row.amount}</Typography>
+                                                  <Typography variant="body2" sx={{ color: 'gray', fontSize: '12px' }}>{row.usd} USD</Typography>
                                                 </TableCell>
                                                 <TableCell>
                                                   <Button
@@ -1168,18 +1472,65 @@ const GroupDetailPage = () => {
                                                       backgroundColor: row.type === 'Received' ? '#E6FFFA' : '#E0E7FF',
                                                       color: row.type === 'Received' ? '#2B8A3E' : '#1A73E8',
                                                       textTransform: 'none',
+                                                      fontSize: '14px',
+                                                      '&:hover': {
+                                                        backgroundColor: row.type === 'Received' ? '#E6FFFA' : '#E0E7FF',
+                                                      },
                                                     }}
                                                   >
                                                     {row.type}
                                                   </Button>
                                                 </TableCell>
-                                                <TableCell>{row.dateTime}</TableCell>
+                                                <TableCell sx={{ color: 'gray', fontSize: '16px' }}>{row.dateTime}</TableCell>
                                                 <TableCell>
-                                                  {row.counterparty} <Button size="small">📋</Button>
+                                                  <Typography
+                                                    variant="body2"
+                                                    sx={{
+                                                      whiteSpace: 'nowrap',
+                                                      overflow: 'hidden',
+                                                      textOverflow: 'ellipsis',
+                                                      maxWidth: '160px',
+                                                      color: 'gray',
+                                                      fontSize: '12px',
+                                                    }}
+                                                  >
+                                                    {row.counterparty}
+                                                  </Typography>
+                                                  <Button size="small">📋</Button>
                                                 </TableCell>
-                                                <TableCell>{row.fees}</TableCell>
+                                                <TableCell sx={{ color: 'gray', fontSize: '12px' }}>{row.fees}</TableCell>
                                                 <TableCell>
-                                                  <Avatar src={row.member} alt="Member Avatar" />
+                                                  <Button
+                                                    variant="contained"
+                                                    size="small"
+                                                    sx={{
+                                                      borderRadius: '12px',
+                                                      backgroundColor:
+                                                        row.status === 'Complete' ? '#E6FFFA' :
+                                                          row.status === 'Pending' ? '#FFF7E0' :
+                                                            '#FFE0E0',
+                                                      color:
+                                                        row.status === 'Complete' ? '#2B8A3E' :
+                                                          row.status === 'Pending' ? '#E6A800' :
+                                                            '#E60000',
+                                                      textTransform: 'none',
+                                                      fontSize: '14px',
+                                                      '&:hover': {
+                                                        backgroundColor:
+                                                          row.status === 'Complete' ? '#E6FFFA' :
+                                                            row.status === 'Pending' ? '#FFF7E0' :
+                                                              '#FFE0E0',
+                                                      }
+                                                    }}
+                                                  >
+                                                    {row.status}
+                                                  </Button>
+                                                </TableCell>
+                                                <TableCell>
+                                                  <Box display="flex" alignItems="center">
+                                                    <Avatar src={row.member.avatar} alt={row.member.name} sx={{ width: 36, height: 36 }} />
+                                                    <Typography sx={{ marginLeft: '8px', fontSize: '16px' }}>{row.member.name}</Typography>
+                                                  </Box>
                                                 </TableCell>
                                               </TableRow>
                                             ))}
@@ -1187,6 +1538,7 @@ const GroupDetailPage = () => {
                                         </Table>
                                       </TableContainer>
                                     </Box>
+
                                     {/* <PaginationTable rows={rows} /> */}
                                   </Box>
                                 )}

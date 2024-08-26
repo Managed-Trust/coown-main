@@ -339,7 +339,7 @@ const FormTabs = () => {
       const response = await ledger.call(
         "addDocumentDetailsCustomer",
         principal,
-        encryptData(formData.document_type),
+        formData.document_type,
         encryptedCitizenship,
         encryptData(formData.document_number),
         encryptData(formData.issuing_country),
@@ -750,8 +750,8 @@ const FormTabs = () => {
                       onChange={handleSelectChange("document_type")}
                       value={formData.document_type}
                     >
-                      <MenuItem value={0}>Image</MenuItem>
-                      <MenuItem value={1}>Other</MenuItem>
+                      <MenuItem value="Image">Image</MenuItem>
+                      <MenuItem value="Other">Other</MenuItem>
                     </Select>
                   </Grid>
                   <Grid item sx={12} lg={12}>

@@ -165,7 +165,7 @@ const UserApproval = () => {
             console.log("Profile:", response);
             const profileData = response[0];
             setProfile(profileData);
-            console.log('Document type', decryptData(profileData.document_type)
+            console.log('Document type', profileData.document_type
             );
         } catch (e) {
             console.log("Error Fetching Profile:", e);
@@ -353,7 +353,7 @@ const UserApproval = () => {
 
                                                 </Grid>
                                                 <Grid item xs={6}>
-                                                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}>{decryptData(profile.document_type)}</Typography>
+                                                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}>{profile.document_type}</Typography>
 
                                                 </Grid>
                                             </Grid>
