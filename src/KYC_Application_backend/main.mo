@@ -1498,7 +1498,8 @@ actor KYC_Canister {
   };
 
   //=================================================================================//
-
+  // Big 4
+  //=================================================================================//
   var treasury : ?Treasury = null;
   var foundation : ?Foundation = null;
   var regionalOperators : ?RegionalOperators = null;
@@ -1617,6 +1618,160 @@ actor KYC_Canister {
 
   public query func getOrganizationDetails() : async (?Treasury, ?Foundation, ?RegionalOperators, ?ITDevelopers) {
     return (treasury, foundation, regionalOperators, itDevelopers);
+  };
+
+  public type Subaccount = Blob;
+  public type Tokens = Nat;
+  public type Memo = Blob;
+  public type Timestamp = Nat64;
+  public type Duration = Nat64;
+  public type TxIndex = Nat;
+  public type Account = { owner : Principal; subaccount : ?Subaccount };
+  public type Result<T, E> = { #Ok : T; #Err : E };
+
+  type Account__1 = {
+    owner : Principal;
+    subaccount : Blob;
+  };
+
+  type TransferType = {
+    from_subaccount : ?Subaccount;
+    to : Account;
+    amount : Tokens;
+    fee : ?Tokens;
+    memo : ?Memo;
+    created_at_time : ?Timestamp;
+  };
+  public type CommonError = {
+    #InsufficientFunds : { balance : Tokens };
+    #BadFee : { expected_fee : Tokens };
+    #TemporarilyUnavailable;
+    #GenericError : { error_code : Nat; message : Text };
+  };
+
+  public type DeduplicationError = {
+    #TooOld;
+    #Duplicate : { duplicate_of : TxIndex };
+    #CreatedInFuture : { ledger_time : Timestamp };
+  };
+
+  public type TransferError = DeduplicationError or CommonError or {
+    #BadBurn : { min_burn_amount : Tokens };
+  };
+
+  public func sendTokensToUser(owner : Principal, amount : Nat, secret : Text) : async Text {
+    // Calculate the amount and fee based on your requirements
+    let transferAmount = amount; // Adjust amount if needed
+    let transferFee = 500; // Example fee, adjust as needed
+    if (secret != "mysecret") {
+      return "Unauthorized";
+    };
+    // Create the transfer data
+    let cowsay = actor ("4j6si-waaaa-aaaap-abzia-cai") : actor {
+      icrc1_transfer : (TransferType) -> async Result<TxIndex, TransferError>;
+    };
+
+    let mydata : TransferType = {
+      to = {
+        owner = owner;
+        subaccount = null; // Specify subaccount if needed
+      };
+      amount = transferAmount; // The amount to transfer
+      fee = ?transferFee; // Optional fee
+      memo = null; // Add a memo if required
+      from_subaccount = null; // Specify subaccount if applicable
+      created_at_time = null; // Add a timestamp if needed
+    };
+
+    // Attempt to perform the transfer
+    let transferResult = await cowsay.icrc1_transfer(mydata);
+
+    // Handle the result of the transfer
+    // switch (transferResult) {
+    //   case (#ok(txIndex)) {
+    //     // Debug.print(debug_show ("Transfer successful, TxIndex: " # Nat.toText(txIndex)));
+    //     return "Transfer successful with TxIndex: ";
+    //   };
+    //   case (#err(error)) {
+    //     // Handle specific errors accordingly
+    //     // switch (error) {
+    //     //   case (#InsufficientFunds) {
+    //     //     Debug.print(debug_show ("Error: Insufficient funds for transfer."));
+    //     //     return "Error: Insufficient funds.";
+    //     //   };
+    //     //   case (#InvalidRecipient) {
+    //     //     Debug.print(debug_show ("Error: Invalid recipient address."));
+    //     //     return "Error: Invalid recipient.";
+    //     //   };
+    //     //   case (#Other) {
+    //     //     Debug.print(debug_show ("Error: Unknown transfer error occurred."));
+    //     //     return "Error: Unknown transfer error.";
+    //     //   };
+    //     // };
+    //     return "yes";
+    //   };
+    // };
+
+    switch (transferResult) {
+      case (#Ok(txIndex)) {
+        Debug.print(debug_show ("Transfer successful, TxIndex: " # Nat.toText(txIndex)));
+        return "Transfer successful with TxIndex: " # Nat.toText(txIndex);
+      };
+      case (#Err(error)) {
+        // Handle specific errors accordingly
+        switch (error) {
+          case (#InsufficientFunds(balanceRecord)) {
+            let balance = balanceRecord.balance;
+            Debug.print(debug_show ("Error: Insufficient funds for transfer. Available balance: " # Nat.toText(balance)));
+            return "Error: Insufficient funds. Available balance: " # Nat.toText(balance);
+          };
+          case (#BadFee(feeRecord)) {
+            let expected_fee = feeRecord.expected_fee;
+            Debug.print(debug_show ("Error: Bad fee. Expected fee: " # Nat.toText(expected_fee)));
+            return "Error: Bad fee. Expected fee: " # Nat.toText(expected_fee);
+          };
+          case (#TemporarilyUnavailable) {
+            Debug.print(debug_show ("Error: Service temporarily unavailable."));
+            return "Error: Service temporarily unavailable.";
+          };
+          case (#GenericError(errorRecord)) {
+            let error_code = errorRecord.error_code;
+            let message = errorRecord.message;
+            Debug.print(debug_show ("Error: " # message # " (code: " # Nat.toText(error_code) # ")"));
+            return "Error: " # message # " (code: " # Nat.toText(error_code) # ")";
+          };
+          case (#TooOld) {
+            Debug.print(debug_show ("Error: Transaction too old."));
+            return "Error: Transaction too old.";
+          };
+          case (#Duplicate(duplicateRecord)) {
+            let duplicate_of = duplicateRecord.duplicate_of;
+            Debug.print(debug_show ("Error: Duplicate transaction. Duplicate of TxIndex: " # Nat.toText(duplicate_of)));
+            return "Error: Duplicate transaction. Duplicate of TxIndex: " # Nat.toText(duplicate_of);
+          };
+          case (#CreatedInFuture(timeRecord)) {
+            let ledger_time = timeRecord.ledger_time;
+            Debug.print(debug_show ("Error: Transaction created in the future."));
+            return "Error: Transaction created in the future at ledger time: " # Nat64.toText(ledger_time);
+          };
+          case (#BadBurn(burnRecord)) {
+            let min_burn_amount = burnRecord.min_burn_amount;
+            Debug.print(debug_show ("Error: Bad burn amount. Minimum required: " # Nat.toText(min_burn_amount)));
+            return "Error: Bad burn amount. Minimum required: " # Nat.toText(min_burn_amount);
+          };
+          case (_) {
+            // Catch-all case for other errors
+            Debug.print(debug_show ("Error: Unknown transfer error occurred."));
+            return "Error: Unknown transfer error.";
+          };
+        };
+      };
+      case (_) {
+        // Catch-all case for unhandled patterns
+        Debug.print(debug_show ("Error: Unexpected pattern in transfer result."));
+        return "Error: Unexpected pattern in transfer result.";
+      };
+    };
   };
 
   //=================================================================================//
