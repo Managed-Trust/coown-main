@@ -1,0 +1,189 @@
+/* .token-swap-container {
+    background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    max-width: 400px;
+    margin: 50px auto;
+    padding: 20px;
+    text-align: center;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+  
+  .swap-title {
+    color: #333;
+    margin-bottom: 20px;
+    font-size: 1.5em;
+  }
+  
+  .swap-inputs {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .input-label {
+    font-size: 1.1em;
+    margin-bottom: 10px;
+    color: #555;
+  }
+  
+  .icp-input {
+    width: 80%;
+    padding: 10px;
+    border: 2px solid #6c63ff;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    font-size: 1em;
+    color: #333;
+    transition: border-color 0.3s;
+  }
+  
+  .icp-input:focus {
+    border-color: #3b3f8d;
+    outline: none;
+  }
+  
+  .token-receive {
+    margin: 15px 0;
+    color: #4a4a4a;
+    font-size: 1.2em;
+  }
+  
+  .token-value {
+    font-weight: bold;
+    color: #3b3f8d;
+  }
+  
+  .swap-button {
+    background: #6c63ff;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1.1em;
+    transition: background 0.3s;
+  }
+  
+  .swap-button:hover {
+    background: #5751d1;
+  }
+  
+  .swap-button:active {
+    transform: scale(0.98);
+  }
+  
+  @media (max-width: 480px) {
+    .token-swap-container {
+      padding: 15px;
+      max-width: 90%;
+    }
+  
+    .swap-title {
+      font-size: 1.2em;
+    }
+  
+    .icp-input {
+      width: 100%;
+    }
+  }
+   */
+
+   
+   .token-swap-container {
+    background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    max-width: 400px;
+    margin: 50px auto;
+    padding: 20px;
+    text-align: center;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+  
+  .swap-title {
+    color: #333;
+    margin-bottom: 20px;
+    font-size: 1.5em;
+  }
+  
+  .swap-inputs {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .input-label {
+    font-size: 1.1em;
+    margin-bottom: 10px;
+    color: #555;
+  }
+  
+  .icp-input {
+    width: 80%;
+    padding: 10px;
+    border: 2px solid #6c63ff;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    font-size: 1em;
+    color: #333;
+    transition: border-color 0.3s;
+  }
+  
+  .icp-input:focus {
+    border-color: #3b3f8d;
+    outline: none;
+  }
+  
+  .token-receive {
+    margin: 15px 0;
+    color: #4a4a4a;
+    font-size: 1.2em;
+  }
+  
+  .token-value {
+    font-weight: bold;
+    color: #3b3f8d;
+  }
+  
+  .icp-price {
+    margin-top: 10px;
+    color: #4a4a4a;
+    font-size: 1em;
+    font-style: italic;
+  }
+  
+  .swap-button {
+    background: #6c63ff;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1.1em;
+    transition: background 0.3s;
+  }
+  
+  .swap-button:hover {
+    background: #5751d1;
+  }
+  
+  .swap-button:active {
+    transform: scale(0.98);
+  }
+  
+  @media (max-width: 480px) {
+    .token-swap-container {
+      padding: 15px;
+      max-width: 90%;
+    }
+  
+    .swap-title {
+      font-size: 1.2em;
+    }
+  
+    .icp-input {
+      width: 100%;
+    }
+  }
+  
