@@ -1,4 +1,4 @@
-import React from 'react';
+import React,{useEffect} from 'react';
 import {
     Table,
     TableBody,
@@ -19,6 +19,9 @@ import ChildCard from '../../../shared/ChildCard';
 
 function GroupTable({ groups }) {
     const [openRows, setOpenRows] = React.useState({});
+    useEffect(() => {
+        console.log("group Table:", groups);
+      }, []);
 
     const handleToggleRow = (rowName) => {
         setOpenRows((prev) => ({ ...prev, [rowName]: !prev[rowName] }));

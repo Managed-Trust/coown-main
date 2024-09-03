@@ -30,6 +30,8 @@ import {
 
 } from "@connect2ic/react";
 import CreateGroup from '../../views/apps/Group/CreateGroup.jsx';
+import PrivateGroup from '../../views/apps/Group/PrivateGroup.jsx';
+import RegisterCompany from '../../views/apps/Group/RegisterCompany.jsx';
 
 const MainWrapper = styled('div')(() => ({
   display: 'flex',
@@ -79,6 +81,8 @@ const FullLayout = () => {
                 <Route path="/apps/followers" element={<Followers />} />
                 <Route path="/apps/friends" element={<Friends />} />
                 <Route path="/apps/gallery" element={<Gallery />} />
+                <Route path="/apps/private" element={<PrivateGroup/>} />
+                <Route path="/apps/registerCompany" element={<RegisterCompany/>} />
                 <Route path="/user-profile" element={<UserProfile />} />
                 <Route path="/referral" element={<Galleryr/>}/>
                 <Route path="/account" element={<Account />} />
