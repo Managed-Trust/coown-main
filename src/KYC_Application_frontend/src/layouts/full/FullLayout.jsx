@@ -24,14 +24,14 @@ import AddStakeHolder from '../../views/apps/stakeholder/AddStakeHolder.jsx';
 import Faq from '../../views/pages/faq/Faq.jsx';
 import UserApproval from '../../components/apps/tickets/UserApproval.jsx';
 import Galleryr from '../../views/apps/referrals/ReferralCode.jsx';
-
-import {
-  ConnectDialog,
-
-} from "@connect2ic/react";
 import CreateGroup from '../../views/apps/Group/CreateGroup.jsx';
 import PrivateGroup from '../../views/apps/Group/PrivateGroup.jsx';
 import RegisterCompany from '../../views/apps/Group/RegisterCompany.jsx';
+
+import {
+  ConnectDialog,
+} from "@connect2ic/react";
+
 
 const MainWrapper = styled('div')(() => ({
   display: 'flex',

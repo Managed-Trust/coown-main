@@ -319,7 +319,7 @@ const GroupDetailPage = () => {
                                   </Box>
                                 )}
                                 {tabValue === 1 && (
-                                  <Accounts/>
+                                  <Accounts />
                                 )}
                                 {tabValue === 2 && (
                                   <Box>
@@ -354,7 +354,7 @@ const GroupDetailPage = () => {
                                 )}
                                 {tabValue === 7 && (
                                   <Box>
-                                   <Rewards/>
+                                    <Rewards />
                                   </Box>
                                 )}
                                 {tabValue === 8 && (
@@ -396,8 +396,8 @@ const GroupDetailPage = () => {
                                     <Overview />
                                   </Box>
                                 )}
-                                {tabValue === 1 && (                                 
-                                 <Accounts/>
+                                {tabValue === 1 && (
+                                  <Accounts />
                                 )}
                                 {tabValue === 2 && (
                                   <Box>
@@ -418,7 +418,7 @@ const GroupDetailPage = () => {
                                 )}
                                 {tabValue === 5 && (
                                   <Box>
-                                   <Rewards/>
+                                    <Rewards />
                                   </Box>
                                 )}
                                 {tabValue === 6 && (

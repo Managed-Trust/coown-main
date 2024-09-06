@@ -248,8 +248,8 @@ const PrivateGroup = () => {
               </Typography>
 
               {/* Description */}
-              <Typography variant="body2" color="textSecondary" gutterBottom>
-                Setting up a registered company includes a KYC review of key stakeholder data by an AML Officer to ensure data quality and compliance. Additional transaction fees may apply.{' '}
+              <Typography variant="body2" fontSize="14px" color="gray" gutterBottom>
+                Setting up a registered company includes a KYC review of key stakeholder data by an AML Officer to ensure data quality and compliance. Additional transaction fees may apply.{' '}<br/>
                 <Link href="#" underline="hover">
                   Learn more
                 </Link>
@@ -260,24 +260,24 @@ const PrivateGroup = () => {
               {/* Fees */}
               <Grid container spacing={1}>
                 <Grid item xs={6}>
-                  <Typography variant="body2">KYC review fee</Typography>
+                  <Typography variant="body2" fontSize="14px" color="gray">KYC review fee</Typography>
                 </Grid>
                 <Grid item xs={6} textAlign="right">
-                  <Typography variant="body2">19 USD</Typography>
+                  <Typography variant="body2" fontSize="14px" fontWeight="bold">19 USD</Typography>
                 </Grid>
 
                 <Grid item xs={6}>
-                  <Typography variant="body2">Annual fee (until Dec 31, 2024)</Typography>
+                  <Typography variant="body2" fontSize="14px" color="gray">Annual fee (until Dec 31, 2024)</Typography>
                 </Grid>
                 <Grid item xs={6} textAlign="right">
-                  <Typography variant="body2">0 USD</Typography>
+                  <Typography variant="body2" fontSize="14px" fontWeight="bold">0 USD</Typography>
                 </Grid>
 
                 <Grid item xs={6}>
-                  <Typography variant="body2">File sharing</Typography>
+                  <Typography variant="body2" fontSize="14px" color="gray">File sharing</Typography>
                 </Grid>
                 <Grid item xs={6} textAlign="right">
-                  <Typography variant="body2">0.006 USD/MB</Typography>
+                  <Typography variant="body2" fontSize="14px" fontWeight="bold">0.006 USD/MB</Typography>
                 </Grid>
               </Grid>
 
@@ -285,7 +285,7 @@ const PrivateGroup = () => {
 
               {/* Subscription renewal notice */}
               <Box sx={{ padding: 2, backgroundColor: '#f0f4ff', borderRadius: 1 }}>
-                <Typography variant="body2" color="textSecondary">
+                <Typography variant="body2" color="primary" fontSize="14px">
                   Your subscription will renew automatically on the first week of a next year, at a cost of $60 USD.
                 </Typography>
               </Box>

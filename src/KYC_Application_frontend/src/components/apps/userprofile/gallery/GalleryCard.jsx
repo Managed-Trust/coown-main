@@ -98,9 +98,9 @@ const GalleryCard = () => {
   const dispatch = useDispatch();
 
   const cardData = [
-    { title: "Set-up a private association", desc: "Add  here more user groups as informal private associations, where you are the sole economic beneficiary.", Icon: mygroup1, value: '19 USD', per: 'per group' },
-    { title: "Set-up a registered company", desc: "Setting up a registered company includes a KYC review of key stakeholder data by an AML Officer to ensure data quality and compliance.", Icon: mygroup2, value: '168 USD', per: 'per entity' },
-    { title: "Set-up a public law entitiy", desc: "The setup of a public law entity includes a review of the Know Your Customer (KYC) data by a legal expert to ensure legitimacy and data quality.", Icon: mygroup3, value: '680 USD', per: 'per entity' }
+    { title: "Set-up a private association", desc: "Add  here more user groups as informal private associations, where you are the sole economic beneficiary.", Icon: mygroup1, value: '19 USD', per: 'per year', link: '/apps/private' },
+    { title: "Set-up a registered company", desc: "Setting up a registered company includes a KYC review of key stakeholder data by an AML Officer to ensure data quality and compliance.", Icon: mygroup2, value: '168 USD', per: 'per year', link: '/apps/registerCompany' },
+    { title: "Set-up a public law entitiy", desc: "The setup of a public law entity includes a review of the Know Your Customer (KYC) data by a legal expert to ensure legitimacy and data quality.", Icon: mygroup3, value: '680 USD', per: 'per year', link: '/' }
   ];
 
   useEffect(() => {
@@ -750,9 +750,11 @@ const GalleryCard = () => {
                                     <Typography variant="h5" sx={{ fontWeight: 'bold' }}>{card.value}</Typography>
                                     <Typography variant="body1" sx={{ color: 'gray' }}>{card.per}</Typography>
                                   </Box>
-                                  <Button variant="contained" sx={{ textTransform: 'none' }}>
-                                    Select
-                                  </Button>
+                                  <Link to={card.link} >
+                                    <Button variant="contained" sx={{ textTransform: 'none' }}>
+                                      Select
+                                    </Button>
+                                  </Link>
                                 </Box>
                               </Box>
                             </Stack>

@@ -33,6 +33,7 @@ import {
     Avatar,
     Chip,
     InputBase,
+    useMediaQuery
 } from "@mui/material";
 // Tabler icons
 import {
@@ -59,6 +60,7 @@ import img4 from '../../../../../assets/images/profile/user-4.jpg';
 import img5 from '../../../../../assets/images/profile/user-5.jpg';
 
 const groupDetails = {
+
     name: "Tech Innovators Inc.",
     balances: [
         {
@@ -140,6 +142,7 @@ const StyledPaper = styled(Paper)(({ theme, selected }) => ({
 }));
 
 const Accounts = () => {
+    const isMobile = useMediaQuery('(max-width:600px)');
     const transactionData = [
         {
             id: '123456789',
@@ -385,16 +388,34 @@ const Accounts = () => {
             <Box>
                 <Grid container spacing={2}>
                     <Grid item xs={12} md={6}>
-                        <Card sx={{ background: 'linear-gradient(to right, #2A3547, #2A3547, #2A3547)', color: 'white' }} borderRadius="40px">
+                        <Card
+                            sx={{
+                                background: 'linear-gradient(135deg, #1C2944, #314f7b)', // Adjust the gradient colors to match the design
+                                color: 'white',
+                                borderRadius: '13px', // Adjust the border radius as needed
+                                padding: 1, // Add padding for consistent spacing
+                                boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)' // Add subtle shadow if needed
+                            }}
+                        >
                             <CardContent>
-                                <Box display="flex" justifyContent="start" alignItems="center" mb={2}>
+                                <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
                                     <Box>
-                                        <Typography variant="h2">1.715156 USD</Typography>
-                                        <Typography variant="body1" display="flex" alignItems="flex-start" >Estimated Total</Typography>
+                                        <Typography variant="h2">100 556 USD</Typography>
+                                        <Typography variant="body2" color="rgba(255, 255, 255, 0.7)" fontSize="14px" mt={0.5}>Estimated total</Typography>
                                     </Box>
                                 </Box>
-                                <Box display="flex" alignItems="flex-start" mt={10}>
-                                    <Button variant="contained" sx={{ background: '#1A73E8', color: 'white' }} startIcon={<IconSend />}>
+                                <Box display="flex" alignItems="flex-start" mt={4}>
+                                    <Button
+                                        variant="contained"
+                                        sx={{
+                                            background: '#1A73E8',
+                                            color: 'white',
+                                            textTransform: 'none',
+                                            padding: '8px 16px',
+                                            borderRadius: '5px'
+                                        }}
+                                        startIcon={<IconSend />}
+                                    >
                                         Send
                                     </Button>
                                 </Box>
@@ -403,22 +424,68 @@ const Accounts = () => {
                     </Grid>
                     <Grid item xs={12} md={6}>
                         <Card>
-                            <Box display="flex" justifyContent="space-between" mb={1}>
-                                <Box display="flex" flexDirection="column" alignItems="start" mt={1}>
-                                    <Typography variant="h3" display="flex" alignItems="flex-start">Receive funds</Typography>
-                                    <Box display="flex" alignItems="center" justifyContent="center" mt={8} mb={3} position="relative">
-                                        <Input
-                                            placeholder="Network"
-                                            style={{ width: 200, marginRight: 8 }}
-                                            inputProps={{ 'aria-label': 'network' }}
-                                        />
-                                        <Typography variant="body2" style={{ position: 'absolute', right: 10 }}>IPC</Typography>
+                            <Box
+                                display="flex"
+                                flexDirection={isMobile ? 'column' : 'row'}
+                                justifyContent="space-between"
+                                mb={1}
+                                width="100%"
+                            >
+                                <Box
+                                    display="flex"
+                                    flexDirection="column"
+                                    alignItems={isMobile ? 'center' : 'start'}
+                                    mt={1}
+                                    width={isMobile ? '100%' : '65%'}
+                                >
+                                    <Typography
+                                        variant="h3"
+                                        display="flex"
+                                        alignItems="flex-start"
+                                    >
+                                        Receive funds
+                                    </Typography>
+                                    <Box
+                                        display="flex"
+                                        alignItems="center"
+                                        justifyContent="space-between"
+                                        mt={8}
+                                        p={1}
+                                        bgcolor="#f7f9fc"
+                                        borderRadius={1}
+                                        width="100%"
+                                    >
+                                        <Typography
+                                            variant="body2"
+                                            color="#7C8FAC"
+                                            fontSize="14px"
+                                            style={{ marginLeft: 8 }}
+                                        >
+                                            Network
+                                        </Typography>
+                                        <Typography
+                                            variant="body2"
+                                            fontWeight="bold"
+                                            style={{ marginRight: 16 }}
+                                        >
+                                            ICP
+                                        </Typography>
                                     </Box>
-                                    <Button variant="contained" color="primary" style={{ marginTop: 10, width: '100%' }}>
+                                    <Button
+                                        variant="contained"
+                                        color="primary"
+                                        style={{ marginTop: 10, width: '100%' }}
+                                    >
                                         1A1zp1...DivfNa
                                     </Button>
                                 </Box>
-                                <Box display="flex" alignItems="center" justifyContent="center">
+                                <Box
+                                    display="flex"
+                                    alignItems="center"
+                                    justifyContent="center"
+                                    width={isMobile ? '100%' : '25%'}
+                                    mt={isMobile ? 2 : 0} // Adjust margin for spacing on mobile
+                                >
                                     <QRCodeCanvas value="1A1zp1eP5QGefi2DMPTfTL5SLmv7DivfNa" size={128} />
                                 </Box>
                             </Box>
@@ -440,7 +507,7 @@ const Accounts = () => {
                                 width: "100%",
                             }}
                         >
-                            <Typography variant="h6" color="text.primary">
+                            <Typography variant="h6" fontWeight="200" color="text.primary">
                                 {balance.currency}
                             </Typography>
                             <Typography variant="h2" color="text.secondary">
