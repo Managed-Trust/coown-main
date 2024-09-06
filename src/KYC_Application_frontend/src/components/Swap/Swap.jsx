@@ -4,19 +4,19 @@
 // const TokenSwap = () => {
 //   const [icpAmount, setIcpAmount] = useState("");
 //   const [coOwnTokens, setCoOwnTokens] = useState(0);
-//   const coOwnRate = 0.5; // 1 Co-Own is $0.50
+//   const coOwnRate = 0.5; // 1 $COOWN is $0.50
 //   const [ICP_Price, setICPPrice] = useState(0);
 //   const handleIcpChange = (event) => {
 //     const inputIcp = event.target.value;
 //     setIcpAmount(inputIcp);
 
-//     // Calculate Co-Own tokens based on ICP input
-//     const calculatedCoOwn = (inputIcp / coOwnRate).toFixed(2); // ICP to Co-Own conversion
+//     // Calculate $COOWN tokens based on ICP input
+//     const calculatedCoOwn = (inputIcp / coOwnRate).toFixed(2); // ICP to $COOWN conversion
 //     setCoOwnTokens(calculatedCoOwn);
 //   };
 
 //   const handleSwap = () => {
-//     alert(`You will receive ${coOwnTokens} Co-Own tokens.`);
+//     alert(`You will receive ${coOwnTokens} $COOWN tokens.`);
 //     // Swap logic or API call goes here
 //   };
 
@@ -42,7 +42,7 @@
 
 //   return (
 //     <div className="token-swap-container">
-//       <h2 className="swap-title">Swap ICP for Co-Own Tokens</h2>
+//       <h2 className="swap-title">Swap ICP for $COOWN Tokens</h2>
 //       <div className="swap-inputs">
 //         <label className="input-label">
 //           Enter ICP Amount:
@@ -56,7 +56,7 @@
 //         </label>
 //         <div className="token-receive">
 //           <p>
-//             Receive: <span className="token-value">{coOwnTokens}</span> Co-Own
+//             Receive: <span className="token-value">{coOwnTokens}</span> $COOWN
 //             Tokens
 //           </p>
 //         </div>
@@ -84,7 +84,7 @@ import { createActor } from "../../declarations/Token";
 const TokenSwap = () => {
   const [icpAmount, setIcpAmount] = useState("");
   const [coOwnTokens, setCoOwnTokens] = useState(0);
-  const coOwnRate = 0.5; // 1 Co-Own is $0.50
+  const coOwnRate = 0.5; // 1 $COOWN is $0.50
   const [ICP_Price, setICPPrice] = useState(0);
   const { isConnected, principal } = useConnect({
     onConnect: () => {},
@@ -138,10 +138,10 @@ const TokenSwap = () => {
     const inputIcp = event.target.value;
     setIcpAmount(inputIcp);
 
-    // Calculate Co-Own tokens based on ICP input and current ICP price in USD
+    // Calculate $COOWN tokens based on ICP input and current ICP price in USD
     if (ICP_Price > 0) {
       const usdValue = inputIcp * ICP_Price; // Convert ICP to USD
-      const calculatedCoOwn = (usdValue / coOwnRate).toFixed(2); // USD to Co-Own conversion
+      const calculatedCoOwn = (usdValue / coOwnRate).toFixed(2); // USD to $COOWN conversion
       setCoOwnTokens(calculatedCoOwn);
     }
   };
@@ -185,7 +185,7 @@ const TokenSwap = () => {
     if (true) {
       alert("Transaction Successful");
       try {
-        alert(`You will receive ${coOwnTokens} Co-Own tokens.`);
+        alert(`You will receive ${coOwnTokens} $COOWN tokens.`);
 
         // Call the backend function to perform the swap
         const result = await ledger.call(
@@ -212,7 +212,7 @@ const TokenSwap = () => {
 
   return (
     <div className="token-swap-container">
-      <h2 className="swap-title">Swap ICP for Co-Own Tokens</h2>
+      <h2 className="swap-title">Swap ICP for $COOWN Tokens</h2>
       <div className="swap-inputs">
         <label className="input-label">
           Enter ICP Amount:
@@ -226,7 +226,7 @@ const TokenSwap = () => {
         </label>
         <div className="token-receive">
           <p>
-            Receive: <span className="token-value">{coOwnTokens}</span> Co-Own
+            Receive: <span className="token-value">{coOwnTokens}</span> $COOWN
             Tokens
           </p>
         </div>
@@ -234,7 +234,7 @@ const TokenSwap = () => {
           Swap
         </button>
         <p className="icp-price">Current ICP Price: ${ICP_Price.toFixed(2)}</p>
-        <p className="icp-price">CO-OWN Price: $ 0.50</p>
+        <p className="icp-price">$COOWN Price: $ 0.50</p>
       </div>
     </div>
   );
