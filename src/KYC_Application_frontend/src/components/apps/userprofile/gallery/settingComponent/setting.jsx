@@ -19,6 +19,14 @@ import EditGroup from './EditGroup';
 import ActivityStream from './ActivityStream';
 import Ownership from './Ownership';
 import NotificationTriggers from './NotificationTriggers';
+import BusinessIcon from '@mui/icons-material/Business';
+import GroupWorkIcon from '@mui/icons-material/GroupWork';
+import GavelIcon from '@mui/icons-material/Gavel';
+import FactCheckIcon from '@mui/icons-material/FactCheck';
+import Company from './Company';
+import LeadershipAndOwnerShip from './LeadershipAndOwnerShip';
+import LimitationAndGovernance from './LimitationAndGovernance';
+import Auditing from './Auditing';
 
 const Setting = () => {
     const [selectedView, setSelectedView] = useState('Notifications');
@@ -37,6 +45,14 @@ const Setting = () => {
                 return <ActivityStream />;
             case 'Ownership':
                 return <Ownership />;
+            case 'Company':
+                return <Company/>;
+            case 'Leadership and OwnerShip':
+                return <LeadershipAndOwnerShip />;
+            case 'Limitation and governance':
+                return <LimitationAndGovernance/>;
+            case 'Auditing':
+                return <Auditing />;
             default:
                 return <NotificationSettings />;
         }
@@ -72,6 +88,24 @@ const Setting = () => {
                             { label: 'Notification triggers', icon: <NotificationsIcon /> },
                             { label: 'Activity Stream', icon: <StreamIcon /> },
                             { label: 'Ownership', icon: <GroupIcon /> }
+                        ].map((item) => (
+                            <ListItem
+                                button
+                                key={item.label}
+                                onClick={() => setSelectedView(item.label)}
+                            >
+                                <ListItemIcon>{item.icon}</ListItemIcon>
+                                <ListItemText primary={item.label} />
+                            </ListItem>
+                        ))}
+                        <Typography variant="subtitle2" sx={{ paddingLeft: 1, paddingTop: 1 }}>
+                            Company Configuration
+                        </Typography>
+                        {[
+                            { label: 'Company', icon: <BusinessIcon /> },
+                            { label: 'Leadership and OwnerShip', icon: <GroupWorkIcon /> },
+                            { label: 'Limitation and governance', icon: <GavelIcon /> },
+                            { label: 'Auditing', icon: <FactCheckIcon /> }
                         ].map((item) => (
                             <ListItem
                                 button

@@ -20,7 +20,8 @@ import GroupDetailPage from '../../components/apps/userprofile/gallery/GroupDeta
 import Chats from '../../views/apps/chat/Chat.jsx';
 import GroupInvitation from '../../views/pages/group-invitation/group-invitation.jsx';
 import Tickets from '../../views/apps/tickets/Tickets.jsx';
-import AddStakeHolder from '../../views/apps/stakeholder/AddStakeHolder.jsx';
+// import AddStakeHolder from '../../views/apps/stakeholder/AddStakeHolder.jsx';
+import AddStakeHolder from '../../components/apps/userprofile/gallery/stakeHolderComponent/AddStakeHolder.jsx'
 import Faq from '../../views/pages/faq/Faq.jsx';
 import UserApproval from '../../components/apps/tickets/UserApproval.jsx';
 import Galleryr from '../../views/apps/referrals/ReferralCode.jsx';
@@ -89,6 +90,7 @@ const FullLayout = () => {
                 <Route path="/user-profile/Settings" element={<Settings />} />
                 <Route path="/forms/form-horizontal" element={<FormHorizontal />} />
                 <Route path="/group/:groupId" element={<GroupDetailPage />} />
+                {/* <Route path="/group/:groupId/add-stakeholder" element={<AddStakeHolder/>} /> */}                
                 <Route path="/group/:groupId/add-stakeholder" element={<AddStakeHolder/>} />
                 <Route path="/group/create-group" element={<CreateGroup/>} />
                 <Route path="/apps/chats" element={<Chats />} />

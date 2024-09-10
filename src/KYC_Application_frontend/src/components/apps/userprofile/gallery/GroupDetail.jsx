@@ -7,66 +7,27 @@ import {
   CardContent,
   CardMedia,
   Typography,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Toolbar,
   Paper,
-  IconButton,
-  Tooltip,
   Box,
   Button,
   CircularProgress,
-  FormControl,
-  Select,
-  MenuItem,
   Tabs,
   Tab,
-  TablePagination,
-  TableFooter,
-  Input,
-  Avatar,
-  Chip,
-  InputBase,
+  Avatar
 } from "@mui/material";
-// Tabler icons
-import {
-  IconSend
-} from '@tabler/icons';
-import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-import Chart from 'react-apexcharts';
-import { QRCodeCanvas } from 'qrcode.react';
-import { alpha, styled, useTheme } from "@mui/material/styles";
-import { visuallyHidden } from "@mui/utils";
-import { IconTrash, IconFilter } from "@tabler/icons";
 import { useConnect } from "@connect2ic/react";
 import ic from "ic0";
-import CryptoJS from "crypto-js";
-import FirstPageIcon from '@mui/icons-material/FirstPage';
-import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft';
-import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
-import LastPageIcon from '@mui/icons-material/LastPage';
 import DetailComponent from "./DetailComponent";
 import GroupMembers from "./GroupMembers";
 import Overview from "./overviewComponent/overview";
 import ChatComponent from "./chatComponent/ChatComponent";
 import Setting from "./settingComponent/setting";
-import Stakeholder from "./StakeHolder";
+import Stakeholder from "./stakeHolderComponent/index";
 import Accounts from "./accountComponent/account";
 import Rewards from "./rewardComponent/reward";
 
 const ledger = ic.local("bkyz2-fmaaa-aaaaa-qaaaq-cai");
 
-const secretKey = "your-secret-key"; // Use a strong secret key
-
-const initialState = {
-  email: "",
-  contactDetails: "",
-  recordType: "",
-};
 
 
 const groupDetails = {
@@ -134,24 +95,6 @@ const groupDetails = {
     },
   ],
 };
-
-const StyledPaper = styled(Paper)(({ theme, selected }) => ({
-  padding: "16px",
-  textAlign: "center",
-  cursor: "pointer",
-  backgroundColor: selected
-    ? theme.palette.action.selected
-    : theme.palette.background.paper,
-  transition: "background-color 0.3s ease, maxHeight 0.3s ease",
-  maxHeight: selected ? "250px" : "100px",
-  overflow: "hidden",
-  "&:hover": {
-    backgroundColor: theme.palette.action.hover,
-  },
-}));
-
-
-
 
 const GroupDetailPage = () => {
   const { groupId } = useParams();
@@ -341,7 +284,8 @@ const GroupDetailPage = () => {
                                 {tabValue === 5 && (
                                   <>
                                     <Box>
-                                      <Stakeholder groupId={groupId} />
+                                      {/* <Stakeholder groupId={groupId} /> */}
+                                      <Stakeholder groupId={groupId}/>
                                     </Box>
                                   </>
                                 )}
@@ -449,29 +393,3 @@ const GroupDetailPage = () => {
 };
 
 export default GroupDetailPage;
-
-function descendingComparator(a, b, orderBy) {
-  if (b[orderBy] < a[orderBy]) {
-    return -1;
-  }
-  if (b[orderBy] > a[orderBy]) {
-    return 1;
-  }
-  return 0;
-}
-
-function getComparator(order, orderBy) {
-  return order === "desc"
-    ? (a, b) => descendingComparator(a, b, orderBy)
-    : (a, b) => -descendingComparator(a[0], b[0]);
-}
-
-function stableSort(array, comparator) {
-  const stabilizedThis = array.map((el, index) => [el, index]);
-  stabilizedThis.sort((a, b) => {
-    const order = comparator(a[0], b[0]);
-    if (order !== 0) return order;
-    return a[1] - b[1];
-  });
-  return stabilizedThis.map((el) => el[0]);
-}
