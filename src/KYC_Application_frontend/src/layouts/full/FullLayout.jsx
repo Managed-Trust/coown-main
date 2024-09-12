@@ -1,6 +1,6 @@
 import { styled, Container, Box, useTheme } from '@mui/material';
 import { useSelector } from 'react-redux';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 
 import Header from './vertical/header/Header';
 import HorizontalHeader from './horizontal/header/Header';
@@ -20,8 +20,7 @@ import GroupDetailPage from '../../components/apps/userprofile/gallery/GroupDeta
 import Chats from '../../views/apps/chat/Chat.jsx';
 import GroupInvitation from '../../views/pages/group-invitation/group-invitation.jsx';
 import Tickets from '../../views/apps/tickets/Tickets.jsx';
-// import AddStakeHolder from '../../views/apps/stakeholder/AddStakeHolder.jsx';
-import AddStakeHolder from '../../components/apps/userprofile/gallery/stakeHolderComponent/AddStakeHolder.jsx'
+import AddStakeHolder from '../../components/apps/userprofile/gallery/stakeHolderComponent/AddStakeHolder.jsx';
 import Faq from '../../views/pages/faq/Faq.jsx';
 import UserApproval from '../../components/apps/tickets/UserApproval.jsx';
 import Galleryr from '../../views/apps/referrals/ReferralCode.jsx';
@@ -32,7 +31,6 @@ import RegisterCompany from '../../views/apps/Group/RegisterCompany.jsx';
 import {
   ConnectDialog,
 } from "@connect2ic/react";
-
 
 const MainWrapper = styled('div')(() => ({
   display: 'flex',
@@ -55,58 +53,53 @@ const FullLayout = () => {
   const theme = useTheme();
 
   return (
-    <>
-      <MainWrapper
-        className={customizer.activeMode === 'dark' ? 'darkbg mainwrapper' : 'mainwrapper'}
+    <MainWrapper className={customizer.activeMode === 'dark' ? 'darkbg mainwrapper' : 'mainwrapper'}>
+      {!customizer.isHorizontal && <Sidebar />}
+      <PageWrapper
+        className="page-wrapper"
+        sx={{
+          ...(customizer.isCollapse && {
+            [theme.breakpoints.up('lg')]: { ml: `${customizer.MiniSidebarWidth}px` },
+          }),
+        }}
       >
-        {customizer.isHorizontal ? '' : <Sidebar />}
-        <PageWrapper
-          className="page-wrapper"
+        {customizer.isHorizontal ? <HorizontalHeader /> : <Header />}
+        {customizer.isHorizontal && <Navigation />}
+        <Container
           sx={{
-            ...(customizer.isCollapse && {
-              [theme.breakpoints.up('lg')]: { ml: `${customizer.MiniSidebarWidth}px` },
-            }),
+            maxWidth: customizer.isLayout === 'boxed' ? 'lg' : '100%!important',
           }}
         >
-          {customizer.isHorizontal ? <HorizontalHeader /> : <Header />}
-          {customizer.isHorizontal ? <Navigation /> : ''}
-          <Container
-            sx={{
-              maxWidth: customizer.isLayout === 'boxed' ? 'lg' : '100%!important',
-            }}
-          >
-            <Box sx={{ minHeight: 'calc(100vh - 170px)' }}>
-              <Routes>
-                <Route path="/" element={<EcommerceDash />} />
-                <Route path="/dashboards/modern" element={<Modern />} />
-                <Route path="/apps/followers" element={<Followers />} />
-                <Route path="/apps/friends" element={<Friends />} />
-                <Route path="/apps/gallery" element={<Gallery />} />
-                <Route path="/apps/private" element={<PrivateGroup/>} />
-                <Route path="/apps/registerCompany" element={<RegisterCompany/>} />
-                <Route path="/user-profile" element={<UserProfile />} />
-                <Route path="/referral" element={<Galleryr/>}/>
-                <Route path="/account" element={<Account />} />
-                <Route path="/user-profile/Settings" element={<Settings />} />
-                <Route path="/forms/form-horizontal" element={<FormHorizontal />} />
-                <Route path="/group/:groupId" element={<GroupDetailPage />} />
-                {/* <Route path="/group/:groupId/add-stakeholder" element={<AddStakeHolder/>} /> */}                
-                <Route path="/group/:groupId/add-stakeholder" element={<AddStakeHolder/>} />
-                <Route path="/group/create-group" element={<CreateGroup/>} />
-                <Route path="/apps/chats" element={<Chats />} />
-                <Route path="/group-invitation/:groupId/:email" element={<GroupInvitation />} />
-                <Route path="/apps/tickets" element={<Tickets />} />
-                <Route path="/apps/tickets/user-detail/:id" element={<UserApproval />} />
-                <Route path="/pages/faq" element={<Faq />} />
-              </Routes>
-            </Box>
-          </Container>
-          <Customizer />
-          <ConnectDialog dark={false} />
-        </PageWrapper>
-      </MainWrapper>
-    </>
-
+          <Box sx={{ minHeight: 'calc(100vh - 170px)' }}>
+            <Routes>
+              <Route path="/dashboards/ecommerce" element={<EcommerceDash />} />
+              <Route path="/dashboards/modern" element={<Modern />} />
+              <Route path="/apps/followers" element={<Followers />} />
+              <Route path="/apps/friends" element={<Friends />} />
+              <Route path="/apps/gallery" element={<Gallery />} />
+              <Route path="/apps/private" element={<PrivateGroup />} />
+              <Route path="/apps/registerCompany" element={<RegisterCompany />} />
+              <Route path="/user-profile" element={<UserProfile />} />
+              <Route path="/referral" element={<Galleryr />} />
+              <Route path="/account" element={<Account />} />
+              <Route path="/user-profile/Settings" element={<Settings />} />
+              <Route path="/forms/form-horizontal" element={<FormHorizontal />} />
+              <Route path="/group/:groupId" element={<GroupDetailPage />} />
+              <Route path="/group/:groupId/add-stakeholder" element={<AddStakeHolder />} />
+              <Route path="/group/create-group" element={<CreateGroup />} />
+              <Route path="/apps/chats" element={<Chats />} />
+              <Route path="/group-invitation/:groupId/:email" element={<GroupInvitation />} />
+              <Route path="/apps/tickets" element={<Tickets />} />
+              <Route path="/apps/tickets/user-detail/:id" element={<UserApproval />} />
+              <Route path="/pages/faq" element={<Faq />} />
+              <Route path="*" element={<Navigate to="/404" />} /> {/* Catch-all route for 404 */}
+            </Routes>
+          </Box>
+        </Container>
+        <Customizer />
+        <ConnectDialog dark={false} />
+      </PageWrapper>
+    </MainWrapper>
   );
 };
 

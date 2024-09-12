@@ -121,7 +121,7 @@ const Navigations = () => {
         Support
       </StyledButton>
       <Button color="primary" target="_blank" variant="contained" component={NavLink} to="/auth/login">
-        Login
+        Connect
       </Button>
     </>
   );

@@ -3,6 +3,7 @@ import { Grid, Box, Container, useMediaQuery, styled, Stack } from '@mui/materia
 import BannerContent from './BannerContent';
 import bannerbgImg1 from '../../../assets/images/landingpage/bannerimg1.svg';
 import bannerbgImg2 from '../../../assets/images/landingpage/bannerimg2.svg';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 
 const Banner = () => {
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up('md'));
@@ -16,7 +17,6 @@ const Banner = () => {
         transform: 'translate3d(0px, -100%, 0px)',
       },
     },
-
     animation: 'slideup 35s linear infinite',
   }));
 
@@ -29,51 +29,53 @@ const Banner = () => {
         transform: 'translate3d(0px, 0, 0px)',
       },
     },
-
     animation: 'slideDown 35s linear infinite',
   }));
+
   return (
-    <Box mb={10} sx={{ overflow: 'hidden' }}>
-      <Container maxWidth="lg">
-        <Grid container spacing={3} alignItems="center">
-          <Grid item xs={12} lg={6} md={8}>
-            <BannerContent />
-          </Grid>
-          {lgUp ? (
-            <Grid item xs={12} lg={6} md={4}>
-              <Box
-                p={3.2}
-                sx={{
-                  backgroundColor: (theme) => theme.palette.primary.light,
-                  minWidth: '2000px',
-                  height: 'calc(100vh - 100px)',
-                  maxHeight: '790px',
-                }}
-              >
-                <Stack direction={'row'}>
-                  <Box>
-                    <SliderBox>
-                      <img src={bannerbgImg1} alt="banner" />
-                    </SliderBox>
-                    <SliderBox>
-                      <img src={bannerbgImg1} alt="banner" />
-                    </SliderBox>
-                  </Box>
-                  <Box>
-                    <SliderBox2>
-                      <img src={bannerbgImg2} alt="banner" />
-                    </SliderBox2>
-                    <SliderBox2>
-                      <img src={bannerbgImg2} alt="banner" />
-                    </SliderBox2>
-                  </Box>
-                </Stack>
-              </Box>
+    <GoogleOAuthProvider clientId="725664575664-3tboqhepr5uggob4mitv569jj9vfv362.apps.googleusercontent.com">
+      <Box mb={10} sx={{ overflow: 'hidden' }}>
+        <Container maxWidth="lg">
+          <Grid container spacing={3} alignItems="center">
+            <Grid item xs={12} lg={6} md={8}>
+              <BannerContent />
             </Grid>
-          ) : null}
-        </Grid>
-      </Container>
-    </Box>
+            {lgUp ? (
+              <Grid item xs={12} lg={6} md={4}>
+                <Box
+                  p={3.2}
+                  sx={{
+                    backgroundColor: (theme) => theme.palette.primary.light,
+                    minWidth: '2000px',
+                    height: 'calc(100vh - 100px)',
+                    maxHeight: '790px',
+                  }}
+                >
+                  <Stack direction={'row'}>
+                    <Box>
+                      <SliderBox>
+                        <img src={bannerbgImg1} alt="banner" />
+                      </SliderBox>
+                      <SliderBox>
+                        <img src={bannerbgImg1} alt="banner" />
+                      </SliderBox>
+                    </Box>
+                    <Box>
+                      <SliderBox2>
+                        <img src={bannerbgImg2} alt="banner" />
+                      </SliderBox2>
+                      <SliderBox2>
+                        <img src={bannerbgImg2} alt="banner" />
+                      </SliderBox2>
+                    </Box>
+                  </Stack>
+                </Box>
+              </Grid>
+            ) : null}
+          </Grid>
+        </Container>
+      </Box>
+    </GoogleOAuthProvider>
   );
 };
 

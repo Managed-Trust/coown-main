@@ -3,7 +3,7 @@ import App from "./App";
 import "./index.scss";
 import React, { Suspense } from "react";
 import { Provider } from "react-redux";
-import { BrowserRouter } from "react-router-dom";
+
 import { store } from "./store/Store";
 import Spinner from "./views/spinner/Spinner";
 import "./_mockApis";
@@ -24,11 +24,9 @@ ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <Provider store={store}>
       <Suspense fallback={<Spinner />}>
-        <BrowserRouter>
           <Connect2ICProvider client={client}>
             <App />
           </Connect2ICProvider>
-        </BrowserRouter>
       </Suspense>
     </Provider>
   </React.StrictMode>
