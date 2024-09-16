@@ -11,12 +11,16 @@ import Footer from '../../../components/landingpage/footer/Footer';
 import Frameworks from '../../../components/landingpage/frameworks/Frameworks';
 import LpHeader from '../../../components/landingpage/header/Header';
 import Testimonial from '../../../components/landingpage/testimonial/Testimonial';
+import PartnerLogos from '../../../components/landingpage/PartnerLogos/PartnerLogos';
+import Countdown from '../../../components/landingpage/Countdown/Countdown';
 
 const Landingpage = () => {
   return (
     <PageContainer title="Landingpage" description="this is Landingpage">
       <LpHeader />
       <Banner />
+      <PartnerLogos/>
+      <Countdown/>
       <DemoSlider />
       <Frameworks />
       <Testimonial />

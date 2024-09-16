@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Typography, Box, Button, Stack, styled, useMediaQuery } from '@mui/material';
-import { IconRocket } from '@tabler/icons';
+import { Typography, Box, Button, Stack, styled, useMediaQuery,Grid } from '@mui/material';
+import { IconRocket, IconWallet } from '@tabler/icons';
 import { NavLink } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { GoogleOAuthProvider, useGoogleLogin } from '@react-oauth/google';
@@ -88,9 +88,9 @@ const BannerContent = () => {
         >
           <Typography variant="h6" display={'flex'} gap={1} mb={2}>
             <Typography color={'secondary'}>
-              <IconRocket size={'21'} />
+              <IconWallet size={'21'} />
             </Typography>{' '}
-            Kick start your project with
+            Wallet for your groups
           </Typography>
 
           <Typography
@@ -106,10 +106,17 @@ const BannerContent = () => {
             }}
           >
             Managed{' '}
+            <span
+              style={{
+                background: 'linear-gradient(90deg, #6797FF, #A66EFE)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+              }}
+            >Shared</span>{' '}
             <Typography component={'span'} variant="none" color={'primary'}>
-              Shared
+              assets
             </Typography>{' '}
-            Assets
+            with your team
           </Typography>
         </motion.div>
         <Box pt={2} pb={3}>
@@ -123,8 +130,8 @@ const BannerContent = () => {
               delay: 0.2,
             }}
           >
-            <Typography variant="h5" fontWeight={300}>
-              Transaction approvals and shareholder votings
+            <Typography variant="h6" fontWeight={300}>
+              Group accounts with spending limits, transaction approvals, and custom securities for regional markets, suitable for private groups, corporations and public law entities.
             </Typography>
           </motion.div>
         </Box>
