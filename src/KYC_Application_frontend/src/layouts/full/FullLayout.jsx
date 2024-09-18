@@ -31,6 +31,7 @@ import RegisterCompany from '../../views/apps/Group/RegisterCompany.jsx';
 import {
   ConnectDialog,
 } from "@connect2ic/react";
+import AmlSetting from '../../views/apps/AmlSetting/AmlSetting.jsx';
 
 const MainWrapper = styled('div')(() => ({
   display: 'flex',
@@ -90,6 +91,7 @@ const FullLayout = () => {
               <Route path="/apps/chats" element={<Chats />} />
               <Route path="/group-invitation/:groupId/:email" element={<GroupInvitation />} />
               <Route path="/apps/tickets" element={<Tickets />} />
+              <Route path="/apps/aml-setting" element={<AmlSetting/>} />
               <Route path="/apps/tickets/user-detail/:id" element={<UserApproval />} />
               <Route path="/pages/faq" element={<Faq />} />
               <Route path="*" element={<Navigate to="/404" />} /> {/* Catch-all route for 404 */}

@@ -101,9 +101,9 @@ const Menuitems = [
       },
       {
         id: uniqueId(),
-        title: 'Clients',
+        title: 'AML Setting',
         icon: IconUserPlus,
-        href: '/clients',
+        href: '/apps/aml-setting',
         
       },      
       {
