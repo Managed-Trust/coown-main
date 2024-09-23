@@ -1776,6 +1776,269 @@ actor KYC_Canister {
 
   //=================================================================================//
 
+  // Function to get the total number of users
+
+  private func countIter(iter : Iter.Iter<Text>) : Nat {
+    var count : Nat = 0;
+    loop {
+      switch (iter.next()) {
+        case null {};
+        case (?_) {
+          count += 1;
+          // continue loop;
+        };
+      };
+    };
+    return count;
+  };
+
+  public query func getNumberOfUsers() : async Nat {
+    let userKeys = users.keys();
+    return countIter(userKeys);
+  };
+  // Function to get the total number of groups
+  public query func getNumberOfGroups() : async Nat {
+    let groupKeys = groups.keys();
+    return countIter(groupKeys);
+  };
+
+  // Function to get the total number of business units
+  public query func getNumberOfBusinessUnits() : async Nat {
+    let allGroupsIter = groups.vals();
+    let allGroups = Iter.toArray(allGroupsIter); // Convert iterator to array manually
+    let businessUnits = Array.filter(
+      allGroups,
+      func(g : Group) : Bool {
+        // Assuming `g` has a property `groupType` to check if it is a "BusinessUnit"
+        g.groupType == "BusinessUnit";
+      },
+    );
+    return Array.size(businessUnits);
+  };
+
+  // // Placeholder function for counting transactions
+  public query func getNumberOfTransactions() : async Nat {
+    // This function would need actual transaction data to count
+    let transactionCount : Nat = 0; // Placeholder
+    return transactionCount;
+  };
+
+  // Function to calculate the cost of creating groups
+  public func getTotalCreationCost() : async Nat {
+    let numberOfGroups = await getNumberOfGroups();
+    let costPerGroup : Nat = 100; // Cost to create each group
+    return numberOfGroups * costPerGroup;
+  };
+
+
+//===========================================================================================
+//===========================================================================================
+//===========================================================================================
+
+
+// Define Access Levels
+public type AccessLevel = {
+  #Guest;               // Level 0
+  #EmailRegistered;      // Level 1
+  #GroupMember;          // Level 2
+  #VerifiedAccountHolder; // Level 3
+  #EnterpriseCustomer;   // Level 4
+  #Functionary           // Level 5
+};
+
+private stable var userEntries1 : [(Text, User1)] = [];
+var users1 = HashMap.HashMap<Text, User1>(0, Text.equal, Text.hash);
+
+public type User1 = {
+  id : Text;
+  emailAuth : Text;
+  email : Text;
+  otp : ?Text;
+  otpExpiry : ?Int;
+  accessLevel : AccessLevel;
+  kycCompleted : Bool; // Add a field to check if KYC is completed
+};
+
+// Create a user with Guest access level (Level 0)
+public func createUser1(userId : Text, email : Text) : async Text {
+  let newUser = {
+    id = userId;
+    emailAuth = "pending";
+    email = email;
+    otp = null;
+    otpExpiry = null;
+    accessLevel = #Guest;
+    kycCompleted = false; // Initial state, KYC not completed
+  };
+  users1.put(userId, newUser);
+  return "User created with Guest access level.";
+};
+
+// Move to Email Registered (Level 1)
+public func moveToEmailRegistered(userId : Text) : async Text {
+  switch (users1.get(userId)) {
+    case (null) { return "User does not exist." };
+    case (?user) {
+      let updatedUser = { user with accessLevel = #EmailRegistered };
+      users1.put(userId, updatedUser);
+      return "User access level updated to Email Registered.";
+    };
+  };
+};
+
+// Move to Group Member (Level 2)
+public func moveToGroupMember(userId : Text) : async Text {
+  switch (users1.get(userId)) {
+    case (null) { return "User does not exist." };
+    case (?user) {
+      if (user.accessLevel == #EmailRegistered) {
+        let updatedUser = { user with accessLevel = #GroupMember };
+        users1.put(userId, updatedUser);
+        return "User access level updated to Group Member.";
+      } else {
+        return "User must be Email Registered to join groups.";
+      };
+    };
+  };
+};
+
+// Move to Verified Account Holder (Level 3) - Check if KYC is completed
+public func moveToVerifiedAccountHolder(userId : Text) : async Text {
+  switch (users1.get(userId)) {
+    case (null) { return "User does not exist."; };
+    case (?user) {
+      // Ensure the user is a Group Member and has completed KYC
+      if (user.accessLevel == #GroupMember and user.kycCompleted == true) {
+        let updatedUser = { user with accessLevel = #VerifiedAccountHolder };
+        users1.put(userId, updatedUser);
+        return "User access level updated to Verified Account Holder.";
+      } else if (user.kycCompleted == false) {
+        return "User must complete KYC to become a Verified Account Holder.";
+      } else {
+        return "User must be a Group Member to progress.";
+      };
+    };
+  };
+};
+
+
+
+// Add a function to complete KYC
+public func completeKYC(userId : Text) : async Text {
+  switch (users1.get(userId)) {
+    case (null) { return "User does not exist."; };
+    case (?user) {
+      let updatedUser = { user with kycCompleted = true };
+      users1.put(userId, updatedUser);
+      return "KYC completed successfully.";
+    };
+  };
+};
+
+// Move to Enterprise Customer (Level 4)
+public func moveToEnterpriseCustomer(userId : Text) : async Text {
+  switch (users1.get(userId)) {
+    case (null) { return "User does not exist."; };
+    case (?user) {
+      if (user.accessLevel == #VerifiedAccountHolder) {
+        let updatedUser = { user with accessLevel = #EnterpriseCustomer };
+        users1.put(userId, updatedUser);
+        return "User access level updated to Enterprise Customer.";
+      } else {
+        return "User must be a Verified Account Holder to upgrade to Enterprise Customer.";
+      };
+    };
+  };
+};
+
+// Move to Functionary (Level 5) - Allow managing group funds
+public func moveToFunctionary(userId : Text) : async Text {
+  switch (users1.get(userId)) {
+    case (null) { return "User does not exist."; };
+    case (?user) {
+      if (user.accessLevel == #EnterpriseCustomer) {
+        let updatedUser = { user with accessLevel = #Functionary };
+        users1.put(userId, updatedUser);
+        return "User access level updated to Functionary.";
+      } else {
+        return "User must be an Enterprise Customer to become a Functionary.";
+      };
+    };
+  };
+};
+
+// Function to allow Functionary to manage group funds
+public func manageGroupFunds(userId : Text) : async Text {
+  switch (users1.get(userId)) {
+    case (null) { return "User does not exist."; };
+    case (?user) {
+      if (user.accessLevel == #Functionary) {
+        // Placeholder for fund management logic (e.g., based on STRs)
+        return "User can manage group funds.";
+      } else {
+        return "User must be a Functionary to manage group funds.";
+      };
+    };
+  };
+};
+
+
+// Query the user's access level
+public query func getUserAccessLevel(userId : Text) : async ?AccessLevel {
+  switch (users1.get(userId)) {
+    case (null) { return null; }; 
+    case (?user) { return ?user.accessLevel; };
+  };
+};
+
+// Get stars for access level (UI Display)
+public query func getAccessLevelStars(userId : Text) : async Text {
+  switch (users1.get(userId)) {
+    case (null) { return "☆☆☆☆☆"; }; // Guest (Level 0)
+    case (?user) {
+      switch (user.accessLevel) {
+        case (#Guest) { return "☆☆☆☆☆"; }; // Level 0
+        case (#EmailRegistered) { return "★☆☆☆☆"; }; // Level 1
+        case (#GroupMember) { return "★★☆☆☆"; }; // Level 2
+        case (#VerifiedAccountHolder) { return "★★★☆☆"; }; // Level 3
+        case (#EnterpriseCustomer) { return "★★★★☆"; }; // Level 4
+        case (#Functionary) { return "★★★★★"; }; // Level 5
+      };
+    };
+  };
+};
+
+// Function for participating in group chat (Level 2 and higher)
+public func participateInGroupChat(userId : Text) : async Text {
+  switch (users1.get(userId)) {
+    case (null) { return "User does not exist."; };
+    case (?user) {
+      if (user.accessLevel == #GroupMember or user.accessLevel == #VerifiedAccountHolder or user.accessLevel == #EnterpriseCustomer or user.accessLevel == #Functionary) {
+        return "User can participate in group chat.";
+      } else {
+        return "User must be at least a Group Member to participate in group chat.";
+      };
+    };
+  };
+};
+
+// Function for voting (available for Group Members and higher)
+public func participateInVote(userId : Text) : async Text {
+  switch (users1.get(userId)) {
+    case (null) { return "User does not exist."; };
+    case (?user) {
+      if (user.accessLevel == #GroupMember or user.accessLevel == #VerifiedAccountHolder or user.accessLevel == #EnterpriseCustomer or user.accessLevel == #Functionary) {
+        // Placeholder for voting logic
+        return "User can participate in voting.";
+      } else {
+        return "User must be at least a Group Member to participate in voting.";
+      };
+    };
+  };
+};
+
+
+  // Function to get the total number of users
   system func preupgrade() {
     mapEntries := Iter.toArray(map.entries());
     //==========================================================
