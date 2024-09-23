@@ -98,14 +98,14 @@ const BannerContent = () => {
             fontWeight={900}
             sx={{
               fontSize: {
-                md: '54px',
+                md: '48px',
               },
               lineHeight: {
-                md: '60px',
+                md: '54px',
               },
             }}
           >
-            Managed{' '}
+            Manage{' '}
             <span
               style={{
                 background: 'linear-gradient(90deg, #6797FF, #A66EFE)',

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Grid, Box, Typography, Button } from '@mui/material';
+import { Container,Grid, Box, Typography, Button } from '@mui/material';
 
 const Countdown = () => {
   // Set initial time for the countdown (e.g., 1 day, 12 hours, 35 minutes, and 41 seconds from now)
@@ -32,52 +32,55 @@ const Countdown = () => {
 
   return (
     <Box sx={{ backgroundColor: '#f0f4fa', padding: '30px', borderRadius: '8px' }}>
-      <Grid container alignItems="center" spacing={3} justifyContent="center">
-        <Grid item>
-          <Typography variant="h3" sx={{ fontWeight: 'bold' }}>
-            Next token sale phase starts in
-          </Typography>
-          <Button variant="outlined" sx={{ mt: 1 }}>
-            Learn more
-          </Button>
-        </Grid>
-        <Grid item sx={{ marginLeft: '50px' }}>
-          <Grid container spacing={1} alignItems="center">
-            <Grid item sx={{ marginRight: '20px' }}>
-              <Typography variant="h2" sx={{ color: '#1976d2', fontWeight: 'bold' }}>
-                {timeLeft.days}
-              </Typography>
-              <Typography variant="body2" align="center">
-                Days
-              </Typography>
-            </Grid>
-            <Grid item sx={{ marginRight: '20px' }}>
-              <Typography variant="h2" sx={{ color: '#1976d2', fontWeight: 'bold' }}>
-                {timeLeft.hours}
-              </Typography>
-              <Typography variant="body2" align="center">
-                Hours
-              </Typography>
-            </Grid>
-            <Grid item sx={{ marginRight: '20px' }}>
-              <Typography variant="h2" sx={{ color: '#1976d2', fontWeight: 'bold' }}>
-                {timeLeft.minutes}
-              </Typography>
-              <Typography variant="body2" align="center">
-                Minutes
-              </Typography>
-            </Grid>
-            <Grid item sx={{ marginRight: '20px' }}>
-              <Typography variant="h2" sx={{ color: '#1976d2', fontWeight: 'bold' }}>
-                {timeLeft.seconds}
-              </Typography>
-              <Typography variant="body2" align="center">
-                Seconds
-              </Typography>
+
+      <Container maxWidth="lg">
+        <Grid container  spacing={2} >
+          <Grid item xs={6}>
+            <Typography variant="h2" sx={{ fontWeight: 'bold' }}>
+              Next token sale phase starts in
+            </Typography>
+            <Button variant="outlined" sx={{ mt: 1 }}>
+              Learn more
+            </Button>
+          </Grid>
+          <Grid item   xs={6} >
+            <Grid container spacing={1} alignItems="center">
+              <Grid item sx={{ marginRight: '20px' }}>
+                <Typography variant="h1" sx={{ color: '#1976d2', fontWeight: 'bold' }}>
+                  {timeLeft.days}
+                </Typography>
+                <Typography variant="body2" align="center">
+                  Days
+                </Typography>
+              </Grid>
+              <Grid item sx={{ marginRight: '20px' }}>
+                <Typography variant="h1" sx={{ color: '#1976d2', fontWeight: 'bold' }}>
+                  {timeLeft.hours}
+                </Typography>
+                <Typography variant="body2" align="center">
+                  Hours
+                </Typography>
+              </Grid>
+              <Grid item sx={{ marginRight: '20px' }}>
+                <Typography variant="h1" sx={{ color: '#1976d2', fontWeight: 'bold' }}>
+                  {timeLeft.minutes}
+                </Typography>
+                <Typography variant="body2" align="center">
+                  Minutes
+                </Typography>
+              </Grid>
+              <Grid item sx={{ marginRight: '20px' }}>
+                <Typography variant="h1" sx={{ color: '#1976d2', fontWeight: 'bold' }}>
+                  {timeLeft.seconds}
+                </Typography>
+                <Typography variant="body2" align="center">
+                  Seconds
+                </Typography>
+              </Grid>
             </Grid>
           </Grid>
         </Grid>
-      </Grid>
+      </Container>
     </Box>
   );
 };

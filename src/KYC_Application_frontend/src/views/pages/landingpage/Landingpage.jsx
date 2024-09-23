@@ -13,6 +13,7 @@ import LpHeader from '../../../components/landingpage/header/Header';
 import Testimonial from '../../../components/landingpage/testimonial/Testimonial';
 import PartnerLogos from '../../../components/landingpage/PartnerLogos/PartnerLogos';
 import Countdown from '../../../components/landingpage/Countdown/Countdown';
+import AssetControl from '../../../components/landingpage/AssetControl/AssetControl';
 
 const Landingpage = () => {
   return (
@@ -21,7 +22,8 @@ const Landingpage = () => {
       <Banner />
       <PartnerLogos/>
       <Countdown/>
-      <DemoSlider />
+      <AssetControl/>
+      {/* <DemoSlider /> */}
       <Frameworks />
       <Testimonial />
       <Features />

@@ -53,20 +53,10 @@ const Banner = () => {
                 >
                   <Stack direction={'row'}>
                     <Box>
-                      <SliderBox>
                         <img src={bannerbgImg1} alt="banner" />
-                      </SliderBox>
-                      <SliderBox>
-                        <img src={bannerbgImg1} alt="banner" />
-                      </SliderBox>
                     </Box>
                     <Box>
-                      <SliderBox2>
                         <img src={bannerbgImg2} alt="banner" />
-                      </SliderBox2>
-                      <SliderBox2>
-                        <img src={bannerbgImg2} alt="banner" />
-                      </SliderBox2>
                     </Box>
                   </Stack>
                 </Box>
