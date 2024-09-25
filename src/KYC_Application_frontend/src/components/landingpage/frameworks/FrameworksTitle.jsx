@@ -17,6 +17,10 @@ const FrameworksTitle = () => {
                         xs: '30px'
                     }
                 }}>Innovative tools for secure <br/> collaboration</Typography>
+                
+                <Typography variant='body2' mt={2} sx={{fontSize:'15px'}} textAlign="center">
+                Empower your team with features designed to <br/> simplify collective financial management.
+                    </Typography>
             </Grid>
         </Grid>
     );

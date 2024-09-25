@@ -1,15 +1,14 @@
 import React from 'react';
-import { Typography, Box, Button, styled, CardContent, Stack } from '@mui/material';
+import { Typography, Box, Button, styled, CardContent, Stack, IconButton } from '@mui/material';
+import { Facebook, Instagram, YouTube, LinkedIn } from '@mui/icons-material'; // Replace with appropriate icons
+import TelegramIcon from '@mui/icons-material/Telegram';
+import TwitterIcon from '@mui/icons-material/Twitter';// If you need a custom icon, you can use an SVG or similar library
 
 import BlankCard from '../../shared/BlankCard';
-
 import badgeImg from '../../../assets/images/landingpage/shape/badge.svg';
 import lineImg from '../../../assets/images/landingpage/shape/line-bg-2.svg';
 
 const ImgCard = styled(BlankCard)(() => ({
-  backgroundImage: `url(${lineImg})`,
-  backgroundRepeat: 'no-repeat',
-  backgroundPosition: 'center center',
   marginTop: '-70px',
 }));
 
@@ -21,44 +20,36 @@ const StyledButton = styled(Button)(() => ({
 const GuaranteeCard = () => {
   return (
     <ImgCard>
-      <CardContent>
         <Stack
-          direction={{ xs: 'column', sm: 'row' }}
-          alignItems="center"
-          justifyContent="space-between"
+          direction="row"
+          justifyContent="center"
+          spacing={3}
+          mt={2}
+          mb={2}
+          sx={{
+            padding: '10px 20px',
+            borderRadius: '12px',
+          }}
         >
-          <Stack direction="row" alignItems="center">
-            <Box pl={2}>
-              <img src={badgeImg} alt="bagde" />
-            </Box>
-            <Box pl={3}>
-              <Typography variant="h4">100% moneyback guarantee</Typography>
-              <Typography variant="subtitle1" color="textSecondary">
-                We offer 48 hours moneyback guarantee.
-              </Typography>
-            </Box>
-          </Stack>
-          <Stack
-            sx={{
-              mt: {
-                xs: 2,
-                sm: 0,
-              },
-              mr: {
-                lg: 2,
-              },
-              width: {
-                xs: '100%',
-                sm: 'auto',
-              },
-            }}
-          >
-            <StyledButton variant="contained" color="primary" href="#">
-              Contact
-            </StyledButton>
-          </Stack>
+          <IconButton href="#" aria-label="telegram">
+            <TelegramIcon fontSize="large" />
+          </IconButton>
+          <IconButton href="#" aria-label="youtube">
+            <YouTube fontSize="large" />
+          </IconButton>
+          <IconButton href="#" aria-label="linkedin">
+            <LinkedIn fontSize="large" />
+          </IconButton>
+          <IconButton href="#" aria-label="facebook">
+            <Facebook fontSize="large" />
+          </IconButton>
+          <IconButton href="#" aria-label="instagram">
+            <Instagram fontSize="large" />
+          </IconButton>
+          <IconButton href="#" aria-label="twitter">
+            <TwitterIcon fontSize="large" />
+          </IconButton>
         </Stack>
-      </CardContent>
     </ImgCard>
   );
 };

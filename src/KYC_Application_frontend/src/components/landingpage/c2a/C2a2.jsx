@@ -27,7 +27,7 @@ const StyledButton2 = styled(Button)(({ theme }) => ({
 
 const C2a2 = () => {
   return (
-    <Box>
+    <Box bgcolor='#f8f9fb'>
       <Box
         bgcolor="primary.main"
         sx={{
@@ -39,20 +39,13 @@ const C2a2 = () => {
           <Grid container justifyContent="space-between" spacing={3}>
             <Grid item xs={12} sm={12} lg={5}>
               <Typography variant="h2" color="background.paper" fontWeight={700} mt={4}>
-                Build your app with our highly customizable React based Dashboard
+              Streamline asset management and collaborate across your teams and organizations
               </Typography>
 
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={3} mt={3}>
                 <StyledButton variant="contained" color="inherit" component={NavLink} to="/auth/login">
-                  Login
+                  Contact now
                 </StyledButton>
-                <StyledButton2
-                  variant="outlined"
-                  color="inherit"
-                  component={NavLink} to="/auth/register"
-                >
-                  Register
-                </StyledButton2>
               </Stack>
             </Grid>
             <Grid item xs={12} lg={5}>

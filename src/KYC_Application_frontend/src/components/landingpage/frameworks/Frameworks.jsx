@@ -24,8 +24,8 @@ const Frameworks = () => {
       bgcolor="action.hover"
       sx={{
         py: {
-          xs: '70px',
-          lg: '120px',
+          xs: '50px',
+          lg: '90px',
         },
       }}
     >
