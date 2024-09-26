@@ -1,8 +1,8 @@
 import React from 'react';
 import { Grid, Box, Container, useMediaQuery, styled, Stack } from '@mui/material';
 import BannerContent from './BannerContent';
-import bannerbgImg1 from '../../../assets/images/landingpage/bannerimg1.svg';
-import bannerbgImg2 from '../../../assets/images/landingpage/bannerimg2.svg';
+import bannerbgImg1 from '../../../assets/images/landingpage/imgg1.svg';
+import bannerbgImg2 from '../../../assets/images/landingpage/imgg2.svg';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 
 const Banner = () => {
@@ -53,10 +53,20 @@ const Banner = () => {
                 >
                   <Stack direction={'row'}>
                     <Box>
+                      <SliderBox>
                         <img src={bannerbgImg1} alt="banner" />
+                      </SliderBox>
+                      <SliderBox>
+                        <img src={bannerbgImg1} alt="banner" />
+                      </SliderBox>
                     </Box>
                     <Box>
+                      <SliderBox>
                         <img src={bannerbgImg2} alt="banner" />
+                      </SliderBox>
+                      <SliderBox>
+                        <img src={bannerbgImg2} alt="banner" />
+                      </SliderBox>
                     </Box>
                   </Stack>
                 </Box>
