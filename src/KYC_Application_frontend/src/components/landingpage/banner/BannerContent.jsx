@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Typography, Box, Button, Stack, styled, useMediaQuery,Grid } from '@mui/material';
+import { Typography, Box, Button, Stack, styled, useMediaQuery, Grid } from '@mui/material';
 import { IconRocket, IconWallet } from '@tabler/icons';
 import { NavLink } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -10,7 +10,7 @@ const StyledButton = styled(Button)(() => ({
   padding: '13px 48px',
   fontSize: '16px',
   textTransform: 'none',
-  width: '80%',
+  width: '50%',
   borderRadius: '8px',
   backgroundColor: '#4A80F6',
   color: '#fff',
@@ -24,7 +24,7 @@ const StyledButton2 = styled(Button)(() => ({
   padding: '13px 48px',
   fontSize: '16px',
   textTransform: 'none',
-  width: '75%',
+  width: '50%',
   borderRadius: '8px',
   color: '#4A80F6',
   border: '1px solid #4A80F6',
@@ -145,19 +145,16 @@ const BannerContent = () => {
             delay: 0.4,
           }}
         >
-          <Stack direction='column' spacing={2} mt={3}>
-            <StyledButton variant="contained" color="primary" to="/dashboards/ecommerce" component={NavLink}>
-              Connect with Internet Identity
+          <Stack direction='row' spacing={2} mt={3}>
+            <StyledButton variant="contained" color="primary" to="/user/login" component={NavLink}>
+              Sign In
             </StyledButton>
 
             {/* Custom Google Login Button */}
-            {!profile ? (
-              <StyledButton2 onClick={login}>
-                Connect with personal email
-              </StyledButton2>
-            ) : (
-              <Typography>Welcome, {profile ? profile.name : user.name}!</Typography>
-            )}
+            <StyledButton2>
+              Contact
+            </StyledButton2>
+
           </Stack>
         </motion.div>
       </Box>
