@@ -10,6 +10,8 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Landingpage from './views/pages/landingpage/Landingpage';
 import LoginPage from './views/pages/login/LoginPage';
 import { GoogleOAuthProvider, useGoogleLogin } from '@react-oauth/google';
+import Organization from './views/pages/Organization/Organization';
+
 function App() {
   const theme = ThemeSettings();
   const customizer = useSelector((state) => state.customizer);
@@ -24,6 +26,7 @@ function App() {
               <Routes>
                 {/* Route for the Landing Page */}
                 <Route path="/" element={<Landingpage />} />
+                <Route path="/organization" element={<Organization />} /> 
                 <Route path='/user/login' element={<LoginPage />} />
                 {/* Routes that use FullLayout */}
                 <Route path="/*" element={<FullLayout />} />
