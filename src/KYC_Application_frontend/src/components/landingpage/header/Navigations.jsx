@@ -43,7 +43,7 @@ const Navigations = () => {
       <StyledButton color="inherit" variant="text" href="/organization">
         Organization
       </StyledButton>
-      <StyledButton color="inherit" variant="text" href="/">
+      <StyledButton color="inherit" variant="text" href="/ico">
         ICO
       </StyledButton>
       <StyledButton color="inherit" variant="text" href="/">

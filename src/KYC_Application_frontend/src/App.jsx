@@ -11,6 +11,7 @@ import Landingpage from './views/pages/landingpage/Landingpage';
 import LoginPage from './views/pages/login/LoginPage';
 import { GoogleOAuthProvider, useGoogleLogin } from '@react-oauth/google';
 import Organization from './views/pages/Organization/Organization';
+import ICO from './views/pages/ICO/ICO';
 
 function App() {
   const theme = ThemeSettings();
@@ -27,6 +28,7 @@ function App() {
                 {/* Route for the Landing Page */}
                 <Route path="/" element={<Landingpage />} />
                 <Route path="/organization" element={<Organization />} /> 
+                <Route path="/ico" element={<ICO/>} /> 
                 <Route path='/user/login' element={<LoginPage />} />
                 {/* Routes that use FullLayout */}
                 <Route path="/*" element={<FullLayout />} />
