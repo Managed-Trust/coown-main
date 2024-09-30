@@ -7,10 +7,9 @@ import { GoogleOAuthProvider, useGoogleLogin } from '@react-oauth/google';
 
 // Styled Button for solid style
 const StyledButton = styled(Button)(() => ({
-  padding: '13px 48px',
+  padding: '10px 30px',
   fontSize: '16px',
   textTransform: 'none',
-  width: '50%',
   borderRadius: '8px',
   backgroundColor: '#4A80F6',
   color: '#fff',
@@ -21,12 +20,12 @@ const StyledButton = styled(Button)(() => ({
 
 // Styled Button for outlined style
 const StyledButton2 = styled(Button)(() => ({
-  padding: '13px 48px',
+  padding: '10px 40px',
   fontSize: '16px',
   textTransform: 'none',
-  width: '50%',
   borderRadius: '8px',
   color: '#4A80F6',
+  backgroundColor: '#fff',
   border: '1px solid #4A80F6',
   '&:hover': {
     border: '1px solid #3a6fcc',

@@ -24,7 +24,7 @@ import FAQSection from '../../../components/landingpage/FAQSection/FAQSection';
 
 const Landingpage = () => {
   return (
-    <PageContainer title="Landingpage" description="this is Landingpage">
+    <PageContainer title="COOWN" description="COOWN">
       <LpHeader />
       <Banner />
       <PartnerLogos/>
