@@ -4,7 +4,7 @@ import img from '../../../assets/images/landingpage/Vector.svg';
 
 const Footer = () => {
   return (
-    <Box 
+    <Box
       sx={{
         backgroundColor: '#f8f9fb',
         pt: 10,
@@ -17,11 +17,11 @@ const Footer = () => {
           <Grid item xs={12} sm={6}>
             <Box mb={2} display="flex" >
               <img src={img} alt="logo" style={{ width: '80px' }} />
-              <Typography variant='h1'm={2} >COOWN</Typography>
+              <Typography variant='h1' m={2} >COOWN</Typography>
             </Box>
             <Typography variant="subtitle" color="textSecondary" mb={2}>
-              Team-based asset management for private groups, 
-              <br/> corporations, and public law entities.
+              Team-based asset management for private groups,
+              <br /> corporations, and public law entities.
             </Typography>
             <br />
             <Link href="mailto:info@co-own.com" color="primary" underline="none">
@@ -73,12 +73,14 @@ const Footer = () => {
             </Link>
           </Grid>
         </Grid>
-      <hr/>
+        <hr />
         {/* Bottom Copyright Section */}
-        <Grid container justifyContent="center" mt={4}>
+        <Grid container justifyContent="center" mt={4} flexDirection="column" gap="10px">
+          <Typography variant="body2" color="textSecondary" textAlign="center" fontSize="14px" fontWeight="bold">
+            Powred by&nbsp;<img src="../../../src/assets/images/partnerlogo/logoo1.png" style={{ width: '25px',marginTop:'5px' }}/>
+          </Typography>
           <Typography variant="body2" color="textSecondary" textAlign="center">
-            Copyright © 2024 <br />
-            Web3 technology, cookie-free
+            Copyright © 2024 , cookie-free
           </Typography>
         </Grid>
       </Container>
