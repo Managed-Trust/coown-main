@@ -1,7 +1,7 @@
 import React from 'react';
 import { Grid, Link, Typography, Container, Box } from '@mui/material';
 import img from '../../../assets/images/landingpage/Vector.svg';
-
+import logo from '../../../assets/images/partnerlogo/logoo1.png';
 const Footer = () => {
   return (
     <Box
@@ -77,7 +77,7 @@ const Footer = () => {
         {/* Bottom Copyright Section */}
         <Grid container justifyContent="center" mt={4} flexDirection="column" gap="10px">
           <Typography variant="body2" color="textSecondary" textAlign="center" fontSize="14px" fontWeight="bold">
-            Powred by&nbsp;<img src="../../../src/assets/images/partnerlogo/logoo1.png" style={{ width: '25px',marginTop:'5px' }}/>
+            Powred by&nbsp;<img src={logo} style={{ width: '25px',marginTop:'5px' }}/>
           </Typography>
           <Typography variant="body2" color="textSecondary" textAlign="center">
             Copyright © 2024 , cookie-free

@@ -4,7 +4,7 @@ import FrameworksTitle from './FrameworksTitle';
 
 // images
 
-import sliderImg from '../../../assets/images/landingpage/background/slider-group.png';
+import  SliderImage  from '../../../assets/images/backgrounds/SliderImage.png';
 
 const SliderBox = styled(Box)(() => ({
   '@keyframes slide': {
@@ -36,12 +36,12 @@ const Frameworks = () => {
       <Stack overflow="hidden" mt={6} direction={'row'}>
         <Box>
           <SliderBox>
-            <img src={sliderImg} alt="slide" height={'100%'} />
+            <img src={SliderImage} alt="slide" height={'100%'} />
           </SliderBox>
         </Box>
         <Box>
           <SliderBox>
-            <img src={sliderImg} alt="slide" height={'100%'} />
+            <img src={SliderImage} alt="slide" height={'100%'} />
           </SliderBox>
         </Box>
       </Stack>

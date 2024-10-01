@@ -24,7 +24,7 @@ import FAQSection from '../../../components/landingpage/FAQSection/FAQSection';
 
 const Landingpage = () => {
   return (
-    <PageContainer title="COOWN" description="COOWN">
+    <PageContainer title="COOWN - wallets for your groups" description="COOWN - wallets for your groups">
       <LpHeader />
       <Banner />
       <PartnerLogos/>
