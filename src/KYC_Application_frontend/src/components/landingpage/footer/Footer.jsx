@@ -56,9 +56,10 @@ const Footer = () => {
             <Typography variant="h6" fontWeight="bold" mb={2}>
               Links
             </Typography>
-            <Link href="#" color="textSecondary" underline="none" mb={1} display="block">
+            <Link href="/whitepaper/COOWN_Whitepaper.pdf" target="_blank" rel="noopener noreferrer" color="textSecondary" underline="none" mb={1} display="block">
               Whitepaper
             </Link>
+
             <Link href="#" color="textSecondary" underline="none" mb={1} display="block">
               Investor Pitch
             </Link>
@@ -77,7 +78,7 @@ const Footer = () => {
         {/* Bottom Copyright Section */}
         <Grid container justifyContent="center" mt={4} flexDirection="column" gap="10px">
           <Typography variant="body2" color="textSecondary" textAlign="center" fontSize="14px" fontWeight="bold">
-            Powred by&nbsp;<img src={logo} style={{ width: '25px',marginTop:'5px' }}/>
+            Powred by&nbsp;<img src={logo} style={{ width: '25px', marginTop: '5px' }} />
           </Typography>
           <Typography variant="body2" color="textSecondary" textAlign="center">
             Copyright © 2024 , cookie-free
