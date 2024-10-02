@@ -1,16 +1,16 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-import LogoDark from '../../../../assets/images/logos/dark-logo.svg';
-import LogoDarkRTL from '../../../../assets/images/logos/dark-rtl-logo.svg';
-import LogoLight from '../../../../assets/images/logos/light-logo.svg';
-import LogoLightRTL from '../../../../assets/images/logos/light-logo-rtl.svg';
+import LogoDark from '../../../../assets/images/logos/logo_full.png';
+import LogoDarkRTL from '../../../../assets/images/logos/logo_full.png';
+import LogoLight from '../../../../assets/images/logos/dark_full.png';
+import LogoLightRTL from '../../../../assets/images/logos/dark_full.png';
 import { styled } from '@mui/material';
 
 const Logo = () => {
   const customizer = useSelector((state) => state.customizer);
   const LinkStyled = styled(Link)(() => ({
-    height: 'auto',
+    height: customizer.TopbarHeight,
     width: customizer.isCollapse ? '40px' : '180px',
     overflow: 'hidden',
     display: 'block',
@@ -23,9 +23,9 @@ const Logo = () => {
         alignItems: 'center',
       }}>
         {customizer.activeMode === 'dark' ? (
-          <img src={LogoLight} alt="Logo" style={{ height:'auto' }}/>
+          <img src={LogoLight} alt="Logo" style={{ width:'180px', height:'42.13px' }}/>
         ) : (
-          <img src={LogoDark} alt="Logo" style={{ height:'auto' }}/>
+          <img src={LogoDark} alt="Logo" style={{ width:'180px', height:'42.13px' }}/>
         )}
       </LinkStyled>
     );
@@ -36,9 +36,9 @@ const Logo = () => {
       alignItems: 'center',
     }}>
       {customizer.activeMode === 'dark' ? (
-        <img src={LogoDarkRTL} alt="Logo" style={{ height:'auto' }} />
+        <img src={LogoDarkRTL} alt="Logo" />
       ) : (
-        <img src={LogoLightRTL} alt="Logo" style={{ height:'auto' }} />
+        <img src={LogoLightRTL} alt="Logo" />
       )}
     </LinkStyled>
   );
