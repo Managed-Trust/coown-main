@@ -10,7 +10,7 @@ import { styled } from '@mui/material';
 const Logo = () => {
   const customizer = useSelector((state) => state.customizer);
   const LinkStyled = styled(Link)(() => ({
-    height: customizer.TopbarHeight,
+    height: 'auto',
     width: customizer.isCollapse ? '40px' : '180px',
     overflow: 'hidden',
     display: 'block',
@@ -23,9 +23,9 @@ const Logo = () => {
         alignItems: 'center',
       }}>
         {customizer.activeMode === 'dark' ? (
-          <img src={LogoLight} alt="Logo" />
+          <img src={LogoLight} alt="Logo" style={{ height:'auto' }}/>
         ) : (
-          <img src={LogoDark} alt="Logo" />
+          <img src={LogoDark} alt="Logo" style={{ height:'auto' }}/>
         )}
       </LinkStyled>
     );
@@ -36,9 +36,9 @@ const Logo = () => {
       alignItems: 'center',
     }}>
       {customizer.activeMode === 'dark' ? (
-        <img src={LogoDarkRTL} alt="Logo" />
+        <img src={LogoDarkRTL} alt="Logo" style={{ height:'auto' }} />
       ) : (
-        <img src={LogoLightRTL} alt="Logo" />
+        <img src={LogoLightRTL} alt="Logo" style={{ height:'auto' }} />
       )}
     </LinkStyled>
   );
