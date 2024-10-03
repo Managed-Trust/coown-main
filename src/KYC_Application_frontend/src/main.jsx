@@ -13,6 +13,8 @@ import { InfinityWallet } from "@connect2ic/core/providers/infinity-wallet";
 import { createClient } from "@connect2ic/core";
 import { Connect2ICProvider } from "@connect2ic/react";
 import "@connect2ic/core/style.css";
+import { UserProvider } from "./userContext/UserContext";
+
 const client = createClient({
   providers: [new InternetIdentity(), new InfinityWallet()],
   // canisters: {
@@ -22,12 +24,14 @@ const client = createClient({
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <Provider store={store}>
-      <Suspense fallback={<Spinner />}>
+    <UserProvider>
+      <Provider store={store}>
+        <Suspense fallback={<Spinner />}>
           <Connect2ICProvider client={client}>
             <App />
           </Connect2ICProvider>
-      </Suspense>
-    </Provider>
+        </Suspense>
+      </Provider>
+    </UserProvider>
   </React.StrictMode>
 );

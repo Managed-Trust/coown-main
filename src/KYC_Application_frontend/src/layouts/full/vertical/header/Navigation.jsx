@@ -28,24 +28,24 @@ const AppDD = () => {
       // Signed out
     },
   });
-  useEffect(() => {
-    const checkUserProfile = async () => {
-      if (isConnected && principal) {
-        try {
-          console.log("Principal:",principal);
-          const profileResponse = await ledger.call("getUser", principal);
-          const hasProfile = profileResponse[0];
-          console.log("Profile:", profileResponse);
-          if (!hasProfile) {
-            navigate("/forms/form-horizontal");
-          }
-        } catch (e) {
-          console.log("Error checking user profile:", e);
-        }
-      }
-    };
-    checkUserProfile();
-  }, [isConnected, principal, navigate]);
+  // useEffect(() => {
+  //   const checkUserProfile = async () => {
+  //     if (isConnected && principal) {
+  //       try {
+  //         console.log("Principal:",principal);
+  //         const profileResponse = await ledger.call("getUser", principal);
+  //         const hasProfile = profileResponse[0];
+  //         console.log("Profile:", profileResponse);
+  //         if (!hasProfile) {
+  //           navigate("/forms/form-horizontal");
+  //         }
+  //       } catch (e) {
+  //         console.log("Error checking user profile:", e);
+  //       }
+  //     }
+  //   };
+  //   checkUserProfile();
+  // }, [isConnected, principal, navigate]);
 
   const handleClick2 = (event) => {
     setAnchorEl2(event.currentTarget);

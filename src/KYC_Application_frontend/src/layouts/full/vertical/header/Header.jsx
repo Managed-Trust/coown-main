@@ -96,7 +96,7 @@ const Header = () => {
           {/* ------------------------------------------- */}
           {lgDown ? <MobileRightSidebar /> : null}
           <Profile />
-          <ConnectButton />
+          {/* <ConnectButton /> */}
         </Stack>
       </ToolbarStyled>
     </AppBarStyled>

@@ -20,7 +20,7 @@ const Menuitems = [
     id: uniqueId(),
     title: 'Dashboard',
     icon: IconHome,
-    href: '/dashboards/',
+    href: '/dashboards/ecommerce',
     children: [
       {
         id: uniqueId(),

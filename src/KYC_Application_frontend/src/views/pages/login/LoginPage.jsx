@@ -1,22 +1,65 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Grid, Box, Typography, TextField, Button, Divider, Checkbox, FormControlLabel } from '@mui/material';
-
-// Import the Google logo as an image for a colorful look
-import googleLogo from '../../../assets/images/login/GoogleIcon.svg'; // You can use any colorful Google logo image
+import googleLogo from '../../../assets/images/login/GoogleIcon.svg';
 import GoogleLoginLogo from "../../../assets/images/login/GoogleLogin.svg";
-import { GoogleOAuthProvider, useGoogleLogin } from '@react-oauth/google';
+import { useGoogleLogin } from '@react-oauth/google';
+import swal from 'sweetalert';
+import emailjs from "@emailjs/browser";
+import { useUser } from "../../../userContext/UserContext";
 
 const LoginPage = () => {
+    const { user, setUser } = useUser();
     const [email, setEmail] = useState('');
-    const [isOtpSent, setIsOtpSent] = useState(false); // Toggle between email and OTP form
-    const [otp, setOtp] = useState(['', '', '', '']);  // Store 4-digit OTP
-    const [profile, setProfile] = useState(null); // State to store user profile
+    const [isOtpSent, setIsOtpSent] = useState(false);
+    const [otp, setOtp] = useState(['', '', '', '']);
+    const [profile, setProfile] = useState(null);
+    const [generatedOtp, setGeneratedOtp] = useState("");
+    const navigate = useNavigate();
+
+    // Function to generate and set a 4-digit OTP
+    const generateOtp = () => {
+        const otp = Math.floor(1000 + Math.random() * 9000); // Generates a number between 1000 and 9999
+        setGeneratedOtp(otp.toString());
+    };
 
     // Function to simulate sending OTP to email
-    const sendOtpToEmail = () => {
-        console.log(`OTP sent to ${email}`);
+    const sendOtpToEmail = async () => {
+        generateOtp(); // Generate OTP first
         setIsOtpSent(true); // Switch to OTP form
     };
+
+    // useEffect to send the OTP once it is generated
+    useEffect(() => {
+        if (generatedOtp && isOtpSent) {
+            const emailParams = {
+                email: email,
+                otp: generatedOtp,
+            };
+
+            emailjs
+                .send(
+                    "service_idh0h15",
+                    "template_3d2t5lb",
+                    emailParams,
+                    "Y4QJDpwjrsdi3tQAR"
+                )
+                .then(
+                    () => {
+                        console.log("SUCCESS!");
+                        swal("OTP sent to your email!", email, "success");
+                    },
+                    (error) => {
+                        console.log("FAILED...", error.text);
+                        swal("Error Sending OTP", error.text, "error");
+                    }
+                )
+                .catch((error) => {
+                    console.log("Error sending OTP:", error);
+                    swal("Error Sending OTP", error.message, "error");
+                });
+        }
+    }, [generatedOtp, isOtpSent]);
 
     // Handle OTP input changes
     const handleOtpChange = (value, index) => {
@@ -27,15 +70,33 @@ const LoginPage = () => {
 
     // Handle form submission (for OTP verification)
     const verifyOtp = () => {
-        console.log(`OTP Entered: ${otp.join('')}`);
-        // Add OTP verification logic here
+        const enteredOtp = otp.join('');
+        if (enteredOtp === generatedOtp) {
+            console.log('OTP Verified!');
+            swal("Success", "OTP verified successfully!", "success").then(() => {
+                // Navigate to the dashboard or e-commerce page
+                setUser(email);
+                navigate('/dashboards/ecommerce');
+            });
+        } else {
+            console.log('Incorrect OTP');
+            swal("Error", "Incorrect OTP. Please try again.", "error");
+            setOtp(['', '', '', '']); // Clear OTP state
+        }
+    };
+
+    // Function to go back to email form
+    const handleBack = () => {
+        setIsOtpSent(false);
+        setOtp(['', '', '', '']);
+        setEmail('');
     };
 
     // Initialize Google login
     const login = useGoogleLogin({
         onSuccess: (tokenResponse) => {
             console.log('Login Success:', tokenResponse);
-            fetchUserProfile(tokenResponse.access_token); // Fetch user profile using access token
+            fetchUserProfile(tokenResponse.access_token);
         },
         onError: (error) => {
             console.log('Login Failed:', error);
@@ -58,13 +119,17 @@ const LoginPage = () => {
         }
     };
 
-    // useEffect to re-render the component when the profile state changes
+    // useEffect to re-render the component and set user state when the profile state changes
     useEffect(() => {
         if (profile) {
-            // Trigger any side effects or updates that should occur when the profile changes
             console.log('Profile updated, re-rendering component:', profile);
+            setUser(profile.email); // Set user email when profile is updated
+            swal("Success", "Login successfully!", "success").then(() => {
+                // Navigate to the dashboard or e-commerce page
+                navigate('/dashboards/ecommerce');
+            });
         }
-    }, [profile]); // Dependency array with profile ensures this runs when profile changes
+    }, [profile, navigate, setUser]);
 
     return (
         <Grid container component="main" sx={{ height: '100vh' }}>
@@ -81,9 +146,8 @@ const LoginPage = () => {
                     alignItems: 'center',
                 }}
             >
-                {/* Image Placeholder */}
                 <img
-                    src={GoogleLoginLogo} // Replace with your image URL
+                    src={GoogleLoginLogo}
                     alt="Login Illustration"
                     style={{ maxWidth: '80%', height: 'auto' }}
                 />
@@ -115,7 +179,6 @@ const LoginPage = () => {
                 >
                     {!isOtpSent ? (
                         <>
-                            {/* Email Form */}
                             <Typography variant="h5" gutterBottom sx={{ fontWeight: 600, fontSize: '26px' }}>
                                 Sign in via email
                             </Typography>
@@ -123,7 +186,6 @@ const LoginPage = () => {
                                 Enter your email address to receive a one-time password to sign in.
                             </Typography>
 
-                            {/* Email Input */}
                             <TextField
                                 margin="normal"
                                 fullWidth
@@ -135,7 +197,6 @@ const LoginPage = () => {
                                 sx={{ borderRadius: '8px', marginBottom: 2 }}
                             />
 
-                            {/* Checkboxes */}
                             <FormControlLabel
                                 control={<Checkbox value="receiveProductNotifications" color="primary" />}
                                 label="I agree to receive product notifications via email"
@@ -147,7 +208,6 @@ const LoginPage = () => {
                                 sx={{ alignItems: 'center' }}
                             />
 
-                            {/* Submit Button to send OTP */}
                             <Button
                                 type="button"
                                 fullWidth
@@ -156,13 +216,11 @@ const LoginPage = () => {
                                 onClick={sendOtpToEmail}
                                 sx={{ mt: 2, mb: 2, borderRadius: '12px', padding: '12px 0', fontWeight: '600' }}
                             >
-                                Send password
+                                Send OTP
                             </Button>
 
-                            {/* Divider */}
                             <Divider sx={{ my: 3, color: '#aaa' }}>or sign in with</Divider>
 
-                            {/* Google Sign In Button */}
                             <Button
                                 fullWidth
                                 variant="outlined"
@@ -185,7 +243,6 @@ const LoginPage = () => {
                         </>
                     ) : (
                         <>
-                            {/* OTP Form */}
                             <Typography variant="h5" gutterBottom sx={{ fontWeight: 600, fontSize: '26px' }}>
                                 Enter One-Time Password
                             </Typography>
@@ -193,7 +250,6 @@ const LoginPage = () => {
                                 Please enter the password we sent to {email}.
                             </Typography>
 
-                            {/* OTP Input (4 Digits) */}
                             <Box display="flex" justifyContent="space-between" mt={3} mb={3}>
                                 {otp.map((digit, index) => (
                                     <TextField
@@ -202,20 +258,18 @@ const LoginPage = () => {
                                         onChange={(e) => handleOtpChange(e.target.value, index)}
                                         inputProps={{
                                             maxLength: 1,
-                                            style: { textAlign: 'center',padding:'25px 0px' },
-                                            
+                                            style: { textAlign: 'center', padding: '25px 0px' },
                                         }}
                                         sx={{
                                             width: 60,
-                                            height: 70,  // Increased height
+                                            height: 70,
                                             fontSize: '24px',
-                                            borderRadius: '8px', // Add border radius for rounded look
+                                            borderRadius: '8px',
                                         }}
                                     />
                                 ))}
                             </Box>
 
-                            {/* Submit Button to verify OTP */}
                             <Button
                                 type="button"
                                 fullWidth
@@ -226,6 +280,32 @@ const LoginPage = () => {
                             >
                                 Sign in
                             </Button>
+
+                            {/* Resend and Back Buttons in Same Row */}
+                            <Box display="flex" justifyContent="space-between" mt={1} mb={2}>
+                                <Button
+                                    type="button"
+                                    onClick={sendOtpToEmail}
+                                    sx={{
+                                        textTransform: 'none',
+                                        fontWeight: '600',
+                                        color: 'primary.main',
+                                    }}
+                                >
+                                    Resend OTP
+                                </Button>
+                                <Button
+                                    type="button"
+                                    onClick={handleBack}
+                                    sx={{
+                                        textTransform: 'none',
+                                        fontWeight: '600',
+                                        color: 'primary.main',
+                                    }}
+                                >
+                                    Back
+                                </Button>
+                            </Box>
 
                             <Typography variant="body2" color="textSecondary" align="center" sx={{ mt: 2 }}>
                                 If you sign in for the first time, a free account will be created

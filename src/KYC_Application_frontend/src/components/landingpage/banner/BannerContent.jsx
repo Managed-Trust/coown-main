@@ -4,6 +4,7 @@ import { IconRocket, IconWallet } from '@tabler/icons';
 import { NavLink } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { GoogleOAuthProvider, useGoogleLogin } from '@react-oauth/google';
+import { useUser } from "../../../userContext/UserContext";
 
 // Styled Button for solid style
 const StyledButton = styled(Button)(() => ({
@@ -34,8 +35,8 @@ const StyledButton2 = styled(Button)(() => ({
 }));
 
 const BannerContent = () => {
+  const { user, setUser } = useUser();
   const lgDown = useMediaQuery((theme) => theme.breakpoints.down('lg'));
-  const [user, setUser] = useState(null); // State to track the authenticated user
   const [profile, setProfile] = useState(null); // State to store user profile
 
   // Initialize Google login
@@ -145,9 +146,21 @@ const BannerContent = () => {
           }}
         >
           <Stack direction='row' spacing={2} mt={3}>
-            <StyledButton variant="contained" color="primary" to="/user/login" component={NavLink}>
-              Sign In
-            </StyledButton>
+            {user ? (
+              <>
+                <StyledButton variant="contained" color="primary" to="/dashboards/ecommerce" component={NavLink}>
+                  Launch App
+                </StyledButton>
+              </>
+            ) :
+              (
+                <>
+                  <StyledButton variant="contained" color="primary" to="/user/login" component={NavLink}>
+                    Sign In
+                  </StyledButton>
+                </>
+              )}
+
 
             {/* Custom Google Login Button */}
             <StyledButton2>

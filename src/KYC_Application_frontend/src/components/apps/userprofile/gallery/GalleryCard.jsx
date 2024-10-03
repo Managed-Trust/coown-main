@@ -167,7 +167,9 @@ const GalleryCard = () => {
           const groupDetails = await Promise.all(
             response.map(async (groupId) => {
               try {
+                console.log("Single Group ID:",groupId);
                 const groupDetailResponse = await ledger.call("getGroup", groupId);
+                console.log("Single Group:",groupDetailResponse);
                 return groupDetailResponse;
               } catch (e) {
                 console.error(`Error fetching group details for group ID ${groupId}:`, e);
@@ -218,13 +220,14 @@ const GalleryCard = () => {
     setIsCreateGroupLoading(true);
     console.log("FormData:", formData);
     try {
-      await ledger.call(
+      const response = await ledger.call(
         "createGroup",
         principal,
         formData.groupId,
         formData.groupName,
         formData.entityType,
       );
+      console.log("Group Response:", response);
       swal("Success", 'Group Created Successfully!', "success");
       fetchGroup(); // Fetch updated groups
     } catch (e) {
