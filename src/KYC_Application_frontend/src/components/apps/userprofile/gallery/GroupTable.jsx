@@ -56,7 +56,7 @@ function GroupTable({ groups }) {
                         </Box>
                     </TableCell>
                     <TableCell sx={{ width: '15%' }}>
-                        <Link to={`/group/${row[0].adminId}`} style={{ textDecoration: 'none' }}>
+                        <Link to={`/group/${row[0].groupId}`} style={{ textDecoration: 'none' }}>
                             <Button variant="contained" color="primary">
                                 View Details
                             </Button>
@@ -99,7 +99,7 @@ function GroupTable({ groups }) {
                                                     </Box>
                                                 </TableCell>
                                                 <TableCell sx={{ width: '15%', padding: '0px' }}>
-                                                    <Link to={`/group/${subgroup.adminId}`} style={{ textDecoration: 'none' }}>
+                                                    <Link to={`/group/${subgroup.groupId}`} style={{ textDecoration: 'none' }}>
                                                         <Button variant="contained" color="primary">
                                                             View Details
                                                         </Button>

@@ -167,9 +167,12 @@ const GalleryCard = () => {
           const groupDetails = await Promise.all(
             response.map(async (groupId) => {
               try {
-                console.log("Single Group ID:",groupId);
+                console.log("Single Group ID:", groupId);
                 const groupDetailResponse = await ledger.call("getGroup", groupId);
-                console.log("Single Group:",groupDetailResponse);
+                if (groupDetailResponse.length > 0) {
+                  groupDetailResponse[0].groupId = groupId;
+                }
+                console.log("Single Group with ID:", groupDetailResponse);
                 return groupDetailResponse;
               } catch (e) {
                 console.error(`Error fetching group details for group ID ${groupId}:`, e);
