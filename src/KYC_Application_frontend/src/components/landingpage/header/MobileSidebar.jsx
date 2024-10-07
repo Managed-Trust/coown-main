@@ -35,7 +35,7 @@ const MobileSidebar = () => {
                     <Button color="inherit" href="/contact-us" sx={{
                         justifyContent: 'start'
                     }}>Contact</Button>
-                    <Button color="primary" variant="contained" component={NavLink} to="/auth/login">Login</Button>
+                    <Button color="primary" variant="contained" component={NavLink} to="/user/login">Login</Button>
                 </Stack>
             </Box>
         </>
