@@ -3,7 +3,7 @@ import { Container,Grid, Box, Typography, Button } from '@mui/material';
 
 const Countdown = () => {
   // Set initial time for the countdown (e.g., 1 day, 12 hours, 35 minutes, and 41 seconds from now)
-  const targetDate = new Date().getTime() + 1 * 24 * 60 * 60 * 1000 + 12 * 60 * 60 * 1000 + 35 * 60 * 1000 + 41 * 1000;
+  const targetDate = new Date("12/21/2024")
 
   const calculateTimeLeft = () => {
     const now = new Date().getTime();

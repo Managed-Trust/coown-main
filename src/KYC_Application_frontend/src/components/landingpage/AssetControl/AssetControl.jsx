@@ -5,7 +5,7 @@ import img from '../../../assets/images/landingpage/image94.png'
 const AssetControl = () => {
 
     return (
-        <Box mt={2}>
+        <Box mt={10} mb={5}>
             <Container maxWidth="lg">
                 <Grid container spacing={2} >
                     <Grid item xs={12} md={6}>

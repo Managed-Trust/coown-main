@@ -54,7 +54,7 @@ const AssetControl = () => {
     return (
         <Box mt={10} mb={5}>
             <Container maxWidth="lg">
-                <Grid container spacing={2}>
+                <Grid container spacing={4}>
                     <Grid item xs={12} md={6} p={4}>
                         <Box mt={10}>
                             <motion.div
@@ -192,7 +192,7 @@ const AssetControl = () => {
                         </Box>
                     </Grid>
                     <Grid item xs={12} md={6}>
-                        <Grid container spacing={1} p={2} alignItems="center">
+                        <Grid container spacing={1} ml={5} p={2} alignItems="center">
                             <Box
                                 component="img"
                                 src={img}

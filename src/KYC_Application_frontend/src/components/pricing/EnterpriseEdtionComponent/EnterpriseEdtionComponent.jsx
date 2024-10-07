@@ -32,7 +32,7 @@ const EnterpriseEdtionComponent = () => {
     return (
         <Box mt={10} mb={5}>
             <Container maxWidth="lg">
-                <Box textAlign="center" mb={4}>
+                <Box textAlign="center">
                     <Typography variant="h2" sx={{ fontWeight: 'bold' }}>
                         Enterprise edition
                     </Typography>
@@ -40,7 +40,7 @@ const EnterpriseEdtionComponent = () => {
                         Suitable for larger structures and enterprises.
                     </Typography>
                 </Box>
-                <Grid container spacing={4} sx={{ marginTop: '5px', marginBottom: '20px',padding:'30px' }}>
+                <Grid container spacing={4} sx={{padding:'30px' }}>
                     {cardData.map((card) => (
                         <Grid item xs={12} sm={4} md={4} lg={4} key={card.title}>
                             <BlankCard className="hoverCard" sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
@@ -71,7 +71,7 @@ const EnterpriseEdtionComponent = () => {
                         </Grid>
                     ))}
                 </Grid>
-                <Box mt={4} >
+                <Box>
                     <Typography variant="caption" color="textSecondary">
                         * The above prices are applied by the sandbox operator to early adopters for testing and launching the product with residents and companies of selected countries. Prices provided by your regional operator may differ.
                     </Typography>

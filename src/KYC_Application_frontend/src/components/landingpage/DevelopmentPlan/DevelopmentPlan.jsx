@@ -26,7 +26,7 @@ const developmentSteps = [
 
 const DevelopmentPlan = () => {
   return (
-    <Box mt={5} mb={5}>
+    <Box mt={10} mb={5}>
       <Container maxWidth="lg">
         {/* Title Section */}
         <Typography

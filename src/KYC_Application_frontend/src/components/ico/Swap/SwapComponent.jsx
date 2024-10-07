@@ -4,7 +4,7 @@ import InfoOutlined from '@mui/icons-material/InfoOutlined';
 
 const SwapComponent = () => {
   return (
-    <Box mt={10}>
+    <Box mt={10} mb={15}>
       <Container maxWidth="lg">
         <Grid container spacing={4} >
           {/* Text Section */}

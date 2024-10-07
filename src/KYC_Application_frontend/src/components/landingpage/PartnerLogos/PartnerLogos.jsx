@@ -8,7 +8,7 @@ import logo5 from '../../../assets/images/partnerlogo/logoo5.png';
 
 const PartnerLogos = () => {
     return (
-        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', margin: '20px 0', padding: '10px 0' }}>
+        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', margin: '30px 0', padding: '10px 0' }}>
 
             <Grid container spacing={2} justifyContent="center" alignItems="center">
 

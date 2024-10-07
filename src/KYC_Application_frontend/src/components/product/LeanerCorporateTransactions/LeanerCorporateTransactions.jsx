@@ -15,7 +15,7 @@ const FeatureItem = ({ title, description }) => (
 
 export default function LeanerCorporateTransactions() {
   return (
-    <Container sx={{ p: 4, mt: 10 , mb:5 }}>
+    <Container sx={{ p: 4, mt: 10 , mb:10 }}>
       <Grid container spacing={4}>
         <Grid item xs={12} md={4}>
           <Typography

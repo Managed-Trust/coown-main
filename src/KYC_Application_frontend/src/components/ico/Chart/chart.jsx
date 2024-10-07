@@ -87,7 +87,7 @@ const DoughnutChart = () => {
   const seriesDoughnutChart = [7, 1, 2, 52, 2, 9, 9, 9, 9];
 
     return (
-        <Box mt={2}>
+        <Box mt={10} mb={10}>
             <Container maxWidth="lg">
                 <Grid container alignItems="center">
                     <Grid item xs={12}>

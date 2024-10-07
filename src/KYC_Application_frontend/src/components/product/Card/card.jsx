@@ -28,7 +28,7 @@ const EntityBox = ({ title }) => (
 
 export default function Card() {
   return (
-    <Container sx={{mt: 15, mb:10 }}>
+    <Container sx={{mt: 15, mb:15 }}>
     <Box>
       <Typography
         variant="h2"

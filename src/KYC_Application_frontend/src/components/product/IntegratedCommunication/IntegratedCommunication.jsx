@@ -13,7 +13,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 
 export default function IntegratedCommunication() {
     return (
-        <Container sx={{ p: 4, mt: 10 }}>
+        <Container sx={{ p: 4, mt: 10, mb:5 }}>
             <Grid container spacing={4}>
                 <Grid item xs={12} md={6} p={10}>
                     <Typography variant="h2" sx={{ fontWeight: 'bold', mt: 8 }}>

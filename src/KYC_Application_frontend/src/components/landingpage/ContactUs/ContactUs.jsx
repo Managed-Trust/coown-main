@@ -16,7 +16,7 @@ const ContactUs = () => {
 
 
   return (
-    <Box mt={10} mb={5} id='contacts'>
+    <Box mt={10} mb={10} id='contacts'>
       <Container maxWidth="lg">
         <Grid container spacing={4}>
           {/* Form Section */}

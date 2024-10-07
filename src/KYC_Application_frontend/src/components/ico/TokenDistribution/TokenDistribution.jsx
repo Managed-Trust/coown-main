@@ -3,7 +3,7 @@ import { Box, Container, Grid, Typography, LinearProgress } from '@mui/material'
 
 const TokenDistribution = () => {
     return (
-        <Box mt={10} mb={5}>
+        <Box mt={15} mb={10}>
             <Container maxWidth="md">
                 {/* Title */}
                 <Typography variant="h2" fontWeight="bold" gutterBottom textAlign="center" mb={3}>

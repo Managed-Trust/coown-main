@@ -15,7 +15,7 @@ const userGroups = [
 
 const CoownAddress = () => {
   return (
-    <Box mt={15} mb={5}>
+    <Box mt={15} mb={10}>
       <Container maxWidth="lg">
         <Grid container spacing={2}>
           <Grid item xs={12} md={6}>

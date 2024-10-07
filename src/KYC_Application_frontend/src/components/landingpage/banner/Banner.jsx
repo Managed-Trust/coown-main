@@ -45,7 +45,7 @@ const Banner = () => {
                 <Box
                   p={3.2}
                   sx={{
-                    backgroundColor: (theme) => theme.palette.primary.light,
+                    backgroundColor: '#E7F4FF',
                     minWidth: '2000px',
                     height: 'calc(100vh - 100px)',
                     maxHeight: '790px',

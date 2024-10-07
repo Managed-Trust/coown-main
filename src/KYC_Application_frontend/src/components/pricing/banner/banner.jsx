@@ -13,7 +13,7 @@ function Banner() {
                         <img src={coown} />
                         <Typography variant="body"> &nbsp; With scalability in mind</Typography>
                     </Typography>
-                    <Typography variant="h3" align="center" gutterBottom sx={{ fontWeight: 700 }}>
+                    <Typography variant="h1" align="center" gutterBottom sx={{ fontWeight: 700 }}>
                         Plans for every group
                     </Typography>
                     <Typography variant="body1" align="center" paragraph sx={{ color: '#5A6A85' }}>
