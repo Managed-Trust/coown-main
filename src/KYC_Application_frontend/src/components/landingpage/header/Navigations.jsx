@@ -37,7 +37,7 @@ const Navigations = () => {
 
   return (
     <>
-      <StyledButton color="inherit" variant="text" href="/">
+      <StyledButton color="inherit" variant="text" href="/product">
       Product
       </StyledButton>
       <StyledButton color="inherit" variant="text" href="/organization">
@@ -46,10 +46,10 @@ const Navigations = () => {
       <StyledButton color="inherit" variant="text" href="/ico">
         ICO
       </StyledButton>
-      <StyledButton color="inherit" variant="text" href="/">
+      <StyledButton color="inherit" variant="text" href="/pricing">
       Pricing
       </StyledButton>
-      <StyledButton color="inherit" variant="text" href="/">
+      <StyledButton color="inherit" variant="text" href="/contact-us">
       Contact
       </StyledButton>
       <Button color="primary" target="_blank" variant="contained" component={NavLink} to="/auth/login">

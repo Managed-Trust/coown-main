@@ -741,7 +741,7 @@ const GalleryCard = () => {
                 <Box p={3}>
                   <Grid container spacing={3} sx={{ marginTop: '10px', marginBottom: '20px' }}>
                     {cardData.map((card) => (
-                      <Grid item xs={12} lg={4} key={card.title}>
+                      <Grid item xs={12} md={4} lg={4} key={card.title}>
                         <BlankCard className="hoverCard" sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
                           <CardMedia component={'img'} height="220" alt={card.title} src={card.Icon} />
                           <Box p={3} sx={{ minHeight: '200px', flexGrow: 1 }}>

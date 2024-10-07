@@ -7,14 +7,11 @@ import {
     Grid,
     Select,
     MenuItem,
-    List,
-    ListItem,
-    ListItemText,
     ThemeProvider,
-    createTheme,
+    createTheme, Container,
+    Link,
 } from '@mui/material';
 import CustomFormLabel from '../../forms/theme-elements/CustomFormLabel';
-import { styled } from '@mui/system';
 
 const theme = createTheme({
     palette: {
@@ -59,34 +56,6 @@ const theme = createTheme({
     },
 });
 
-const StyledTextField = styled(TextField)(({ theme }) => ({
-    '& .MuiOutlinedInput-root': {
-        backgroundColor: 'white',
-        borderRadius: '0.5rem',
-        '& fieldset': {
-            borderColor: '#e2e8f0',
-        },
-        '&:hover fieldset': {
-            borderColor: '#cbd5e1',
-        },
-        '&.Mui-focused fieldset': {
-            borderColor: theme.palette.primary.main,
-        },
-    },
-    '& .MuiInputLabel-root': {
-        color: '#94a3b8',
-    },
-    '& .MuiInputBase-input::placeholder': {
-        color: '#94a3b8',
-        opacity: 1,
-    },
-}));
-
-const StyledMenuItem = styled(MenuItem)({
-    '&.MuiMenuItem-root': {
-        color: '#64748b',
-    },
-});
 
 export default function Contact() {
     const subjects = [
@@ -99,47 +68,16 @@ export default function Contact() {
         'Customization',
     ];
 
-    const engagementOptions = [
-        {
-            title: 'ICO Participation',
-            description: 'Purchase $COOWN tokens for staking rewards and help shape the platform through the DAO.',
-        },
-        {
-            title: 'Venture Capital',
-            description: 'Explore investment opportunities in secure digital asset management and enterprise solutions.',
-        },
-        {
-            title: 'Early Access',
-            description: 'Access the MVP via a licensed operator in a sandbox environment, with initial regulatory limitations.',
-        },
-        {
-            title: 'Regional Operators',
-            description: 'Apply to become a regional operator, ensuring AML compliance and secure authorization, and benefit from enterprise subscription fees. Banks, crypto service providers, and governmental agencies are welcome.',
-        },
-        {
-            title: 'Partnerships',
-            description: 'Contact the Foundation to join the Consortium as an ambassador, advisor, banking partner, software supplier, or auditor.',
-        },
-        {
-            title: 'Support',
-            description: 'Get help with using the COOWN platform.',
-        },
-        {
-            title: 'Customization',
-            description: 'Inquire about customizing COOWN for your specific needs.',
-        },
-    ];
-
     return (
         <ThemeProvider theme={theme}>
-            <Box width="100%" >
-                <Box sx={{ maxWidth: 1200, margin: 'auto', p: 4 }}>
-                    <Typography variant="h3" gutterBottom>
+            <Box width="100%" sx={{ backgroundColor: '#F4F8FB' }}>
+                <Container sx={{ p: 4 , mt:10,paddingBottom: 10 }} >
+                    <Typography variant="h3" mt={5} gutterBottom>
                         Get in touch
                     </Typography>
                     <Grid container spacing={4}>
-                        <Grid item xs={12} md={6}>
-                            <Box component="form" noValidate autoComplete="off" sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                        <Grid item xs={12} md={6} mt={-1}>
+                            <Box component="form" noValidate autoComplete="off">
                                 <Grid container spacing={2}>
                                     <Grid item xs={12} sm={6}>
                                         <CustomFormLabel htmlFor="name">Your name</CustomFormLabel>
@@ -161,7 +99,7 @@ export default function Contact() {
                                             }}
                                         />
                                     </Grid>
-                                    <Grid item xs={12}>
+                                    <Grid item xs={12} mt={-3}>
                                         <CustomFormLabel htmlFor="email">Subject* </CustomFormLabel>
                                         <Select
                                             fullWidth
@@ -180,7 +118,7 @@ export default function Contact() {
                                             ))}
                                         </Select>
                                     </Grid>
-                                    <Grid item xs={12}>
+                                    <Grid item xs={12} mt={-3}>
                                         <CustomFormLabel htmlFor="message">Your message </CustomFormLabel>
                                         <TextField
                                             fullWidth
@@ -198,26 +136,31 @@ export default function Contact() {
                                     variant="contained"
                                     color="primary"
                                     size="large"
-                                    sx={{ alignSelf: 'flex-start', mt: 1 }}
+                                    sx={{ alignSelf: 'flex-start', mt: 3 }}
                                 >
                                     Submit message
                                 </Button>
                             </Box>
                         </Grid>
-                        <Grid item xs={12} md={6} mt={2}>
-                            {engagementOptions.map((option, index) => (
-                                <Box key={index} pt={2}>
-                                    <Typography variant="h6" fontWeight="bold" display="inline">
-                                        {option.title}:
-                                    </Typography>
-                                    <Typography variant="body2" sx={{ color: '#000', display: 'inline', ml: 1 }}>
-                                        {option.description}
-                                    </Typography>
-                                </Box>
-                            ))}
+                        <Grid item xs={12} md={6}>
+                            <Box sx={{ mt: { xs: 3, md: 0 },p:4 }}>
+                                <Typography variant="h4" sx={{fontWeight:'semibold'}}>Coown init s.r.l.</Typography>
+                                <Typography variant="body2" sx={{ mt: 1 }}>
+                                    Foundation, token issuer, and sandbox operator
+                                </Typography>
+                                <Typography variant="body2" sx={{ mt: 1 }}>
+                                    San José, los yoses, 8-10 ave, 39 st, ly center, Costa Rica
+                                </Typography>
+                                <Link href="mailto:coown@dmail.ai" underline="none" sx={{ display: 'block', mt: 2, color: '#3b82f6' }}>
+                                    coown@dmail.ai
+                                </Link>
+                                <Link href="#" underline="none" sx={{ mt: 1, color: '#3b82f6' }}>
+                                    OpenChat
+                                </Link>
+                            </Box>
                         </Grid>
                     </Grid>
-                </Box>
+                </Container>
             </Box>
         </ThemeProvider>
     );

@@ -12,6 +12,9 @@ import LoginPage from './views/pages/login/LoginPage';
 import { GoogleOAuthProvider, useGoogleLogin } from '@react-oauth/google';
 import Organization from './views/pages/Organization/Organization';
 import ICO from './views/pages/ICO/ICO';
+import Product from './views/pages/Product/Product';
+import Pricing from './views/pages/Pricing/Pricing';
+import ContactUs from './views/pages/ContactUs/ContactUs';
 
 function App() {
   const theme = ThemeSettings();
@@ -29,6 +32,9 @@ function App() {
                 <Route path="/" element={<Landingpage />} />
                 <Route path="/organization" element={<Organization />} /> 
                 <Route path="/ico" element={<ICO/>} /> 
+                <Route path="/product" element={<Product/>} /> 
+                <Route path="/pricing" element={<Pricing />} /> 
+                <Route path="/contact-us" element={<ContactUs/>} /> 
                 <Route path='/user/login' element={<LoginPage />} />
                 {/* Routes that use FullLayout */}
                 <Route path="/*" element={<FullLayout />} />

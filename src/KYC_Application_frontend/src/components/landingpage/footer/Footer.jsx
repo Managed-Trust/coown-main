@@ -81,7 +81,7 @@ const Footer = () => {
             Powred by&nbsp;<img src={logo} style={{ width: '25px', marginTop: '5px' }} />
           </Typography>
           <Typography variant="body2" color="textSecondary" textAlign="center">
-            Copyright © 2024 , cookie-free
+            Copyright © 2024 , Cookie-free
           </Typography>
         </Grid>
       </Container>

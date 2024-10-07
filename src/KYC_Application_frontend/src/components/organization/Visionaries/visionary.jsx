@@ -9,7 +9,7 @@ import Simon_Image from "../../../assets/images/organization/Simon_Kaiser.svg";
 export default function Visionary() {
   return (
     <Box sx={{ maxWidth: 1000, margin: 'auto', p: 4 }}>
-      <Typography variant="overline" display="block" align="center" gutterBottom color="primary" sx={{ fontWeight: 'bold' }}>
+      <Typography variant="body2" display="block" align="center" gutterBottom color="primary" sx={{ fontSize:'14px',  fontWeight: 'semibold' }}>
         The Visionaries Behind COOWN
       </Typography>
       <Typography variant="h3" align="center" gutterBottom sx={{ fontWeight: 'bold', color: 'text.primary' }}>

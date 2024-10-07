@@ -1,15 +1,15 @@
 import React from 'react';
 import { Box, Typography, Paper, Grid } from '@mui/material';
-import BusinessIcon from '@mui/icons-material/Business';
+import bank from '../../../assets/images/svgs/building-08.svg';
 
 function Banner() {
     return (
         <>
             <Box sx={{ width: '100%', maxWidth: '100%', background: 'linear-gradient(to bottom, #FFFFFF, #F2F6FA)' }}>
-                <Box sx={{ maxWidth: 800, margin: 'auto', padding: 4 }}>
-                    <Typography variant="h6" align="center" gutterBottom>
-                        <BusinessIcon sx={{ verticalAlign: 'middle', marginRight: 1 }} />
-                        Consortium Governance Structure
+                <Box sx={{ maxWidth: 800, margin: 'auto', padding: '4 4 4 0' ,mt:6 }}>
+                <Typography variant="body" align="center" display={'flex'} justifyContent={'center'} gutterBottom>
+                        <img src={bank} />
+                        <Typography variant="body"sx={{fontWeight:'bold'}} mt={0.5}> &nbsp;  Consortium Governance Structure</Typography>
                     </Typography>
                     <Typography variant="h1" align="center" gutterBottom sx={{ color: '#3b82f6' }}>
                         Decentralization

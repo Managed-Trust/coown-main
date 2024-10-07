@@ -6,7 +6,7 @@ import C2a2 from '../../../components/landingpage/c2a/C2a2';
 import Banner from "../../../components/organization/banner/banner";
 import Card from "../../../components/organization/Card/card";
 import Visionary from '../../../components/organization/Visionaries/visionary';
-import Contact from "../../../components/organization/Contact/contact";
+import Contact from "../../../components/ico/Contact/contact";
 
 const Organization = () => {
     return (
