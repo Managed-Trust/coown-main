@@ -192,7 +192,7 @@ const AssetControl = () => {
                         </Box>
                     </Grid>
                     <Grid item xs={12} md={6}>
-                        <Grid container spacing={1} ml={5} p={2} alignItems="center">
+                        <Grid container spacing={1} p={2} alignItems="center">
                             <Box
                                 component="img"
                                 src={img}

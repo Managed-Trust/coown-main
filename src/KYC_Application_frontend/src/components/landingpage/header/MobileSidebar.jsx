@@ -8,8 +8,6 @@ import QuickLinks from '../../../layouts/full/vertical/header/QuickLinks';
 import { NavLink } from 'react-router-dom';
 
 const MobileSidebar = () => {
-    const [toggle, setToggle] = useState(false)
-    const [toggle2, setToggle2] = useState(false)
 
     return (
         <>
@@ -18,46 +16,25 @@ const MobileSidebar = () => {
             </Box>
             <Box p={3}>
 
-                <Stack direction="column" spacing={2} >
-                    <Button color="inherit"
-                        onClick={() => setToggle(!toggle)}
-                        endIcon={<IconChevronDown width={20} />}
-                        sx={{
-                            justifyContent: 'space-between'
-                        }}>
-
-                        Demos
-                    </Button>
-                    {toggle && (
-                        <Collapse in={toggle}>
-                            <Box m="-21px">
-                                <Box ml={1}>
-                                    <DemosDD />
-                                </Box>
-                            </Box>
-                        </Collapse>
-                    )}
-
-                    <Button color="inherit"
-                        onClick={() => setToggle2(!toggle2)}
-                        endIcon={<IconChevronDown width={20} />}
-                        sx={{
-                            justifyContent: 'space-between'
-                        }}>Pages</Button>
-                    {toggle2 && (
-                        <Collapse in={toggle2}>
-                            <Box overflow="hidden" ml={1}>
-                                <AppLinks />
-                                <QuickLinks />
-                            </Box>
-                        </Collapse>
-                    )}
-                    <Button color="inherit" href="#" sx={{
+                <Stack direction="column" spacing={2} >                    
+                    <Button color="inherit" href="/product" sx={{
                         justifyContent: 'start'
-                    }}>Documentation</Button>
-                    <Button color="inherit" href="https://adminmart.com/support" sx={{
+                    }}>Product</Button>
+                    
+                    <Button color="inherit" href="/organization" sx={{
                         justifyContent: 'start'
-                    }}>Support</Button>
+                    }}>Organization</Button>
+                    
+                    <Button color="inherit" href="/ico" sx={{
+                        justifyContent: 'start'
+                    }}>ICO</Button>
+                    <Button color="inherit" href="/pricing" sx={{
+                        justifyContent: 'start'
+                    }}>Pricing</Button>
+                    
+                    <Button color="inherit" href="/contact-us" sx={{
+                        justifyContent: 'start'
+                    }}>Contact</Button>
                     <Button color="primary" variant="contained" component={NavLink} to="/auth/login">Login</Button>
                 </Stack>
             </Box>
