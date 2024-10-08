@@ -12,6 +12,7 @@ import GroupMembersComponent from '../../../components/product/GroupMembersCompo
 import ShareHolderComponent from '../../../components/product/ShareHolderComponent/ShareHolderComponent';
 import ShareControlComponent from '../../../components/product/ShareControlComponent/ShareControlComponent';
 import IntegratedCommunication from '../../../components/product/IntegratedCommunication/IntegratedCommunication';
+import DevelopmentPlan from '../../../components/landingpage/DevelopmentPlan/DevelopmentPlan';
 
 const Product = () => {
     return (
@@ -26,6 +27,7 @@ const Product = () => {
                 <ShareHolderComponent />
                 <ShareControlComponent />
                 <IntegratedCommunication />
+                <DevelopmentPlan/>
                 <Contact />
                 <C2a2 />
                 <Footer />

@@ -28,10 +28,10 @@ const AssetControl = () => {
                                     variant="h1"
                                     fontWeight={700}
                                 >
-                                    Streamline asset control and decisions
+                                    Streamline asset control and decision-making 
                                 </Typography>
                             </motion.div>
-                            <Box pt={2} pb={3}>
+                            <Box pt={2} pb={3} >
                                 <motion.div
                                     initial={{ opacity: 0, translateY: 550 }}
                                     animate={{ opacity: 1, translateY: 0 }}
@@ -43,8 +43,7 @@ const AssetControl = () => {
                                     }}
                                 >
                                     <Typography variant="body">
-                                        COOWN offers an integrated solution for families, corporations, and public entities to share and control digital assets. With features like shareholder voting, custom spending limits, and multi-signature payments, COOWN empowers groups to manage assets securely and in full compliance with local regulations. Simplify governance, enhance transparency, and gain control over group finances with COOWN.
-                                    </Typography>
+                                    COOWN offers an integrated solution for families, corporations, and public entities to share and control digital assets. Spending limits can be set by administrators or executive managers for each user individually. Transaction approvals are implemented by management decisions or even shareholder voting as needed. COOWN empowers groups to manage assets securely, fully on-chain, and in compliance with local regulations. Simplify governance, enhance transparency, and gain control over group finances with COOWN.   </Typography>
                                 </motion.div>
                             </Box>
                         </Box>

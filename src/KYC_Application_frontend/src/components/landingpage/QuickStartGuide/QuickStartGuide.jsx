@@ -4,33 +4,33 @@ import { Container, Grid, Box, Typography, Paper } from '@mui/material';
 const steps = [
   {
     number: '1',
-    title: 'Sign up and connect your personal wallet',
-    description: 'Empower your team with features designed to simplify collective financial management.',
+    title: 'Sign up ',
+    description: 'Sign up using your personal email, complete the Know-Your-Customer (KYC) process for individuals. As invited user you may participate in the chat.',
   },
   {
     number: '2',
-    title: 'Create a group wallet',
-    description: 'Empower your team with features designed to simplify collective financial management.',
+    title: 'Create a group wallet ',
+    description: 'Connect with the identity provided for Internet Computer Protocol (ICP), to enable your personal and group wallets.',
   },
   {
     number: '3',
-    title: 'Invite your team and set spending limits',
-    description: 'Empower your team with features designed to simplify collective financial management.',
+    title: 'Setup your group',
+    description: 'Invite people to your group, set spending limits for users, add funds, make transactions, chat, and check reports.',
   },
   {
     number: '4',
-    title: 'Upgrade your group to legal entity status',
-    description: 'Empower your team with features designed to simplify collective financial management.',
+    title: 'Upgrade for onboarding legal entities',
+    description: 'Purchase an annual enterprise license for adding additional groups and to set up one as legal entity for which the KYC is repeated.  ',
   },
   {
     number: '5',
-    title: 'Digitize company shares for voting and distributing dividends',
-    description: 'Empower your team with features designed to simplify collective financial management.',
+    title: 'Maintain the shareholder book',
+    description: 'Optionally you can create email based shareholder records to enable voting which will allow you to limit the transaction power of administrators and executives.',
   },
   {
     number: '6',
-    title: 'Mint and certify custom NFTs as securities, such as commodities.',
-    description: 'Empower your team with features designed to simplify collective financial management.',
+    title: 'Mint and market custom NFT series',
+    description: 'In later releases, we plan to enable the minting of NFT series by offering legal reviews, technical support, and by operating regional market places.',
   },
 ];
 
@@ -72,14 +72,14 @@ const QuickStartGuide = () => {
                   variant="h3"
                   fontWeight={700}
                   color="#5D87FF"
-                  mb={1}
+                  mb={2}
                 >
                   {step.number}
                 </Typography>
                 <Typography variant="h6" fontWeight={600} mb={1}>
                   {step.title}
                 </Typography>
-                <Typography variant="body2" color="textSecondary">
+                <Typography variant="body2" color="textSecondary" sx={{fontSize:'14px', color:"#5A6A85"}}> 
                   {step.description}
                 </Typography>
               </Paper>

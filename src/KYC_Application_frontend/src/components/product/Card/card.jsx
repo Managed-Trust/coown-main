@@ -1,8 +1,12 @@
 import React from 'react';
 import { Box, Typography, Paper, Grid, Avatar, Container } from '@mui/material';
-import img from '../../../assets/images/products/Frame1.png';
+import img1 from '../../../assets/images/products/Frame1.png';
+import img2 from '../../../assets/images/svgs/Frame11.svg';
+import img3 from '../../../assets/images/svgs/Frame13.svg';
+import img4 from '../../../assets/images/svgs/btc-pic.svg';
+import img5 from '../../../assets/images/svgs/Frame12.svg';
 
-const EntityBox = ({ title }) => (
+const EntityBox = ({ title,icon}) => (
   <Paper
     elevation={3}
     sx={{
@@ -17,7 +21,7 @@ const EntityBox = ({ title }) => (
   >
     <Avatar
       alt={title}
-      src={img}
+      src={icon}
       sx={{ width: 60, height: 60, mb: 2 }}
     />
     <Typography variant="h6" sx={{ margin: '10px 0' }} gutterBottom>
@@ -39,21 +43,21 @@ export default function Card() {
         COOWN empowers individuals and <br /> businesses to
       </Typography>
       <Box sx={{ mt: 8 }}>
-        <Grid container spacing={2} justifyContent="center">
+        <Grid container spacing={4} justifyContent="center">
           <Grid item xs={12} sm={6} md={2}>
-            <EntityBox title="Identification" />
+            <EntityBox title="Identification" icon={img1} />
           </Grid>
           <Grid item xs={12} sm={6} md={2}>
-            <EntityBox title="Corporate governance" />
+            <EntityBox title="Corporate governance"  icon={img2} />
           </Grid>
           <Grid item xs={12} sm={6} md={2}>
-            <EntityBox title="Transactions regulation" />
+            <EntityBox title="Transactions regulation"  icon={img3} />
           </Grid>
           <Grid item xs={12} sm={6} md={2}>
-            <EntityBox title="Digital asset management" />
+            <EntityBox title="Digital asset management"  icon={img4} />
           </Grid>
           <Grid item xs={12} sm={6} md={2}>
-            <EntityBox title="Custom assets creation" />
+            <EntityBox title="Custom assets creation"  icon={img5} />
           </Grid>
         </Grid>
       </Box>

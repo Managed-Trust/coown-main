@@ -30,7 +30,7 @@ const Landingpage = () => {
       <CoownAddress/>
       <Frameworks />
       <FeaturesGrid/>
-      <DevelopmentPlan/>
+      {/* <DevelopmentPlan/> */}
       <QuickStartGuide/>
       <ContactUs/>
       <FAQSection/>

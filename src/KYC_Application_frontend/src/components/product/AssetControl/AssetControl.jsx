@@ -8,17 +8,17 @@ const faqs = [
     {
       id: '01',
       question: 'Our concept',
-      answer: 'Empowering groups to manage assets as a team within a multi signature wallet using the latest blockchain technology.',
+      answer: 'The admin dashboard gives business owners and administrators a comprehensive overview of their business. It provides real-time insights into revenue, budget, expenses, and other key metrics.',
     },
     {
       id: '02',
-      question: 'User Group',
-      answer: 'Empowering groups to manage assets as a team within a multi signature wallet using the latest blockchain technology.',
+      question: 'Why Group Wallets? ',
+      answer: 'Group wallets are a multi-purpose solution. They can be used to securely and efficiently manage assets that belong to a legal entity, or to allocate funds to business units and allow team members implementing smaller payments. ',
    },
     {
       id: '03',
-      question: 'Shared assets',
-      answer: 'Empowering groups to manage assets as a team within a multi signature wallet using the latest blockchain technology.',
+      question: 'Digital Assets',
+      answer: 'Inside our wallets you can hold Bitcoin, USD and gold related token, other stable currencies, and your own digitalized shares will follow soon.',
     },
   ];
 
