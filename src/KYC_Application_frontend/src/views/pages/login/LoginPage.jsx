@@ -76,7 +76,7 @@ const LoginPage = () => {
             swal("Success", "OTP verified successfully!", "success").then(() => {
                 // Navigate to the dashboard or e-commerce page
                 setUser(email);
-                navigate('/dashboards/ecommerce');
+                navigate('/user/connect');
             });
         } else {
             console.log('Incorrect OTP');
@@ -126,7 +126,7 @@ const LoginPage = () => {
             setUser(profile.email); // Set user email when profile is updated
             swal("Success", "Login successfully!", "success").then(() => {
                 // Navigate to the dashboard or e-commerce page
-                navigate('/dashboards/ecommerce');
+                navigate('/user/connect');
             });
         }
     }, [profile, navigate, setUser]);

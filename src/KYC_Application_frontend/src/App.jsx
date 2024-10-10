@@ -15,6 +15,7 @@ import ICO from './views/pages/ICO/ICO';
 import Product from './views/pages/Product/Product';
 import Pricing from './views/pages/Pricing/Pricing';
 import ContactUs from './views/pages/ContactUs/ContactUs';
+import ConnectPage from './views/pages/connect/ConnectPage';
 
 function App() {
   const theme = ThemeSettings();
@@ -36,6 +37,7 @@ function App() {
                 <Route path="/pricing" element={<Pricing />} /> 
                 <Route path="/contact-us" element={<ContactUs/>} /> 
                 <Route path='/user/login' element={<LoginPage />} />
+                <Route path='/user/connect' element={<ConnectPage/>} />
                 {/* Routes that use FullLayout */}
                 <Route path="/*" element={<FullLayout />} />
 
