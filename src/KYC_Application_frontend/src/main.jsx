@@ -10,13 +10,15 @@ import "./_mockApis";
 import "./utils/i18n";
 import { InternetIdentity } from "@connect2ic/core/providers/internet-identity";
 import { InfinityWallet } from "@connect2ic/core/providers/infinity-wallet";
+import { PlugWallet } from "@connect2ic/core/providers/plug-wallet";
+
 import { createClient } from "@connect2ic/core";
 import { Connect2ICProvider } from "@connect2ic/react";
 import "@connect2ic/core/style.css";
 import { UserProvider } from "./userContext/UserContext";
 
 const client = createClient({
-  providers: [new InternetIdentity()],
+  providers: [new InternetIdentity(), new PlugWallet()],
   // canisters: {
   //   myCanister
   // }

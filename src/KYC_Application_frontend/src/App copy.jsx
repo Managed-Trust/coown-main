@@ -15,11 +15,9 @@ import ICO from './views/pages/ICO/ICO';
 import Product from './views/pages/Product/Product';
 import Pricing from './views/pages/Pricing/Pricing';
 import ContactUs from './views/pages/ContactUs/ContactUs';
-import ConnectPage from './views/pages/connect/ConnectPage';
-import AtlasDashboard from './PreSale/Socials';
-import NFTPresaleMarketplace from './PreSale/Nft';
-import ICPTokenSwap from './PreSale/kycapp';
-
+import ICPTokenSwap from './kycapp';
+import AtlasDashboard from './Socials';
+import NFTPresaleMarketplace from './Nft';
 function App() {
   const theme = ThemeSettings();
   const customizer = useSelector((state) => state.customizer);
@@ -33,19 +31,18 @@ function App() {
             <ScrollToTop>
               <Routes>
                 {/* Route for the Landing Page */}
-
                 <Route path="/" element={<Landingpage />} />
+                <Route path="/prelaunch" element={<ICPTokenSwap />} />
+                <Route path="/prelaunch2" element={<AtlasDashboard />} />
+                <Route path="/prelaunch3" element={<NFTPresaleMarketplace />} />
+
+
                 <Route path="/organization" element={<Organization />} /> 
                 <Route path="/ico" element={<ICO/>} /> 
                 <Route path="/product" element={<Product/>} /> 
                 <Route path="/pricing" element={<Pricing />} /> 
                 <Route path="/contact-us" element={<ContactUs/>} /> 
                 <Route path='/user/login' element={<LoginPage />} />
-                <Route path='/user/connect' element={<ConnectPage/>} />
-                <Route path="/prelaunch" element={<ICPTokenSwap />} />
-                <Route path="/prelaunch-social" element={<AtlasDashboard />} />
-                <Route path="/prelaunch-nft" element={<NFTPresaleMarketplace />} />
-
                 {/* Routes that use FullLayout */}
                 <Route path="/*" element={<FullLayout />} />
 
