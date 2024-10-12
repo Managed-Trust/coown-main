@@ -146,7 +146,7 @@ const Menuitems = [
     id: uniqueId(),
     title: 'Dashboard',
     icon: IconAperture,
-    href: '/',
+    href: '/dashboards/ecommerce',
   },
   {
     id: uniqueId(),

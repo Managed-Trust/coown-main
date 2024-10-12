@@ -32,6 +32,7 @@ import {
   ConnectDialog,
 } from "@connect2ic/react";
 import AmlSetting from '../../views/apps/AmlSetting/AmlSetting.jsx';
+import UserDashboard from '../../views/apps/user-dashboard/UserDashboard.jsx';
 
 const MainWrapper = styled('div')(() => ({
   display: 'flex',
@@ -81,6 +82,7 @@ const FullLayout = () => {
               <Route path="/apps/private" element={<PrivateGroup />} />
               <Route path="/apps/registerCompany" element={<RegisterCompany />} />
               <Route path="/user-profile" element={<UserProfile />} />
+              <Route path="/app/user-dashboard" element={<UserDashboard/>} />
               <Route path="/referral" element={<Galleryr />} />
               <Route path="/account" element={<Account />} />
               <Route path="/user-profile/Settings" element={<Settings />} />

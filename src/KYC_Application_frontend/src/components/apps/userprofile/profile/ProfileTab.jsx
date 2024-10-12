@@ -19,7 +19,7 @@ const ProfileTab = () => {
     {
       label: 'Dashboard',
       icon: <IconAperture size="20" />,
-      to: '/user-profile',
+      to: '/app/user-dashboard',
     },
     {
       label: 'Personal Account',
