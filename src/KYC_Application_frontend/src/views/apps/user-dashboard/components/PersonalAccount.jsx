@@ -92,14 +92,18 @@ const PersonalAccount = () => {
   ];
 
   return (
-    <Card>
+    <Paper
+    elevation={3}
+    style={{
+        padding: '10px',
+    }}>
       <Box sx={{ width: '100%', padding: '20px' }}>
         <Typography variant="h6" gutterBottom>
           Personal Account
         </Typography>
       </Box>
       <Chart options={optionsareachart} series={seriesareachart} type="area" height="300px" />
-    </Card>
+    </Paper>
   );
 };
 

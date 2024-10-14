@@ -3,14 +3,14 @@ import { Grid, Paper, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 
 const Card = ({ title, value, unit }) => (
-    <Paper elevation={2} sx={{ p: { xs: 2, sm: 3 }, textAlign: 'center' }}>
-      <Typography variant="body2" color="#7C8FAC">
+    <Paper elevation={2} sx={{ p: { xs: 2, sm: 3 } }}>
+      <Typography variant="body" color="#7C8FAC">
         {title}
       </Typography>
-      <Typography variant="h4" sx={{ mt: 0.5 }}>
+      <Typography variant="h3" sx={{ mt: 0.5 }}>
         {value}
         {unit && (
-          <Typography component="span" mx={0.2} variant="body2" color="textSecondary">
+          <Typography component="span" mx={0.2} variant="body2" fontWeight={'bold'} color="textSecondary">
             {unit}
           </Typography>
         )}

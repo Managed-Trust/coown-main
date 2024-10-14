@@ -31,6 +31,7 @@ const ledger = ic.local("bkyz2-fmaaa-aaaaa-qaaaq-cai"); // Ledger canister
 // const ledger = ic("sifoc-qqaaa-aaaap-ahorq-cai"); // Production canister
 
 import CryptoJS from "crypto-js";
+import ConnectBanner from '../../../../views/apps/user-dashboard/components/ConnectBanner';
 
 const secretKey = "your-secret-key"; // Use a strong secret key
 
@@ -233,6 +234,7 @@ const ProfileBanner = () => {
           </Grid>
         </Grid>)}
         {/**TabbingPart**/}
+        <ConnectBanner/>
         <ProfileTab />
       </BlankCard>
     </>
