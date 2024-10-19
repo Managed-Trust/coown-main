@@ -24,7 +24,7 @@ const ProfileTab = () => {
     {
       label: 'Personal Account',
       icon: <IconWallet size="20" />,
-      to: '/apps/followers',
+      to: '/app/user-accounts',
     },
     {
       label: 'Groups',

@@ -33,6 +33,8 @@ import {
 } from "@connect2ic/react";
 import AmlSetting from '../../views/apps/AmlSetting/AmlSetting.jsx';
 import UserDashboard from '../../views/apps/user-dashboard/UserDashboard.jsx';
+import UserAccount from '../../views/apps/user-account/UserAccount.jsx';
+import Profile from '../../views/apps/user-profile/Profile.jsx';
 
 const MainWrapper = styled('div')(() => ({
   display: 'flex',
@@ -81,8 +83,9 @@ const FullLayout = () => {
               <Route path="/apps/gallery" element={<Gallery />} />
               <Route path="/apps/private" element={<PrivateGroup />} />
               <Route path="/apps/registerCompany" element={<RegisterCompany />} />
-              <Route path="/user-profile" element={<UserProfile />} />
+              <Route path="/user-profile" element={<Profile />} />
               <Route path="/app/user-dashboard" element={<UserDashboard/>} />
+              <Route path="/app/user-accounts" element={<UserAccount />} />
               <Route path="/referral" element={<Galleryr />} />
               <Route path="/account" element={<Account />} />
               <Route path="/user-profile/Settings" element={<Settings />} />

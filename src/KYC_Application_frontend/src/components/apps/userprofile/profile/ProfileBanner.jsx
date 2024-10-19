@@ -1,4 +1,4 @@
-import React, { useState ,useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Grid,
   Box,
@@ -13,6 +13,7 @@ import {
 } from '@mui/material';
 import profilecover from '../../../../assets/images/backgrounds/profilebg.jpg';
 import userimg from '../../../../assets/images/profile/user-1.jpg';
+import StarIcon from '@mui/icons-material/Star';
 import {
   IconBrandDribbble,
   IconBrandFacebook,
@@ -50,14 +51,29 @@ const decryptData = (ciphertext) => {
 
 const ProfileBanner = () => {
   const ProfileImage = styled(Box)(() => ({
-    backgroundImage: 'linear-gradient(#50b2fc,#f44c66)',
-    borderRadius: '50%',
+    position: 'relative',
     width: '110px',
     height: '110px',
+    borderRadius: '50%',
+    backgroundImage: 'linear-gradient(#50b2fc,#f44c66)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    margin: '0 auto',
+  }));
+
+  const Badge = styled(Box)(() => ({
+    position: 'absolute',
+    bottom: '0',
+    right: '-10px',
+    backgroundColor: '#22c55e',
+    color: '#fff',
+    borderRadius: '50%',
+    width: '24px',
+    height: '24px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    border: '2px solid white',
   }));
   const [isLoading, setLoading] = React.useState(true);
   const [profile, setProfile] = useState(null);
@@ -78,7 +94,7 @@ const ProfileBanner = () => {
         console.log("Profile:", response);
         const profileData = response[0];
         setProfile(profileData);
-        
+
       } catch (e) {
         console.log("Error Fetching Profile:", e);
       }
@@ -98,60 +114,8 @@ const ProfileBanner = () => {
         ) : (
           <CardMedia component="img" image={profilecover} alt={profilecover} width="100%" />
         )}
-        {profile &&(
-        <Grid container spacing={0} justifyContent="space-between" alignItems="center">
+        <Grid container spacing={0} justifyContent="space-between" alignItems="start">
           {/* Post | Followers | Following */}
-          <Grid
-            item
-            lg={4}
-            sm={12}
-            md={5}
-            xs={12}
-            sx={{
-              order: {
-                xs: '2',
-                sm: '2',
-                lg: '1',
-              },
-            }}
-          >
-            {/* <Stack direction="row" textAlign="center" justifyContent="center" gap={6} m={3}>
-              <Box>
-                <Typography color="text.secondary">
-                  <IconFileDescription width="20" />
-                </Typography>
-                <Typography variant="h4" fontWeight="600">
-                  938
-                </Typography>
-                <Typography color="textSecondary" variant="h6" fontWeight={400}>
-                  Posts
-                </Typography>
-              </Box>
-              <Box>
-                <Typography color="text.secondary">
-                  <IconUserCircle width="20" />
-                </Typography>
-                <Typography variant="h4" fontWeight="600">
-                  3,586
-                </Typography>
-                <Typography color="textSecondary" variant="h6" fontWeight={400}>
-                  Followers
-                </Typography>
-              </Box>
-              <Box>
-                <Typography color="text.secondary">
-                  <IconUserCheck width="20" />
-                </Typography>
-                <Typography variant="h4" fontWeight="600">
-                  2,659
-                </Typography>
-                <Typography color="textSecondary" variant="h6" fontWeight={400}>
-                  Following
-                </Typography>
-              </Box>
-            </Stack> */}
-          </Grid>
-          {/* about profile */}
           <Grid
             item
             lg={4}
@@ -168,38 +132,73 @@ const ProfileBanner = () => {
             <Box
               display="flex"
               alignItems="center"
-              textAlign="center"
+              textAlign="start"
               justifyContent="center"
               sx={{
-                mt: '-85px',
+                mt: '-45px',
               }}
             >
-              {profile && 
-              <Box>
-                <ProfileImage>
-                  <Avatar
-                    src={profile.live_photo[0]}
-                    alt={decryptData(profile.given_name)}
-                    sx={{
-                      borderRadius: '50%',
-                      width: '100px',
-                      height: '100px',
-                      border: '4px solid #fff',
-                    }}
-                  />
-                </ProfileImage>
-                <Box mt={1}>
-                  <Typography fontWeight={600} variant="h5">
-                  {decryptData(profile.given_name)}
-                  </Typography>
-                  <Typography color="textSecondary" variant="h6" fontWeight={400}>
-                  {(profile.role)}
-                  </Typography>
+              {profile ?
+                <Box display="flex" alignItems="center">
+                  <ProfileImage>
+                    <Avatar
+                      src={profile.live_photo[0]}
+                      alt={decryptData(profile.given_name)}
+                      sx={{
+                        borderRadius: '50%',
+                        width: '100px',
+                        height: '100px',
+                        border: '4px solid #fff',
+                      }}
+                    />
+                    <Badge>
+                      <StarIcon fontSize="small" />
+                    </Badge>
+                  </ProfileImage>
+                  <Box mt={2} ml={2}>
+                    <Typography fontWeight={600} variant="h6">
+                      {decryptData(profile.given_name)}
+                    </Typography>
+                    <Typography color="textSecondary" variant="body2">
+                      {(profile.role)}
+                    </Typography>
+                  </Box>
+                </Box> :
+
+                <Box display="flex" alignItems="center">
+                  <ProfileImage>
+                    <Avatar
+                      src={userimg}
+                      alt="Tony Stark"
+                      sx={{
+                        borderRadius: '50%',
+                        width: '100px',
+                        height: '100px',
+                        border: '4px solid #fff',
+                      }}
+                    />
+                    {/* Badge with a star */}
+                    <Badge>
+                      <StarIcon fontSize="small" />
+                    </Badge>
+                  </ProfileImage>
+
+                  {/* Text Section */}
+                  <Box mt={2} ml={2}>
+                    <Typography fontWeight={600} variant="h6">
+                      Tony Stark
+                    </Typography>
+                    <Typography color="textSecondary" variant="body2">
+                      Genius, billionaire, playboy, philanthropist
+                    </Typography>
+                  </Box>
                 </Box>
-              </Box>
               }
             </Box>
           </Grid>
+
+          {/* about profile */}
+
           {/* friends following buttons */}
           <Grid
             item
@@ -232,9 +231,9 @@ const ProfileBanner = () => {
               </Button> */}
             </Stack>
           </Grid>
-        </Grid>)}
+        </Grid>
         {/**TabbingPart**/}
-        <ConnectBanner/>
+        <ConnectBanner />
         <ProfileTab />
       </BlankCard>
     </>
@@ -242,4 +241,3 @@ const ProfileBanner = () => {
 };
 
 export default ProfileBanner;
-   

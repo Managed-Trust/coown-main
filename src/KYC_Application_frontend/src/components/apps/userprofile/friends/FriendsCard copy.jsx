@@ -1,14 +1,15 @@
 import {
   CardContent,
   Box,
+  Stack,
   Avatar,
-  InputAdornment, 
   Grid,
   Typography,
   Chip,
+  TextField,
+  InputAdornment,
   Divider,
   IconButton,
-   TextField,Button, MenuItem, FormControl, Select, Stack 
 } from '@mui/material';
 import React, { useEffect } from 'react';
 import BlankCard from '../../../../components/shared/BlankCard';
@@ -63,51 +64,33 @@ const FriendsCard = () => {
   return (
     <>
       <Grid container spacing={3}>
-        <Grid item xs={12}>
-          <Stack direction="row" alignItems="center" spacing={2} mt={2} sx={{ backgroundColor: '#F8F9FB', p: 2, borderRadius: '8px' }}>
-            {/* Search Input */}
-            <Box flex={1}>
+        <Grid item sm={12} lg={12}>
+          <Stack direction="row" alignItems={'center'} mt={2}>
+            <Box>
+              <Typography variant="h3">
+                Friends &nbsp;
+                <Chip label={getFriends.length} color="secondary" size="small" />
+              </Typography>
+            </Box>
+            <Box ml="auto">
               <TextField
                 id="outlined-search"
-                placeholder="Search for contact"
+                placeholder="Search Friends"
                 size="small"
                 type="search"
                 variant="outlined"
-                fullWidth
+                inputProps={{ 'aria-label': 'Search Followers' }}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <IconSearch size="16" />
+                      <IconSearch size="14" />
                     </InputAdornment>
                   ),
                 }}
+                fullWidth
                 onChange={(e) => setSearch(e.target.value)}
               />
             </Box>
-
-            {/* Groups Select */}
-            <FormControl size="small" sx={{ minWidth: 160 }}>
-              <Select
-                defaultValue="All groups"
-                displayEmpty
-                variant="outlined"
-                sx={{ backgroundColor: 'white' }}
-              >
-                <MenuItem value="All groups">All groups</MenuItem>
-                <MenuItem value="Friends">Friends</MenuItem>
-                <MenuItem value="Family">Family</MenuItem>
-                <MenuItem value="Work">Work</MenuItem>
-              </Select>
-            </FormControl>
-
-            {/* Invite Button */}
-            <Button
-              variant="contained"
-              color="primary"
-              sx={{ minWidth: 120, textTransform: 'none' }}
-            >
-              + Invite
-            </Button>
           </Stack>
         </Grid>
         {getFriends.map((profile) => {
