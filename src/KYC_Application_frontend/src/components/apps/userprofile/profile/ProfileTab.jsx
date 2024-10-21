@@ -49,7 +49,7 @@ const ProfileTab = () => {
     {
       label: 'Settings',
       icon: <IconSettings size="20" />,
-      to: '/apps/settings',
+      to: '/apps/user-setting',
     },
   ];
 

@@ -35,6 +35,7 @@ import AmlSetting from '../../views/apps/AmlSetting/AmlSetting.jsx';
 import UserDashboard from '../../views/apps/user-dashboard/UserDashboard.jsx';
 import UserAccount from '../../views/apps/user-account/UserAccount.jsx';
 import Profile from '../../views/apps/user-profile/Profile.jsx';
+import UserSetting from '../../views/apps/user-setting/UserSetting.jsx';
 
 const MainWrapper = styled('div')(() => ({
   display: 'flex',
@@ -84,6 +85,7 @@ const FullLayout = () => {
               <Route path="/apps/private" element={<PrivateGroup />} />
               <Route path="/apps/registerCompany" element={<RegisterCompany />} />
               <Route path="/user-profile" element={<Profile />} />
+              <Route path="/apps/user-setting" element={<UserSetting/>} />
               <Route path="/app/user-dashboard" element={<UserDashboard/>} />
               <Route path="/app/user-accounts" element={<UserAccount />} />
               <Route path="/referral" element={<Galleryr />} />

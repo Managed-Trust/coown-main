@@ -7,7 +7,6 @@ import ProfileForm from '../../../components/forms/form-horizontal/ProfileForm';
 import { Container } from '@mui/system';
 import AboutCard from './profileComponent/AboutCard';
 import ShareProfile from './profileComponent/ShareProfile';
-import SendMeCrypto from './profileComponent/SendMeCrypto';
 
 const Profile = () => {
     return (
@@ -20,7 +19,6 @@ const Profile = () => {
                 <Container>
                     <AboutCard/>
                     <ShareProfile />
-                    {/* <SendMeCrypto /> */}
                 </Container>
             </Grid>
         </PageContainer>
