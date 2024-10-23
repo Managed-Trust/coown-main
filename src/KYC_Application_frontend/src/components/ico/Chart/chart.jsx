@@ -1,7 +1,6 @@
 import React from 'react';
 import Chart from 'react-apexcharts';
 import { Container, Grid, Box, Typography } from '@mui/material';
-import { motion } from 'framer-motion';
 
 const DoughnutChart = () => {
     // Colors matching the segments as in the reference chart

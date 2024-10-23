@@ -11,10 +11,6 @@ import {
   FormControlLabel,
   IconButton,
 } from '@mui/material';
-import ShareIcon from '@mui/icons-material/Share';
-import TwitterIcon from '@mui/icons-material/Twitter';
-import YouTubeIcon from '@mui/icons-material/YouTube';
-import ForumIcon from '@mui/icons-material/Forum';
 
 const RewardItem = ({ icon, title, description, buttonText }) => (
   <Card

@@ -1,6 +1,5 @@
 import React from 'react';
 import { Box, Typography, Button, Grid } from '@mui/material';
-import { IconChartAreaLine } from '@tabler/icons-react';
 import img from '../../../assets/images/svgs/line-chart-up-01.svg'
 
 function Banner() {
