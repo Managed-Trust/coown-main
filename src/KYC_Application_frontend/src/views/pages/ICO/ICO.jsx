@@ -25,6 +25,10 @@ const StyledTab = styled(Tab)(({ theme }) => ({
     color: '#60a5fa',
     borderBottom: '2px solid #60a5fa',
   },
+  '&:hover': {
+    color: '#60a5fa', // Match hover color to selected tab color
+    borderBottom: '2px solid #60a5fa', // Match hover border to selected tab border
+  },
 }));
 
 const ICO = () => {
