@@ -44,7 +44,7 @@ const ProfileTab = () => {
     {
       label: 'Referral',
       icon: <IconHeart size="20" />,
-      to: '/user-referral',
+      to: '/referral',
     },
     {
       label: 'Settings',
