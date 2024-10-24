@@ -21,10 +21,12 @@ import {
     DialogContent,
     DialogActions,
     Switch,
-    FormControlLabel,
+    IconButton,
     useTheme,
     useMediaQuery,
 } from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
+import ListAltIcon from '@mui/icons-material/ListAlt'; // Import the List icon
 
 const initialCurrencyData = [
     { coin: 'USD', symbol: 'ckUSDC', balance: '155 458.20', usd: '155 458 USD', lastWeek: '+1700', lastMonth: '+1700', percentage: '7.11%', icon: usdc, isVisible: true },
@@ -70,8 +72,12 @@ const AccountBalance = () => {
                 <Typography variant="h6" gutterBottom>
                     Account balance
                 </Typography>
-                <Button variant="outlined" onClick={handleOpenDialog}>
-                    Add Currency
+                <Button 
+                    variant="outlined" 
+                    onClick={handleOpenDialog}
+                    startIcon={<ListAltIcon />} // Add the icon here
+                >
+                    Manage List
                 </Button>
             </Box>
 
@@ -130,9 +136,14 @@ const AccountBalance = () => {
                 PaperProps={{ style: { padding: '20px', borderRadius: '12px' } }} // Style the dialog box
             >
                 <DialogTitle>
-                    <Typography variant="h5" fontWeight="bold">
-                        Select Currencies
-                    </Typography>
+                    <Box display="flex" justifyContent="space-between" alignItems="center">
+                        <Typography variant="h5" fontWeight="bold">
+                            Select Currencies
+                        </Typography>
+                        <IconButton onClick={handleCloseDialog}>
+                            <CloseIcon />
+                        </IconButton>
+                    </Box>
                 </DialogTitle>
                 <DialogContent dividers>
                     {currencyData.map((row, index) => (
