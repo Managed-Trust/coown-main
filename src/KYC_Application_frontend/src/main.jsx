@@ -16,9 +16,8 @@ import { createClient } from "@connect2ic/core";
 import { Connect2ICProvider } from "@connect2ic/react";
 import "@connect2ic/core/style.css";
 import { UserProvider } from "./userContext/UserContext";
-
 const client = createClient({
-  providers: [new InternetIdentity()],
+  providers: [new InternetIdentity(), new PlugWallet()],
   // canisters: {
   //   myCanister
   // }

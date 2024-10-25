@@ -4,7 +4,7 @@ import { Box, Paper, Checkbox, Button, Link, Radio, Grid, TextField, Typography,
 import CustomFormLabel from '../../../../components/forms/theme-elements/CustomFormLabel';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import SecurityIcon from '@mui/icons-material/Security';
-import NotificationsIcon from '@mui/icons-material/Notifications';
+import LockIcon from '@mui/icons-material/Lock';
 import LinkIcon from '@mui/icons-material/Link';
 import icp from '../../../../assets/images/svgs/Layer_1.svg';
 import { ConnectDialog, useConnect, useDialog } from "@connect2ic/react";
@@ -12,7 +12,7 @@ import { ConnectDialog, useConnect, useDialog } from "@connect2ic/react";
 const settingsOptions = [
     { label: 'Profile', icon: <AccountCircleIcon /> },
     { label: 'KYC Data', icon: <SecurityIcon /> },
-    { label: 'Notifications', icon: <NotificationsIcon /> },
+    { label: 'Privacy', icon: <LockIcon /> },
     { label: 'IC ID Connection', icon: <LinkIcon /> }
 ];
 
