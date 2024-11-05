@@ -158,7 +158,7 @@ const Menuitems = [
     id: uniqueId(),
     title: 'Personal Account',
     icon: IconWallet,
-    href: '/personal-profile',
+    href: '/app/user-accounts',
   },
   {
     id: uniqueId(),

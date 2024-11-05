@@ -17,7 +17,7 @@ function Banner() {
                         <Box component="span" sx={{ color: '#3b82f6' }}>
                             shared assets
                         </Box>{' '}
-                        with your team Participate
+                        with your team
                     </Typography>
                     <Typography variant="body1" align="center" paragraph sx={{ color: '#5A6A85' }}>
                         Group accounts with spending limits, transaction approvals, and custom securities for regional markets, suitable for private groups,  corporations and public law entities.
