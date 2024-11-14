@@ -27,6 +27,10 @@ import Galleryr from '../../views/apps/referrals/ReferralCode.jsx';
 import CreateGroup from '../../views/apps/Group/CreateGroup.jsx';
 import PrivateGroup from '../../views/apps/Group/PrivateGroup.jsx';
 import RegisterCompany from '../../views/apps/Group/RegisterCompany.jsx';
+import AdminMain from '../../views/apps/Admin/Dashboard/main.jsx';
+import LocalizationMain from '../../views/apps/Admin/Localization/main.jsx';
+import Fees from '../../views/apps/Admin/Fees/main.jsx';
+import OperatorMain from '../../views/apps/Operator/Dashboard/main.jsx';
 
 import {
   ConnectDialog,
@@ -101,6 +105,10 @@ const FullLayout = () => {
               <Route path="/apps/aml-setting" element={<AmlSetting/>} />
               <Route path="/apps/tickets/user-detail/:id" element={<UserApproval />} />
               <Route path="/pages/faq" element={<Faq />} />
+              <Route path="/pages/admin-dashboard" element={<AdminMain />} />
+              <Route path="/pages/admin-localization" element={<LocalizationMain />} />
+              <Route path="/pages/admin-fees" element={<Fees />} />
+              <Route path="/pages/operator-dashboard" element={<OperatorMain />} />
               <Route path="*" element={<Navigate to="/404" />} /> {/* Catch-all route for 404 */}
             </Routes>
           </Box>

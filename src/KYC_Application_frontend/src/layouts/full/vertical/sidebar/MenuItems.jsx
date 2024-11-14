@@ -38,10 +38,28 @@ const Menuitems = [
     children: [
       {
         id: uniqueId(),
-        title: 'Users',
+        title: 'Dashboard',
         icon: IconUsers,
-        href: '/Users',
+        href: '/pages/admin-dashboard',
         children: [
+          {
+            id: uniqueId(),
+            title: 'Overview',
+            icon: IconUser,
+            href: '/pages/admin-dashboard',
+          },
+          {
+            id: uniqueId(),
+            title: 'Transection Rules',
+            icon: IconUser,
+            href: '/pages/admin-localization',
+          },
+          {
+            id: uniqueId(),
+            title: 'Fees',
+            icon: IconUser,
+            href: '/pages/admin-fees',
+          },
         ],
       },
       {
@@ -52,7 +70,7 @@ const Menuitems = [
         children: [
         ],
       },
-      
+
       {
         id: uniqueId(),
         title: 'DAO',
@@ -76,7 +94,7 @@ const Menuitems = [
         href: '/marketplace-setting',
         children: [
         ],
-      },      
+      },
       {
         id: uniqueId(),
         title: 'Developer Info',
@@ -95,6 +113,12 @@ const Menuitems = [
     children: [
       {
         id: uniqueId(),
+        title: 'Operator',
+        icon: IconShieldCheck,
+        href: '/pages/operator-dashboard'
+      },
+      {
+        id: uniqueId(),
         title: 'AML',
         icon: IconShieldCheck,
         href: '/apps/tickets'
@@ -104,20 +128,20 @@ const Menuitems = [
         title: 'AML Setting',
         icon: IconUserPlus,
         href: '/apps/aml-setting',
-        
-      },      
+
+      },
       {
         id: uniqueId(),
         title: 'Product and Services',
         icon: IconFolder,
         href: '/product-services',
-        
+
       },
       {
         id: uniqueId(),
         title: 'Assets',
         icon: IconRefresh,
-        href: '/assets',        
+        href: '/assets',
       },
       {
         id: uniqueId(),
@@ -126,7 +150,7 @@ const Menuitems = [
         href: '/fee-payments',
         children: [
         ],
-      },      
+      },
       {
         id: uniqueId(),
         title: 'PartnerShip Program',
