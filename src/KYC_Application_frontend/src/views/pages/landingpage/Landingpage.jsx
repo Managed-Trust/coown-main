@@ -17,6 +17,9 @@ import DevelopmentPlan from '../../../components/landingpage/DevelopmentPlan/Dev
 import QuickStartGuide from '../../../components/landingpage/QuickStartGuide/QuickStartGuide';
 import ContactUs from '../../../components/landingpage/ContactUs/ContactUs';
 import FAQSection from '../../../components/landingpage/FAQSection/FAQSection';
+import EasyPayments from '../../../components/landingpage/easy_payments/EasyPayments';
+import InstantTransfers from '../../../components/landingpage/instant_transfers/instent_transfers';
+import GroupFunds from '../../../components/landingpage/groupFunds/groupFunds';
 
 const Landingpage = () => {
   return (
@@ -27,6 +30,9 @@ const Landingpage = () => {
       <Countdown/>
       <AssetControl/>
       <PerformanceMetrics/>
+      <EasyPayments />
+      <InstantTransfers />
+      <GroupFunds />
       <CoownAddress/>
       <Frameworks />
       <FeaturesGrid/>

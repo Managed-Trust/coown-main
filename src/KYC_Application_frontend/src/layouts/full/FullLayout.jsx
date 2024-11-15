@@ -31,6 +31,7 @@ import AdminMain from '../../views/apps/Admin/Dashboard/main.jsx';
 import LocalizationMain from '../../views/apps/Admin/Localization/main.jsx';
 import Fees from '../../views/apps/Admin/Fees/main.jsx';
 import OperatorMain from '../../views/apps/Operator/Dashboard/main.jsx';
+import OperatorTransectionFees from '../../views/apps/Operator/Transection_Rules/main.jsx';
 
 import {
   ConnectDialog,
@@ -40,6 +41,7 @@ import UserDashboard from '../../views/apps/user-dashboard/UserDashboard.jsx';
 import UserAccount from '../../views/apps/user-account/UserAccount.jsx';
 import Profile from '../../views/apps/user-profile/Profile.jsx';
 import UserSetting from '../../views/apps/user-setting/UserSetting.jsx';
+
 
 const MainWrapper = styled('div')(() => ({
   display: 'flex',
@@ -109,6 +111,7 @@ const FullLayout = () => {
               <Route path="/pages/admin-localization" element={<LocalizationMain />} />
               <Route path="/pages/admin-fees" element={<Fees />} />
               <Route path="/pages/operator-dashboard" element={<OperatorMain />} />
+              <Route path="/pages/operator-transection-rules" element={<OperatorTransectionFees />} />
               <Route path="*" element={<Navigate to="/404" />} /> {/* Catch-all route for 404 */}
             </Routes>
           </Box>

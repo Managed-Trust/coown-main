@@ -16,9 +16,15 @@ import {
   createTheme,
   Card,
   CardContent,
-  CardHeader
+  CardHeader,
+  IconButton,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemIcon,
+  Divider
 } from '@mui/material';
-import { ArrowUpward, Settings, ArrowForward } from '@mui/icons-material';
+import { ArrowUpward, Settings, ArrowForward, Group, AccountTree, FiberManualRecord } from '@mui/icons-material';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import Chart from 'react-apexcharts';
 
@@ -67,6 +73,16 @@ const chartData = [
   { name: 'Oct', pending: 100, overdue: 50, suspended: 100 },
   { name: 'Nov', pending: 110, overdue: 55, suspended: 110 },
   { name: 'Dec', pending: 120, overdue: 60, suspended: 120 },
+];
+
+const activityData = [
+  { time: 'Aug 8, 09:46', action: 'Group details updated', by: 'Alice Johnson', color: 'primary' },
+  { time: 'Aug 8, 07:25', action: 'New group member', by: 'Alice Johnson', color: 'secondary' },
+  { time: 'Aug 7, 22:46', action: '0.001535 ckBTC withdrawn', by: 'Bob Smith', id: '#1231616', color: 'warning' },
+  { time: 'Aug 7, 21:15', action: 'Group voted for Deploy GuestOS To All Subnet Nodes', by: 'Michael Anderson', color: 'primary' },
+  { time: 'Aug 7, 21:13', action: '147.14 $COOWN reward received', color: 'success' },
+  { time: 'Aug 7, 20:56', action: '0.001535 ckBTC sent', by: 'Michael Anderson', id: '#1231616', color: 'error' },
+  { time: 'Aug 7, 17:46', action: 'Group voted for Deploy GuestOS To Some API Boundary Nodes', by: 'Michael Anderson', color: 'primary' },
 ];
 
 const operatorGroups = [
@@ -251,43 +267,159 @@ function Dashboard() {
           </Card>
         </Grid>
         <Grid item xs={12}>
-          <Paper elevation={0} sx={{ p: 3 }}>
-            <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-              <Typography variant="h6">Operator groups</Typography>
-              <Button variant="outlined" size="small" startIcon={<Settings />}>Configure</Button>
+          <Paper elevation={1} sx={{ p: 3, borderRadius: 2, boxShadow: 3 }}>
+            <Box
+              display="flex"
+              justifyContent="space-between"
+              alignItems="center"
+              mb={2}
+              pb={1}
+              borderBottom="1px solid"
+              borderColor="divider"
+            >
+              <Typography variant="h6" fontWeight="bold">
+                Operator Groups
+              </Typography>
+              <Button
+                variant="outlined"
+                size="small"
+                startIcon={<Settings />}
+                sx={{ textTransform: 'none' }}
+              >
+                Configure
+              </Button>
             </Box>
-            <Typography variant="body2" color="text.secondary" gutterBottom>Groups of affiliates of the inner and outer circles</Typography>
-            <TableContainer>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Group name</TableCell>
-                    <TableCell align="right">Total members</TableCell>
-                    <TableCell align="right">Function</TableCell>
-                    <TableCell align="right">Since</TableCell>
-                    <TableCell align="right"></TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {operatorGroups.map((group) => (
-                    <TableRow key={group.id}>
-                      <TableCell component="th" scope="row">
-                        {group.name}
-                        <Typography variant="caption" display="block" color="text.secondary">{group.id}</Typography>
-                      </TableCell>
-                      <TableCell align="right">{group.members}</TableCell>
-                      <TableCell align="right">{group.function}</TableCell>
-                      <TableCell align="right">{group.since}</TableCell>
-                      <TableCell align="right">
-                        <Button size="small" endIcon={<ArrowForward />}>View</Button>
-                      </TableCell>
+            <Typography variant="body2" color="text.secondary" gutterBottom sx={{ mb: 3 }}>
+              Groups of affiliates of the inner and outer circles
+            </Typography>
+            <Box
+              sx={{
+                border: "1px solid",
+                borderColor: "divider",
+                borderRadius: 2,
+                overflow: "hidden",
+              }}
+            >
+              <TableContainer>
+                <Table>
+                  <TableHead>
+                    <TableRow sx={{ backgroundColor: "action.hover" }}>
+                      <TableCell sx={{ fontWeight: "bold", color: "text.secondary" }}>Group name</TableCell>
+                      <TableCell align="center" sx={{ fontWeight: "bold", color: "text.secondary" }}>Total members</TableCell>
+                      <TableCell align="center" sx={{ fontWeight: "bold", color: "text.secondary" }}>Function</TableCell>
+                      <TableCell align="center" sx={{ fontWeight: "bold", color: "text.secondary" }}>Since</TableCell>
+                      <TableCell align="center"></TableCell>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
+                  </TableHead>
+                  <TableBody>
+                    {operatorGroups.map((group) => (
+                      <TableRow key={group.id} hover>
+                        <TableCell component="th" scope="row">
+                          <Box display="flex" alignItems="center">
+                            <Group sx={{ fontSize: 20, color: "primary.main", mr: 1 }} />
+                            <Box>
+                              <Typography fontWeight="medium">{group.name}</Typography>
+                              <Typography variant="caption" color="text.secondary">{group.id}</Typography>
+                            </Box>
+                          </Box>
+                        </TableCell>
+                        <TableCell align="center">{group.members}</TableCell>
+                        <TableCell align="center">
+                          <Box display="flex" alignItems="center" justifyContent="center">
+                            <AccountTree sx={{ fontSize: 20, color: "primary.main", mr: 1 }} />
+                            {group.function}
+                          </Box>
+                        </TableCell>
+                        <TableCell align="center">{group.since}</TableCell>
+                        <TableCell align="center">
+                          <IconButton color="primary">
+                            <ArrowForward />
+                          </IconButton>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Box>
           </Paper>
         </Grid>
+        <Grid item xs={12}>
+          <Paper elevation={1} sx={{ p: 3, borderRadius: 2, boxShadow: 3 }}>
+            <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+              <Typography variant="h6" fontWeight="bold">
+                Activity Stream
+              </Typography>
+            </Box>
+            <List sx={{ maxHeight: 400, overflow: 'auto', position: 'relative' }}>
+              {activityData.map((activity, index) => (
+                <React.Fragment key={index}>
+                  <ListItem alignItems="flex-start" sx={{ position: 'relative', pl: 4 }}>
+                    {/* Vertical line connecting the dots */}
+                    <Box
+                      sx={{
+                        position: 'absolute',
+                        top: 0,      // Start at the top of the ListItem
+                        left: 17,    // Align line with the center of the dot
+                        bottom: 0,   // Extend to the bottom of the ListItem
+                        width: '1px',
+                        backgroundColor: theme.palette.divider,
+                        zIndex: 0,   // Behind the dots
+                      }}
+                    />
+                    {/* Custom dot with empty center */}
+                    <Box
+                      sx={{
+                        position: 'absolute',
+                        top: 8,   // Center dot vertically within ListItem
+                        left: 12, // Align dot with line
+                        width: 12,
+                        height: 12,
+                        border: `2px solid ${theme.palette[activity.color].main}`,
+                        borderRadius: '50%',
+                        backgroundColor: 'background.default',
+                        zIndex: 1,  // In front of the line
+                      }}
+                    />
+                    <ListItemText
+                      primary={
+                        <Box display="flex" alignItems="center" gap={1}>
+                          <Typography variant="caption" color="text.secondary">
+                            {activity.time}
+                          </Typography>
+                          <Typography variant="body2">
+                            <span style={{ fontWeight: activity.color === 'secondary' ? 'bold' : 'normal' }}>
+                              {activity.action}
+                            </span>{' '}
+                            {activity.by && (
+                              <Typography component="span" variant="body2" color="primary.main">
+                                {activity.by}
+                              </Typography>
+                            )}
+                            {activity.id && (
+                              <Typography component="span" variant="body2" color="text.secondary">
+                                {' '}{activity.id}
+                              </Typography>
+                            )}
+                          </Typography>
+                        </Box>
+                      }
+                    />
+                  </ListItem>
+                  {index < activityData.length - 1 && <Divider variant="inset" component="li" />}
+                </React.Fragment>
+              ))}
+            </List>
+            <Box display="flex" justifyContent="start" mt={2}>
+              <Button variant="outlined" color="primary" size="medium">
+                Show more
+              </Button>
+            </Box>
+          </Paper>
+        </Grid>
+
+
+
       </Grid>
     </Box>
   );
