@@ -1,4 +1,4 @@
-import React,{useState } from 'react';
+import React, { useState } from 'react';
 import { Container, Card, Grid, Box, Typography, Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
 import { motion } from 'framer-motion';
 import img from '../../../assets/images/products/Frame 1000004276.png';
@@ -6,49 +6,49 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 const faqs = [
     {
-      id: '01',
-      question: 'Our concept',
-      answer: 'The admin dashboard gives business owners and administrators a comprehensive overview of their business. It provides real-time insights into revenue, budget, expenses, and other key metrics.',
+        id: '01',
+        question: 'Our concept',
+        answer: 'The admin dashboard gives business owners and administrators a comprehensive overview of their business. It provides real-time insights into revenue, budget, expenses, and other key metrics.',
     },
     {
-      id: '02',
-      question: 'Why Group Wallets? ',
-      answer: 'Group wallets are a multi-purpose solution. They can be used to securely and efficiently manage assets that belong to a legal entity, or to allocate funds to business units and allow team members implementing smaller payments. ',
-   },
-    {
-      id: '03',
-      question: 'Digital Assets',
-      answer: 'Inside our wallets you can hold Bitcoin, USD and gold related token, other stable currencies, and your own digitalized shares will follow soon.',
+        id: '02',
+        question: 'Why Group Wallets? ',
+        answer: 'Group wallets are a multi-purpose solution. They can be used to securely and efficiently manage assets that belong to a legal entity, or to allocate funds to business units and allow team members implementing smaller payments. ',
     },
-  ];
+    {
+        id: '03',
+        question: 'Digital Assets',
+        answer: 'Inside our wallets you can hold Bitcoin, USD and gold related token, other stable currencies, and your own digitalized shares will follow soon.',
+    },
+];
 
-  const CircularBadge = ({ number, active }) => {
+const CircularBadge = ({ number, active }) => {
     return (
-      <Box
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          width: '30px',
-          height: '30px',
-          borderRadius: '50%',
-          border: '2px solid #d9dbdf',
-          color: active ? '#3B82F6' : '#000', // Active color blue, inactive black
-          fontWeight: 'bold',
-          fontSize: '14px',
-          marginRight: '10px', // Space between badge and text
-        }}
-      >
-        {number}
-      </Box>
+        <Box
+            sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: '30px',
+                height: '30px',
+                borderRadius: '50%',
+                border: '2px solid #d9dbdf',
+                color: active ? '#3B82F6' : '#000', // Active color blue, inactive black
+                fontWeight: 'bold',
+                fontSize: '14px',
+                marginRight: '10px', // Space between badge and text
+            }}
+        >
+            {number}
+        </Box>
     );
-  };
-  
+};
+
 const AssetControl = () => {
     const [expanded, setExpanded] = useState(false);
 
     const handleChange = (panel) => (event, isExpanded) => {
-      setExpanded(isExpanded ? panel : false);
+        setExpanded(isExpanded ? panel : false);
     }
 
     return (
@@ -191,17 +191,22 @@ const AssetControl = () => {
                             </Box>
                         </Box>
                     </Grid>
-                    <Grid item xs={12} md={6}>
-                        <Grid container spacing={1} p={2} alignItems="center">
+                    <Grid item xs={12} md={6} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                        <Grid container spacing={1} p={2} justifyContent="center" alignItems="center">
                             <Box
-                                component="img"
-                                src={img}
-                                alt="Tech Innovators"
+                                component="iframe"
+                                src="https://www.youtube.com/embed/gYw4uIP8vKQ"
+                                title="YouTube video"
+                                frameBorder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                allowFullScreen
                                 sx={{
-                                    width: '55%',
-                                    maxHeight: '500px',
+                                    width: { xs: '80%', md: '55%' }, // Adjust width for mobile and desktop
+                                    maxHeight: '500px',             // Limit height
+                                    aspectRatio: '9 / 16',          // Maintain Shorts video aspect ratio
                                     objectFit: 'cover',
-                                    borderRadius: '12px',
+                                    borderRadius: '12px',           // Rounded corners
+                                    margin: '0 auto',               // Center on smaller screens
                                 }}
                             />
                         </Grid>
