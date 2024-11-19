@@ -6,28 +6,41 @@ import {
     List,
     ListItem,
     ListItemIcon,
-    ListItemText,Container
+    ListItemText, Container
 } from '@mui/material';
 import img from '../../../assets/images/svgs/integratedCommunication.svg'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 
 export default function FileSharingComponent() {
     return (
-        <Container sx={{ p: 4, mt: 10,mb:5 }}>
+        <Container sx={{ p: 4, mt: 10, mb: 5 }}>
             <Grid container spacing={4}>
                 <Grid item xs={12} md={6} p={10}>
                     <Typography variant="h2" sx={{ fontWeight: 'bold', mt: 8 }}>
-                    File sharing
+                        Decentralized storage capacity
                     </Typography>
-                    <Typography variant="body2" sx={{ mt: 2, fontSize:'14px',color:'#5A6A85' }}>
-                    Enable file sharing to allow group members to easily send and share files directly within the group chat.   </Typography>
+                    <Typography variant="body2" sx={{ mt: 2, fontSize: '14px', color: '#5A6A85' }}>
+                        Optionally, you can expand file sharing capacity to allow members to easily send and share files directly within the group chat.
+                    </Typography>
                     <List>
                         <ListItem disableGutters>
                             <ListItemIcon>
                                 <CheckCircleIcon color="primary" />
                             </ListItemIcon>
-                            <ListItemText primary="Available as add-on " />
-                        </ListItem>                        
+                            <ListItemText primary="500MB free " />
+                        </ListItem>
+                        <ListItem disableGutters>
+                            <ListItemIcon>
+                                <CheckCircleIcon color="primary" />
+                            </ListItemIcon>
+                            <ListItemText primary="Upto 5GB for 72 USD / year" />
+                        </ListItem>
+                        <ListItem disableGutters>
+                            <ListItemIcon>
+                                <CheckCircleIcon color="primary" />
+                            </ListItemIcon>
+                            <ListItemText primary="Upto 25GB for 260 USD / year" />
+                        </ListItem>
                     </List>
                 </Grid>
 

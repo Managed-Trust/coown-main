@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Typography, Paper, Grid } from '@mui/material';
+import { Box, Typography, Paper, Grid, Button } from '@mui/material';
 import coin from '../../../assets/images/svgs/coins-03.svg';
 import coinHand from '../../../assets/images/svgs/coins-hand.svg';
 import star from '../../../assets/images/svgs/stars-01.svg';
@@ -17,9 +17,9 @@ function Banner() {
         { label: 'Venture Capital', icon: coinHand },
         { label: 'Get Early Access', icon: star },
         { label: 'Become Regional Operator', icon: globe },
-        { label: 'Partnerships', icon: briefcase},
+        { label: 'Partnerships', icon: briefcase },
         { label: 'Customization Requests', icon: brush },
-        { label: 'Feature Sponsoring', icon: star7},
+        { label: 'Feature Sponsoring', icon: star7 },
         { label: 'Customer Support', icon: headphone },
     ];
 
@@ -56,7 +56,7 @@ function Banner() {
                                         },
                                     }}
                                 >
-                                   <img src={option.icon} alt="" />
+                                    <img src={option.icon} alt="" />
                                     <Typography variant="body2">
                                         {option.label}
                                     </Typography>
@@ -64,6 +64,21 @@ function Banner() {
                             </Grid>
                         ))}
                     </Grid>
+                    <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
+                        <img src="/images/landingPage/Contact_image.jpg" />
+                    </div>
+                    <Typography variant="h2" align="center" gutterBottom>
+                        Send us messages
+                    </Typography>
+                    <Typography variant="body2" fontSize={16} align="center" gutterBottom>
+                        Feel free to contact us for opportunities, support, or customization. Our team will respond promptly.
+                    </Typography>
+                    <div style={{ display:'flex',justifyContent:'center' }}>
+                        <Button variant="contained" color="primary" sx={{ mt: 2 }}>
+                            Get in touch
+                        </Button>
+                    </div>
+
                 </Container>
             </Box>
         </>

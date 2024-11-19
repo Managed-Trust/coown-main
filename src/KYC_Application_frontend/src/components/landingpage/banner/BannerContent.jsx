@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Typography, Box, Button, Stack, styled, useMediaQuery, Grid } from '@mui/material';
 import { IconRocket, IconWallet } from '@tabler/icons';
-import { NavLink } from 'react-router-dom';
+import { NavLink, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { GoogleOAuthProvider, useGoogleLogin } from '@react-oauth/google';
 import { useUser } from "../../../userContext/UserContext";
@@ -163,9 +163,12 @@ const BannerContent = () => {
 
 
             {/* Custom Google Login Button */}
-            <StyledButton2>
-              Contact
-            </StyledButton2>
+            <Link to="/ico">
+              <StyledButton2>
+                Contact us
+              </StyledButton2>
+            </Link>
+
 
           </Stack>
         </motion.div>

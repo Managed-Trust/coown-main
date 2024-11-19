@@ -60,7 +60,7 @@ const EnterpriseEdtionComponent = () => {
                                             <Box sx={{ width: '100%', marginTop: 2 }}>
                                                 <Link to={card.link} >
                                                     <Button variant="contained" sx={{ width: '100%', marginTop: 2, textTransform: 'none' }}>
-                                                        Select
+                                                        Get Started
                                                     </Button>
                                                 </Link>
                                             </Box>

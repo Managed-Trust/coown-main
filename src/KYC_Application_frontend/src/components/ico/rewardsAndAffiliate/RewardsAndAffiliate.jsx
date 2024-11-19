@@ -28,7 +28,7 @@ const RewardItem = ({ icon, title, description, buttonText }) => (
           {icon}
         </IconButton>
         <Box>
-          <Typography variant="subtitle1" sx={{ fontWeight: 'medium' }}>
+          <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
             {title}
           </Typography>
           <Typography variant="body2" color="text.secondary">
@@ -48,10 +48,10 @@ export default function RewardsAndAffiliate() {
     <Box sx={{ maxWidth: 1200, mx: 'auto', mt: 4, px: 2 }}>
       <Grid container spacing={4}>
         <Grid item xs={12} md={5}>
-          <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold', color: '#1e293b' }}>
-            Rewards
+          <Typography variant="h2" gutterBottom sx={{ fontWeight: 'bold', color: '#1e293b' }}>
+            Social Rewards
           </Typography>
-          <Typography variant="body2" paragraph sx={{ color: '#64748b', mb: 4,fontSize:'14px' }}>
+          <Typography variant="body2" paragraph sx={{ color: '#64748b', mb: 4, fontSize: '14px' }}>
             Participate in community tasks to earn rewards! Engage in various activities,
             collaborate with others, and contribute to community goals to unlock special
             bonuses.
@@ -87,11 +87,10 @@ export default function RewardsAndAffiliate() {
       <Grid container spacing={4} sx={{ mt: 4 }}>
         <Grid item xs={12} md={5}>
           <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold', color: '#1e293b' }}>
-            Affiliate Link
+            Referral Code
           </Typography>
-          <Typography variant="body2" paragraph sx={{ color: '#64748b', mb: 2,fontSize:'14px' }}>
-            Create a custom invite code. If others use it to sign-up, you will get a one-time
-            bonus when your affiliates upgrade to our enterprise plan.
+          <Typography variant="body2" paragraph sx={{ color: '#64748b', mb: 2, fontSize: '14px' }}>
+            Create a custom invite code. If other use it to upgrade to our enterprise plan, you will get a one-time bonus.
           </Typography>
           <FormControlLabel
             control={<Checkbox sx={{ '& .MuiSvgIcon-root': { fontSize: 28 } }} />}

@@ -7,6 +7,7 @@ import Banner from "../../../components/contactus/banner/banner";
 import Contact from "../../../components/contactus/Contact/contact";
 import ContactDetails from '../../../components/contactus/ContactDetails/ContactDetails';
 import FAQs from '../../../components/contactus/FAQ/FAQ';
+import OpenChatCommunity from '../../../components/contactus/OpenChatCommunity/openChatCommunity';
 
 const ContactUs = () => {
     return (
@@ -14,7 +15,8 @@ const ContactUs = () => {
             <PageContainer title="Contact Us" description="Contact Us">
                 <LpHeader />
                 <Banner/>
-                <Contact />
+                {/* <Contact /> */}
+                <OpenChatCommunity />
                 <ContactDetails />
                 <FAQs />
                 <C2a2 />
