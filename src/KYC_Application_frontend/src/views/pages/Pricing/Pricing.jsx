@@ -24,7 +24,7 @@ const Pricing = () => {
                 <AssetMiningComponent />
                 <LiveSupportComponent />
                 <CustomSolution />
-                <Contact />
+                {/* <Contact /> */}
                 <C2a2 />
                 <Footer />
             </PageContainer>
