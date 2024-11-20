@@ -1,8 +1,8 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-import LogoDark from '../../../../assets/images/logos/logo_full.png';
-import LogoDarkRTL from '../../../../assets/images/logos/logo_full.png';
+import LogoDark from '../../../../assets/images/logos/logo_full.jpg';
+import LogoDarkRTL from '../../../../assets/images/logos/logo_full.jpg';
 import LogoLight from '../../../../assets/images/logos/dark_full.png';
 import LogoLightRTL from '../../../../assets/images/logos/dark_full.png';
 import { styled } from '@mui/material';

@@ -73,8 +73,25 @@ const ResellerProgramCard = () => {
             value="https://co-own.com/affiliate/i94hf8f2h3h"
             InputProps={{
               readOnly: true,
+              sx: {
+                '&.MuiOutlinedInput-root': {
+                  '& fieldset': {
+                    border: 'none', // Removes the border
+                    color: '#7C8FAC'
+                  },
+                  '&:hover fieldset': {
+                    border: 'none', // Ensures no border on hover
+                    color: '#7C8FAC'
+                  },
+                  '&.Mui-focused fieldset': {
+                    border: 'none', // Ensures no border on focus
+                    color: '#7C8FAC'
+                  },
+                },
+              },
             }}
           />
+
           <Button
             variant="contained"
             startIcon={<CopyIcon />}

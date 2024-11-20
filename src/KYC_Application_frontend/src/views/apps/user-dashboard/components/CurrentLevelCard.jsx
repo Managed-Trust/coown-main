@@ -30,10 +30,10 @@ const CurrentLevelCard = () => {
           icon={<StarIcon style={{ color: 'white' }} />}
           label="2"
           sx={{
-            backgroundColor: '#2ECC71',
+            backgroundColor: '#19BB8D',
             color: 'white',
             fontWeight: 'bold',
-            mt: { xs: 1, sm: 0 },
+            fontSize: '14px',
           }}
         />
       </Box>

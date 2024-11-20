@@ -50,7 +50,7 @@ const RewardTabs = () => {
                                 <img src={icp} alt="ICP Icon" style={{ maxWidth: '100%', height: 'auto' }} />
                             </Grid>
                             <Grid item xs={8} md={10}>
-                                <Typography sx={{ padding: '3px 0px' }} variant="h6">
+                                <Typography sx={{ padding: '3px 0px' }} variant="h5">
                                     Get rewards by staking $COOWN token   <Chip
                                         label="Coming soon"
                                         sx={{
@@ -58,6 +58,7 @@ const RewardTabs = () => {
                                             backgroundColor: 'rgba(106, 153, 242, 0.15)',
                                             color: 'rgb(106, 153, 242)',
                                             fontWeight: 'bold',
+                                            fontSize:'16px'
                                         }}
                                     />
                                 </Typography>
@@ -90,9 +91,9 @@ const RewardTabs = () => {
                     <Grid container alignItems="center" spacing={2}>
                         <Grid item xs={12} sm={12} md={6} container alignItems="center" justifyContent="start">
                             <img src={icp} alt="ICP Icon" style={{ maxWidth: '100%', height: 'auto' }} />
-                            <Typography ml={2} variant="h5">$TAR Rewards
+                            <Typography ml={2} variant="h5">Staking rewards
                                 <Typography variant="body2" color="#5A6A85">
-                                    Receive rewards for processing ckUSDC
+                                    Receive rewards for processing $COOWN
                                 </Typography>
                             </Typography>
 

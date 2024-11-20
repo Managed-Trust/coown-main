@@ -16,7 +16,7 @@ const UserAccount = () => {
   return (
     <PageContainer title="User Profile" description="This is the User Profile page">
 
-      <Grid container spacing={3}>
+      <Grid container spacing={2}>
         {/* Profile Banner */}
         <Grid item xs={12}>
           <ProfileBanner />
@@ -29,7 +29,8 @@ const UserAccount = () => {
               <YourCurrencies />
             </Grid>
             <Grid item xs={12} sm={8} md={8}>
-              <BalanceHistory /></Grid>
+              <BalanceHistory />
+            </Grid>
           </Grid>
           <PendingMember/>
           <TransactionHistory/>

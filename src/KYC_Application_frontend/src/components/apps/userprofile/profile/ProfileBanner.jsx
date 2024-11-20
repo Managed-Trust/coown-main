@@ -10,8 +10,9 @@ import {
   styled,
   Fab,
   Skeleton,
+  Chip
 } from '@mui/material';
-import profilecover from '../../../../assets/images/backgrounds/profilebg.jpg';
+import profilecover from '../../../../assets/images/backgrounds/account_bg.png';
 import userimg from '../../../../assets/images/profile/user-1.jpg';
 import StarIcon from '@mui/icons-material/Star';
 import {
@@ -55,7 +56,7 @@ const ProfileBanner = () => {
     width: '110px',
     height: '110px',
     borderRadius: '50%',
-    backgroundImage: 'linear-gradient(#50b2fc,#f44c66)',
+    // backgroundImage: 'linear-gradient(#50b2fc,#f44c66)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -112,7 +113,7 @@ const ProfileBanner = () => {
             <Skeleton variant="square" animation="wave" width="100%" height={330}></Skeleton>
           </>
         ) : (
-          <CardMedia component="img" image={profilecover} alt={profilecover} width="100%" />
+          <CardMedia component="img" image={profilecover} alt={profilecover} width="100%" height={250} />
         )}
         <Grid container spacing={0} justifyContent="space-between" alignItems="start">
           {/* Post | Followers | Following */}
@@ -136,6 +137,7 @@ const ProfileBanner = () => {
               justifyContent="center"
               sx={{
                 mt: '-45px',
+                pb: '25px'
               }}
             >
               {profile ?
@@ -151,9 +153,19 @@ const ProfileBanner = () => {
                         border: '4px solid #fff',
                       }}
                     />
-                    <Badge>
-                      <StarIcon fontSize="small" />
-                    </Badge>
+                    <Chip
+                      icon={<StarIcon style={{ color: 'white' }} />}
+                      label="2"
+                      sx={{
+                        backgroundColor: '#19BB8D',
+                        color: 'white',
+                        fontWeight: 'bold',
+                        fontSize: '14px',
+                        position: 'absolute',
+                        bottom: '0px',
+                        right: '0px'
+                      }}
+                    />
                   </ProfileImage>
                   <Box mt={2} ml={2}>
                     <Typography fontWeight={600} variant="h6">
@@ -172,20 +184,29 @@ const ProfileBanner = () => {
                       alt="Tony Stark"
                       sx={{
                         borderRadius: '50%',
-                        width: '100px',
-                        height: '100px',
+                        width: '110px',
+                        height: '110px',
                         border: '4px solid #fff',
                       }}
                     />
-                    {/* Badge with a star */}
-                    <Badge>
-                      <StarIcon fontSize="small" />
-                    </Badge>
+                    <Chip
+                      icon={<StarIcon style={{ color: 'white' }} />}
+                      label="2"
+                      sx={{
+                        backgroundColor: '#19BB8D',
+                        color: 'white',
+                        fontWeight: 'bold',
+                        fontSize: '14px',
+                        position: 'absolute',
+                        bottom: '0px',
+                        right: '0px'
+                      }}
+                    />
                   </ProfileImage>
 
                   {/* Text Section */}
-                  <Box mt={2} ml={2}>
-                    <Typography fontWeight={600} variant="h6">
+                  <Box mt={7} ml={2}>
+                    <Typography fontWeight={600} variant="h2" mb={1}>
                       Tony Stark
                     </Typography>
                     <Typography color="textSecondary" variant="body2">
@@ -214,7 +235,7 @@ const ProfileBanner = () => {
             }}
           >
             <Stack direction={'row'} gap={2} alignItems="center" justifyContent="center" my={2}>
-              <Fab size="small" color="primary" sx={{ backgroundColor: '#1877F2' }}>
+              {/* <Fab size="small" color="primary" sx={{ backgroundColor: '#1877F2' }}>
                 <IconBrandFacebook size="16" />
               </Fab>
               <Fab size="small" color="primary" sx={{ backgroundColor: '#1DA1F2' }}>
@@ -225,10 +246,10 @@ const ProfileBanner = () => {
               </Fab>
               <Fab size="small" color="error" sx={{ backgroundColor: '#CD201F' }}>
                 <IconBrandYoutube size="18" />
-              </Fab>
-              {/* <Button color="primary" variant="contained">
-                Add To Story
-              </Button> */}
+              </Fab> */}
+              <Button color="primary" variant="contained">
+                Edit Cover
+              </Button>
             </Stack>
           </Grid>
         </Grid>

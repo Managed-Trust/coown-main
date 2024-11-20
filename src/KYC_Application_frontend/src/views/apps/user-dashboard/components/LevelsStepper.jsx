@@ -79,7 +79,7 @@ const LevelsStepper = () => {
                 </Typography>
                 <Typography
                   variant="body2"
-                  sx={{ fontWeight: 'bold', fontSize: { xs: '0.875rem', sm: '1rem' } }}
+                  sx={{ fontWeight: '600', fontSize: { xs: '0.875rem', sm: '1rem' } }}
                 >
                   {level.title}
                 </Typography>

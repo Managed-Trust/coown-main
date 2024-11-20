@@ -64,7 +64,7 @@ const ProfileTab = () => {
                 iconPosition="start"
                 label={tab.label}
                 sx={{ minHeight: '50px' }}
-                icon={tab.icon}
+              
                 component={Link}
                 to={tab.to}
                 value={tab.to}

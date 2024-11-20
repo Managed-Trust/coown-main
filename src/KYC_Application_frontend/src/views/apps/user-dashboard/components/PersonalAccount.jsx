@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card , Paper, Typography } from '@mui/material';
+import { Card, Paper, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import Chart from 'react-apexcharts';
 import { useTheme } from '@mui/material/styles';
@@ -93,10 +93,7 @@ const PersonalAccount = () => {
 
   return (
     <Paper
-    elevation={3}
-    style={{
-        padding: '10px',
-    }}>
+      elevation={3}>
       <Box sx={{ width: '100%', padding: '20px' }}>
         <Typography variant="h6" gutterBottom>
           Personal Account
@@ -107,4 +104,4 @@ const PersonalAccount = () => {
   );
 };
 
-export default PersonalAccount ;
+export default PersonalAccount;
