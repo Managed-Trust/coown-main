@@ -2,16 +2,17 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Box, Menu, Avatar, Typography, Divider, Button, IconButton } from '@mui/material';
 import * as dropdownData from './data';
-
+import { useNavigate } from 'react-router-dom';
 import { IconMail } from '@tabler/icons';
 import { Stack } from '@mui/system';
 
 import ProfileImg from '../../../../assets/images/profile/user-1.jpg';
 import unlimitedImg from '../../../../assets/images/backgrounds/unlimited-bg.png';
 import Scrollbar from '../../../../components/custom-scroll/Scrollbar';
-
+import { useUser } from "../../../../userContext/UserContext";
 const Profile = () => {
   const [anchorEl2, setAnchorEl2] = useState(null);
+  const { user, setUser } = useUser();
   const handleClick2 = (event) => {
     setAnchorEl2(event.currentTarget);
   };
@@ -19,6 +20,12 @@ const Profile = () => {
     setAnchorEl2(null);
   };
 
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    setUser(null);
+    navigate('/');
+  }
   return (
     <Box>
       <IconButton
@@ -153,10 +160,9 @@ const Profile = () => {
                 </Box>
               </Box>
               <Button
-                to="/auth/login"
+                onClick={handleLogout}
                 variant="outlined"
                 color="primary"
-                component={Link}
                 fullWidth
               >
                 Logout
