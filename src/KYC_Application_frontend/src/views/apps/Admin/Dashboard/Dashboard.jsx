@@ -160,7 +160,7 @@ function Row({ row }) {
                 <TableBody>
                   {row.subRows.map((subRow) => (
                     <StyledTableRow key={subRow.name}>
-                      <TableCell sx={{ pl: 6, display: 'flex', alignItems: 'center', gap: 1, py: 2 }}>
+                      <TableCell sx={{ pl: 8, display: 'flex', alignItems: 'center', gap: 1, py: 2 }}>
                         <Box>
                           <Typography variant="body2" sx={{ color: '#1e293b', fontWeight: 500 }}>
                             {subRow.name}
@@ -206,14 +206,13 @@ export default function Dashboard() {
           </Typography>
         </Box>
         <Button
-          variant="contained"
+          variant="outlined"
           startIcon={<AddIcon />}
           sx={{
-            borderRadius: 2,
+            borderRadius: 1,
             textTransform: 'none',
-            backgroundColor: '#6366f1',
             '&:hover': {
-              backgroundColor: '#4f46e5',
+              backgroundColor: '#5d87ff',
             },
             boxShadow: 'none',
             padding: '8px 16px',

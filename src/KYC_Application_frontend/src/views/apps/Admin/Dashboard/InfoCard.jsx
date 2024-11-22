@@ -1,5 +1,5 @@
 import React from 'react';
-import { Grid, Paper, Typography, Box } from '@mui/material';
+import { Grid, Paper, Typography, Box, Chip } from '@mui/material';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 
 const Card = ({ title, value, unit, percentage }) => (
@@ -22,23 +22,26 @@ const Card = ({ title, value, unit, percentage }) => (
             <Typography variant="h4" fontWeight="bold" color="textPrimary">
                 {value}
             </Typography>
-            {unit && (
-                <Typography component="span" variant="h6" fontWeight="bold" color="textSecondary" mx={0.5}>
-                    {unit}
-                </Typography>
-            )}
-        </Box>
-        {percentage && (
-            <>
-                <div style={{ display: 'flex', flexDirection: 'row' }}>
-                    <ArrowUpwardIcon sx={{ color: '#4CAF50', fontSize: '18px' }} />
-                    <Typography variant="body2" fontWeight="bold" color="#4CAF50" ml={0.5}>
-                        {percentage}%
-                    </Typography>
-                </div>
+            {percentage && (<Chip
+                label={
+                    <Box display="flex" alignItems="center" gap={0.5}>
+                        <span style={{ display: 'inline-block' }}>
+                            ➚ 
+                        </span>
+                        <Typography sx={{ fontSize: '12px' }}>{percentage} %</Typography>
+                    </Box>
+                }
+                sx={{
+                    backgroundColor: '#E3FAED',
+                    color: '#19BB8D',
+                    borderRadius: '16px',
+                    marginLeft:'4px'
 
-            </>
-        )}
+                }}
+            />
+            )}
+
+        </Box>
     </Paper>
 );
 

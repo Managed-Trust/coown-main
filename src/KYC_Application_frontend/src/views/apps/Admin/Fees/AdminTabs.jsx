@@ -18,12 +18,12 @@ const AdminTabs = () => {
       to: '/pages/admin-localization',
     },
     {
-      label: 'Fees',
+      label: 'Transaction Fees',
       to: '/pages/admin-fees',
     },
     {
       label: 'Management',
-      to: '/apps/friends',
+      to: '/pages/admin-management',
     }
   ];
 

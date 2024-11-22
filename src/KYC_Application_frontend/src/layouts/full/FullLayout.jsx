@@ -110,6 +110,7 @@ const FullLayout = () => {
               <Route path="/pages/admin-dashboard" element={<AdminMain />} />
               <Route path="/pages/admin-localization" element={<LocalizationMain />} />
               <Route path="/pages/admin-fees" element={<Fees />} />
+              <Route path="/pages/admin-management" element={<Fees />} />
               <Route path="/pages/operator-dashboard" element={<OperatorMain />} />
               <Route path="/pages/operator-transection-rules" element={<OperatorTransectionFees />} />
               <Route path="*" element={<Navigate to="/404" />} /> {/* Catch-all route for 404 */}

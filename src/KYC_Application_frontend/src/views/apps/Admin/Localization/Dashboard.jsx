@@ -11,7 +11,7 @@ import {
   Button,
   IconButton,
   Paper,
-  Collapse,
+  Avatar,
   styled,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
@@ -19,7 +19,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import Coown_Logo from '../../../../assets/images/logos/coown-logo-group.jpg';
+import Coown_Logo from '../../../../assets/images/profile/user-5.jpg';
 
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
   '&:hover': {
@@ -32,8 +32,8 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 
 const affiliatesData = [
   {
-    id: '987654321',
-    name: 'Software Developers',
+    id: '1',
+    name: 'Operator  F',
     totalMembers: 15,
     Balance: '$100 000',
     total_revenue: '$100 000',
@@ -45,8 +45,8 @@ const affiliatesData = [
     subRows: [],
   },
   {
-    id: '123456789',
-    name: 'Regional Operator "Sandbox"',
+    id: '2',
+    name: 'Operator  G',
     totalMembers: 15,
     Balance: '$100 000',
     total_revenue: '$100 000',
@@ -58,8 +58,8 @@ const affiliatesData = [
     subRows: [],
   },
   {
-    id: '1122334455',
-    name: 'Auditor company',
+    id: '3',
+    name: 'Operator J',
     totalMembers: 15,
     Balance: '$100 000',
     total_revenue: '$100 000',
@@ -78,18 +78,15 @@ function Row({ row }) {
   return (
     <>
       <StyledTableRow>
+        <TableCell sx={{ color: '#1e293b' }}>{row.id}</TableCell>
         <TableCell sx={{ pl: 2, display: 'flex', alignItems: 'center', gap: 1, py: 2 }}>
-          <IconButton
-            aria-label="expand row"
-            size="small"
-            onClick={() => setOpen(!open)}
-            sx={{ visibility: row.subRows.length > 0 ? 'visible' : 'hidden' }}
-          >
-            {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-          </IconButton>
           {row.isMain && (
             <Box sx={{ display: 'flex', gap: 0.5 }}>
-              <img src={Coown_Logo} />
+              <Avatar
+                src={Coown_Logo}
+                alt={Coown_Logo}
+                width="30"
+              />
             </Box>
           )}
           <Box>
@@ -97,7 +94,7 @@ function Row({ row }) {
               {row.name}
             </Typography>
             <Typography variant="caption" sx={{ color: '#64748b' }}>
-              #{row.id}
+              GROUP ID
             </Typography>
           </Box>
         </TableCell>
@@ -143,42 +140,6 @@ function Row({ row }) {
           </IconButton>
         </TableCell>
       </StyledTableRow>
-      <TableRow>
-        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={9}>
-          <Collapse in={open} timeout="auto" unmountOnExit>
-            <Box sx={{ margin: 1 }}>
-              <Table size="small" aria-label="purchases">
-                <TableBody>
-                  {row.subRows.map((subRow) => (
-                    <StyledTableRow key={subRow.name}>
-                      <TableCell sx={{ pl: 6, display: 'flex', alignItems: 'center', gap: 1, py: 2 }}>
-                        <Box>
-                          <Typography variant="body2" sx={{ color: '#1e293b', fontWeight: 500 }}>
-                            {subRow.name}
-                          </Typography>
-                          <Typography variant="caption" sx={{ color: '#64748b' }}>
-                            #{subRow.id}
-                          </Typography>
-                        </Box>
-                      </TableCell>
-                      <TableCell sx={{ color: '#1e293b' }}>{subRow.totalMembers}</TableCell>
-                      <TableCell sx={{ color: '#1e293b' }}>{subRow.since}</TableCell>
-                      <TableCell align="right">
-                        <IconButton size="small" sx={{ color: '#94a3b8', '&:hover': { color: '#6366f1' } }}>
-                          <EditIcon fontSize="small" />
-                        </IconButton>
-                        <IconButton size="small" sx={{ color: '#94a3b8', '&:hover': { color: '#6366f1' } }}>
-                          <ArrowForwardIcon fontSize="small" />
-                        </IconButton>
-                      </TableCell>
-                    </StyledTableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </Box>
-          </Collapse>
-        </TableCell>
-      </TableRow>
     </>
   );
 }
@@ -189,11 +150,9 @@ export default function Dashboard() {
       <Box sx={{ p: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #e2e8f0' }}>
         <Box>
           <Typography variant="h5" component="h2" sx={{ fontWeight: 600, color: '#1e293b', mb: 0.5 }}>
-            Affiliates
+            Operators
           </Typography>
-          <Typography variant="body2" sx={{ color: '#64748b' }}>
-            Groups of affiliates of the inner and outer circles
-          </Typography>
+
         </Box>
         <Button
           variant="contained"
@@ -209,7 +168,7 @@ export default function Dashboard() {
             padding: '8px 16px',
           }}
         >
-          Add Operator
+          + Add Operator
         </Button>
       </Box>
 
@@ -217,15 +176,16 @@ export default function Dashboard() {
         <Table sx={{ minWidth: 650 }}>
           <TableHead>
             <TableRow>
-              <TableCell sx={{ color: '#64748b', fontWeight: 600, fontSize: '0.875rem' }}>Group name</TableCell>
-              <TableCell sx={{ color: '#64748b', fontWeight: 600, fontSize: '0.875rem' }}>Staff</TableCell>
-              <TableCell sx={{ color: '#64748b', fontWeight: 600, fontSize: '0.875rem' }}>Balance</TableCell>
-              <TableCell sx={{ color: '#64748b', fontWeight: 600, fontSize: '0.875rem' }}>Total Revenue</TableCell>
-              <TableCell sx={{ color: '#64748b', fontWeight: 600, fontSize: '0.875rem' }}>Licensed in</TableCell>
-              <TableCell sx={{ color: '#64748b', fontWeight: 600, fontSize: '0.875rem' }}>Non-exclusive areas</TableCell>
-              <TableCell sx={{ color: '#64748b', fontWeight: 600, fontSize: '0.875rem' }}>Exclusive areas</TableCell>
-              <TableCell sx={{ color: '#64748b', fontWeight: 600, fontSize: '0.875rem' }}>Since</TableCell>
-              <TableCell align="right" sx={{ color: '#64748b', fontWeight: 600, fontSize: '0.875rem' }}></TableCell>
+              <TableCell sx={{ color: '#7C8FAC', fontWeight: 500, fontSize: '0.875rem' }}>ID</TableCell>
+              <TableCell sx={{ color: '#7C8FAC', fontWeight: 500, fontSize: '0.875rem' }}>Group name</TableCell>
+              <TableCell sx={{ color: '#7C8FAC', fontWeight: 500, fontSize: '0.875rem' }}>Staff</TableCell>
+              <TableCell sx={{ color: '#7C8FAC', fontWeight: 500, fontSize: '0.875rem' }}>Balance</TableCell>
+              <TableCell sx={{ color: '#7C8FAC', fontWeight: 500, fontSize: '0.875rem' }}>Total Revenue</TableCell>
+              <TableCell sx={{ color: '#7C8FAC', fontWeight: 500, fontSize: '0.875rem' }}>Licensed in</TableCell>
+              <TableCell sx={{ color: '#7C8FAC', fontWeight: 500, fontSize: '0.875rem' }}>Non-exclusive areas</TableCell>
+              <TableCell sx={{ color: '#7C8FAC', fontWeight: 500, fontSize: '0.875rem' }}>Exclusive areas</TableCell>
+              <TableCell sx={{ color: '#7C8FAC', fontWeight: 500, fontSize: '0.875rem' }}>Since</TableCell>
+              <TableCell align="right" sx={{ color: '#7C8FAC', fontWeight: 500, fontSize: '0.875rem' }}></TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -238,4 +198,3 @@ export default function Dashboard() {
     </Box>
   );
 }
- 

@@ -72,8 +72,8 @@ const AccountBalance = () => {
                 <Typography variant="h6" gutterBottom>
                     Account balance
                 </Typography>
-                <Button 
-                    variant="outlined" 
+                <Button
+                    variant="outlined"
                     onClick={handleOpenDialog}
                     startIcon={<ListAltIcon />} // Add the icon here
                 >
@@ -116,10 +116,60 @@ const AccountBalance = () => {
                                         </Typography>
                                     </TableCell>
                                     <TableCell align="right">
-                                        <Chip label={row.lastWeek} />
+                                        <Box display="flex" flexDirection="column" alignItems="center" gap={1}>
+                                            <Box display="flex" alignItems="center" gap={1}>
+                                                <Typography variant="body1" fontWeight="bold">
+                                                    {row.lastWeek}
+                                                </Typography>
+                                                <Chip
+                                                    label={
+                                                        <Box display="flex" alignItems="center" gap={0.5}>
+                                                            <span style={{ display: 'inline-block', transform: row.lastMonth.startsWith('-') ? 'rotate(90deg)' : '' }}>
+                                                                ➚ &nbsp;
+                                                            </span>
+                                                            <Typography sx={{ fontSize: '12px' }}>7.11%</Typography>
+                                                        </Box>
+                                                    }
+                                                    sx={{
+                                                        backgroundColor: row.lastMonth.startsWith('-') ? 'rgba(255,0,0,0.1)' : 'rgba(76,175,80,0.15)',
+                                                        color: row.lastMonth.startsWith('-') ? 'error.main' : 'success.main',
+                                                        borderRadius: '16px',
+
+                                                    }}
+                                                />
+                                            </Box>
+                                            <Typography variant="body2" color="textSecondary">
+                                                {row.usd}
+                                            </Typography>
+                                        </Box>
                                     </TableCell>
                                     <TableCell align="right">
-                                        <Chip label={row.lastMonth} />
+                                        <Box display="flex" flexDirection="column" alignItems="center" gap={1}>
+                                            <Box display="flex" alignItems="center" gap={1}>
+                                                <Typography variant="body1" fontWeight="bold">
+                                                    {row.lastWeek}
+                                                </Typography>
+                                                <Chip
+                                                    label={
+                                                        <Box display="flex" alignItems="center" gap={0.5}>
+                                                            <span style={{ display: 'inline-block', transform: row.lastMonth.startsWith('-') ? 'rotate(90deg)' : '' }}>
+                                                                ➚ &nbsp;
+                                                            </span>
+                                                            <Typography sx={{ fontSize: '12px' }}>7.11%</Typography>
+                                                        </Box>
+                                                    }
+                                                    sx={{
+                                                        backgroundColor: row.lastMonth.startsWith('-') ? 'rgba(255,0,0,0.1)' : 'rgba(76,175,80,0.15)',
+                                                        color: row.lastMonth.startsWith('-') ? 'error.main' : 'success.main',
+                                                        borderRadius: '16px',
+
+                                                    }}
+                                                />
+                                            </Box>
+                                            <Typography variant="body2" color="textSecondary">
+                                                {row.usd}
+                                            </Typography>
+                                        </Box>
                                     </TableCell>
                                 </TableRow>
                             ))}
@@ -128,8 +178,8 @@ const AccountBalance = () => {
             </TableContainer>
 
             {/* Popup Dialog */}
-            <Dialog 
-                open={isDialogOpen} 
+            <Dialog
+                open={isDialogOpen}
                 onClose={handleCloseDialog}
                 fullWidth
                 maxWidth={isMobile ? 'xs' : 'md'} // Make it larger and responsive
