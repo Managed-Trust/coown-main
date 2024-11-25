@@ -282,12 +282,12 @@ const Dashboard = () => {
             <Box sx={{ p: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #e2e8f0' }}>
               <Box>
                 <Typography variant="h5" component="h2" sx={{ fontWeight: 600, color: '#1e293b', mb: 0.5 }}>
-                  Operators
+                  Polices
                 </Typography>
 
               </Box>
               <Button
-                variant="contained"
+                variant="outlined"
                 startIcon={<AddIcon />}
                 sx={{
                   borderRadius: 2,
