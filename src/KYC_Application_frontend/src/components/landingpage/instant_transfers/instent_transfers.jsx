@@ -18,9 +18,9 @@ export default function InstantTransfers() {
                     </Typography>
                     <Typography
                         variant="body1"
-                        color="text.secondary"
-                        sx={{ lineHeight: 1.8 }}
-                        style={{ fontSize: "14px" }}
+                        color="#5A6A85"
+                        sx={{ lineHeight: 1.5 }}
+                        style={{ fontSize: "16px" }}
                     >
                         With COOWN, you can make instant payments easily. Transections take less then 2 seconds, and a typical transection fee is around $0.05 with no extra charges for using the network.
                     </Typography>

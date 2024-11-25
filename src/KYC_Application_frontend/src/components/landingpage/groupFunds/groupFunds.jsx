@@ -22,8 +22,9 @@ export default function GroupFunds() {
           </Typography>
           <Typography
             variant="body1"
-            color="text.secondary"
-            sx={{ lineHeight: 1.8 }}
+            color="#5A6A85"
+            fontSize={16}
+            sx={{ lineHeight: 1.5 }}
           >
             COOWN helps families, companies, and public groups share and control
             digital assets easily. Managers can set daily and monthly spending

@@ -68,7 +68,7 @@ const CoownAddress = () => {
                   </ListItemIcon>
                   <ListItemText
                     primary={<Typography variant="h6" fontWeight={600}>{group.title}</Typography>}
-                    secondary={<Typography variant="body2" color="textSecondary">{group.description}</Typography>}
+                    secondary={<Typography variant="body2" color="#5A6A85" fontSize={14}>{group.description}</Typography>}
                   />
                 </ListItem>
               ))}

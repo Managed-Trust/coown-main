@@ -25,9 +25,9 @@ export default function EasyPayments() {
           </Typography>
           <Typography
             variant="body1"
-            color="text.secondary"
-            sx={{ lineHeight: 1.8 }}
-            style = {{  fontSize:"14px" }}
+            color="#5A6A85"
+            sx={{ lineHeight: 1.5 }}
+            style = {{  fontSize:"16px" }}
           >
             COOWN makes crypto payments simple for both businesses and individuals.
             Every user and company is verified, sharing real names with their

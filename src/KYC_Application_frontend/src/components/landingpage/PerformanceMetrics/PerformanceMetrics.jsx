@@ -45,7 +45,7 @@ const PerformanceMetrics = () => {
                   borderRadius: '12px',
                 }}
               >
-                <Typography variant="body2" color="textSecondary" mb={1}>
+                <Typography variant="body2" fontSize={13} fontWeight={500} mb={1} color="#5A6A85">
                   {metric.label}
                 </Typography>
                 <Typography variant="h4" fontWeight={700} color="#5D87FF">

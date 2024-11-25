@@ -42,8 +42,9 @@ const AssetControl = () => {
                                         delay: 0.2,
                                     }}
                                 >
-                                    <Typography variant="body">
-                                    COOWN offers an integrated solution for families, corporations, and public entities to share and control digital assets. Spending limits can be set by administrators or executive managers for each user individually. Transaction approvals are implemented by management decisions or even shareholder voting as needed. COOWN empowers groups to manage assets securely, fully on-chain, and in compliance with local regulations. Simplify governance, enhance transparency, and gain control over group finances with COOWN.   </Typography>
+                                    <Typography variant="body" color="#5A6A85" fontSize={16} lineHeight={1.5}>
+                                        COOWN offers an integrated solution for families, corporations, and public entities to share and control digital assets. Spending limits can be set by administrators or executive managers for each user individually. Transaction approvals are implemented by management decisions or even shareholder voting as needed. COOWN empowers groups to manage assets securely, fully on-chain, and in compliance with local regulations. Simplify governance, enhance transparency, and gain control over group finances with COOWN.   
+                                    </Typography>
                                 </motion.div>
                             </Box>
                         </Box>

@@ -67,7 +67,7 @@ const FeaturesGrid = () => {
                                 <Typography variant="h6" fontWeight={600} mt={2} mb={2}>
                                     {feature.title}
                                 </Typography>
-                                <Typography variant="body2" color="textSecondary">
+                                <Typography variant="body2" color="#5A6A85" fontSize={14} lineHeight={1.3}>
                                     {feature.description}
                                 </Typography>
                             </Box>

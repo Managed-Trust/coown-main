@@ -32,8 +32,8 @@ const PartnerLogos = () => {
 
     return (
         <Box sx={{ textAlign: 'center', margin: '30px 0', padding: '10px 0' }}>
-            <Typography variant="h2" sx={{ fontWeight: 'bold', marginBottom: '20px' }}>
-                Partners
+            <Typography variant="h3" sx={{ fontWeight: 'bold', marginBottom: '20px' }}>
+                Our friends
             </Typography>
             <Slider {...settings}>
                 {logos.map((logo, index) => (

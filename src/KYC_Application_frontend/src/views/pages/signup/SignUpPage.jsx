@@ -1,9 +1,6 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { Grid, Box, Typography, TextField, Button, Divider, Checkbox, FormControlLabel } from '@mui/material';
-import googleLogo from '../../../assets/images/login/GoogleIcon.svg';
+import { Grid, Box, Typography, Button, Checkbox, FormControlLabel } from '@mui/material';
 import GoogleLoginLogo from "../../../assets/images/login/GoogleLogin.svg";
-import { useGoogleLogin } from '@react-oauth/google';
 import swal from 'sweetalert';
 import emailjs from "@emailjs/browser";
 import { useUser } from "../../../userContext/UserContext";
@@ -11,16 +8,20 @@ import { useUser } from "../../../userContext/UserContext";
 const SignUpPage = () => {
     const { user, setUser } = useUser();
     const [email, setEmail] = useState('');
-    const navigate = useNavigate();
+    const [isCryptoRestrictionChecked, setIsCryptoRestrictionChecked] = useState(false);
+    const [isPrivacyPolicyChecked, setIsPrivacyPolicyChecked] = useState(false);
 
     // Function to send OTP to email
     const sendOtpToEmail = () => {
+        if (!isCryptoRestrictionChecked || !isPrivacyPolicyChecked) {
+            swal("Error", "Please agree to the required terms to create an account", "error");
+            return;
+        }
         if (!email) {
             swal("Error", "Please enter a valid email address", "error");
             return;
         }
         const otp = Math.floor(1000 + Math.random() * 9000).toString(); // Generate a 4-digit OTP
-        setGeneratedOtp(otp);
         emailjs.send(
             'YOUR_SERVICE_ID',
             'YOUR_TEMPLATE_ID',
@@ -29,38 +30,12 @@ const SignUpPage = () => {
         )
             .then(() => {
                 swal("Success", "OTP sent to your email address", "success");
-                setIsOtpSent(true);
             })
             .catch((error) => {
                 swal("Error", "Failed to send OTP. Please try again later.", "error");
                 console.error(error);
             });
     };
-
-    // Function to handle Google login
-    const login = useGoogleLogin({
-        onSuccess: async (response) => {
-            try {
-                const { access_token } = response;
-                const userInfo = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
-                    headers: {
-                        Authorization: `Bearer ${access_token}`,
-                    },
-                });
-                const profileData = await userInfo.json();
-                setProfile(profileData);
-                setUser(profileData);
-                navigate('/dashboard'); // Navigate to the dashboard after successful login
-            } catch (error) {
-                swal("Error", "Google login failed. Please try again.", "error");
-                console.error(error);
-            }
-        },
-        onError: (error) => {
-            swal("Error", "Google login was unsuccessful", "error");
-            console.error(error);
-        },
-    });
 
     return (
         <Grid container component="main" sx={{ height: '100vh' }}>
@@ -107,22 +82,34 @@ const SignUpPage = () => {
                     </Typography>
 
                     <FormControlLabel
-                        control={<Checkbox value="receiveProductNotifications" color="primary" />}
+                        control={<Checkbox color="primary" />}
                         label="I agree to receive product notifications via email"
                         sx={{ alignItems: 'center' }}
                     />
                     <FormControlLabel
-                        control={<Checkbox value="receiveSpecialOffers" color="primary" />}
+                        control={<Checkbox color="primary" />}
                         label="I agree to receive marketing notifications via email"
                         sx={{ alignItems: 'center' }}
                     />
                     <FormControlLabel
-                        control={<Checkbox value="receiveProductNotifications" color="primary" />}
+                        control={
+                            <Checkbox
+                                color="primary"
+                                checked={isCryptoRestrictionChecked}
+                                onChange={(e) => setIsCryptoRestrictionChecked(e.target.checked)}
+                            />
+                        }
                         label="I am not resident of a country with prohibitive crypto restrictions"
                         sx={{ alignItems: 'center' }}
                     />
                     <FormControlLabel
-                        control={<Checkbox value="receiveSpecialOffers" color="primary" />}
+                        control={
+                            <Checkbox
+                                color="primary"
+                                checked={isPrivacyPolicyChecked}
+                                onChange={(e) => setIsPrivacyPolicyChecked(e.target.checked)}
+                            />
+                        }
                         label="I agree to the Data Privacy Policy and General Terms of Service"
                         sx={{ alignItems: 'center' }}
                     />
@@ -133,13 +120,20 @@ const SignUpPage = () => {
                         variant="contained"
                         color="primary"
                         onClick={sendOtpToEmail}
-                        sx={{ mt: 2, mb: 2, borderRadius: '12px', padding: '12px 0', fontWeight: '600' }}
+                        disabled={!isCryptoRestrictionChecked || !isPrivacyPolicyChecked}
+                        sx={{
+                            mt: 2,
+                            mb: 2,
+                            borderRadius: '12px',
+                            padding: '12px 0',
+                            fontWeight: '600',
+                            backgroundColor: !isCryptoRestrictionChecked || !isPrivacyPolicyChecked ? '#d3d3d3' : '',
+                            color: !isCryptoRestrictionChecked || !isPrivacyPolicyChecked ? '#808080' : '',
+                        }}
                     >
                         Create account
                     </Button>
                 </div>
-
-
             </Grid>
         </Grid>
     );

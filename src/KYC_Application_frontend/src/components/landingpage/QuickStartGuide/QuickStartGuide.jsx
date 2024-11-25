@@ -47,7 +47,7 @@ const QuickStartGuide = () => {
           Simple and effective
         </Typography>
         <Typography
-          variant="h4"
+          variant="h2"
           textAlign="center"
           fontWeight={700}
           mb={4}
@@ -79,7 +79,7 @@ const QuickStartGuide = () => {
                 <Typography variant="h6" fontWeight={600} mb={1}>
                   {step.title}
                 </Typography>
-                <Typography variant="body2" color="textSecondary" sx={{fontSize:'14px', color:"#5A6A85"}}> 
+                <Typography variant="body2" color="#5A6A85" lineHeight={1.3} sx={{fontSize:'16px'}}> 
                   {step.description}
                 </Typography>
               </Paper>

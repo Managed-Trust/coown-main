@@ -76,7 +76,7 @@ const BannerContent = () => {
 
   return (
     <GoogleOAuthProvider clientId="725664575664-3tboqhepr5uggob4mitv569jj9vfv362.apps.googleusercontent.com">
-      <Box mt={lgDown ? 8 : 0}>
+      <Box mt={lgDown ? 8 : 0} px='35px'>
         <motion.div
           initial={{ opacity: 0, translateY: 550 }}
           animate={{ opacity: 1, translateY: 0 }}
@@ -87,7 +87,7 @@ const BannerContent = () => {
           }}
         >
           <Typography variant="h6" display={'flex'} gap={1} mb={2}>
-            <Typography color={'secondary'}>
+            <Typography color={'#5D87FF'}>
               <IconWallet size={'21'} />
             </Typography>{' '}
             Wallet for your groups
@@ -95,7 +95,7 @@ const BannerContent = () => {
 
           <Typography
             variant="h1"
-            fontWeight={900}
+            fontWeight="bold"
             sx={{
               fontSize: {
                 md: '48px',
@@ -103,6 +103,7 @@ const BannerContent = () => {
               lineHeight: {
                 md: '54px',
               },
+             
             }}
           >
             Manage{' '}
@@ -130,7 +131,7 @@ const BannerContent = () => {
               delay: 0.2,
             }}
           >
-            <Typography variant="h6" fontWeight={300}>
+            <Typography variant="body2" fontSize={18} lineHeight={1.5} fontWeight={400} color="#5A6A85">
               Group accounts with spending limits, transaction approvals, and custom securities for regional markets, suitable for private groups, corporations and public law entities.
             </Typography>
           </motion.div>
