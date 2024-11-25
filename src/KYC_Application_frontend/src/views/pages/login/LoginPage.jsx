@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Grid, Box, Typography, TextField, Button, Divider, Checkbox, FormControlLabel } from '@mui/material';
 import googleLogo from '../../../assets/images/login/GoogleIcon.svg';
 import GoogleLoginLogo from "../../../assets/images/login/GoogleLogin.svg";
@@ -240,6 +240,9 @@ const LoginPage = () => {
                                 <img src={googleLogo} alt="Google Logo" style={{ width: '20px', marginRight: '8px' }} />
                                 Sign in with Google
                             </Button>
+                            <Typography variant="body2" gutterBottom sx={{ fontSize: '14px', textAlign:'center',marginTop:'10px' }}>
+                                or Register new Account, <Link to="/user/sign-up" color="primary">Regirster Account</Link>
+                            </Typography>
                         </>
                     ) : (
                         <>

@@ -19,6 +19,7 @@ import ConnectPage from './views/pages/connect/ConnectPage';
 import AtlasDashboard from './PreSale/Socials';
 import NFTPresaleMarketplace from './PreSale/Nft';
 import ICPTokenSwap from './PreSale/kycapp';
+import SignUpPage from './views/pages/signup/SignUpPage';
 
 function App() {
   const theme = ThemeSettings();
@@ -45,7 +46,7 @@ function App() {
                 <Route path="/prelaunch" element={<ICPTokenSwap />} />
                 <Route path="/prelaunch-social" element={<AtlasDashboard />} />
                 <Route path="/prelaunch-nft" element={<NFTPresaleMarketplace />} />
-
+                <Route path="/user/sign-up" element={<SignUpPage />} />
                 {/* Routes that use FullLayout */}
                 <Route path="/*" element={<FullLayout />} />
 
