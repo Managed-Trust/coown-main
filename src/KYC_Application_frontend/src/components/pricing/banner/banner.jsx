@@ -16,7 +16,7 @@ function Banner() {
                     <Typography variant="h1" align="center" gutterBottom sx={{ fontWeight: 700 }}>
                         Plans for every group
                     </Typography>
-                    <Typography variant="body1" align="center" paragraph sx={{ color: '#5A6A85' }}>
+                    <Typography variant="body1" align="center" paragraph sx={{ color: '#5A6A85', fontSize:'16px' }}>
                         Essential features are available for free and low maintenance fees.
                     </Typography>
                     

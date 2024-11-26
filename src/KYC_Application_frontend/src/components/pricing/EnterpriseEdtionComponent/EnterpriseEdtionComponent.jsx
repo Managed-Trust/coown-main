@@ -49,7 +49,7 @@ const EnterpriseEdtionComponent = () => {
                                     <Stack direction="row" gap={1}>
                                         <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', marginTop: 1 }}>
                                             <Typography variant="h6">{card.title}</Typography>
-                                            <Typography variant="caption" sx={{ minHeight: '60px', display: 'block', overflow: 'hidden', marginTop: 1, textOverflow: 'ellipsis', whiteSpace: 'normal', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical' }}>
+                                            <Typography variant="caption" sx={{ minHeight: '60px', color: '#5A6A85', fontSize:'13px' , display: 'block', overflow: 'hidden', marginTop: 1, textOverflow: 'ellipsis', whiteSpace: 'normal', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical' }}>
                                                 {card.desc}
                                             </Typography>
                                             <Box>
