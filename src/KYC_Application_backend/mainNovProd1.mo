@@ -29,7 +29,6 @@ actor KYC_Canister {
     family_name : Text;
     birth_date : Text;
     birth_country : Text;
-    referral_code : ?Text;
     phone : Text;
     resident_address : Text;
     resident_country : Text;
@@ -57,7 +56,6 @@ actor KYC_Canister {
     birth_date : Text, // ISO format
     birth_country : Text,
     phone : Text,
-    referralCode:Text
   ) : async Text {
     // Checking if the user exists and is verified
     switch (users.get(id)) {
@@ -73,18 +71,12 @@ actor KYC_Canister {
               if (phone == "") {
                 return "Phone number cannot be empty.";
               };
-              var code = ?referralCode;
-              if (referralCode=="")
-              {
-                code := null;
-              };
               let newCustomer : Customer = {
                 id = id;
                 family_name = family_name;
                 given_name = given_name;
                 birth_date = birth_date;
                 birth_country = birth_country;
-                referral_code = code;
                 phone = phone;
                 resident_address = ""; // Assume default or null since not provided
                 resident_country = ""; // Assuming `residency` corresponds to this field
@@ -619,14 +611,13 @@ actor KYC_Canister {
   };
 
   //====================================================================================
-  // Code from here
 
   public type User = {
+    id : Text;
     emailAuth : Text;
     email : Text;
     otp : ?Text;
     otpExpiry : ?Int;
-    authMethod: ?Text;
   };
   private stable var userEntries : [(Text, User)] = [];
   var users = HashMap.HashMap<Text, User>(0, Text.equal, Text.hash);
@@ -638,24 +629,20 @@ actor KYC_Canister {
   };
 
   public func createUser(
-    email : Text,
-    authMethod: Text
+    userId : Text,
+    email : Text
+
   ) : async Text {
 
-    var status = "pending";
-    if(authMethod == "Google")
-    {
-      status := "verified"; 
-    };
     let newUser = {
-      emailAuth = status;
+      id = userId;
+      emailAuth = "pending";
       email = email;
       otp = null;
       otpExpiry = null;
-      authMethod = ?authMethod;
     };
 
-    users.put(email, newUser);
+    users.put(userId, newUser);
     return "User created with default group.";
   };
 
