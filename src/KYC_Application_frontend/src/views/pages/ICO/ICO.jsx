@@ -85,7 +85,7 @@ const ICO = () => {
         )}
       </Box>
 
-      <Contact />
+      {/* <Contact /> */}
       <C2a2 />
       <Footer />
     </PageContainer>

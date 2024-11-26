@@ -7,7 +7,7 @@ const FeatureItem = ({ title, description }) => (
     <Typography variant="h6" sx={{ fontWeight: 'bold', mb:1 }}>
       {title}
     </Typography>
-    <Typography sx={{fontSize:'13px'}} color="textSecondary">
+    <Typography sx={{fontSize:'14px'}} color="#5A6A85">
       {description}
     </Typography>
   </Box>

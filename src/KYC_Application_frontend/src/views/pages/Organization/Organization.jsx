@@ -16,7 +16,7 @@ const Organization = () => {
                 <Banner/>
                 <Card />
                 <Visionary />
-                <Contact />
+                {/* <Contact /> */}
                 <C2a2 />
                 <Footer />
             </PageContainer>

@@ -128,7 +128,7 @@ const AssetControl = () => {
                                                             </Box>
                                                         </AccordionSummary>
                                                         <AccordionDetails sx={{ backgroundColor: '#fff' }}>
-                                                            <Typography>{faq.answer}</Typography>
+                                                            <Typography color="#5A6A85">{faq.answer}</Typography>
                                                         </AccordionDetails>
                                                     </Accordion>
                                                 </Card>
@@ -180,7 +180,7 @@ const AssetControl = () => {
                                                             </Box>
                                                         </AccordionSummary>
                                                         <AccordionDetails sx={{ backgroundColor: '#fff' }}>
-                                                            <Typography>{faq.answer}</Typography>
+                                                            <Typography color="#5A6A85">{faq.answer}</Typography>
                                                         </AccordionDetails>
                                                     </Accordion>
                                                 </Card>

@@ -28,7 +28,7 @@ const Product = () => {
                 <ShareControlComponent />
                 <IntegratedCommunication />
                 <DevelopmentPlan/>
-                <Contact />
+                {/* <Contact /> */}
                 <C2a2 />
                 <Footer />
             </PageContainer>

@@ -33,7 +33,7 @@ export default function Visionary() {
           <Typography variant="subtitle1" color ='#5A6A85' fontWeight="bold" gutterBottom>
             Founder
           </Typography>
-          <Typography variant="body2" paragraph color ='#5A6A85' fontSize="12px">
+          <Typography variant="body2" paragraph color ='#5A6A85' fontSize="14px" lineHeight={1.4}>
             Law and economics expert with a strong IT background and an award-winning MBA thesis on the cyber resilience of Swiss private banks. Proven success in software sales to enterprises and government entities, alongside experience in aviation industry, corporate law, rulemaking and oversight.
           </Typography>
           <Grid container spacing={1}>

@@ -69,7 +69,7 @@ const DevelopmentPlan = () => {
                 <Typography variant="h6" fontWeight={600} textAlign={'start'} mb={2}>
                   {step.title}
                 </Typography>
-                <Typography variant="body2" textAlign={'start'} color="textSecondary">
+                <Typography variant="body2" textAlign={'start'} fontSize={14} color="#5A6A85">
                   {step.description}
                 </Typography>
               </Paper>

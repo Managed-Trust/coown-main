@@ -19,7 +19,7 @@ function Banner() {
                         </Box>{' '}
                         with your team
                     </Typography>
-                    <Typography variant="body1" align="center" paragraph sx={{ color: '#5A6A85' }}>
+                    <Typography variant="body1" align="center" paragraph sx={{ color: "#5A6A85", fontSize:'16px' }}>
                         Group accounts with spending limits, transaction approvals, and custom securities for regional markets, suitable for private groups,  corporations and public law entities.
                     </Typography>
                     <Box

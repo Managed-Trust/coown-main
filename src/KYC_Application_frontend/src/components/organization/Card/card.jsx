@@ -28,7 +28,7 @@ const EntityBox = ({ icon, title, description }) => (
     <Typography variant="h6" gutterBottom>
       {title}
     </Typography>
-    <Typography variant="body2" sx={{ color: '#5A6A85' }}>
+    <Typography variant="body2" sx={{ color: '#5A6A85', fontSize:'13px' }}>
       {description}
     </Typography>
   </Paper>
@@ -43,12 +43,12 @@ export default function Card() {
       <Typography variant="h2" align="center" gutterBottom sx={{ fontWeight: 'bold' }}>
         COOWN is governed by a DAO
       </Typography>
-      <Typography variant="body1" align="center" paragraph sx={{ color: '#5A6A85' }}>
+      <Typography variant="body1" align="center" paragraph sx={{ color:"#5A6A85",fontSize:'16px' }}>
         Token holders elect the Foundation and approve transactions fees for performance based staking rewards.
       </Typography>
 
       <Box sx={{ position: 'relative', mt: 8, mb: 8 }}>
-        <Typography variant="subtitle1" align="center" sx={{ position: 'absolute', top: -20, left: 0, right: 0, color: '#5A6A85' }}>
+        <Typography variant="subtitle1" align="center" sx={{ position: 'absolute', top: -20, left: 0, right: 0, color: '#5A6A85', fontSize:'16px' }}>
           Inner circle
         </Typography>
         <Grid container spacing={4} justifyContent="center">
@@ -77,7 +77,7 @@ export default function Card() {
       </Box>
 
       <Box sx={{ position: 'relative', mt: 8 }}>
-        <Typography variant="subtitle1" align="center" sx={{ position: 'absolute', top: -20, left: 0, right: 0, color: '#5A6A85' }}>
+        <Typography variant="subtitle1" align="center" sx={{ position: 'absolute', top: -20, left: 0, right: 0, color: '#5A6A85', fontSize:'16px' }}>
           Outer circle
         </Typography>
         <Grid container spacing={4} justifyContent="center">
