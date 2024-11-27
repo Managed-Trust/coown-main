@@ -7,7 +7,7 @@ import React, { useState, useEffect } from 'react';
 import { useConnect } from '@connect2ic/react';
 import ic from 'ic0';
 
-const ledger = ic.local("bkyz2-fmaaa-aaaaa-qaaaq-cai"); // Ledger canister
+const ledger = ic("speiw-5iaaa-aaaap-ahora-cai"); // Ledger canister
 // const ledger = ic("sifoc-qqaaa-aaaap-ahorq-cai"); // Production canister
 
 const BCrumb = [

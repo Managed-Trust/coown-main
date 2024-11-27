@@ -1,94 +1,112 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Grid, Box, Typography, TextField, Button, Divider, Checkbox, FormControlLabel } from '@mui/material';
+import { Grid, Box, Typography, TextField, Button, Divider, Checkbox, FormControlLabel, CircularProgress } from '@mui/material';
 import googleLogo from '../../../assets/images/login/GoogleIcon.svg';
-import GoogleLoginLogo from "../../../assets/images/login/GoogleLogin.svg";
+import GoogleLoginLogo from '../../../assets/images/login/GoogleLogin.svg';
 import { useGoogleLogin } from '@react-oauth/google';
 import swal from 'sweetalert';
-import emailjs from "@emailjs/browser";
-import { useUser } from "../../../userContext/UserContext";
+import emailjs from '@emailjs/browser';
+import { useUser } from '../../../userContext/UserContext';
+import { ConnectButton, ConnectDialog, useConnect } from "@connect2ic/react";
+import ic from "ic0";
+
+const ledger = ic("speiw-5iaaa-aaaap-ahora-cai"); // Ledger canister
 
 const LoginPage = () => {
     const { user, setUser } = useUser();
     const [email, setEmail] = useState('');
     const [isOtpSent, setIsOtpSent] = useState(false);
-    const [otp, setOtp] = useState(['', '', '', '']);
+    const [otp, setOtp] = useState(['', '', '', '', '', '']);
     const [profile, setProfile] = useState(null);
-    const [generatedOtp, setGeneratedOtp] = useState("");
+    const [generatedOtp, setGeneratedOtp] = useState('');
+    const [agreeToProductNotifications, setAgreeToProductNotifications] = useState(false);
+    const [agreeToSpecialOffers, setAgreeToSpecialOffers] = useState(false);
+    const [isLoading, setIsLoading] = useState(false); // Loader state
     const navigate = useNavigate();
+    const otpRefs = useRef([]); // Refs for OTP boxes
 
-    // Function to generate and set a 4-digit OTP
-    const generateOtp = () => {
-        const otp = Math.floor(1000 + Math.random() * 9000); // Generates a number between 1000 and 9999
-        setGeneratedOtp(otp.toString());
-    };
-
-    // Function to simulate sending OTP to email
+    // Function to create user, fetch OTP from backend, and send it via email
     const sendOtpToEmail = async () => {
-        generateOtp(); // Generate OTP first
-        setIsOtpSent(true); // Switch to OTP form
-    };
+        setIsLoading(true); // Show loader
+        try {
+            // Backend call to create user
+            await ledger.call("createUser", email, 'simple');
+            console.log("User created successfully!");
 
-    // useEffect to send the OTP once it is generated
-    useEffect(() => {
-        if (generatedOtp && isOtpSent) {
-            const emailParams = {
-                email: email,
-                otp: generatedOtp,
-            };
+            // Backend call to fetch OTP
+            const otpResponse = await ledger.call("generateOTP", email);
+            if (otpResponse) {
+                setGeneratedOtp(otpResponse.toString());
+                console.log("OTP fetched from backend:", otpResponse);
 
-            emailjs
-                .send(
-                    "service_idh0h15",
-                    "template_3d2t5lb",
+                // Send OTP via email using emailjs
+                const emailParams = {
+                    email: email,
+                    otp: otpResponse.toString(),
+                };
+
+                await emailjs.send(
+                    'service_idh0h15', // Replace with your actual service ID
+                    'template_3d2t5lb', // Replace with your actual template ID
                     emailParams,
-                    "Y4QJDpwjrsdi3tQAR"
-                )
-                .then(
-                    () => {
-                        console.log("SUCCESS!");
-                        swal("OTP sent to your email!", email, "success");
-                    },
-                    (error) => {
-                        console.log("FAILED...", error.text);
-                        swal("Error Sending OTP", error.text, "error");
-                    }
-                )
-                .catch((error) => {
-                    console.log("Error sending OTP:", error);
-                    swal("Error Sending OTP", error.message, "error");
-                });
+                    'Y4QJDpwjrsdi3tQAR' // Replace with your actual user/public key
+                );
+
+                console.log("OTP sent via email!");
+                swal("Success", "User account created and OTP sent to your email!", "success");
+            } else {
+                throw new Error("Failed to fetch OTP from backend.");
+            }
+
+            setIsOtpSent(true); // Show OTP form
+        } catch (error) {
+            swal("Error", "Failed to create user or send OTP. Please try again.", "error");
+            console.error("Error in user creation or OTP process:", error);
+        } finally {
+            setIsLoading(false); // Hide loader
         }
-    }, [generatedOtp, isOtpSent]);
+    };
 
     // Handle OTP input changes
     const handleOtpChange = (value, index) => {
         const newOtp = [...otp];
-        newOtp[index] = value;
+        newOtp[index] = value.slice(-1); // Ensure only 1 digit is added
         setOtp(newOtp);
+
+        // Move to the next input if a digit is entered
+        if (value && index < otpRefs.current.length - 1) {
+            otpRefs.current[index + 1].focus();
+        }
     };
 
     // Handle form submission (for OTP verification)
-    const verifyOtp = () => {
-        const enteredOtp = otp.join('');
-        if (enteredOtp === generatedOtp) {
-            console.log('OTP Verified!');
-            swal("Success", "OTP verified successfully!", "success").then(() => {
-                // Navigate to the dashboard or e-commerce page
-                setUser(email);
-                navigate('/user/connect');
-            });
-        } else {
-            console.log('Incorrect OTP');
-            swal("Error", "Incorrect OTP. Please try again.", "error");
-            setOtp(['', '', '', '']); // Clear OTP state
+    const verifyOtp = async () => {
+        const enteredOtp = otp.join(''); // Combine OTP digits into a single string
+        try {
+            // Make the backend call to verify OTP
+            const isVerified = await ledger.call("verifyOTP", email, enteredOtp);
+
+            if (isVerified) {
+                swal('Success', 'OTP verified successfully!', 'success').then(() => {
+                    setUser(email);
+                    navigate('/user/connect'); // Navigate to the next page
+                });
+            } else {
+                throw new Error('Incorrect OTP'); // Throw error for incorrect OTP
+            }
+        } catch (error) {
+            console.error("Error verifying OTP:", error);
+            swal('Error', 'Incorrect OTP. Please try again.', 'error');
+            setOtp(new Array(6).fill('')); // Clear OTP state
+            otpRefs.current[0].focus(); // Focus back to the first input
         }
     };
+
 
     // Function to go back to email form
     const handleBack = () => {
         setIsOtpSent(false);
-        setOtp(['', '', '', '']);
+        setOtp(new Array(6).fill(''));
         setEmail('');
     };
 
@@ -113,7 +131,15 @@ const LoginPage = () => {
             });
             const data = await response.json();
             console.log('User Profile:', data);
-            setProfile(data); // Set profile state to the fetched user data
+            // setProfile(data); // Set profile state to the fetched user data
+            try{
+              const res = await ledger.call("createUser",data.email,'Google');  
+              console.log("User Created Via Google:",res);
+            }catch(e){
+                console.log("Error Creating User via Google:",e);
+            }finally{
+                setProfile(data.email);
+            }
         } catch (error) {
             console.error('Error fetching user profile:', error);
         }
@@ -123,7 +149,7 @@ const LoginPage = () => {
     useEffect(() => {
         if (profile) {
             console.log('Profile updated, re-rendering component:', profile);
-            setUser(profile.email); // Set user email when profile is updated
+            setUser(profile); // Set user email when profile is updated
             swal("Success", "Login successfully!", "success").then(() => {
                 // Navigate to the dashboard or e-commerce page
                 navigate('/user/connect');
@@ -180,10 +206,10 @@ const LoginPage = () => {
                     {!isOtpSent ? (
                         <>
                             <Typography variant="h5" gutterBottom sx={{ fontWeight: 600, fontSize: '26px' }}>
-                                Sign in via email
+                                Sign up via email
                             </Typography>
                             <Typography variant="body2" color="textSecondary" gutterBottom>
-                                Enter your email address to receive a one-time password to sign in.
+                                Enter your email address to create an account and receive a one-time password.
                             </Typography>
 
                             <TextField
@@ -198,14 +224,26 @@ const LoginPage = () => {
                             />
 
                             <FormControlLabel
-                                control={<Checkbox value="receiveProductNotifications" color="primary" />}
+                                control={
+                                    <Checkbox
+                                        value="receiveProductNotifications"
+                                        color="primary"
+                                        checked={agreeToProductNotifications}
+                                        onChange={(e) => setAgreeToProductNotifications(e.target.checked)}
+                                    />
+                                }
                                 label="I agree to receive product notifications via email"
-                                sx={{ alignItems: 'center' }}
                             />
                             <FormControlLabel
-                                control={<Checkbox value="receiveSpecialOffers" color="primary" />}
+                                control={
+                                    <Checkbox
+                                        value="receiveSpecialOffers"
+                                        color="primary"
+                                        checked={agreeToSpecialOffers}
+                                        onChange={(e) => setAgreeToSpecialOffers(e.target.checked)}
+                                    />
+                                }
                                 label="I agree to receive updates on news and special offers via email"
-                                sx={{ alignItems: 'center' }}
                             />
 
                             <Button
@@ -214,11 +252,11 @@ const LoginPage = () => {
                                 variant="contained"
                                 color="primary"
                                 onClick={sendOtpToEmail}
+                                disabled={isLoading || !agreeToProductNotifications || !agreeToSpecialOffers}
                                 sx={{ mt: 2, mb: 2, borderRadius: '12px', padding: '12px 0', fontWeight: '600' }}
                             >
-                                Send OTP
+                                {isLoading ? <CircularProgress size={24} /> : 'Create Account'}
                             </Button>
-
                             <Divider sx={{ my: 3, color: '#aaa' }}>or sign in with</Divider>
 
                             <Button
@@ -240,7 +278,7 @@ const LoginPage = () => {
                                 <img src={googleLogo} alt="Google Logo" style={{ width: '20px', marginRight: '8px' }} />
                                 Sign in with Google
                             </Button>
-                            <Typography variant="body2" gutterBottom sx={{ fontSize: '14px', textAlign:'center',marginTop:'10px' }}>
+                            <Typography variant="body2" gutterBottom sx={{ fontSize: '14px', textAlign: 'center', marginTop: '10px' }}>
                                 or Register new Account, <Link to="/user/sign-up" color="primary">Regirster Account</Link>
                             </Typography>
                         </>
@@ -250,7 +288,7 @@ const LoginPage = () => {
                                 Enter One-Time Password
                             </Typography>
                             <Typography variant="body2" color="textSecondary" gutterBottom>
-                                Please enter the password we sent to {email}.
+                                Please enter the 6-digit password sent to {email}.
                             </Typography>
 
                             <Box display="flex" justifyContent="space-between" mt={3} mb={3}>
@@ -259,14 +297,16 @@ const LoginPage = () => {
                                         key={index}
                                         value={digit}
                                         onChange={(e) => handleOtpChange(e.target.value, index)}
+                                        inputRef={(el) => (otpRefs.current[index] = el)}
                                         inputProps={{
                                             maxLength: 1,
-                                            style: { textAlign: 'center', padding: '25px 0px' },
+                                            style: { textAlign: 'center', padding: '10px' },
                                         }}
                                         sx={{
-                                            width: 60,
-                                            height: 70,
-                                            fontSize: '24px',
+                                            width: 50,
+                                            height: 50,
+                                            fontSize: '20px',
+                                            textAlign: 'center',
                                             borderRadius: '8px',
                                         }}
                                     />
@@ -281,10 +321,9 @@ const LoginPage = () => {
                                 onClick={verifyOtp}
                                 sx={{ mt: 2, mb: 2, borderRadius: '12px', padding: '12px 0', fontWeight: '600' }}
                             >
-                                Sign in
+                                Verify OTP
                             </Button>
 
-                            {/* Resend and Back Buttons in Same Row */}
                             <Box display="flex" justifyContent="space-between" mt={1} mb={2}>
                                 <Button
                                     type="button"
