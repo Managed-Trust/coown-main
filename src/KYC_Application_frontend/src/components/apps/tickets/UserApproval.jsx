@@ -8,10 +8,11 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useConnect } from '@connect2ic/react';
 import ic from 'ic0';
 import './style.css';
-const ledger = ic.local("bkyz2-fmaaa-aaaaa-qaaaq-cai"); // Ledger canister
+// const ledger = ic.local("bkyz2-fmaaa-aaaaa-qaaaq-cai"); // Ledger canister
+const ledger = ic("speiw-5iaaa-aaaap-ahora-cai"); // Ledger canister
 // const ledger = ic("sifoc-qqaaa-aaaap-ahorq-cai"); // Production canister
 import {
-    Grid,
+    Grid, Chip,
     Typography,
     Box, Switch, TextField, Button, Skeleton, CircularProgress
 } from "@mui/material";
@@ -46,16 +47,43 @@ const UserApproval = () => {
     const [approving, setApproving] = useState(false);
     const [document, setDocument] = useState(false);
     const [identity, setIdentity] = useState(false);
-    const { isConnected, principal } = useConnect({
-        onConnect: () => { },
-        onDisconnect: () => { },
-    });
+    const fetchProfile = async () => {
+        setLoading(true);
+        try {
+            const response = await ledger.call("getCustomer", id);
+            console.log("Profile:", response);
+            const profileData = response[0];
+            setProfile(profileData);
+            console.log('Document type', profileData.document_type
+            );
+        } catch (e) {
+            console.log("Error Fetching Profile:", e);
+        }
+        setLoading(false);
+    }; const checkDocumentStatus = async () => {
+        try {
+            const result = await ledger.call("isDocumentVerified", id);
+            console.log('result document', result);
+            setDocument(result[0]);
+        } catch (e) {
+            console.log("Error checking document verified:", e);
+        }
+    };
+    const checkIdentityStatus = async () => {
+        try {
+            const result = await ledger.call("isIdentityVerified", id);
+            console.log('result identity', result);
+            setIdentity(result[0]);
+        } catch (e) {
+            console.log("Error checking identity:", e);
+        }
+    }
 
     useEffect(() => {
         fetchProfile();
         checkDocumentStatus();
         checkIdentityStatus();
-    }, [principal]);
+    }, [id]);
 
 
     const showDeclineReasonAlert = () => {
@@ -158,39 +186,9 @@ const UserApproval = () => {
             );
         }
     }
-    const fetchProfile = async () => {
-        setLoading(true);
-        try {
-            const response = await ledger.call("getCustomer", id);
-            console.log("Profile:", response);
-            const profileData = response[0];
-            setProfile(profileData);
-            console.log('Document type', profileData.document_type
-            );
-        } catch (e) {
-            console.log("Error Fetching Profile:", e);
-        }
-        setLoading(false);
-    };
 
-    const checkDocumentStatus = async () => {
-        try {
-            const result = await ledger.call("isDocumentVerified", id);
-            console.log('result document', result);
-            setDocument(result[0]);
-        } catch (e) {
-            console.log("Error checking document verified:", e);
-        }
-    };
-    const checkIdentityStatus = async () => {
-        try {
-            const result = await ledger.call("isIdentityVerified", id);
-            console.log('result identity', result);
-            setIdentity(result[0]);
-        } catch (e) {
-            console.log("Error checking identity:", e);
-        }
-    }
+
+
 
     const toggleDocument = async () => {
         setDocumentLoader(true);
@@ -249,7 +247,7 @@ const UserApproval = () => {
 
                                                 </Grid>
                                                 <Grid item xs={6}>
-                                                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}>{decryptData(profile.given_name)}</Typography>
+                                                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}>{profile.given_name}</Typography>
 
                                                 </Grid>
                                             </Grid>
@@ -259,7 +257,7 @@ const UserApproval = () => {
 
                                                 </Grid>
                                                 <Grid item xs={6}>
-                                                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}> {decryptData(profile.family_name)}</Typography>
+                                                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}> {profile.family_name}</Typography>
 
                                                 </Grid>
                                             </Grid>
@@ -269,7 +267,7 @@ const UserApproval = () => {
 
                                                 </Grid>
                                                 <Grid item xs={6}>
-                                                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}> {decryptData(profile.birth_date)}</Typography>
+                                                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}> {profile.birth_date}</Typography>
 
                                                 </Grid>
                                             </Grid>
@@ -279,7 +277,7 @@ const UserApproval = () => {
 
                                                 </Grid>
                                                 <Grid item xs={6}>
-                                                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}>{decryptData(profile.birth_country)}</Typography>
+                                                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}>{profile.birth_country}</Typography>
 
                                                 </Grid>
                                             </Grid>
@@ -289,7 +287,7 @@ const UserApproval = () => {
 
                                                 </Grid>
                                                 <Grid item xs={6}>
-                                                    <Typography variant="body1" sx={{ fontWeight: 'bold', color: 'blue' }}>{decryptData(profile.phone)}</Typography>
+                                                    <Typography variant="body1" sx={{ fontWeight: 'bold', color: 'blue' }}>{profile.phone}</Typography>
 
                                                 </Grid>
                                             </Grid>
@@ -314,7 +312,7 @@ const UserApproval = () => {
 
                                                 </Grid>
                                                 <Grid item xs={6}>
-                                                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}>{decryptData(profile.resident_address)}</Typography>
+                                                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}>{profile.resident_address}</Typography>
 
                                                 </Grid>
                                             </Grid>
@@ -324,7 +322,7 @@ const UserApproval = () => {
 
                                                 </Grid>
                                                 <Grid item xs={6}>
-                                                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}>{decryptData(profile.resident_country)}</Typography>
+                                                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}>{profile.resident_country}</Typography>
 
                                                 </Grid>
                                             </Grid>
@@ -363,7 +361,7 @@ const UserApproval = () => {
 
                                                 </Grid>
                                                 <Grid item xs={6}>
-                                                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}>{decryptData(profile.citizenship[0])}</Typography>
+                                                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}>{profile.citizenship[0]}</Typography>
 
                                                 </Grid>
                                             </Grid>
@@ -373,7 +371,7 @@ const UserApproval = () => {
 
                                                 </Grid>
                                                 <Grid item xs={6}>
-                                                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}>{decryptData(profile.document_number)}</Typography>
+                                                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}>{profile.document_number}</Typography>
 
                                                 </Grid>
                                             </Grid>
@@ -383,7 +381,7 @@ const UserApproval = () => {
 
                                                 </Grid>
                                                 <Grid item xs={6}>
-                                                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}>{decryptData(profile.issuing_country)}</Typography>
+                                                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}>{profile.issuing_country}</Typography>
 
                                                 </Grid>
                                             </Grid>
@@ -393,7 +391,7 @@ const UserApproval = () => {
 
                                                 </Grid>
                                                 <Grid item xs={6}>
-                                                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}>{decryptData(profile.issuance_date)}</Typography>
+                                                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}>{profile.issuance_date}</Typography>
 
                                                 </Grid>
                                             </Grid>
@@ -403,20 +401,26 @@ const UserApproval = () => {
 
                                                 </Grid>
                                                 <Grid item xs={6}>
-                                                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}>{decryptData(profile.expiry_date)}</Typography>
+                                                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}>{profile.expiry_date}</Typography>
 
                                                 </Grid>
                                             </Grid>
 
-                                            <Grid item xs={12} mt={0.5}>
+                                            {/* <Grid item xs={12} mt={0.5}>
                                                 {displayFile(profile.document_photo[0])}
+                                            </Grid> */}
+                                            <Grid item xs={12} mt={0.5}>
+                                                <img
+                                                    src={`https://ipfs.io/ipfs/${profile.document_photo[0]}`}
+                                                    alt="Identity Document"
+                                                    style={{ maxWidth: '100%', width: '150px', height: 'auto', marginTop: 10 }}
+                                                />
                                             </Grid>
-
                                             <Grid item xs={12} mt={0.5}>
                                                 <img
                                                     src={`${profile.live_photo[0]}`}
                                                     alt="Identity Document"
-                                                    style={{ maxWidth: '100%', width: '150px', height: 'auto', marginTop: 10 }}
+                                                    style={{ maxWidth: '100%', width: '250px', height: 'auto', marginTop: 10 }}
                                                 />
                                             </Grid>
                                         </Grid>
@@ -438,11 +442,11 @@ const UserApproval = () => {
                                                     <Switch /> <Typography variant="body1" p={0.2}>Address matches user's data</Typography>
                                                 </Grid>
                                                 <Grid item xs={12} display={'flex'}>
-                                                {documentLoader ? <CircularProgress style={{ color: 'black' }} size={24} /> : <Switch checked={document} onClick={toggleDocument} /> }  <Typography variant="body1" p={0.2}>Document matches user's data</Typography>
+                                                    {documentLoader ? <CircularProgress style={{ color: 'black' }} size={24} /> : <Switch checked={document} onClick={toggleDocument} />}  <Typography variant="body1" p={0.2}>Document matches user's data</Typography>
                                                 </Grid>
                                                 <Grid item xs={12} display={'flex'}>
-                                                {identityLoader ? <CircularProgress style={{ color: 'black' }} size={24} /> : <Switch checked={identity} onClick={toggleIdentity} /> }
-                                                     <Typography variant="body1" p={0.2}>Face matches document</Typography>
+                                                    {identityLoader ? <CircularProgress style={{ color: 'black' }} size={24} /> : <Switch checked={identity} onClick={toggleIdentity} />}
+                                                    <Typography variant="body1" p={0.2}>Face matches document</Typography>
                                                 </Grid>
                                                 <Grid item xs={12}>
                                                     <Box mt={2} p={2} bgcolor="#fce4ec">
@@ -490,19 +494,56 @@ const UserApproval = () => {
                                                     placeholder='Transaction limit USD'
                                                 />
                                             </Grid>
-                                            <Box pt={3} display="flex" justifyContent="flex-start">
-                                                <Button onClick={() => handleVerify()} variant="contained" color="primary" style={{ marginRight: '10px' }}>
-                                                    {approving ? <CircularProgress style={{ color: 'white' }} size={24} /> : "Approve"}
-                                                </Button>
-                                                <Button onClick={() => showDeclineReasonAlert()} className="btn-decline" variant="contained" sx={{ color: 'white', backgroundColor: 'red' }}>
-                                                    Reject
-                                                </Button>
-                                            </Box>
-                                            <Box pt={3} display="flex" justifyContent="flex-start">
-                                                <Button onClick={() => showApproveReasonAlert()} variant="contained" color="primary" style={{ marginRight: '10px' }}>
-                                                    Approve with limitations
-                                                </Button>
-                                            </Box>
+                                            {(profile.verified || profile.limitation_reason.length !== 0 || profile.decline_reason.length !== 0) ?
+                                                <>
+                                                    <Grid item xs={12} mt={2}>
+                                                        <Chip
+                                                            label={
+                                                                profile.verified
+                                                                    ? profile.limitation_reason.length === 0
+                                                                        ? 'Approved'
+                                                                        : 'Limitations'
+                                                                    : profile.decline_reason.length === 0
+                                                                        ? 'Pending'
+                                                                        : 'Decline'
+                                                            }
+                                                            sx={{
+                                                                bgcolor: profile.verified
+                                                                    ? profile.limitation_reason.length === 0
+                                                                        ? 'success.main'
+                                                                        : 'info.main'
+                                                                    : profile.decline_reason.length === 0
+                                                                        ? 'warning.main'
+                                                                        : 'error.main',
+                                                                color: profile.verified
+                                                                    ? profile.limitation_reason.length === 0
+                                                                        ? 'success.light'
+                                                                        : 'info.light'
+                                                                    : profile.decline_reason.length === 0
+                                                                        ? 'warning.light'
+                                                                        : 'error.light',
+                                                            }}
+                                                        />
+                                                    </Grid>
+                                                </>
+                                                :
+                                                <>
+
+                                                    <Box pt={3} display="flex" justifyContent="flex-start">
+                                                        <Button onClick={() => handleVerify()} variant="contained" color="primary" style={{ marginRight: '10px' }}>
+                                                            {approving ? <CircularProgress style={{ color: 'white' }} size={24} /> : "Approve"}
+                                                        </Button>
+                                                        <Button onClick={() => showDeclineReasonAlert()} className="btn-decline" variant="contained" sx={{ color: 'white', backgroundColor: 'red' }}>
+                                                            Reject
+                                                        </Button>
+                                                    </Box>
+                                                    <Box pt={3} display="flex" justifyContent="flex-start">
+                                                        <Button onClick={() => showApproveReasonAlert()} variant="contained" color="primary" style={{ marginRight: '10px' }}>
+                                                            Approve with limitations
+                                                        </Button>
+                                                    </Box>
+                                                </>
+                                            }
                                         </Grid>
                                     </Grid>
                                 </Box>

@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import axios from 'axios';
 import {
   Box,
   Button,
@@ -25,6 +26,11 @@ import ParentCard from "../../../components/shared/ParentCard";
 import PageContainer from "../../../components/container/PageContainer";
 import Breadcrumb from "../../../layouts/full/shared/breadcrumb/Breadcrumb";
 import swal from "sweetalert";
+import { useUser } from "../../../userContext/UserContext";
+import {
+  FleekSdk,
+  ApplicationAccessTokenService,
+} from "@fleek-platform/sdk/browser";
 
 import {
   ConnectButton,
@@ -49,8 +55,8 @@ const decryptData = (ciphertext) => {
   return bytes.toString(CryptoJS.enc.Utf8);
 };
 
-const ledger = ic.local("bkyz2-fmaaa-aaaaa-qaaaq-cai"); // Ledger canister
-// const ledger = ic("sifoc-qqaaa-aaaap-ahorq-cai"); // Production canister
+// const ledger = ic.local("bkyz2-fmaaa-aaaaa-qaaaq-cai"); // Ledger canister
+const ledger = ic("speiw-5iaaa-aaaap-ahora-cai");// Production canister
 
 const countries = [
   { value: "IN", label: "India" },
@@ -64,10 +70,10 @@ const initialState = {
   birth_date: "",
   birth_country: "",
   phone: "",
-  referralCode:"",
+  referralCode: "",
   resident_address: "",
   resident_country: "",
-  addressVerificationDoc: null, 
+  addressVerificationDoc: null,
   document_type: "",
   citizenship: [],
   document_number: "",
@@ -86,13 +92,19 @@ const steps = [
 ];
 
 const FormTabs = () => {
+  const { user, setUser } = useUser();
+  const [userId, setUserId] = useState(null);
   const [activeStep, setActiveStep] = useState(0);
   const [formData, setFormData] = useState(initialState);
   const [documentPreview, setDocumentPreview] = useState(null);
   const [addressDocumentPreview, setAddressDocumentPreview] = useState(null);
   const [image, setImage] = useState(null);
+  const [results, setResults] = useState(null);
   const [skipped, setSkipped] = useState(new Set());
   const [loading, setLoading] = useState(false);
+  const [file, setFile] = useState(null);
+  const [hash, setHash] = useState("");
+
 
   const isStepOptional = (step) => false;
   const isStepSkipped = (step) => skipped.has(step);
@@ -105,6 +117,60 @@ const FormTabs = () => {
       // Signed out
     },
   });
+  const applicationService = new ApplicationAccessTokenService({
+    clientId: "client_NSez4i7UHB-0M6r2OJp-", // Use your actual client ID here
+  });
+  const fleekSdk = new FleekSdk({
+    accessTokenService: applicationService,
+  });
+  const handleFleekFileChange = async (event) => {
+    setFile(event.target.files[0]);
+    console.log('upp', event.target.files[0]);
+    setDocumentPreview(URL.createObjectURL(event.target.files[0]));
+  };
+
+  const handleUpload = async () => {
+    if (!file) {
+      alert("Please select a file to upload");
+      return;
+    }
+    setLoading(true);
+    try {
+      // Upload the file using the Fleek SDK
+      const result = await fleekSdk.storage().uploadFile({
+        file: file,
+        onUploadProgress: (progress) => {
+          // const percentage = (progress.loaded / progress.total) * 100;
+          // console.log(`Upload progress: ${percentage}%`);
+        },
+      });
+      setHash(result.pin.cid);
+      console.log('hash', result.pin.cid);
+      const response = await ledger.call("uploadDocumentPhoto", userId, result.pin.cid);
+      console.log("Document Upload Response:", response);
+      swal("Success", "Identity Details Stored Successfully", "success");
+
+    } catch (error) {
+      console.error("Error uploading file:", error);
+      alert("Failed to upload file.");
+    }
+    setLoading(false);
+    handleNext();
+  };
+
+
+  const fetchUser = async (e) => {
+    console.log('user2', user);
+    const response = await ledger.call("getUser", user);
+    console.log("User records :", response);
+    setUserId(response[0].email);
+
+  }
+
+  useEffect(() => {
+    console.log('user1', user);
+    fetchUser();
+  }, [user,userId]);
 
   const handleNext = () => {
     let newSkipped = skipped;
@@ -205,7 +271,7 @@ const FormTabs = () => {
           formData.expiry_date
         );
       case 3:
-        return formData.identityDoc;
+        return file;
       case 4:
         return image;
       default:
@@ -257,53 +323,25 @@ const FormTabs = () => {
 
   const handlePersonalDetailsSubmit = async () => {
     console.log("Personal Details Submitted", formData);
+
     setLoading(true);
-
     try {
-      
-      const referralCode = await ledger.call('redeemReferralCode',formData.referralCode,principal);
-      console.log('referralCode',referralCode);
-      const encryptedIdentityDoc6 = formData.identityDoc;
-      const response = await ledger.call(
-        "addBasicInfoCustomer",
-        principal,
-        encryptData(formData.family_name),
-        encryptData(formData.given_name),
-        encryptData(formData.birth_date),
-        encryptData(formData.birth_country),
-        encryptData(formData.phone)
-      );
-
-      console.log("Personal Detail Result:",response);
+      // if(formData.referralCode){
+      // const referralCode = await ledger.call('redeemReferralCode',formData.referralCode,principal);
+      // console.log('referralCode',referralCode);
+      // }
+      console.log('user id', userId);
+      const response = await ledger.call("addBasicInfoCustomer", userId, formData.family_name,
+        formData.given_name, formData.birth_date, formData.birth_country, formData.phone, formData.referralCode);
+      console.log("Personal Detail Result:", response);
 
       swal("Success", "Personal Record Stored Successfully!", "success");
+      handleNext();
     } catch (e) {
+      console.log('error', e);
       swal("Error", e.message || e.toString(), "error");
     } finally {
       setLoading(false);
-      handleNext();
-    }
-  };
-
-
-  const handleMoreDetailsSubmit = async () => {
-    console.log("More Details Submitted", formData);
-    setLoading(true);
-
-    try {
-      const response = await ledger.call(
-        "addResidencyCustomer",
-        principal,
-        encryptData(formData.resident_address),
-        encryptData(formData.resident_country),
-        formData.addressVerificationDoc,
-      );
-      swal("Success", "Address Details Successfully!", "success");
-    } catch (e) {
-      swal("Error", e.message || e.toString(), "error");
-    } finally {
-      setLoading(false);
-      handleNext();
     }
   };
 
@@ -314,14 +352,15 @@ const FormTabs = () => {
     try {
       const response = await ledger.call(
         "addResidencyCustomer",
-        principal,
-        encryptData(formData.resident_address),
-        encryptData(formData.resident_country),
+        userId,
+        formData.resident_address,
+        formData.resident_country,
         formData.addressVerificationDoc,
       );
-      console.log("Address details response:",response);
+      console.log("Address details response:", response);
       swal("Success", "Address Details Stored Successfully!", "success");
     } catch (e) {
+      console.log('error', e);
       swal("Error", e.message || e.toString(), "error");
     } finally {
       setLoading(false);
@@ -338,13 +377,13 @@ const FormTabs = () => {
     try {
       const response = await ledger.call(
         "addDocumentDetailsCustomer",
-        principal,
+        userId,
         formData.document_type,
-        encryptedCitizenship,
-        encryptData(formData.document_number),
-        encryptData(formData.issuing_country),
-        encryptData(formData.issuance_date),
-        encryptData(formData.expiry_date),
+        formData.citizenship,
+        formData.document_number,
+        formData.issuing_country,
+        formData.issuance_date,
+        formData.expiry_date,
       );
       swal("Success", "Document Details Stored Successfully!", "success");
     } catch (e) {
@@ -357,16 +396,16 @@ const FormTabs = () => {
 
   };
 
-  const handleDocumentUploadeSubmit = async() => {
+  const handleDocumentUploadeSubmit = async () => {
     console.log("Document Image Submitted", formData);
     setLoading(true);
     try {
       const response = await ledger.call(
         "uploadDocumentPhoto",
-        principal,
+        userId,
         formData.identityDoc
       );
-      console.log("Document Upload Response:",response);
+      console.log("Document Upload Response:", response);
       swal("Success", "Identity Details Stored Successfully", "success");
     } catch (e) {
       swal("Error", e, "error");
@@ -377,23 +416,72 @@ const FormTabs = () => {
   }
 
   const handleCaptureImageSubmit = async () => {
-    console.log("Image Captured", image);
+    console.log('params', userId, image);
     setLoading(true);
-
+    setResults(null);
+  
     try {
-      const response = await ledger.call(
-        "addImage",
-        principal,
-        image
-      );
-      swal("Success", "Image Stored Successfully!", "success");
+      const base64Image = image;
+      const base64Data = base64Image.split(',')[1];
+      const options = {
+        method: 'POST',
+        url: 'https://face-liveness-detection3.p.rapidapi.com/api/liveness_base64',
+        headers: {
+          'x-rapidapi-key': '2bd268fcc8msh258d57ad291526bp1d1eedjsnc9fc5ab835d7',
+          'x-rapidapi-host': 'face-liveness-detection3.p.rapidapi.com',
+          'Content-Type': 'application/json',
+        },
+        data: { image: base64Data },
+      };
+  
+      const response = await axios.request(options);
+      if (response.data.data.result === 'no face detected!') {
+        swal({
+          title: 'No face detected!',
+          text: 'Please ensure that your face is close to the camera, clear, and well-lit.',
+          icon: 'error',
+        });
+      } else if (response.data.data.result === 'spoof') {
+        swal({
+          title: 'Spoof',
+          text: 'Please ensure that your face is close to the camera, clear, and well-lit.',
+          icon: 'error',
+        });
+      } else if (response.data.data.result === 'multiple face detected!') {
+        swal({
+          title: 'Multiple face detected!',
+          text: 'Please ensure that your face is close to the camera, clear, and well-lit.',
+          icon: 'error',
+        });
+      } else {
+        console.log('params', userId, image);
+        try {
+          const response1 = await ledger.call("addImage", userId, image);
+          setResults(response.data.data);
+          console.log('response', response1);
+          swal({
+            title: 'Success',
+            text: 'Image Stored Successfully!',
+            icon: 'success',
+          });
+          handleNext();
+        } catch (e) {
+          // Convert the error to a string
+          const errorMessage = e.message || 'An unexpected error occurred.';
+          swal("Error", errorMessage, "error");
+        } finally {
+          setLoading(false);
+        }
+      }
     } catch (e) {
-      swal("Error", e, "error");
+      // Convert the error to a string
+      const errorMessage = e.message || 'An unexpected error occurred.';
+      swal("Error", errorMessage, "error");
     } finally {
       setLoading(false);
-      handleNext();
     }
   };
+  
 
   const handleSteps = (step) => {
     switch (step) {
@@ -538,7 +626,7 @@ const FormTabs = () => {
                       sx={{ mt: 0 }}
                       className="center"
                     >
-                      Referral Code 
+                      Referral Code
                       <Tooltip
                         title="Referral Code"
                         placement="top"
@@ -941,7 +1029,7 @@ const FormTabs = () => {
                       <input
                         type="file"
                         accept="image/*"
-                        onChange={handleFileChange}
+                        onChange={handleFleekFileChange}
                         id="file-upload"
                         style={{ display: 'none' }}
                       />
@@ -966,7 +1054,7 @@ const FormTabs = () => {
               <Button
                 variant="contained"
                 color="primary"
-                onClick={handleDocumentUploadeSubmit}
+                onClick={handleUpload}
                 disabled={!isFormValid(3) || loading}
               >
                 {loading ? <CircularProgress size={24} /> : "Next"}

@@ -212,11 +212,21 @@ const UserListing = ({ Users }) => {
       let filteredData = Users.filter((user) => user.id.toLowerCase().includes(search.toLowerCase()));
 
       if (filters.residency !== 'All countries') {
-        filteredData = filteredData.filter((user) => decryptData(user.resident_country) === filters.residency);
+        filteredData = filteredData.filter((user) => user.resident_country === filters.residency);
       }
 
       if (filters.status !== 'All Status') {
-        filteredData = filteredData.filter((user) => (user.verified ? 'Approved' : 'Pending') === filters.status);
+        filteredData = filteredData.filter((user) => {
+          const status = user.verified
+            ? user.limitation_reason.length === 0
+              ? 'Approved'
+              : 'Limitations'
+            : user.decline_reason.length === 0
+              ? 'Pending'
+              : 'Decline';
+
+          return status === filters.status;
+        });
       }
 
       if (filters.time !== 'All time') {
@@ -319,42 +329,55 @@ const UserListing = ({ Users }) => {
                               borderRadius: '100%',
                             }}
                           />
-                          <Typography variant="h6">{decryptData(user.given_name)} {decryptData(user.family_name)}</Typography>
+                          <Typography variant="h6">{user.given_name} {user.family_name}</Typography>
                         </Stack>
                       </TableCell>
                       <TableCell>
-                        <Typography variant="h6">{decryptData(user.resident_country)}</Typography>
+                        <Typography variant="h6">{user.resident_country}</Typography>
                       </TableCell>
                       <TableCell>{formatId(user.id)}</TableCell>
                       <TableCell>
                         <Typography variant="h6">{user.role}</Typography>
                       </TableCell>
                       <TableCell>
-                        <Typography variant="h6">{decryptData(user.phone)}</Typography>
+                        <Typography variant="h6">{user.phone}</Typography>
                       </TableCell>
                       <TableCell>
                         <Chip
-                          label={user.verified === true
-                            ? 'Approved'
-                            : 'Pending'}
+                          label={
+                            user.verified
+                              ? user.limitation_reason.length === 0
+                                ? 'Approved'
+                                : 'Limitations'
+                              : user.decline_reason.length === 0
+                                ? 'Pending'
+                                : 'Decline'
+                          }
                           sx={{
-                            bgcolor:
-                              user.verified === true
+                            bgcolor: user.verified
+                              ? user.limitation_reason.length === 0
                                 ? 'success.main'
-                                : 'warning.main', // default color if none of the conditions match
-                            color: user.verified === true
-                              ? 'success.light'
-                              : 'warning.light',
+                                : 'info.main'
+                              : user.decline_reason.length === 0
+                                ? 'warning.main'
+                                : 'error.main',
+                            color: user.verified
+                              ? user.limitation_reason.length === 0
+                                ? 'success.light'
+                                : 'info.light'
+                              : user.decline_reason.length === 0
+                                ? 'warning.light'
+                                : 'error.light',
                           }}
                         />
                       </TableCell>
-                      <TableCell> 
+                      <TableCell>
                         <Link to={`/apps/tickets/user-detail/${user.id}`}>
-                        <Button variant="outlined" onClick={() => handleViewDetails(user)}>
-                          {user.verified === true
-                            ? 'View'
-                            : 'Review'}</Button>
-                            </Link>
+                          <Button variant="outlined" onClick={() => handleViewDetails(user)}>
+                            {user.verified === true
+                              ? 'View'
+                              : 'Review'}</Button>
+                        </Link>
                       </TableCell>
                     </TableRow>
                   ))
