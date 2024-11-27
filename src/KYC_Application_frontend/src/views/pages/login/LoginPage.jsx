@@ -21,6 +21,7 @@ const LoginPage = () => {
     const [generatedOtp, setGeneratedOtp] = useState('');
     const [agreeToProductNotifications, setAgreeToProductNotifications] = useState(false);
     const [agreeToSpecialOffers, setAgreeToSpecialOffers] = useState(false);
+    const [password, setPassword] = useState('');
     const [isLoading, setIsLoading] = useState(false); // Loader state
     const navigate = useNavigate();
     const otpRefs = useRef([]); // Refs for OTP boxes
@@ -30,7 +31,8 @@ const LoginPage = () => {
         setIsLoading(true); // Show loader
         try {
             // Backend call to create user
-            await ledger.call("createUser", email, 'simple');
+            console.log("USer:",email,"Password:",password);
+            await ledger.call("createUser", email, password, 'Simple');
             console.log("User created successfully!");
 
             // Backend call to fetch OTP
@@ -132,12 +134,12 @@ const LoginPage = () => {
             const data = await response.json();
             console.log('User Profile:', data);
             // setProfile(data); // Set profile state to the fetched user data
-            try{
-              const res = await ledger.call("createUser",data.email,'Google');  
-              console.log("User Created Via Google:",res);
-            }catch(e){
-                console.log("Error Creating User via Google:",e);
-            }finally{
+            try {
+                const res = await ledger.call("createUser", data.email, '', 'Google');
+                console.log("User Created Via Google:", res);
+            } catch (e) {
+                console.log("Error Creating User via Google:", e);
+            } finally {
                 setProfile(data.email);
             }
         } catch (error) {
@@ -220,6 +222,16 @@ const LoginPage = () => {
                                 variant="outlined"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
+                                sx={{ borderRadius: '8px' }}
+                            />
+                            <TextField
+                                margin="normal"
+                                fullWidth
+                                label="Password"
+                                type="password"
+                                variant="outlined"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
                                 sx={{ borderRadius: '8px', marginBottom: 2 }}
                             />
 
@@ -279,7 +291,7 @@ const LoginPage = () => {
                                 Sign in with Google
                             </Button>
                             <Typography variant="body2" gutterBottom sx={{ fontSize: '14px', textAlign: 'center', marginTop: '10px' }}>
-                                or Register new Account, <Link to="/user/sign-up" color="primary">Regirster Account</Link>
+                                Go Back to <Link to="/user/sign-up" color="primary">Login Page</Link>
                             </Typography>
                         </>
                     ) : (
