@@ -27,10 +27,10 @@ import PageContainer from "../../../components/container/PageContainer";
 import Breadcrumb from "../../../layouts/full/shared/breadcrumb/Breadcrumb";
 import swal from "sweetalert";
 import { useUser } from "../../../userContext/UserContext";
-import {
-  FleekSdk,
-  ApplicationAccessTokenService,
-} from "@fleek-platform/sdk/browser";
+// import {
+//   FleekSdk,
+//   ApplicationAccessTokenService,
+// } from "@fleek-platform/sdk/browser";
 
 import {
   ConnectButton,
@@ -117,12 +117,12 @@ const FormTabs = () => {
       // Signed out
     },
   });
-  const applicationService = new ApplicationAccessTokenService({
-    clientId: "client_NSez4i7UHB-0M6r2OJp-", // Use your actual client ID here
-  });
-  const fleekSdk = new FleekSdk({
-    accessTokenService: applicationService,
-  });
+  // const applicationService = new ApplicationAccessTokenService({
+  //   clientId: "client_NSez4i7UHB-0M6r2OJp-", // Use your actual client ID here
+  // });
+  // const fleekSdk = new FleekSdk({
+  //   accessTokenService: applicationService,
+  // });
   const handleFleekFileChange = async (event) => {
     setFile(event.target.files[0]);
     console.log('upp', event.target.files[0]);
@@ -137,16 +137,16 @@ const FormTabs = () => {
     setLoading(true);
     try {
       // Upload the file using the Fleek SDK
-      const result = await fleekSdk.storage().uploadFile({
-        file: file,
-        onUploadProgress: (progress) => {
-          // const percentage = (progress.loaded / progress.total) * 100;
-          // console.log(`Upload progress: ${percentage}%`);
-        },
-      });
-      setHash(result.pin.cid);
-      console.log('hash', result.pin.cid);
-      const response = await ledger.call("uploadDocumentPhoto", userId, result.pin.cid);
+      // const result = await fleekSdk.storage().uploadFile({
+      //   file: file,
+      //   onUploadProgress: (progress) => {
+      //     // const percentage = (progress.loaded / progress.total) * 100;
+      //     // console.log(`Upload progress: ${percentage}%`);
+      //   },
+      // });
+      // setHash(result.pin.cid);
+      // console.log('hash', result.pin.cid);
+      const response = await ledger.call("uploadDocumentPhoto", userId, file);
       console.log("Document Upload Response:", response);
       swal("Success", "Identity Details Stored Successfully", "success");
 
