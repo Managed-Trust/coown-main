@@ -285,6 +285,7 @@ actor KYC_Canister {
           adminId = id;
           groupName = "DefaultGroup";
           groupType = "Default";
+          logoHash = "";
           companyDetails = null;
           publicLawEntityDetails = null;
           personalRecords = [];
@@ -339,6 +340,7 @@ actor KYC_Canister {
           adminId = id;
           groupName = "DefaultGroup";
           groupType = "Default";
+          logoHash = "";
           companyDetails = null;
           publicLawEntityDetails = null;
           personalRecords = [];
@@ -624,10 +626,113 @@ actor KYC_Canister {
   public type User = {
     emailAuth : Text;
     email : Text;
+    password: Text;
     otp : ?Text;
     otpExpiry : ?Int;
     authMethod: ?Text;
   };
+
+  public type UserInternetIdentity = {
+  ii : Text;         // Internet Identity
+  email : Text;      // Email address
+  iiCode: ?Text;     // Optional II Code
+};
+
+// Stable variable for storing II associations
+private stable var userIIEntries : [(Text, UserInternetIdentity)] = [];
+var usersII = HashMap.HashMap<Text, UserInternetIdentity>(0, Text.equal, Text.hash);
+
+public func associateIIWithEmail(email : Text, ii : Text) : async Text {
+  // Convert the HashMap values into an array and check if the II exists
+  let iiExists = Array.filter(
+    Iter.toArray(usersII.vals()),
+    func(entry : UserInternetIdentity) : Bool {
+      entry.ii == ii;
+    },
+  );
+
+  if (Array.size(iiExists) > 0) {
+    // If the II exists, return an error message with the associated email
+    return "Internet Identity (II) is already associated with another email: " # iiExists[0].email;
+  } else {
+    // If II doesn't exist, check if the email already has an II
+    switch (usersII.get(email)) {
+      case (?user) {
+        return "This email already has an associated Internet Identity (II): " # user.ii;
+      };
+      case null {
+        // Create a new UserInternetIdentity entry
+        let newUserII : UserInternetIdentity = {
+          ii = ii;
+          email = email;
+          iiCode = null;
+        };
+
+        usersII.put(email, newUserII); // Associate II with the email
+        return "Internet Identity (II) successfully associated with the email.";
+      };
+    };
+  };
+};
+public func updateIICode(email : Text, iiCode : Text) : async Text {
+  // Check if the email exists in the usersII HashMap
+  switch (usersII.get(email)) {
+    case null {
+      return "No Internet Identity (II) is associated with this email.";
+    };
+    case (?userII) {
+      // Update the iiCode for the existing UserInternetIdentity
+      let updatedUserII : UserInternetIdentity = {
+        userII with iiCode = ?iiCode;
+      };
+      usersII.put(email, updatedUserII); // Save the updated entry
+      return "iiCode updated successfully for the associated email.";
+    };
+  };
+};
+
+
+public query func isIIAssociated(ii : Text) : async ?Text {
+  // Convert HashMap values to an array and filter to check for the II
+  let iiExists = Array.filter(
+    Iter.toArray(usersII.vals()),
+    func(entry : UserInternetIdentity) : Bool {
+      entry.ii == ii;
+    },
+  );
+
+  if (Array.size(iiExists) > 0) {
+    return ?iiExists[0].email; // Return the email associated with this II
+  } else {
+    return null; // II is not associated with any email
+  };
+};
+// Function to get the Internet Identity (II) associated with an email
+public query func getIIByEmail(email : Text) : async ?UserInternetIdentity {
+  return usersII.get(email);
+};
+
+// Function to list all II associations (For Debugging)
+public query func listAllIIAssociations() : async [UserInternetIdentity] {
+  return Iter.toArray(usersII.vals());
+};
+
+// Function to remove II association for an email
+public func removeIIByEmail(email : Text) : async Text {
+  switch (usersII.get(email)) {
+    case (null) {
+      return "No Internet Identity (II) associated with this email.";
+    };
+    case (?entry) {
+      usersII.delete(email);
+      return "Internet Identity (II) association removed successfully.";
+    };
+  };
+};
+
+
+
+
   private stable var userEntries : [(Text, User)] = [];
   var users = HashMap.HashMap<Text, User>(0, Text.equal, Text.hash);
   //==================================================================================
@@ -639,25 +744,56 @@ actor KYC_Canister {
 
   public func createUser(
     email : Text,
+    password: Text,
     authMethod: Text
   ) : async Text {
 
-    var status = "pending";
-    if(authMethod == "Google")
-    {
-      status := "verified"; 
-    };
-    let newUser = {
-      emailAuth = status;
-      email = email;
+      switch (users.get(email)) {
+      case (?x) {
+        return "user exsists";
+      };
+      case (null) {
+          var status = "pending";
+         if(authMethod == "Google")
+         {
+           status := "verified"; 
+          };
+           let newUser = {
+          emailAuth = status;
+            email = email;
+            password = password;
       otp = null;
-      otpExpiry = null;
+       otpExpiry = null;
       authMethod = ?authMethod;
     };
 
     users.put(email, newUser);
     return "User created with default group.";
+      };
+    };
+   
   };
+
+  public func loginUser(email : Text, password : Text) : async ?User {
+    // Check if the user exists in the `users` HashMap
+    switch (users.get(email)) {
+        case (null) {
+            return null;
+        };
+        case (?user) {
+            // Check if the provided password matches the stored password
+            if (user.password == password) {
+                // if (user.emailAuth != "verified") {
+                //     return "Email not verified.";
+                // };
+                return ?user;
+            } else {
+                return null;
+            };
+        };
+    };
+};
+
 
   //==============================================================
   //OTP logic
@@ -783,6 +919,7 @@ actor KYC_Canister {
     adminId : Text;
     groupName : Text;
     groupType : Text;
+    logoHash:Text;
     companyDetails : ?CompanyDetails; //null
     publicLawEntityDetails : ?PublicLawEntityDetails;
     personalRecords : [PersonalRecord]; //empty
@@ -792,11 +929,72 @@ actor KYC_Canister {
     logo : Text;
   };
 
+  //====================================================================================
+  //new subscriptions
+  //====================================================================================
+
+  type SubscriptionType = {
+    storageCapacity : Text; // e.g., "500MB", "5GB", "25GB"
+    storageFee : Nat;       // e.g., 0 USD, 72 USD, etc.
+    setupFee : Nat;         // Initial setup fee, if any
+    annualFee : Nat;        // e.g., 168 USD
+    totalCost : Nat;        // Total cost (sum of fees)
+    subscriptionDate : Int; // Subscription start date
+    expiryDate : Int;      // Expiry date (one year from subscription date)
+};
+
+type UserSubscription = {
+  groupId : Text;
+    userId : Text;
+    subscription : SubscriptionType;
+};
+
+private stable var subscriptions : [(Text, UserSubscription)] = []; // Store user subscriptions
+var subscriptionMap = HashMap.HashMap<Text, UserSubscription>(0, Text.equal, Text.hash);
+
+
+public func createSubscription(
+    userId : Text,
+    storageCapacity : Text,
+    groupId:Text,
+    storageFee : Nat,
+    setupFee : Nat,
+    annualFee : Nat
+) : async Text {
+    let totalCost = storageFee + setupFee + annualFee; // Calculate total cost
+    let now = Time.now();
+    let expiry = now + (365 * 24 * 60 * 60 * 1_000_000_000); // Expiry: 1 year from now
+
+    let newSubscription : SubscriptionType = {
+        storageCapacity = storageCapacity;
+        storageFee = storageFee;
+        setupFee = setupFee;
+        annualFee = annualFee;
+        totalCost = totalCost;
+        subscriptionDate = now;
+        expiryDate = expiry;
+    };
+
+    let userSubscription : UserSubscription = {
+        groupId = groupId;
+        userId = userId;
+        subscription = newSubscription;
+    };
+
+    subscriptionMap.put(userId, userSubscription);
+    return "Subscription created successfully.";
+};
+
   public func createGroup(
     adminId : Text,
     rand : Text,
     groupName : Text,
     groupType : Text,
+    logoHash:Text,
+    storageCapacity : Text,
+    storageFee : Nat,
+    setupFee : Nat,
+    annualFee : Nat
   ) : async Text {
     let groupId = Text.concat(adminId, rand);
     switch (groups.get(groupId)) {
@@ -805,6 +1003,7 @@ actor KYC_Canister {
           adminId = adminId;
           groupName = groupName;
           groupType = groupType;
+          logoHash = logoHash;
           companyDetails = null;
           publicLawEntityDetails = null;
           personalRecords = [];
@@ -814,6 +1013,28 @@ actor KYC_Canister {
 
         };
         groups.put(groupId, newGroup);
+
+         let totalCost = storageFee + setupFee + annualFee; // Calculate total cost
+    let now = Time.now();
+    let expiry = now + (365 * 24 * 60 * 60 * 1_000_000_000); // Expiry: 1 year from now
+
+    let newSubscription : SubscriptionType = {
+        storageCapacity = storageCapacity;
+        storageFee = storageFee;
+        setupFee = setupFee;
+        annualFee = annualFee;
+        totalCost = totalCost;
+        subscriptionDate = now;
+        expiryDate = expiry;
+    };
+
+    let userSubscription : UserSubscription = {
+      groupId = groupId;
+        userId = adminId;
+        subscription = newSubscription;
+    };
+
+    subscriptionMap.put(groupId, userSubscription);
 
         switch (groupIds.get(adminId)) {
           case (?buffer) {
