@@ -1,6 +1,7 @@
 import React from 'react';
 import { Box, Button, Typography } from '@mui/material';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import { Link } from 'react-router-dom';
 
 const ConnectBanner = () => {
     return (
@@ -26,7 +27,9 @@ const ConnectBanner = () => {
             </Box>
 
             {/* Right side - Connect button */}
-            <Button
+            <Link to='/user/connect'              
+            >
+                <Button
                 variant="contained"
                 sx={{
                     backgroundColor: '#000',
@@ -41,6 +44,7 @@ const ConnectBanner = () => {
             >
                 Connect
             </Button>
+            </Link>
         </Box>
     );
 };

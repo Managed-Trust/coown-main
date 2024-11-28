@@ -5,13 +5,19 @@ import GoogleLoginLogo from "../../../assets/images/login/GoogleLogin.svg";
 import icp from "../../../assets/images/svgs/icLogo.svg"
 import { useUser } from '../../../userContext/UserContext';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import ic from "ic0";
 import swal from 'sweetalert';
 import { ConnectDialog, useConnect, useDialog } from "@connect2ic/react";
+const ledger = ic("speiw-5iaaa-aaaap-ahora-cai");// Production canister
 
 const ConnectPage = () => {
     const navigate = useNavigate();
     const { user, setUser } = useUser();
-    const [internetId,setInternetId] = useState('2345678');
+    const [visit, setVisit] = useState(null);
+    const [userRecord, setUserRecord] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [internetId, setInternetId] = useState(null);
+    const [code, setCode] = useState(null);
     const [loginCount, setLoginCount] = useState(1);
     const { isConnected, principal, disconnect } = useConnect({
         onConnect: () => {
@@ -33,14 +39,32 @@ const ConnectPage = () => {
                 icon: 'success'
             });
             console.log("Disconnecting...");
-            disconnect(); // If already connected, clicking will disconnect
+            disconnect(); 
+            navigate(-1);// If already connected, clicking will disconnect
         } else {
             console.log("Connecting...");
             open(); // If not connected, clicking will trigger connection
         }
     };
 
-    const handleCopy = (internetId)=>{
+    const handleSaveCode = async () => {
+        try {
+            const response = await ledger.call('updateIICode', user, code);
+            console.log('res3', response);
+            if (response == 'iiCode updated successfully for the associated email.') {
+                swal('Success', 'Internet Identity Code saved successfully', 'success');
+                navigate('/dashboards/ecommerce');
+            } else {
+                swal('Info', response, 'info');
+            }
+
+        } catch (e) {
+
+        }
+    }
+
+
+    const handleCopy = (internetId) => {
         navigator.clipboard.writeText(internetId)
         swal({
             title: 'Success',
@@ -49,15 +73,76 @@ const ConnectPage = () => {
 
         })
     }
+    const CheckStatus = async () => {
+        setLoading(true);
+        try {
+            const response = await ledger.call('getIIByEmail', user);
+            console.log('res', response);
+            if (response.length === 0) {
+                setLoginCount(1);
+                setVisit('first');
+            }
+            else if(response[0].iiCode.length === 0){
+                setUserRecord(response);
+                setLoginCount(4);
+                setVisit('second');
+            }
+            else {
+                setUserRecord(response);
+                setInternetId(response[0].iiCode[0]);
+                setLoginCount(5);
+                setVisit('second');
+                //It's four second time 
+                // setLoginCount(4);
+
+            }
+        } catch (error) {
+            console.log('Some thing went wrong');
+        }
+        setLoading(false);
+    }
+
+    const addInternetIdentity = async () => {
+        try {
+            console.log('principal', principal);
+            const response = await ledger.call('associateIIWithEmail', user, principal);
+            console.log('res1', response);
+            if (response == 'Internet Identity (II) successfully associated with the email.') {
+                swal("Success", 'Internet Identity (II) successfully associated with the email', 'success');
+                setLoginCount(2);
+            } else {
+                // swal("Info", response, 'info');
+
+            }
+        } catch (e) {
+            console.log('Some thing went wrong');
+
+        }
+
+    }
+    const CheckIdentity = () => {
+            console.log('principal', principal);
+            if(principal == userRecord[0].ii){
+                swal("Success", 'Internet Identity (II) connected successfully', 'success'); 
+                navigate('/dashboards/ecommerce');
+            }else{
+                setLoginCount(3);
+            }
+    }
 
     useEffect(() => {
         console.log('user', user);
-        if (isConnected) {
-            setLoginCount(2);
-        } else {
-            setLoginCount(1);
+        if (user && visit == null) {
+            CheckStatus();
         }
-    }, [isConnected, principal, user]);
+    }, [user]);
+    useEffect(() => {
+        if (principal && user && loginCount == 1) {
+            addInternetIdentity();
+        }else if (principal && user && (loginCount == 4 || loginCount == 5)) {
+            CheckIdentity();
+        }
+    }, [principal, user]);
 
     const handleBack = () => {
         navigate('/user/login'); // Replace with your back navigation logic
@@ -233,7 +318,8 @@ const ConnectPage = () => {
                                 margin="normal"
                                 fullWidth
                                 placeholder='Enter your internet identity (e.g 2345678)'
-                                type="email"
+                                type="number"
+                                onChange={(e) => setCode(e.target.value)}
                                 variant="outlined"
                                 sx={{ borderRadius: '8px', marginBottom: 2 }}
                             />
@@ -248,7 +334,7 @@ const ConnectPage = () => {
                                     fontSize: { xs: '14px', md: '16px' },
                                     marginBottom: 2,
                                 }}
-                                onClick={handleConnect}
+                                onClick={handleSaveCode}
                             >
                                 Save
                             </Button>
@@ -364,7 +450,7 @@ const ConnectPage = () => {
                             <Box sx={{ backgroundColor: '#F2F6FA', p: 2, borderRadius: '8px', marginBottom: 3 }}>
                                 <Grid container>
                                     <Grid item xs={12} sm={4}><Typography variant='body1'>Principal ID</Typography></Grid>
-                                    <Grid item xs={12} sm={8}> <Typography variant='body1' fontWeight={'bold'}> {principal} </Typography></Grid>
+                                    <Grid item xs={12} sm={8}> <Typography variant='body1' fontWeight={'bold'}> {userRecord && userRecord.length > 0 && userRecord[0].ii}</Typography></Grid>
                                     <Grid item xs={12} sm={4} mt={1}><Typography variant='body1'> Email </Typography></Grid>
                                     <Grid item xs={12} sm={8} mt={1}><Typography variant='body1' fontWeight={'bold'}> {user} </Typography></Grid>
                                 </Grid>
@@ -436,7 +522,7 @@ const ConnectPage = () => {
                             <Box sx={{ backgroundColor: '#F2F6FA', p: 2, borderRadius: '8px', marginBottom: 3 }}>
                                 <Grid container>
                                     <Grid item xs={12} sm={4}><Typography variant='body1'>Principal ID</Typography></Grid>
-                                    <Grid item xs={12} sm={8}> <Typography variant='body1' fontWeight={'bold'}> {principal} </Typography></Grid>
+                                    <Grid item xs={12} sm={8}> <Typography variant='body1' fontWeight={'bold'}> {userRecord && userRecord.length > 0 && userRecord[0].ii} </Typography></Grid>
                                     <Grid item xs={12} sm={4} mt={1}><Typography variant='body1'> Email </Typography></Grid>
                                     <Grid item xs={12} sm={8} mt={1}><Typography variant='body1' fontWeight={'bold'}> {user} </Typography></Grid>
                                     <Grid item xs={12} sm={4} mt={1}>

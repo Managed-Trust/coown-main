@@ -148,14 +148,18 @@ const FormTabs = () => {
       // console.log('hash', result.pin.cid);
       const response = await ledger.call("uploadDocumentPhoto", userId, file);
       console.log("Document Upload Response:", response);
-      swal("Success", "Identity Details Stored Successfully", "success");
+      if(response == 'Success'){
+        swal("Success", "Identity Details Stored Successfully!", "success");
+        handleNext();
+      }else{
+        swal("Info", response, "info");
+      }
 
     } catch (error) {
       console.error("Error uploading file:", error);
       alert("Failed to upload file.");
     }
     setLoading(false);
-    handleNext();
   };
 
 
@@ -326,17 +330,20 @@ const FormTabs = () => {
 
     setLoading(true);
     try {
-      // if(formData.referralCode){
-      // const referralCode = await ledger.call('redeemReferralCode',formData.referralCode,principal);
-      // console.log('referralCode',referralCode);
-      // }
+      if(formData.referralCode){
+      const referralCode = await ledger.call('redeemReferralCode',formData.referralCode,principal);
+      console.log('referralCode',referralCode);
+      }
       console.log('user id', userId);
       const response = await ledger.call("addBasicInfoCustomer", userId, formData.family_name,
         formData.given_name, formData.birth_date, formData.birth_country, formData.phone, formData.referralCode);
       console.log("Personal Detail Result:", response);
-
-      swal("Success", "Personal Record Stored Successfully!", "success");
-      handleNext();
+        if(response == 'Success'){
+          swal("Success", "Personal Record Stored Successfully!", "success");
+          handleNext();
+        }else{
+          swal("Info", response, "info");
+        }
     } catch (e) {
       console.log('error', e);
       swal("Error", e.message || e.toString(), "error");
@@ -358,13 +365,17 @@ const FormTabs = () => {
         formData.addressVerificationDoc,
       );
       console.log("Address details response:", response);
-      swal("Success", "Address Details Stored Successfully!", "success");
+      if(response == 'Success'){
+        swal("Success", "Address Details Stored Successfully!", "success");
+        handleNext();
+      }else{
+        swal("Info", response, "info");
+      }
     } catch (e) {
       console.log('error', e);
       swal("Error", e.message || e.toString(), "error");
     } finally {
       setLoading(false);
-      handleNext();
     }
   };
 
@@ -385,35 +396,21 @@ const FormTabs = () => {
         formData.issuance_date,
         formData.expiry_date,
       );
-      swal("Success", "Document Details Stored Successfully!", "success");
+      if(response == 'Success'){ 
+        swal("Success", "Document Details Stored Successfully!", "success");
+        handleNext();
+      }else{
+        swal("Info", response, "info");
+      }
+     
     } catch (e) {
       swal("Error", e.message || e.toString(), "error");
     } finally {
       setLoading(false);
-      handleNext();
     }
 
 
   };
-
-  const handleDocumentUploadeSubmit = async () => {
-    console.log("Document Image Submitted", formData);
-    setLoading(true);
-    try {
-      const response = await ledger.call(
-        "uploadDocumentPhoto",
-        userId,
-        formData.identityDoc
-      );
-      console.log("Document Upload Response:", response);
-      swal("Success", "Identity Details Stored Successfully", "success");
-    } catch (e) {
-      swal("Error", e, "error");
-    } finally {
-      setLoading(false);
-      handleNext();
-    }
-  }
 
   const handleCaptureImageSubmit = async () => {
     console.log('params', userId, image);
@@ -459,12 +456,17 @@ const FormTabs = () => {
           const response1 = await ledger.call("addImage", userId, image);
           setResults(response.data.data);
           console.log('response', response1);
-          swal({
-            title: 'Success',
-            text: 'Image Stored Successfully!',
-            icon: 'success',
-          });
-          handleNext();
+          
+          if(response == 'Success'){ 
+            swal({
+              title: 'Success',
+              text: 'Image Stored Successfully!',
+              icon: 'success',
+            });
+            handleNext();
+          }else{
+            swal("Info", response, "info");
+          }
         } catch (e) {
           // Convert the error to a string
           const errorMessage = e.message || 'An unexpected error occurred.';
