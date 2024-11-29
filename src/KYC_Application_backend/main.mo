@@ -102,7 +102,7 @@ actor KYC_Canister {
                 decline_reason = null;
                 limitation_reason = null;
                 verified = false;
-                role = "";
+                role = "applicant";
               };
               map.put(id, newCustomer);
               return "Success";
@@ -259,6 +259,7 @@ actor KYC_Canister {
         let updatedProfile = {
           value with
           live_photo = ?image;
+          role = "fullapplicant";
         };
         map.put(id, updatedProfile);
         return "Success";
@@ -266,6 +267,32 @@ actor KYC_Canister {
       };
     };
   };
+
+  public query func getApplicantCustomers() : async [Customer] {
+    // Use Iter.filter to filter customers by the role "applicant"
+    let applicantCustomers = Iter.filter<Customer>(
+        map.vals(), // Iterate over all customers in the HashMap
+        func(customer) : Bool {
+            customer.role == "applicant"; // Check if the customer's role is "applicant"
+        },
+    );
+    // Convert the filtered iterator to an array and return
+    return Iter.toArray(applicantCustomers);
+};
+
+public query func getFullApplicantCustomers() : async [Customer] {
+    // Use Iter.filter to filter customers by the role "applicant"
+    let applicantCustomers = Iter.filter<Customer>(
+        map.vals(), // Iterate over all customers in the HashMap
+        func(customer) : Bool {
+            customer.role == "fullapplicant"; // Check if the customer's role is "applicant"
+        },
+    );
+    // Convert the filtered iterator to an array and return
+    return Iter.toArray(applicantCustomers);
+};
+
+
 
   // Function to verify a customer
   public func verifyCustomer(id : Text) : async Text {
