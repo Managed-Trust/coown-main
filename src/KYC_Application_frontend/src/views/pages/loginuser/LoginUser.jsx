@@ -8,6 +8,7 @@ import swal from 'sweetalert';
 import { useUser } from '../../../userContext/UserContext';
 import ic from "ic0";
 
+// const ledger = ic.local('bkyz2-fmaaa-aaaaa-qaaaq-cai'); //local
 const ledger = ic("speiw-5iaaa-aaaap-ahora-cai"); // Ledger canister
 
 const LoginUser = () => {

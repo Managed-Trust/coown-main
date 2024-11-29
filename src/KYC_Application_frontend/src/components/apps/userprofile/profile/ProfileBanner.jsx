@@ -12,9 +12,11 @@ import {
   Skeleton,
   Chip
 } from '@mui/material';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import profilecover from '../../../../assets/images/backgrounds/account_bg.png';
 import userimg from '../../../../assets/images/profile/user-1.jpg';
 import StarIcon from '@mui/icons-material/Star';
+import { Link } from 'react-router-dom';
 import {
   IconBrandDribbble,
   IconBrandFacebook,
@@ -28,9 +30,10 @@ import ProfileTab from './ProfileTab';
 import BlankCard from '../../../shared/BlankCard';
 import { useConnect } from "@connect2ic/react";
 import ic from "ic0";
+import { useUser } from '../../../../userContext/UserContext';
 
-const ledger = ic.local("bkyz2-fmaaa-aaaaa-qaaaq-cai"); // Ledger canister
-// const ledger = ic("sifoc-qqaaa-aaaap-ahorq-cai"); // Production canister
+// const ledger = ic.local('bkyz2-fmaaa-aaaaa-qaaaq-cai'); //local
+const ledger = ic("speiw-5iaaa-aaaap-ahora-cai"); // Ledger canister
 
 import CryptoJS from "crypto-js";
 import ConnectBanner from '../../../../views/apps/user-dashboard/components/ConnectBanner';
@@ -76,8 +79,11 @@ const ProfileBanner = () => {
     justifyContent: 'center',
     border: '2px solid white',
   }));
+
+  const { user, setUser } = useUser();
   const [isLoading, setLoading] = React.useState(true);
   const [profile, setProfile] = useState(null);
+  const [kyc, setKyc] = useState(null);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -87,23 +93,26 @@ const ProfileBanner = () => {
   }, []);
 
   const { principal } = useConnect();
-
-  useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const response = await ledger.call("getCustomer", principal);
-        console.log("Profile:", response);
+  const fetchProfile = async () => {
+    try {
+      const response = await ledger.call("getCustomer", user);
+      console.log("Profile:", response);
+      if (response.length > 0) {
         const profileData = response[0];
         setProfile(profileData);
-
-      } catch (e) {
-        console.log("Error Fetching Profile:", e);
       }
-    };
-    if (principal) {
+
+    } catch (e) {
+      console.log("Error Fetching Profile:", e);
+    }
+  };
+
+  useEffect(() => {
+    console.log('user', user);
+    if (user) {
       fetchProfile();
     }
-  }, [principal]);
+  }, [user]);
 
   return (
     <>
@@ -169,10 +178,10 @@ const ProfileBanner = () => {
                   </ProfileImage>
                   <Box mt={2} ml={2}>
                     <Typography fontWeight={600} variant="h6">
-                      {decryptData(profile.given_name)}
+                      {profile.given_name}
                     </Typography>
                     <Typography color="textSecondary" variant="body2">
-                      {(profile.role)}
+                      {profile.role}
                     </Typography>
                   </Box>
                 </Box> :
@@ -254,9 +263,55 @@ const ProfileBanner = () => {
           </Grid>
         </Grid>
         {/**TabbingPart**/}
-        <ConnectBanner />
+        {profile && profile.verified && profile.verified ?
+          <ConnectBanner />
+          : <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              backgroundColor: '#4e84ff',
+              padding: '10px 20px',
+              borderRadius: '5px',
+              color: '#fff',
+              my: 1,
+              boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
+            }}
+          >
+            {/* Left side - Info text with an icon */}
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <InfoOutlinedIcon sx={{ marginRight: '8px', color: '#fff' }} />
+              <Typography variant="body1">
+                {profile && profile.role && profile.role == 'fullapplicant' ?
+                !profile.verified && profile.decline_reason.length !== 0 ?  'Your KYC Application is declined' :
+                  'Your KYC Application is pending for approval' : 'Perform KYC to get your personal wallet'
+                }
+              </Typography>
+            </Box>
+            {profile && profile.role && !profile.role == 'fullapplicant' &&
+              <Link to='/dashboards/modern'
+              >
+                <Button
+                  variant="contained"
+                  sx={{
+                    backgroundColor: '#000',
+                    color: '#fff',
+                    borderRadius: '20px',
+                    padding: '6px 16px',
+                    textTransform: 'none',
+                    '&:hover': {
+                      backgroundColor: '#333',
+                    },
+                  }}
+                >
+                  KYC
+                </Button>
+              </Link>
+            }
+          </Box>
+        }
         <ProfileTab />
-      </BlankCard>
+      </BlankCard >
     </>
   );
 };

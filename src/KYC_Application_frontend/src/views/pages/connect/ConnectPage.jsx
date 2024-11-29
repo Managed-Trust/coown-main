@@ -8,7 +8,9 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import ic from "ic0";
 import swal from 'sweetalert';
 import { ConnectDialog, useConnect, useDialog } from "@connect2ic/react";
-const ledger = ic("speiw-5iaaa-aaaap-ahora-cai");// Production canister
+
+// const ledger = ic.local('bkyz2-fmaaa-aaaaa-qaaaq-cai'); //local
+const ledger = ic("speiw-5iaaa-aaaap-ahora-cai"); // Ledger canister
 
 const ConnectPage = () => {
     const navigate = useNavigate();

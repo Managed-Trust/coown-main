@@ -173,12 +173,12 @@ const Menuitems = [
     href: '/dashboards/ecommerce',
   },
   
-  {
-    id: uniqueId(),
-    title: 'KYC',
-    icon: IconAperture,
-    href: '/dashboards/modern',
-  },
+  // {
+  //   id: uniqueId(),
+  //   title: 'KYC',
+  //   icon: IconAperture,
+  //   href: '/dashboards/modern',
+  // },
   {
     id: uniqueId(),
     title: 'Profile',

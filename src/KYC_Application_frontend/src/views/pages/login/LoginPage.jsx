@@ -10,6 +10,8 @@ import { useUser } from '../../../userContext/UserContext';
 import { ConnectButton, ConnectDialog, useConnect } from "@connect2ic/react";
 import ic from "ic0";
 
+
+// const ledger = ic.local('bkyz2-fmaaa-aaaaa-qaaaq-cai'); //local
 const ledger = ic("speiw-5iaaa-aaaap-ahora-cai"); // Ledger canister
 
 const LoginPage = () => {

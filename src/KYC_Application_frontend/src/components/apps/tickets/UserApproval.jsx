@@ -8,7 +8,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useConnect } from '@connect2ic/react';
 import ic from 'ic0';
 import './style.css';
-// const ledger = ic.local("bkyz2-fmaaa-aaaaa-qaaaq-cai"); // Ledger canister
+
+// const ledger = ic.local('bkyz2-fmaaa-aaaaa-qaaaq-cai'); //local
 const ledger = ic("speiw-5iaaa-aaaap-ahora-cai"); // Ledger canister
 // const ledger = ic("sifoc-qqaaa-aaaap-ahorq-cai"); // Production canister
 import {
@@ -60,7 +61,8 @@ const UserApproval = () => {
             console.log("Error Fetching Profile:", e);
         }
         setLoading(false);
-    }; const checkDocumentStatus = async () => {
+    };
+     const checkDocumentStatus = async () => {
         try {
             const result = await ledger.call("isDocumentVerified", id);
             console.log('result document', result);

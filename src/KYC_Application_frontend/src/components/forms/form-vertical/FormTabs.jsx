@@ -55,8 +55,8 @@ const decryptData = (ciphertext) => {
   return bytes.toString(CryptoJS.enc.Utf8);
 };
 
-// const ledger = ic.local("bkyz2-fmaaa-aaaaa-qaaaq-cai"); // Ledger canister
-const ledger = ic("speiw-5iaaa-aaaap-ahora-cai");// Production canister
+// const ledger = ic.local('bkyz2-fmaaa-aaaaa-qaaaq-cai'); //local
+const ledger = ic("speiw-5iaaa-aaaap-ahora-cai"); // Ledger canister
 
 const countries = [
   { value: "IN", label: "India" },
@@ -124,7 +124,9 @@ const FormTabs = () => {
   //   accessTokenService: applicationService,
   // });
   const handleFleekFileChange = async (event) => {
-    setFile(event.target.files[0]);
+    
+    const base64String = await readFileAsBase64(event.target.files[0]);
+    setFile(base64String);
     console.log('upp', event.target.files[0]);
     setDocumentPreview(URL.createObjectURL(event.target.files[0]));
   };
@@ -192,7 +194,7 @@ const FormTabs = () => {
   };
 
   const handleReset = () => {
-    window.location.href = "/";
+    window.location.href = "/user-profile";
   };
 
   const handleInputChange = (e) => {
@@ -457,7 +459,7 @@ const FormTabs = () => {
           setResults(response.data.data);
           console.log('response', response1);
           
-          if(response == 'Success'){ 
+          if(response1 == 'Success'){ 
             swal({
               title: 'Success',
               text: 'Image Stored Successfully!',
@@ -465,10 +467,15 @@ const FormTabs = () => {
             });
             handleNext();
           }else{
-            swal("Info", response, "info");
+            swal({
+              title: 'Info',
+              text: response,
+              icon: 'info',
+            });
           }
         } catch (e) {
           // Convert the error to a string
+          console.log('error',e);
           const errorMessage = e.message || 'An unexpected error occurred.';
           swal("Error", errorMessage, "error");
         } finally {
@@ -844,7 +851,7 @@ const FormTabs = () => {
                       <MenuItem value="Other">Other</MenuItem>
                     </Select>
                   </Grid>
-                  <Grid item sx={12} lg={12}>
+                  <Grid item sm={12} lg={12}>
                     <CustomFormLabel
                       htmlFor="citizenship"
                       sx={{ mt: 0 }}
