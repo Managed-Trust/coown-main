@@ -1,687 +1,488 @@
+import React, { useState } from 'react';
 import Breadcrumb from '../../../layouts/full/shared/breadcrumb/Breadcrumb';
 import PageContainer from '../../../components/container/PageContainer';
 import ChildCard from '../../../components/shared/ChildCard';
-import CustomFormLabel from '../../../components/forms/theme-elements/CustomFormLabel';
-import React, { useState } from 'react';
+import { CopyAll as CopyIcon } from '@mui/icons-material';
+import { QRCodeCanvas } from 'qrcode.react';
 import {
-  Grid,
-  TextField,
-  Typography,
-  Box,
-  MenuItem,
-  Select,
-  FormControl,
-  Button,
-  Paper
-} from "@mui/material";
+  Card, CardContent, Box, Grid, Typography, TextField, Radio, RadioGroup, MenuItem, Checkbox, Button, Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions, FormControlLabel, Divider, Link,
+  useMediaQuery,
+  useTheme,
+  IconButton,
+} from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
+import CustomFormLabel from '../../../components/forms/theme-elements/CustomFormLabel';
+import { useParams } from 'react-router';
+import { useConnect } from "@connect2ic/react";
+import ic from "ic0";
+import { useUser } from '../../../userContext/UserContext';
+
+// const ledger = ic.local('bkyz2-fmaaa-aaaaa-qaaaq-cai'); //local
+const ledger = ic("speiw-5iaaa-aaaap-ahora-cai"); // Ledger canister
 
 const BCrumb = [
   {
     to: '/',
-    title: 'Home',
+    title: 'Group',
   },
   {
-    title: 'Create New Group',
+    title: 'Create Group',
   },
 ];
 
-const initialState = {
-  groupName: "",
-  groupId: "",
-  addressOfLegalEntity: "",
-  residencyOfGroup: "",
-  groupDescription: "",
-  groupImage: "",
-  email: "",
-  entityType: "",
-  registerCompany: false,
-  companyName: "",
-  industrySector: "", // Added industry sector
-  registrationNumber: "",
-  legalStructure: "",
-  registeredAddress: "",
-  taxID: "",
-  incorporationCertificate: [],
-  memorandumAndArticles: [],
-  representativeFullName: "",
-  position: "",
-  idDocumentType: "",
-  idDocumentNumber: "",
-  idDocument: [],
-  proofOfAuthority: [],
-  emailRep: "",
-  phoneNumber: "",
-  beneficialOwner: "",
-  economicOwner: "",
-  publicLawEntity: false,
-  entityName: "",
-  jurisdiction: "",
-  establishmentDate: "",
-  function: "",
-  address: "",
-  phone: "",
-  caller: "",
-  contactDetails: "",
-  recordType: "",
-  cPerson: "",
-  cpEmail: "",
-  website: "",
-  emailGJ:"",
-  emailGB:"",
-  supervisoryBody:"",
-  legislation:""
-};
-
 const CreateGroup = () => {
-  const [formData, setFormData] = useState(initialState);
-  const [filePreviews, setFilePreviews] = useState({});
-  const [isSubmitted, setIsSubmitted] = useState(false);
+  const { groupType } = useParams();
+  const { user, setUser } = useUser();
+  const [isLoading,setLoading]=useState(false);
+  const [isDialogOpen, setDialogOpen] = useState(false);
+  const [isDialogOpen2, setDialogOpen2] = useState(false);
+  const [groupName, setGroupName] = useState('');
+  const [groupDescription, setGroupDescription] = useState('');
+  const [groupLogo, setGroupLogo] = useState(null);
+  const [logoPreview, setLogoPreview] = useState(null);
+  const [storage, setStorage] = useState('5GB');
+  const [setupFee, setSetupFee] = useState(0);
+  const [annualFee, setAnnualFee] = useState(168);
+  const [storageFee, setStorageFee] = useState(72);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
+  const { isConnected, principal, disconnect } = useConnect({
+    onConnect: () => {
+        console.log("User connected!");
+    },
+    onDisconnect: () => {
+        console.log("User disconnected!");
+    },
+});
+
+  const handleOpenDialog = () => {
+    setDialogOpen(true);
+  };
+  const handleCloseDialog = () => {
+    setDialogOpen(false);
+  };
+  const handleOpenDailog2 = () => {
+    setDialogOpen(false);
+    setDialogOpen2(true);
+  };
+
+  const handleCloseDialog2 = () => {
+    setDialogOpen2(false);
+  };
+  const handleLogoChange = (event) => {
+    const file = event.target.files[0];
+    setGroupLogo(file);
+    setLogoPreview(URL.createObjectURL(file));
+  };
 
   const handleChange = (event) => {
-    const { name, value, type, checked } = event.target;
-    setFormData({
-      ...formData,
-      [name]: type === 'checkbox' ? checked : value,
-    });
+    setStorage(event.target.value);
   };
 
-  const handleInputChange = (e) => {
-    const { id, value, name } = e.target;
-    const inputId = id || name; // for Select component
-    setFormData((prevData) => ({
-      ...prevData,
-      [inputId]: value,
-    }));
+  const generateRandom = (principal) => {
+    // Get the first 5 digits of the principal
+    const prefix = principal.slice(0, 5);
+  
+    // Generate a random number with 5 digits
+    const randomNumber = Math.floor(10000 + Math.random() * 90000);
+  
+    // Concatenate the prefix and random number
+    return `${prefix}-${randomNumber}`;
   };
-
-  const handleFileChange = async (e) => {
-    const { id, files } = e.target;
-    const file = files[0];
-
-    if (id === "groupImage") {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const base64String = reader.result
-          .replace("data:", "")
-          .replace(/^.+,/, "");
-        setFormData((prevData) => ({
-          ...prevData,
-          [id]: base64String,
-        }));
-        setFilePreviews((prev) => ({
-          ...prev,
-          [id]: URL.createObjectURL(file),
-        }));
-      };
-      reader.readAsDataURL(file);
-    } else {
-      const blob = await file.arrayBuffer();
-      setFormData((prevData) => ({
-        ...prevData,
-        [id]: new Uint8Array(blob),
-      }));
-      setFilePreviews((prev) => ({
-        ...prev,
-        [id]: URL.createObjectURL(file),
-      }));
+  
+  const handleSubmit = async(event) => {
+    event.preventDefault();
+    setLoading(false);
+    const randomNumber = generateRandom(principal);
+    try{
+      const response = await ledger.call('createGroup',user,randomNumber, groupName, groupType,groupLogo,storage, storageFee,setupFee,annualFee);
+      
+    }catch(error){
+      console.log('error',error);
     }
-  };
+    setLoading(true);
 
-  const handleRegisterCompanySubmit = (event) => {
-    event.preventDefault();
-    console.log('Register Company Data:', formData);
-    // Add your register company logic here
   };
-
-  const handlePublicLawEntitySubmit = (event) => {
-    event.preventDefault();
-    console.log('Public Law Entity Data:', formData);
-    // Add your public law entity logic here
-  };
-
-  const handleInitialSubmit = (event) => {
-    event.preventDefault();
-    setIsSubmitted(true);
-  };
+  const initialCurrencyData = [
+    { coin: "USD", symbol: "ckUSD", balance: "100 000", usd: "100 000 USD" },
+    { coin: "Euro", symbol: "ckEURC", balance: "100 000", usd: "100 000 USD" },
+    { coin: "Bitcoin", symbol: "ckBTC", balance: "100 000", usd: "100 000 USD" },
+    { coin: "Ethereum", symbol: "ckETH", balance: "100 000", usd: "100 000 USD" },
+    { coin: "Gold", symbol: "ckXAUt", balance: "100 000", usd: "100 000 USD" },
+    { coin: "Utility token", symbol: "ICP", balance: "100 000", usd: "100 000 USD" },
+  ];
 
   return (
-    <PageContainer title="Create New Group" description="this is Note page">
-      <Breadcrumb title="Create New Group" items={BCrumb} />
-      <form onSubmit={handleInitialSubmit}>
-        <Box p={2}>
-          <ChildCard>
-            <Box p={2}>
-              <Grid container spacing={2}>
-                <Grid item xs={12} sm={12} md={4}>
-                  <Typography variant="h6" gutterBottom>
-                    Group Information
-                  </Typography>
-                </Grid>
-                <Grid item xs={12} sm={12} md={8}>
-                  <Grid container spacing={2}>
-                    <Grid item xs={12}>
-                      <CustomFormLabel htmlFor="groupName">Group Name</CustomFormLabel>
-                      <TextField
-                        id="groupName"
-                        fullWidth
-                        placeholder='Group name'
-                        value={formData.groupName}
-                        onChange={handleInputChange}
-                        disabled={isSubmitted}
-                      />
-                    </Grid>
-                    <Grid item xs={12}>
-                      <CustomFormLabel htmlFor="entityType">Group Type</CustomFormLabel>
-                      <FormControl fullWidth>
-                        <Select
-                          labelId="entityType-label"
-                          id="entityType"
-                          name="entityType"
-                          value={formData.entityType}
-                          onChange={handleInputChange}
-                          disabled={isSubmitted}
-                        >
-                          <MenuItem value="">Select Group Type</MenuItem>
-                          <MenuItem value="registerCompany">Register Company</MenuItem>
-                          <MenuItem value="publicLawEntity">Public Law Entity</MenuItem>
-                        </Select>
-                      </FormControl>
-                    </Grid>
-                  </Grid>
-                </Grid>
-              </Grid>
-            </Box>
-          </ChildCard>
-        </Box>
-        {isSubmitted && formData.entityType === "registerCompany" && (
-          <>
-            <Box p={2}>
-              <ChildCard>
-                <Box p={2}>
-                  <Grid container spacing={2}>
-                    <Grid item xs={12} sm={12} md={4}>
-                      <Typography variant="h6" gutterBottom>
-                        Company Details
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={12} sm={12} md={8}>
-                      <Grid container spacing={2}>
-                        <Grid item xs={12}>
-                          <CustomFormLabel htmlFor="companyName">
-                            Company Name
-                          </CustomFormLabel>
-                          <TextField
-                            id="companyName"
-                            fullWidth
-                            placeholder='Company Name'
-                            onChange={handleInputChange}
-                          />
-                        </Grid>
-                        <Grid item xs={12}>
-                          <CustomFormLabel htmlFor="industrySector">
-                            Industry Sector
-                          </CustomFormLabel>
-                          <FormControl fullWidth>
-                            <Select
-                              labelId="industrySector-label"
-                              id="industrySector"
-                              name="industrySector"
-                              value={formData.industrySector}
-                              onChange={handleInputChange}
-                            >
-                              <MenuItem value="">Select Industry Sector</MenuItem>
-                              <MenuItem value="technology">Technology</MenuItem>
-                              <MenuItem value="finance">Finance</MenuItem>
-                              <MenuItem value="healthcare">Healthcare</MenuItem>
-                              <MenuItem value="education">Education</MenuItem>
-                              <MenuItem value="manufacturing">Manufacturing</MenuItem>
-                              {/* Add more sectors as needed */}
-                            </Select>
-                          </FormControl>
-                        </Grid>
-                        <Grid item xs={12}>
-                          <CustomFormLabel htmlFor="registrationNumber">
-                            Registration Number
-                          </CustomFormLabel>
-                          <TextField
-                            id="registrationNumber"
-                            fullWidth
-                            placeholder='Registration Number'
-                            onChange={handleInputChange}
-                          />
-                        </Grid>
-                        <Grid item xs={12}>
-                          <CustomFormLabel htmlFor="legalStructure">
-                            Legal Structure
-                          </CustomFormLabel>
-                          <TextField
-                            id="legalStructure"
-                            fullWidth
-                            placeholder='Legal Structure'
-                            onChange={handleInputChange}
-                          />
-                        </Grid>
-                        <Grid item xs={12}>
-                          <CustomFormLabel htmlFor="registeredAddress">
-                            Registered Address
-                          </CustomFormLabel>
-                          <TextField
-                            required
-                            fullWidth
-                            id="registeredAddress"
-                            placeholder="Enter full address"
-                            name="registeredAddress"
-                            onChange={handleInputChange}
-                            multiline
-                            rows={4}
-                            InputProps={{
-                              style: {
-                                borderRadius: '8px',
-                                border: '1px solid #E2E8F0',
-                              },
-                            }}
-                          />
-                        </Grid>
-                        <Grid item xs={12}>
-                          <CustomFormLabel htmlFor="taxID">Tax ID</CustomFormLabel>
-                          <TextField
-                            id="taxID"
-                            placeholder='Tax ID'
-                            fullWidth
-                            onChange={handleInputChange}
-                          />
-                        </Grid>
-                        <Grid item xs={12}>
-                          <CustomFormLabel htmlFor="incorporationCertificate">
-                            Incorporation Certificate
-                          </CustomFormLabel>
-                          <TextField
-                            id="incorporationCertificate"
-                            type="file"
-                            fullWidth
-                            onChange={handleFileChange}
-                          />
-                          {filePreviews.incorporationCertificate && (
-                            <Paper
-                              elevation={3}
-                              sx={{ mt: 2, width: 100, height: 100 }}
-                            >
-                              <img
-                                src={filePreviews.incorporationCertificate}
-                                alt="Incorporation Certificate"
-                                style={{
-                                  width: "100%",
-                                  height: "100%",
-                                  objectFit: "cover",
-                                }}
-                              />
-                            </Paper>
-                          )}
-                        </Grid>
-                        <Grid item xs={12}>
-                          <CustomFormLabel htmlFor="memorandumAndArticles">
-                            Memorandum And Articles
-                          </CustomFormLabel>
-                          <TextField
-                            id="memorandumAndArticles"
-                            type="file"
-                            fullWidth
-                            onChange={handleFileChange}
-                          />
-                          {filePreviews.memorandumAndArticles && (
-                            <Paper
-                              elevation={3}
-                              sx={{ mt: 2, width: 100, height: 100 }}
-                            >
-                              <img
-                                src={filePreviews.memorandumAndArticles}
-                                alt="Memorandum And Articles"
-                                style={{
-                                  width: "100%",
-                                  height: "100%",
-                                  objectFit: "cover",
-                                }}
-                              />
-                            </Paper>
-                          )}
-                        </Grid>
-                      </Grid>
-                    </Grid>
-                  </Grid>
-                </Box>
-              </ChildCard>
-            </Box>
-            <Box p={2}>
-              <ChildCard>
-                <Box p={2}>
-                  <Grid container spacing={2}>
-                    <Grid item xs={12} sm={12} md={4}>
-                      <Typography variant="h6" gutterBottom>
-                        Representative Information
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={12} sm={12} md={8}>
-                      <Grid container spacing={2}>
-                        <Grid item xs={12}>
-                          <CustomFormLabel htmlFor="representativeFullName">
-                            Representative Full Name
-                          </CustomFormLabel>
-                          <TextField
-                            id="representativeFullName"
-                            placeholder='Representative Full Name'
-                            fullWidth
-                            onChange={handleInputChange}
-                          />
-                        </Grid>
-                        <Grid item xs={12}>
-                          <CustomFormLabel htmlFor="position">
-                            Representative Position
-                          </CustomFormLabel>
-                          <TextField
-                            id="position"
-                            placeholder='Representative Position'
-                            fullWidth
-                            onChange={handleInputChange}
-                          />
-                        </Grid>
-                        <Grid item xs={12}>
-                          <CustomFormLabel htmlFor="idDocumentType">
-                            ID Document Type
-                          </CustomFormLabel>
-                          <FormControl fullWidth>
-                            <Select
-                              labelId="idDocumentType"
-                              id="idDocumentType"
-                              name="idDocumentType"
-                              value={formData.idDocumentType}
-                              onChange={handleInputChange}
-                            >
-                              <MenuItem value="">Select document type</MenuItem>
-                              <MenuItem value="image">Image</MenuItem>
-                              <MenuItem value="other">Other</MenuItem>
-                            </Select>
-                          </FormControl>
-                        </Grid>
+    <PageContainer title="Create Private Group" description="this is Note page">
+      <Breadcrumb title="Create Private Group" items={BCrumb} />
+      <form onSubmit={handleSubmit}>
 
-                        <Grid item xs={12}>
-                          <CustomFormLabel htmlFor="idDocumentNumber">
-                            ID Document Number
-                          </CustomFormLabel>
-                          <TextField
-                            id="idDocumentNumber"
-                            placeholder='ID Document Number'
-                            fullWidth
-                            onChange={handleInputChange}
-                          />
-                        </Grid>
-                        <Grid item xs={12}>
-                          <CustomFormLabel htmlFor="idDocument">
-                            ID Document
-                          </CustomFormLabel>
-                          <TextField
-                            id="idDocument"
-                            type="file"
-                            fullWidth
-                            onChange={handleFileChange}
-                          />
-                          {filePreviews.idDocument && (
-                            <Paper
-                              elevation={3}
-                              sx={{ mt: 2, width: 100, height: 100 }}
-                            >
-                              <img
-                                src={filePreviews.idDocument}
-                                alt="ID Document"
-                                style={{
-                                  width: "100%",
-                                  height: "100%",
-                                  objectFit: "cover",
-                                }}
-                              />
-                            </Paper>
-                          )}
-                        </Grid>
-                        <Grid item xs={12}>
-                          <CustomFormLabel htmlFor="proofOfAuthority">
-                            Proof of Authority 
-                          </CustomFormLabel>
-                          <TextField
-                            id="proofOfAuthority"
-                            type="file"
-                            fullWidth
-                            onChange={handleFileChange}
-                          />
-                          {filePreviews.proofOfAuthority && (
-                            <Paper
-                              elevation={3}
-                              sx={{ mt: 2, width: 100, height: 100 }}
-                            >
-                              <img
-                                src={filePreviews.proofOfAuthority}
-                                alt="Proof of Authority"
-                                style={{
-                                  width: "100%",
-                                  height: "100%",
-                                  objectFit: "cover",
-                                }}
-                              />
-                            </Paper>
-                          )}
-                        </Grid>
-                        <Grid item xs={12}>
-                          <CustomFormLabel htmlFor="emailRep">Representative Email</CustomFormLabel>
-                          <TextField
-                            id="emailRep"
-                            fullWidth
-                            placeholder='Representative Email'
-                            onChange={handleInputChange}
-                          />
-                        </Grid>
-                        <Grid item xs={12}>
-                          <CustomFormLabel htmlFor="phoneNumber">
-                            Representative Phone Number
-                          </CustomFormLabel>
-                          <TextField
-                            id="phoneNumber"
-                            fullWidth
-                            placeholder='+123'
-                            onChange={handleInputChange}
-                          />
-                        </Grid>
-                      </Grid>
-                    </Grid>
+        <Grid container spacing={2}>
+          <Grid item xs={12} sm={12} md={8}>
+            <ChildCard>
+              <Box mt={2}>
+                <Grid container spacing={2}>
+                  <Grid item xs={12} sm={12} md={4}>
+                    <Typography sx={{ paddingTop: '30px' }} variant="h6" gutterBottom>
+                      Group Details
+                    </Typography>
                   </Grid>
-                </Box>
-              </ChildCard>
-            </Box>
-            <Box p={3} display="flex" justifyContent="flex-start">
-              <Button type="button" variant="contained" color="primary" onClick={handleRegisterCompanySubmit}>
-                Register Company
-              </Button>
-            </Box>
-          </>
-        )}
-        {isSubmitted && formData.entityType === "publicLawEntity" && (
-          <>
-            <Box p={2}>
-              <ChildCard>
-                <Box p={2}>
-                  <Grid container spacing={2}>
-                    <Grid item xs={12} sm={12} md={4}>
-                      <Typography variant="h6" gutterBottom>
-                        Entity Information
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={12} sm={12} md={8}>
-                      <Grid container spacing={2}>
-                        <Grid item xs={12}>
-                          <CustomFormLabel htmlFor="entityName">
-                            Entity Name
-                          </CustomFormLabel>
-                          <TextField
-                            id="entityName"
-                            placeholder='Entity Name'
-                            fullWidth
-                            onChange={handleInputChange}
-                          />
-                        </Grid>
-                        <Grid item xs={12}>
-                          <Grid item xs={12}>
-                            <CustomFormLabel htmlFor="address">Address</CustomFormLabel>
-                            <TextField
-                              id="address"
-                              fullWidth
-                              placeholder='Enter full address'
-                              onChange={handleInputChange}
-                              multiline
-                              rows={4}
-                            />
-                          </Grid>
-                        </Grid>
-                        <Grid item xs={12}>
-                          <CustomFormLabel htmlFor="cPerson">
-                            Contact Person
-                          </CustomFormLabel>
-                          <TextField
-                            id="cPerson"
-                            placeholder='Contact person'
-                            fullWidth
-                            onChange={handleInputChange}
-                          />
-                        </Grid>
-                        <Grid item xs={12}>
-                          <CustomFormLabel htmlFor="cpEmail">
-                            Contact Person Email
-                          </CustomFormLabel>
-                          <TextField
-                            id="cpEmail"
-                            placeholder='Contact person email'
-                            fullWidth
-                            onChange={handleInputChange}
-                          />
-                        </Grid>
-                        <Grid item xs={12}>
-                          <CustomFormLabel htmlFor="website">Website</CustomFormLabel>
-                          <TextField
-                            id="website"
-                            placeholder='http://'
-                            fullWidth
-                            onChange={handleInputChange}
-                          />
-                        </Grid>
-                      </Grid>
-                    </Grid>
-                  </Grid>
-                </Box>
-              </ChildCard>
-            </Box>
-            <Box p={2}>
-              <ChildCard>
-                <Box p={2}>
-                  <Grid container spacing={2}>
-                    <Grid item xs={12} sm={12} md={4}>
-                      <Typography variant="h6" gutterBottom>
-                        Group Owner
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={12} sm={12} md={8}>
-                      <Grid container spacing={2}>
-                        <Grid item xs={12}>
-                          <CustomFormLabel htmlFor="emailGJ">
-                            Group Owner Job Title
-                          </CustomFormLabel>
-                          <TextField
-                            id="emailGJ"
-                            placeholder='Group owner job title'
-                            fullWidth
-                            onChange={handleInputChange}
-                          />
-                        </Grid>
-                        <Grid item xs={12}>
-                          <CustomFormLabel htmlFor="emailGB">
-                            Group Owner Business Email
-                          </CustomFormLabel>
-                          <TextField
-                            id="emailGB"
-                            placeholder='Group owner business email'
-                            fullWidth
-                            onChange={handleInputChange}
-                          />
-                        </Grid>
-                      </Grid>
-                    </Grid>
-                  </Grid>
-                </Box>
-              </ChildCard>
-            </Box>
-            <Box p={2}>
-              <ChildCard>
-                <Box p={2}>
-                  <Grid container spacing={2}>
-                    <Grid item xs={12} sm={12} md={4}>
-                      <Typography variant="h6" gutterBottom>
-                        Legal Framework 
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={12} sm={12} md={8}>
+                  <Grid item xs={12} sm={12} md={8}>
+                    <Grid container spacing={2}>
                       <Grid item xs={12}>
-                        <CustomFormLabel htmlFor="economicOwner">Description of Purpose</CustomFormLabel>
+                        <CustomFormLabel htmlFor="groupName">Group name</CustomFormLabel>
                         <TextField
-                          id="economicOwner"
+                          id="groupName"
+                          fullWidth
+                          value={groupName}
+                          onChange={(e) => setGroupName(e.target.value)}
+                        />
+                      </Grid>
+                      <Grid item xs={12}>
+                        <CustomFormLabel htmlFor="groupDescription">Group description</CustomFormLabel>
+                        <TextField
+                          id="groupDescription"
                           fullWidth
                           multiline
                           rows={4}
-                          placeholder='Economic Owner'
-                          onChange={handleInputChange}
+                          variant="outlined"
+                          value={groupDescription}
+                          onChange={(e) => setGroupDescription(e.target.value)}
                         />
                       </Grid>
                       <Grid item xs={12}>
-                        <CustomFormLabel htmlFor="legislation">
-                          Link to Constituting Legislation
-                        </CustomFormLabel>
-                        <TextField
-                          id="legislation"
-                          placeholder='https://'
-                          fullWidth
-                          onChange={handleInputChange}
-                        />
+                        <CustomFormLabel htmlFor="groupLogo">Group logo</CustomFormLabel>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                          <Button variant="contained" component="label">
+                            Choose file
+                            <input
+                              type="file"
+                              id="groupLogo"
+                              hidden
+                              onChange={handleLogoChange}
+                            />
+                          </Button>
+                          {logoPreview && (
+                            <Box
+                              component="img"
+                              sx={{ width: 100, height: 100, borderRadius: '8px' }}
+                              src={logoPreview}
+                              alt="Logo preview"
+                            />
+                          )}
+                        </Box>
                       </Grid>
-                      <Grid item xs={12}>
-                        <CustomFormLabel htmlFor="supervisoryBody">
-                          Link to Supervisory Body
-                        </CustomFormLabel>
-                        <TextField
-                          id="supervisoryBody"
-                          placeholder='https://'
-                          fullWidth
-                          onChange={handleInputChange}
-                        />
+                    </Grid>
+                  </Grid>
+                </Grid>
+              </Box>
+            </ChildCard>
+            <Box mt={2}>
+              <ChildCard >
+                <Box mt={2}>
+                  <Grid container spacing={2}>
+                    <Grid item xs={12} sm={12} md={4}>
+                      <Typography sx={{ paddingTop: '10px' }} variant="h6" gutterBottom>
+                        Storage capacity
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={12} sm={12} md={8}>
+                      <Grid container spacing={2}>
+                        <Grid item xs={12}>
+                          <Typography sx={{ paddingTop: '10px' }} variant="body2" gutterBottom>
+                            Expand file sharing capacity to allow members to easily send and share files directly within the group chat.
+                          </Typography>
+                        </Grid>
+
+                        <Grid item xs={12}>
+                          <Card variant="outlined">
+                            <CardContent>
+                              <RadioGroup value={storage} onChange={handleChange}>
+                                <Box display="flex" flexDirection="column" gap={2}>
+                                  <FormControlLabel
+                                    value="500MB"
+                                    control={<Radio />}
+                                    label={
+                                      <Box display="flex" justifyContent="space-between" alignItems="center" width="100%">
+                                        <Typography variant="body1" sx={{ marginRight: 'auto' }}>500MB</Typography>
+                                        <Typography variant="body1" sx={{ color: 'text.secondary' }}> &nbsp; Free</Typography>
+                                      </Box>
+                                    }
+                                  />
+                                  <FormControlLabel
+                                    value="5GB"
+                                    control={<Radio />}
+                                    label={
+                                      <Box display="flex" justifyContent="space-between" alignItems="center" width="100%">
+                                        <Typography variant="body1" sx={{ marginRight: 'auto' }}>5GB</Typography>
+                                        <Typography variant="body1" sx={{ color: 'text.secondary' }}> &nbsp; 72 USD / year</Typography>
+                                      </Box>
+                                    }
+                                  />
+                                  <FormControlLabel
+                                    value="25GB"
+                                    control={<Radio />}
+                                    label={
+                                      <Box display="flex" justifyContent="space-between" alignItems="center" width="100%">
+                                        <Typography variant="body1" sx={{ marginRight: 'auto' }}>25GB</Typography>
+                                        <Typography variant="body1" sx={{ color: 'text.secondary' }}> &nbsp; 260 USD / year</Typography>
+                                      </Box>
+                                    }
+                                  />
+                                </Box>
+                              </RadioGroup>
+                            </CardContent>
+                          </Card>
+                        </Grid>
+
                       </Grid>
                     </Grid>
                   </Grid>
                 </Box>
               </ChildCard>
             </Box>
-            <Box p={3} display="flex" justifyContent="flex-start">
-              <Button type="button" variant="contained" color="primary" onClick={handlePublicLawEntitySubmit}>
-                Submit Public Law Entity
+
+          </Grid>
+          <Grid item xs={12} sm={12} md={4}>
+            <Box sx={{ padding: 5, borderRadius: 2, boxShadow: 3, backgroundColor: '#fff' }}>
+              {/* Order summary title */}
+              <Typography variant="h6" gutterBottom>
+                Order summary
+              </Typography>
+
+              {/* Description */}
+              <Typography variant="body2" fontSize="14px" color="gray" gutterBottom>
+                Setting up a registered company includes a KYC review of key stakeholder data by an AML Officer to ensure data quality and compliance. Additional transaction fees may apply.{' '}<br />
+                <Link href="#" underline="hover">
+                  Learn more
+                </Link>
+              </Typography>
+
+              <Divider sx={{ my: 2 }} />
+
+              {/* Fees */}
+              <Grid container spacing={1}>
+                <Grid item xs={6}>
+                  <Typography variant="body2" fontSize="14px" color="gray">Setup fee</Typography>
+                </Grid>
+                <Grid item xs={6} textAlign="right">
+                  <Typography variant="body2" fontSize="14px" fontWeight="bold">0 USD</Typography>
+                </Grid>
+
+                <Grid item xs={6}>
+                  <Typography variant="body2" fontSize="14px" color="gray">Annual fee</Typography>
+                </Grid>
+                <Grid item xs={6} textAlign="right">
+                  <Typography variant="body2" fontSize="14px" fontWeight="bold">168 USD</Typography>
+                </Grid>
+
+                <Grid item xs={6}>
+                  <Typography variant="body2" fontSize="14px" color="gray">Annual storage fee</Typography>
+                </Grid>
+                <Grid item xs={6} textAlign="right">
+                  <Typography variant="body2" fontSize="14px" fontWeight="bold">72 USD</Typography>
+                </Grid>
+              </Grid>
+
+              <Divider sx={{ my: 2 }} />
+
+              {/* Subscription renewal notice */}
+              <Box sx={{ padding: 2, backgroundColor: '#f0f4ff', borderRadius: 1 }}>
+                <Typography variant="body2" color="primary" fontSize="14px">
+                  Without recurrent payment from owner/admin, the group account suspends after a 3-month grace period.
+                </Typography>
+              </Box>
+
+              <Divider sx={{ my: 2 }} />
+
+              {/* Total to pay */}
+              <Grid container spacing={1}>
+                <Grid item xs={12}>
+                  <Typography textAlign="right" variant="body1">
+                    To pay today
+                  </Typography>
+                </Grid>
+                <Grid item xs={12} textAlign="right">
+                  <Typography variant="h5" fontWeight="bold">
+                    240 USD
+                  </Typography>
+                </Grid>
+              </Grid>
+
+              {/* Confirm and pay button */}
+              <Button
+                onClick={handleOpenDialog} variant="contained" color="primary" fullWidth sx={{ mt: 3 }}>
+                Confirm and pay
               </Button>
             </Box>
-          </>
-        )}
-        <Box p={3} display="flex" justifyContent="flex-start">
-          {!isSubmitted && (
-            <>
-              <Button type="submit" variant="contained" color="primary" style={{ marginRight: '8px' }}>
-                Create Group
-              </Button>
-              <Button variant="outlined" color="secondary">
-                Cancel
-              </Button>
-            </>
-          )}
-        </Box>
+          </Grid>
+        </Grid>
       </form>
+      <Dialog
+        open={isDialogOpen}
+        onClose={handleCloseDialog}
+        fullWidth
+        maxWidth='xs' // Make it larger and responsive
+        PaperProps={{ style: { padding: '20px', borderRadius: '12px' } }} // Style the dialog box
+      >
+        <DialogTitle>
+          <Box display="flex" justifyContent="space-between" alignItems="center">
+            <Typography variant="h5" fontWeight="bold">
+              Select currency
+            </Typography>
+            <IconButton onClick={handleCloseDialog}>
+              <CloseIcon />
+            </IconButton>
+          </Box>
+        </DialogTitle>
+        <DialogContent dividers>
+          <RadioGroup>
+            {initialCurrencyData.map((row, index) => (
+              <Box
+                key={row.coin}
+                display="flex"
+                alignItems="center"
+                justifyContent="space-between"
+                mb={2}
+                p={2}
+                sx={{
+                  borderRadius: "8px",
+                  backgroundColor: "#f9f9f9",
+                  "&:hover": {
+                    backgroundColor: "#eaeaea",
+                  },
+                }}
+              >
+                <Box display="flex" alignItems="center" gap={2}>
+                  <FormControlLabel
+                    value={row.symbol}
+                    control={<Radio />}
+                    label={
+                      <Box>
+                        <Typography variant="subtitle1" fontWeight="500">
+                          {row.symbol}
+                        </Typography>
+                        <Typography variant="body2" color="textSecondary">
+                          {row.coin}
+                        </Typography>
+                      </Box>
+                    }
+                  />
+                </Box>
+                <Box>
+                  <Typography variant="subtitle1" fontWeight="500">
+                    {row.balance}
+                  </Typography>
+                  <Typography variant="body2" color="textSecondary">
+                    {row.usd}
+                  </Typography>
+                </Box>
+              </Box>
+            ))}
+          </RadioGroup>
+        </DialogContent>
+        <DialogActions>
+          <Grid container>
+            <Grid item xs={12}>
+              <Button sx={{ width: '100%' }} onClick={handleOpenDailog2} variant="contained" color="primary">
+                Pay 240 USD
+              </Button></Grid>
+          </Grid>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={isDialogOpen2}
+        onClose={handleCloseDialog2}
+        fullWidth
+        maxWidth='xs' // Make it larger and responsive
+        PaperProps={{ style: { padding: '20px', borderRadius: '12px' } }} // Style the dialog box
+      >
+        <DialogTitle>
+          <Box display="flex" justifyContent="space-between" alignItems="center">
+            <Typography variant="h5" fontWeight="bold">
+              Not enough funds on your personal account
+            </Typography>
+            <IconButton onClick={handleCloseDialog2}>
+              <CloseIcon />
+            </IconButton>
+          </Box>
+        </DialogTitle>
+        <DialogContent dividers>
+
+          <Grid container>
+            <Grid item xs={12}>
+              <Typography variant="body2">To pay for your group deposit funds to your personal COOWN  account. Copy or scan the address below.
+              </Typography>
+              <br />
+              <Typography variant="body2">
+                Supported currencies:<br />
+                <b>ckUSDC, ckEURC, ckBTC, ckETH, ckXUAt, ICP</b>
+              </Typography>
+            </Grid>
+            <Grid item xs={12}></Grid>
+            <Grid item xs={12} mb={1}>
+              <Box
+                display="flex"
+                alignItems="center"
+                justifyContent="space-between"
+                mt={2}
+                p={2}
+                bgcolor="#f7f9fc"
+                borderRadius={1}
+                width="100%"
+              >
+                <Typography
+                  variant="body2"
+                  color="#7C8FAC"
+                  fontSize="14px"
+                  style={{ marginLeft: 8 }}
+                >
+                  Network
+                </Typography>
+                <Typography
+                  variant="body2"
+                  fontWeight="bold"
+                  style={{ marginRight: 16 }}
+                >
+                  ICP
+                </Typography>
+              </Box>
+            </Grid>
+            <Grid item xs={12}  mt={1}
+             display="flex"
+             justifyContent="center"
+             alignItems="center"
+             width="100%" // Ensure it takes full width of the container
+             height="auto">
+                  <QRCodeCanvas
+                    value="1A1zp1eP5QGefi2DMPTfTL5SLmv7DivfNa"
+                    size={300} // Adjust QR code size
+                    level="H" // Set the error correction level for better readability
+                  />
+            </Grid>
+
+          </Grid>
+        </DialogContent>
+        <DialogActions>
+          <Grid container>
+            <Grid item xs={12}>
+              <Button
+                startIcon={<CopyIcon />} sx={{ width: '100%' }} onClick={handleCloseDialog2} variant="contained" color="primary">
+                1A1zP1...DivfNa
+              </Button>
+
+              <Button sx={{ width: '100%', mt: 2 }} onClick={handleCloseDialog2} variant="outlined" color="primary">
+                Refresh
+              </Button>
+            </Grid>
+          </Grid>
+        </DialogActions>
+      </Dialog>
     </PageContainer>
   );
 };

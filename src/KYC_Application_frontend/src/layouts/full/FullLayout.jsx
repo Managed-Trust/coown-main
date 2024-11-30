@@ -25,7 +25,7 @@ import Faq from '../../views/pages/faq/Faq.jsx';
 import UserApproval from '../../components/apps/tickets/UserApproval.jsx';
 import Galleryr from '../../views/apps/referrals/ReferralCode.jsx';
 import CreateGroup from '../../views/apps/Group/CreateGroup.jsx';
-import PrivateGroup from '../../views/apps/Group/PrivateGroup.jsx';
+import PrivateGroup from '../../views/apps/Group/CreateGroup.jsx';
 import RegisterCompany from '../../views/apps/Group/RegisterCompany.jsx';
 import AdminMain from '../../views/apps/Admin/Dashboard/main.jsx';
 import LocalizationMain from '../../views/apps/Admin/Localization/main.jsx';
@@ -99,6 +99,7 @@ const FullLayout = () => {
               <Route path="/account" element={<Account />} />
               <Route path="/user-profile/Settings" element={<Settings />} />
               <Route path="/forms/form-horizontal" element={<FormHorizontal />} />
+              <Route path="/create-group/:groupType" element={<PrivateGroup />} />
               <Route path="/group/:groupId" element={<GroupDetailPage />} />
               <Route path="/group/:groupId/add-stakeholder" element={<AddStakeHolder />} />
               <Route path="/group/create-group" element={<CreateGroup />} />

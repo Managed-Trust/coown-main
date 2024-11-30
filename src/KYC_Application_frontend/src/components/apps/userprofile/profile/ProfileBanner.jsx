@@ -17,15 +17,6 @@ import profilecover from '../../../../assets/images/backgrounds/account_bg.png';
 import userimg from '../../../../assets/images/profile/user-1.jpg';
 import StarIcon from '@mui/icons-material/Star';
 import { Link } from 'react-router-dom';
-import {
-  IconBrandDribbble,
-  IconBrandFacebook,
-  IconBrandTwitter,
-  IconBrandYoutube,
-  IconFileDescription,
-  IconUserCheck,
-  IconUserCircle,
-} from '@tabler/icons';
 import ProfileTab from './ProfileTab';
 import BlankCard from '../../../shared/BlankCard';
 import { useConnect } from "@connect2ic/react";
