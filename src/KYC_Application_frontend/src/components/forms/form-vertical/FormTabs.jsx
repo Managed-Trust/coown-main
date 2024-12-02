@@ -357,10 +357,10 @@ const FormTabs = () => {
 
     setLoading(true);
     try {
-      if(formData.referralCode){
-      const referralCode = await ledger.call('redeemReferralCode',formData.referralCode,principal);
-      console.log('referralCode',referralCode);
-      }
+      // if(formData.referralCode){
+      // const referralCode = await ledger.call('redeemReferralCode',formData.referralCode,principal);
+      // console.log('referralCode',referralCode);
+      // }
       console.log('user id', userId);
       const response = await ledger.call("addBasicInfoCustomer", userId, formData.family_name,
         formData.given_name, formData.birth_date, formData.birth_country, formData.phone, formData.referralCode);
