@@ -1,3 +1,9 @@
+window.process = {
+  env: {
+    NODE_ENV: 'production', // or 'development', depending on your environment
+  },
+  versions: {}, // Optional, in case the library is checking versions
+};
 import ReactDOM from "react-dom/client";
 import App from "./App";
 import "./index.scss";

@@ -94,12 +94,17 @@ const CreateGroup = () => {
     return `${prefix}-${randomNumber}`;
   };
   
-  const handleSubmit = async(event) => {
-    event.preventDefault();
+  const handleSubmit = async() => {
     setLoading(false);
+    if(principal){
     const randomNumber = generateRandom(principal);
+    console.log('data',user,randomNumber,groupName,groupType,groupLogo,storage,storageFee,setupFee,annualFee)
+   
+    }else {
+      swal('Connect your wallet first','','success');
+    } 
     try{
-      const response = await ledger.call('createGroup',user,randomNumber, groupName, groupType,groupLogo,storage, storageFee,setupFee,annualFee);
+      // const response = await ledger.call('createGroup',user,randomNumber, groupName, groupType,groupLogo,storage, storageFee,setupFee,annualFee);
       
     }catch(error){
       console.log('error',error);
@@ -472,7 +477,7 @@ const CreateGroup = () => {
           <Grid container>
             <Grid item xs={12}>
               <Button
-                startIcon={<CopyIcon />} sx={{ width: '100%' }} onClick={handleCloseDialog2} variant="contained" color="primary">
+                startIcon={<CopyIcon />} sx={{ width: '100%' }} onClick={handleSubmit} variant="contained" color="primary">
                 1A1zP1...DivfNa
               </Button>
 

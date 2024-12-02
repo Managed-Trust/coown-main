@@ -1,3 +1,9 @@
+window.process = {
+  env: {
+    NODE_ENV: 'production', // or 'development', depending on your environment
+  },
+  versions: {}, // Optional, in case the library is checking versions
+};
 import { useState } from 'react';
 import { KYC_Application_backend } from 'declarations/KYC_Application_backend';
 import { useSelector } from 'react-redux';

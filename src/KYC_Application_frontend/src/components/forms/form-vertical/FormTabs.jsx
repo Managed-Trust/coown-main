@@ -27,10 +27,10 @@ import PageContainer from "../../../components/container/PageContainer";
 import Breadcrumb from "../../../layouts/full/shared/breadcrumb/Breadcrumb";
 import swal from "sweetalert";
 import { useUser } from "../../../userContext/UserContext";
-// import {
-//   FleekSdk,
-//   ApplicationAccessTokenService,
-// } from "@fleek-platform/sdk/browser";
+import {
+  FleekSdk,
+  ApplicationAccessTokenService,
+} from "@fleek-platform/sdk/browser";
 
 import {
   ConnectButton,
@@ -94,7 +94,7 @@ const steps = [
 const FormTabs = () => {
   const { user, setUser } = useUser();
   const [userId, setUserId] = useState(null);
-  const [activeStep, setActiveStep] = useState(0);
+  const [activeStep, setActiveStep] = useState(3);
   const [formData, setFormData] = useState(initialState);
   const [documentPreview, setDocumentPreview] = useState(null);
   const [addressDocumentPreview, setAddressDocumentPreview] = useState(null);
@@ -117,16 +117,16 @@ const FormTabs = () => {
       // Signed out
     },
   });
-  // const applicationService = new ApplicationAccessTokenService({
-  //   clientId: "client_NSez4i7UHB-0M6r2OJp-", // Use your actual client ID here
-  // });
-  // const fleekSdk = new FleekSdk({
-  //   accessTokenService: applicationService,
-  // });
+  const applicationService = new ApplicationAccessTokenService({
+    clientId: "client_NSez4i7UHB-0M6r2OJp-", // Use your actual client ID here
+  });
+  const fleekSdk = new FleekSdk({
+    accessTokenService: applicationService,
+  });
   const handleFleekFileChange = async (event) => {
     
-    const base64String = await readFileAsBase64(event.target.files[0]);
-    setFile(base64String);
+    // const base64String = await readFileAsBase64(event.target.files[0]);
+    setFile(event.target.files[0]);
     console.log('upp', event.target.files[0]);
     setDocumentPreview(URL.createObjectURL(event.target.files[0]));
   };
@@ -136,33 +136,58 @@ const FormTabs = () => {
       alert("Please select a file to upload");
       return;
     }
-    setLoading(true);
+
     try {
       // Upload the file using the Fleek SDK
-      // const result = await fleekSdk.storage().uploadFile({
-      //   file: file,
-      //   onUploadProgress: (progress) => {
-      //     // const percentage = (progress.loaded / progress.total) * 100;
-      //     // console.log(`Upload progress: ${percentage}%`);
-      //   },
-      // });
-      // setHash(result.pin.cid);
-      // console.log('hash', result.pin.cid);
-      const response = await ledger.call("uploadDocumentPhoto", userId, file);
-      console.log("Document Upload Response:", response);
-      if(response == 'Success'){
-        swal("Success", "Identity Details Stored Successfully!", "success");
-        handleNext();
-      }else{
-        swal("Info", response, "info");
-      }
+      const result = await fleekSdk.storage().uploadFile({
+        file: file,
+        onUploadProgress: (progress) => {
+          console.log(`Upload progress: ${(progress.loaded / progress.total) * 100}%`);
+        },
+      });
 
+      // setHash(result.hash);
+      console.log('result',result);
+      alert("File uploaded successfully!");
     } catch (error) {
       console.error("Error uploading file:", error);
       alert("Failed to upload file.");
     }
-    setLoading(false);
   };
+
+
+  // const handleUpload = async () => {
+  //   if (!file) {
+  //     alert("Please select a file to upload");
+  //     return;
+  //   }
+  //   setLoading(true);
+  //   try {
+  //     // Upload the file using the Fleek SDK
+  //     const result = await fleekSdk.storage().uploadFile({
+  //       file: file,
+  //       onUploadProgress: (progress) => {
+  //         // const percentage = (progress.loaded / progress.total) * 100;
+  //         // console.log(`Upload progress: ${percentage}%`);
+  //       },
+  //     });
+  //     setHash(result.pin.cid);
+  //     console.log('hash', result.pin.cid);
+  //     // const response = await ledger.call("uploadDocumentPhoto", userId, file);
+  //     // console.log("Document Upload Response:", response);
+  //     // if(response == 'Success'){
+  //     //   swal("Success", "Identity Details Stored Successfully!", "success");
+  //     //   handleNext();
+  //     // }else{
+  //     //   swal("Info", response, "info");
+  //     // }
+
+  //   } catch (error) {
+  //     console.error("Error uploading file:", error);
+  //     alert("Failed to upload file.");
+  //   }
+  //   setLoading(false);
+  // };
 
 
   const fetchUser = async (e) => {
