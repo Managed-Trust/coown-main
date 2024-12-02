@@ -27,10 +27,10 @@ import PageContainer from "../../../components/container/PageContainer";
 import Breadcrumb from "../../../layouts/full/shared/breadcrumb/Breadcrumb";
 import swal from "sweetalert";
 import { useUser } from "../../../userContext/UserContext";
-// import {
-//   FleekSdk,
-//   ApplicationAccessTokenService,
-// } from "@fleek-platform/sdk/browser";
+import {
+  FleekSdk,
+  ApplicationAccessTokenService,
+} from "@fleek-platform/sdk/browser";
 
 import {
   ConnectButton,
