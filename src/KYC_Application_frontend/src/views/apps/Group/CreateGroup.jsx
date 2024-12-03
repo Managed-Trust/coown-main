@@ -19,6 +19,10 @@ import { useParams } from 'react-router';
 import { useConnect } from "@connect2ic/react";
 import ic from "ic0";
 import { useUser } from '../../../userContext/UserContext';
+import {
+  FleekSdk,
+  ApplicationAccessTokenService,
+} from "@fleek-platform/sdk/browser";
 
 // const ledger = ic.local('bkyz2-fmaaa-aaaaa-qaaaq-cai'); //local
 const ledger = ic("speiw-5iaaa-aaaap-ahora-cai"); // Ledger canister
@@ -36,7 +40,7 @@ const BCrumb = [
 const CreateGroup = () => {
   const { groupType } = useParams();
   const { user, setUser } = useUser();
-  const [isLoading,setLoading]=useState(false);
+  const [isLoading, setLoading] = useState(false);
   const [isDialogOpen, setDialogOpen] = useState(false);
   const [isDialogOpen2, setDialogOpen2] = useState(false);
   const [groupName, setGroupName] = useState('');
@@ -52,12 +56,19 @@ const CreateGroup = () => {
 
   const { isConnected, principal, disconnect } = useConnect({
     onConnect: () => {
-        console.log("User connected!");
+      console.log("User connected!");
     },
     onDisconnect: () => {
-        console.log("User disconnected!");
+      console.log("User disconnected!");
     },
-});
+  });
+
+  const applicationService = new ApplicationAccessTokenService({
+    clientId: "client_NSez4i7UHB-0M6r2OJp-", // Use your actual client ID here
+  });
+  const fleekSdk = new FleekSdk({
+    accessTokenService: applicationService,
+  });
 
   const handleOpenDialog = () => {
     setDialogOpen(true);
@@ -86,28 +97,37 @@ const CreateGroup = () => {
   const generateRandom = (principal) => {
     // Get the first 5 digits of the principal
     const prefix = principal.slice(0, 5);
-  
+
     // Generate a random number with 5 digits
     const randomNumber = Math.floor(10000 + Math.random() * 90000);
-  
+
     // Concatenate the prefix and random number
     return `${prefix}-${randomNumber}`;
   };
-  
-  const handleSubmit = async() => {
+
+  const handleSubmit = async () => {
     setLoading(false);
-    if(principal){
-    const randomNumber = generateRandom(principal);
-    console.log('data',user,randomNumber,groupName,groupType,groupLogo,storage,storageFee,setupFee,annualFee)
-   
-    }else {
-      swal('Connect your wallet first','','success');
-    } 
-    try{
-      // const response = await ledger.call('createGroup',user,randomNumber, groupName, groupType,groupLogo,storage, storageFee,setupFee,annualFee);
-      
-    }catch(error){
-      console.log('error',error);
+    if (!principal) {
+      swal('Connect your wallet first', '', 'success');
+      return;
+    }
+      const randomNumber = generateRandom(principal);
+      console.log('data', user, randomNumber, groupName, groupType, groupLogo, storage, storageFee, setupFee, annualFee)
+    try {
+      const result = await fleekSdk.storage().uploadFile({
+        file: groupLogo,
+        onUploadProgress: (progress) => {
+          console.log(`Upload progress: ${(progress.loaded / progress.total) * 100}%`);
+        },
+      });
+      // setHash(result.pin.cid);
+      console.log('result', result);
+      console.log('params', user, result.pin.cid);
+      const response = await ledger.call('createGroup', user, randomNumber, groupName, groupType, result.pin.cid, storage, storageFee, setupFee, annualFee);
+      console.log('response 1',response);
+      swal('Success',response,'success');
+    } catch (error) {
+      console.log('error', error);
     }
     setLoading(true);
 
@@ -458,17 +478,17 @@ const CreateGroup = () => {
                 </Typography>
               </Box>
             </Grid>
-            <Grid item xs={12}  mt={1}
-             display="flex"
-             justifyContent="center"
-             alignItems="center"
-             width="100%" // Ensure it takes full width of the container
-             height="auto">
-                  <QRCodeCanvas
-                    value="1A1zp1eP5QGefi2DMPTfTL5SLmv7DivfNa"
-                    size={300} // Adjust QR code size
-                    level="H" // Set the error correction level for better readability
-                  />
+            <Grid item xs={12} mt={1}
+              display="flex"
+              justifyContent="center"
+              alignItems="center"
+              width="100%" // Ensure it takes full width of the container
+              height="auto">
+              <QRCodeCanvas
+                value="1A1zp1eP5QGefi2DMPTfTL5SLmv7DivfNa"
+                size={300} // Adjust QR code size
+                level="H" // Set the error correction level for better readability
+              />
             </Grid>
 
           </Grid>

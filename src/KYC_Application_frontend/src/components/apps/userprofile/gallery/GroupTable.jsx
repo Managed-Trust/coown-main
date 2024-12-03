@@ -20,7 +20,7 @@ import ChildCard from '../../../shared/ChildCard';
 function GroupTable({ groups }) {
     const [openRows, setOpenRows] = React.useState({});
     useEffect(() => {
-        console.log("group Table:", groups);
+        console.log("group Table:1", groups);
       }, []);
 
     const handleToggleRow = (rowName) => {
@@ -155,7 +155,7 @@ function GroupTable({ groups }) {
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {renderGroupRows(groups.filter(group => group[0].groupType === 'Registered Company'))}
+                            {renderGroupRows(groups.filter(group => group[0].groupType === "registeredCompany"))}
                         </TableBody>
                     </Table>
                 </ChildCard>
@@ -176,7 +176,7 @@ function GroupTable({ groups }) {
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {renderGroupRows(groups.filter(group => group[0].groupType === 'Public Law Entity'))}
+                            {renderGroupRows(groups.filter(group => group[0].groupType === 'publicLawEntitiy'))}
                         </TableBody>
                     </Table>
                 </ChildCard>

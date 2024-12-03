@@ -31,7 +31,10 @@ import mygroup1 from '../../../../assets/images/group/mygroup1.svg';
 import mygroup2 from '../../../../assets/images/group/mygroup2.svg';
 import mygroup3 from '../../../../assets/images/group/mygroup3.svg';
 import GroupTable from './GroupTable';
-const ledger = ic.local("bkyz2-fmaaa-aaaaa-qaaaq-cai"); // Ledger canister
+
+// const ledger = ic.local("bkyz2-fmaaa-aaaaa-qaaaq-cai"); // Ledger canister
+
+const ledger = ic("speiw-5iaaa-aaaap-ahora-cai"); // Ledger canister
 
 const secretKey = "your-secret-key"; // Use a strong secret key
 
@@ -159,7 +162,8 @@ const GalleryCard = () => {
     setFetchingGroups(true);
     try {
       if (principal) {
-        const response = await ledger.call("getGroupIdsByUserId", principal);
+        const response = await ledger.call("getGroupIdsByUserId", 'horrorshorts645@gmail.com');
+        console.log('res',response);
         if (response != null) {
           setGroupId(response);
           setGroups(response);

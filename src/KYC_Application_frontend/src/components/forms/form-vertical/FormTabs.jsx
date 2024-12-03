@@ -146,7 +146,7 @@ const FormTabs = () => {
           console.log(`Upload progress: ${(progress.loaded / progress.total) * 100}%`);
         },
       });
-      setHash(result.pin.cid);
+      // setHash(result.pin.cid);
       console.log('result', result);
       console.log('params', userId, result.pin.cid);
       const response = await ledger.call("uploadDocumentPhoto", userId, result.pin.cid);
