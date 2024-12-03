@@ -274,14 +274,15 @@ const ProfileBanner = () => {
               <InfoOutlinedIcon sx={{ marginRight: '8px', color: '#fff' }} />
               <Typography variant="body1">
                 {profile && profile.role && profile.role == 'fullapplicant' ?
-                !profile.verified && profile.decline_reason.length !== 0 ?  'Your KYC Application is declined' :
-                  'Your KYC Application is pending for approval' : 'Perform KYC to get your personal wallet'
+                  !profile.verified && profile.decline_reason.length !== 0 ? 'Your KYC Application is declined' :
+                    'Your KYC Application is pending for approval' : 'Perform KYC to get your personal wallet'
                 }
               </Typography>
             </Box>
-            {profile && profile.role && !profile.role == 'fullapplicant' &&
-              <Link to='/dashboards/modern'
-              >
+            {profile && profile.role && profile.role == 'fullapplicant' ?
+              !profile.verified && profile.decline_reason.length !== 0 ? <></> :
+                <></> : <Link to='/dashboards/modern'
+                >
                 <Button
                   variant="contained"
                   sx={{
@@ -299,6 +300,7 @@ const ProfileBanner = () => {
                 </Button>
               </Link>
             }
+
           </Box>
         }
         <ProfileTab />

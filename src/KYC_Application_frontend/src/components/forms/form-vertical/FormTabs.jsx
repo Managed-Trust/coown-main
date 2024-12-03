@@ -94,7 +94,7 @@ const steps = [
 const FormTabs = () => {
   const { user, setUser } = useUser();
   const [userId, setUserId] = useState(null);
-  const [activeStep, setActiveStep] = useState(3);
+  const [activeStep, setActiveStep] = useState(0);
   const [formData, setFormData] = useState(initialState);
   const [documentPreview, setDocumentPreview] = useState(null);
   const [addressDocumentPreview, setAddressDocumentPreview] = useState(null);
@@ -124,7 +124,7 @@ const FormTabs = () => {
     accessTokenService: applicationService,
   });
   const handleFleekFileChange = async (event) => {
-    
+
     // const base64String = await readFileAsBase64(event.target.files[0]);
     setFile(event.target.files[0]);
     console.log('upp', event.target.files[0]);
@@ -137,6 +137,7 @@ const FormTabs = () => {
       return;
     }
 
+    setLoading(true);
     try {
       // Upload the file using the Fleek SDK
       const result = await fleekSdk.storage().uploadFile({
@@ -145,14 +146,22 @@ const FormTabs = () => {
           console.log(`Upload progress: ${(progress.loaded / progress.total) * 100}%`);
         },
       });
-
-      // setHash(result.hash);
-      console.log('result',result);
-      alert("File uploaded successfully!");
+      setHash(result.pin.cid);
+      console.log('result', result);
+      console.log('params', userId, file);
+      const response = await ledger.call("uploadDocumentPhoto", userId, result.pin.cid);
+      console.log("Document Upload Response:", response);
+      if (response == 'Success') {
+        swal("Success", "Identity Details Stored Successfully!", "success");
+        handleNext();
+      } else {
+        swal("Info", response, "info");
+      }
     } catch (error) {
-      console.error("Error uploading file:", error);
+      console.log("Error uploading file:", error);
       alert("Failed to upload file.");
     }
+    setLoading(false);
   };
 
 
@@ -201,7 +210,7 @@ const FormTabs = () => {
   useEffect(() => {
     console.log('user1', user);
     fetchUser();
-  }, [user,userId]);
+  }, [user, userId]);
 
   const handleNext = () => {
     let newSkipped = skipped;
@@ -365,12 +374,12 @@ const FormTabs = () => {
       const response = await ledger.call("addBasicInfoCustomer", userId, formData.family_name,
         formData.given_name, formData.birth_date, formData.birth_country, formData.phone, formData.referralCode);
       console.log("Personal Detail Result:", response);
-        if(response == 'Success'){
-          swal("Success", "Personal Record Stored Successfully!", "success");
-          handleNext();
-        }else{
-          swal("Info", response, "info");
-        }
+      if (response == 'Success') {
+        swal("Success", "Personal Record Stored Successfully!", "success");
+        handleNext();
+      } else {
+        swal("Info", response, "info");
+      }
     } catch (e) {
       console.log('error', e);
       swal("Error", e.message || e.toString(), "error");
@@ -392,10 +401,10 @@ const FormTabs = () => {
         formData.addressVerificationDoc,
       );
       console.log("Address details response:", response);
-      if(response == 'Success'){
+      if (response == 'Success') {
         swal("Success", "Address Details Stored Successfully!", "success");
         handleNext();
-      }else{
+      } else {
         swal("Info", response, "info");
       }
     } catch (e) {
@@ -423,13 +432,13 @@ const FormTabs = () => {
         formData.issuance_date,
         formData.expiry_date,
       );
-      if(response == 'Success'){ 
+      if (response == 'Success') {
         swal("Success", "Document Details Stored Successfully!", "success");
         handleNext();
-      }else{
+      } else {
         swal("Info", response, "info");
       }
-     
+
     } catch (e) {
       swal("Error", e.message || e.toString(), "error");
     } finally {
@@ -442,80 +451,80 @@ const FormTabs = () => {
   const handleCaptureImageSubmit = async () => {
     console.log('params', userId, image);
     setLoading(true);
-    setResults(null);
-  
+    // setResults(null);
+
+    // try {
+    // const base64Image = image;
+    // const base64Data = base64Image.split(',')[1];
+    // const options = {
+    //   method: 'POST',
+    //   url: 'https://face-liveness-detection3.p.rapidapi.com/api/liveness_base64',
+    //   headers: {
+    //     'x-rapidapi-key': '2bd268fcc8msh258d57ad291526bp1d1eedjsnc9fc5ab835d7',
+    //     'x-rapidapi-host': 'face-liveness-detection3.p.rapidapi.com',
+    //     'Content-Type': 'application/json',
+    //   },
+    //   data: { image: base64Data },
+    // };
+
+    // const response = await axios.request(options);
+    // if (response.data.data.result === 'no face detected!') {
+    //   swal({
+    //     title: 'No face detected!',
+    //     text: 'Please ensure that your face is close to the camera, clear, and well-lit.',
+    //     icon: 'error',
+    //   });
+    // } else if (response.data.data.result === 'spoof') {
+    //   swal({
+    //     title: 'Spoof',
+    //     text: 'Please ensure that your face is close to the camera, clear, and well-lit.',
+    //     icon: 'error',
+    //   });
+    // } else if (response.data.data.result === 'multiple face detected!') {
+    //   swal({
+    //     title: 'Multiple face detected!',
+    //     text: 'Please ensure that your face is close to the camera, clear, and well-lit.',
+    //     icon: 'error',
+    //   });
+    // } else {
+    console.log('params', userId, image);
     try {
-      const base64Image = image;
-      const base64Data = base64Image.split(',')[1];
-      const options = {
-        method: 'POST',
-        url: 'https://face-liveness-detection3.p.rapidapi.com/api/liveness_base64',
-        headers: {
-          'x-rapidapi-key': '2bd268fcc8msh258d57ad291526bp1d1eedjsnc9fc5ab835d7',
-          'x-rapidapi-host': 'face-liveness-detection3.p.rapidapi.com',
-          'Content-Type': 'application/json',
-        },
-        data: { image: base64Data },
-      };
-  
-      const response = await axios.request(options);
-      if (response.data.data.result === 'no face detected!') {
+      const response1 = await ledger.call("addImage", userId, image);
+      // setResults(response.data.data);
+      console.log('response', response1);
+
+      if (response1 == 'Success') {
         swal({
-          title: 'No face detected!',
-          text: 'Please ensure that your face is close to the camera, clear, and well-lit.',
-          icon: 'error',
+          title: 'Success',
+          text: 'Image Stored Successfully!',
+          icon: 'success',
         });
-      } else if (response.data.data.result === 'spoof') {
-        swal({
-          title: 'Spoof',
-          text: 'Please ensure that your face is close to the camera, clear, and well-lit.',
-          icon: 'error',
-        });
-      } else if (response.data.data.result === 'multiple face detected!') {
-        swal({
-          title: 'Multiple face detected!',
-          text: 'Please ensure that your face is close to the camera, clear, and well-lit.',
-          icon: 'error',
-        });
+        handleNext();
       } else {
-        console.log('params', userId, image);
-        try {
-          const response1 = await ledger.call("addImage", userId, image);
-          setResults(response.data.data);
-          console.log('response', response1);
-          
-          if(response1 == 'Success'){ 
-            swal({
-              title: 'Success',
-              text: 'Image Stored Successfully!',
-              icon: 'success',
-            });
-            handleNext();
-          }else{
-            swal({
-              title: 'Info',
-              text: response,
-              icon: 'info',
-            });
-          }
-        } catch (e) {
-          // Convert the error to a string
-          console.log('error',e);
-          const errorMessage = e.message || 'An unexpected error occurred.';
-          swal("Error", errorMessage, "error");
-        } finally {
-          setLoading(false);
-        }
+        swal({
+          title: 'Info',
+          text: response1,
+          icon: 'info',
+        });
       }
     } catch (e) {
       // Convert the error to a string
+      console.log('error', e);
       const errorMessage = e.message || 'An unexpected error occurred.';
       swal("Error", errorMessage, "error");
     } finally {
       setLoading(false);
     }
+    // }
+    // } catch (e) {
+    //   // Convert the error to a string
+    //   const errorMessage = e.message || 'An unexpected error occurred.';
+    //   swal("Error", errorMessage, "error");
+    // } finally {
+    //   setLoading(false);
+    // }
   };
-  
+
 
   const handleSteps = (step) => {
     switch (step) {
