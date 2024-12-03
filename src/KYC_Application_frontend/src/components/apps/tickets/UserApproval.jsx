@@ -330,7 +330,12 @@ const UserApproval = () => {
                                             </Grid>
 
                                             <Grid item xs={12}>
-                                                {displayFile(profile.residency_doc[0])}
+                                            <img
+                                                    src={`https://ipfs.io/ipfs/${profile.residency_doc[0]}`}
+                                                    alt="Identity Document"
+                                                    style={{ maxWidth: '100%', width: '150px', height: 'auto', marginTop: 10 }}
+                                                />
+                                                {/* {displayFile(profile.residency_doc[0])} */}
                                             </Grid>
                                         </Grid>
                                     </Grid>
@@ -419,8 +424,8 @@ const UserApproval = () => {
                                                 />
                                             </Grid>
                                             <Grid item xs={12} mt={0.5}>
-                                                <img
-                                                    src={`${profile.live_photo[0]}`}
+                                                <img                                                    
+                                                    src={`https://ipfs.io/ipfs/${profile.live_photo[0]}`}
                                                     alt="Identity Document"
                                                     style={{ maxWidth: '100%', width: '250px', height: 'auto', marginTop: 10 }}
                                                 />

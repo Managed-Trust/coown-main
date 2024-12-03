@@ -94,7 +94,7 @@ const steps = [
 const FormTabs = () => {
   const { user, setUser } = useUser();
   const [userId, setUserId] = useState(null);
-  const [activeStep, setActiveStep] = useState(0);
+  const [activeStep, setActiveStep] = useState(4);
   const [formData, setFormData] = useState(initialState);
   const [documentPreview, setDocumentPreview] = useState(null);
   const [addressDocumentPreview, setAddressDocumentPreview] = useState(null);
@@ -148,7 +148,7 @@ const FormTabs = () => {
       });
       setHash(result.pin.cid);
       console.log('result', result);
-      console.log('params', userId, file);
+      console.log('params', userId, result.pin.cid);
       const response = await ledger.call("uploadDocumentPhoto", userId, result.pin.cid);
       console.log("Document Upload Response:", response);
       if (response == 'Success') {
@@ -256,7 +256,7 @@ const FormTabs = () => {
 
     setFormData((prevData) => ({
       ...prevData,
-      addressVerificationDoc: base64String,
+      addressVerificationDoc: e.target.files[0],
     }));
     setAddressDocumentPreview(URL.createObjectURL(file));
   };
@@ -318,9 +318,20 @@ const FormTabs = () => {
         return false;
     }
   };
+  const base64ToFile = (base64, fileName) => {
+    const arr = base64.split(',');
+    const mime = arr[0].match(/:(.*?);/)[1];
+    const bstr = atob(arr[1]);
+    let n = bstr.length;
+    const u8arr = new Uint8Array(n);
+    while (n--) {
+      u8arr[n] = bstr.charCodeAt(n);
+    }
+    return new File([u8arr], fileName, { type: mime });
+  }
 
   const handleCapture = async (imageSrc) => {
-    setImage(imageSrc);
+        setImage(imageSrc);
     try {
       console.log("Captured Image: ", imageSrc);
     } catch (error) {
@@ -389,16 +400,28 @@ const FormTabs = () => {
   };
 
   const handleAddressDetailsSubmit = async () => {
+    if (!formData.addressVerificationDoc) {
+      alert("Please select a file to upload");
+      return;
+    }
     console.log("Address Details Submitted", formData);
     setLoading(true);
 
     try {
+      const result = await fleekSdk.storage().uploadFile({
+        file: formData.addressVerificationDoc,
+        onUploadProgress: (progress) => {
+          // console.log(`Upload progress: ${(progress.loaded / progress.total) * 100}%`);
+        },
+      });
+      console.log('result', result);
+      console.log('params', userId, result.pin.cid);
       const response = await ledger.call(
         "addResidencyCustomer",
         userId,
         formData.resident_address,
         formData.resident_country,
-        formData.addressVerificationDoc,
+        result.pin.cid,
       );
       console.log("Address details response:", response);
       if (response == 'Success') {
@@ -449,47 +472,19 @@ const FormTabs = () => {
   };
 
   const handleCaptureImageSubmit = async () => {
+    
+    const file = base64ToFile(image, 'live-image.jpg');
     console.log('params', userId, image);
     setLoading(true);
-    // setResults(null);
-
-    // try {
-    // const base64Image = image;
-    // const base64Data = base64Image.split(',')[1];
-    // const options = {
-    //   method: 'POST',
-    //   url: 'https://face-liveness-detection3.p.rapidapi.com/api/liveness_base64',
-    //   headers: {
-    //     'x-rapidapi-key': '2bd268fcc8msh258d57ad291526bp1d1eedjsnc9fc5ab835d7',
-    //     'x-rapidapi-host': 'face-liveness-detection3.p.rapidapi.com',
-    //     'Content-Type': 'application/json',
-    //   },
-    //   data: { image: base64Data },
-    // };
-
-    // const response = await axios.request(options);
-    // if (response.data.data.result === 'no face detected!') {
-    //   swal({
-    //     title: 'No face detected!',
-    //     text: 'Please ensure that your face is close to the camera, clear, and well-lit.',
-    //     icon: 'error',
-    //   });
-    // } else if (response.data.data.result === 'spoof') {
-    //   swal({
-    //     title: 'Spoof',
-    //     text: 'Please ensure that your face is close to the camera, clear, and well-lit.',
-    //     icon: 'error',
-    //   });
-    // } else if (response.data.data.result === 'multiple face detected!') {
-    //   swal({
-    //     title: 'Multiple face detected!',
-    //     text: 'Please ensure that your face is close to the camera, clear, and well-lit.',
-    //     icon: 'error',
-    //   });
-    // } else {
-    console.log('params', userId, image);
     try {
-      const response1 = await ledger.call("addImage", userId, image);
+      const result = await fleekSdk.storage().uploadFile({
+        file: file,
+        onUploadProgress: (progress) => {
+        },
+      });
+      console.log('result', result);
+      console.log('params', userId, result.pin.cid);
+      const response1 = await ledger.call("addImage", userId, result.pin.cid);
       // setResults(response.data.data);
       console.log('response', response1);
 
@@ -515,14 +510,6 @@ const FormTabs = () => {
     } finally {
       setLoading(false);
     }
-    // }
-    // } catch (e) {
-    //   // Convert the error to a string
-    //   const errorMessage = e.message || 'An unexpected error occurred.';
-    //   swal("Error", errorMessage, "error");
-    // } finally {
-    //   setLoading(false);
-    // }
   };
 
 
