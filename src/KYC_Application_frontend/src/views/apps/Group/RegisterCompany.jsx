@@ -34,8 +34,8 @@ const initialState1 = {
   memorandumArticles: null,
   isUserManager: false,
   otherManagers: '',//
-  beneficiaryType: '#Shareholders',
-  shareholderAdditionMethod: '#Manual',
+  beneficiaryType: 'Shareholders',
+  shareholderAdditionMethod: 'Manual',
   digitalShares: false,
   premiumUpgradeInfo: false, // Not require
   boardExists: false,
@@ -44,14 +44,14 @@ const initialState1 = {
   spendingPowerLimitations: false, //
   dailySpendingPower: '', // REQUIRE
   monthlySpendingPower: '', //  REQUIRE
-  groupAdminApprovalMethod: '#BoardVoting',
-  groupMemberApprovalMethod: '#GroupAdminApproval',
-  adminAdditionMethod: '#GroupAdmin',
-  boardMemberAdditionMethod: '#GroupAdmin',
+  groupAdminApprovalMethod: 'BoardVoting',
+  groupMemberApprovalMethod: 'GroupAdminApproval',
+  adminAdditionMethod: 'GroupAdmin',
+  boardMemberAdditionMethod: 'GroupAdmin',
   isAuditingRequired: false,
-  auditScope: '#AllTransactionsIncludingBankAccounts',
-  auditorNominationMethod: '#BoardApproves',
-  auditReportRecipients: '#BoardAndExecutiveManagers',
+  auditScope: 'AllTransactionsIncludingBankAccounts',
+  auditorNominationMethod: 'BoardApproves',
+  auditReportRecipients: 'BoardAndExecutiveManagers',
   promotionAccepted: false,
 };
 const RegisterCompany = () => {
@@ -258,7 +258,7 @@ const RegisterCompany = () => {
           result2.pin.cid,
           formData.isUserManager,
           formData.otherManagers ? formData.otherManagers.split(',') : [], // Ensure array
-          formData.beneficiaryType,
+          mapBeneficiaryType(formData.beneficiaryType),
           mapShareholderAdditionMethod(formData.shareholderAdditionMethod),
           formData.digitalShares,
           BigInt(formData.dailySpendingPower || 0),
@@ -565,17 +565,17 @@ const RegisterCompany = () => {
                           value={formData.beneficiaryType}
                         >
                           <FormControlLabel
-                            value="#Shareholders"
+                            value="Shareholders"
                             control={<Radio />}
                             label="Shareholders"
                           />
                           <FormControlLabel
-                            value="#OnlyMe"
+                            value="OnlyMe"
                             control={<Radio />}
                             label="Only me"
                           />
                           <FormControlLabel
-                            value="#OtherEntityOrPerson"
+                            value="OtherEntityOrPerson"
                             control={<Radio />}
                             label="Another entity or person"
                           />

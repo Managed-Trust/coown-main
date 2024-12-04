@@ -94,24 +94,20 @@ const CreateGroup = () => {
     setStorage(event.target.value);
   };
 
-  const generateRandom = (principal) => {
+  const generateRandom = () => {
     // Get the first 5 digits of the principal
-    const prefix = principal.slice(0, 5);
 
     // Generate a random number with 5 digits
     const randomNumber = Math.floor(10000 + Math.random() * 90000);
 
     // Concatenate the prefix and random number
-    return `${prefix}-${randomNumber}`;
+    return `${randomNumber}`;
   };
 
   const handleSubmit = async () => {
     setLoading(false);
-    // if (!principal) {
-    //   swal('Connect your wallet first', '', 'success');
-    //   return;
-    // }
-      const randomNumber = '32323';
+    
+      const randomNumber = generateRandom();
       console.log('data', user, randomNumber, groupName, groupType, groupLogo, storage, storageFee, setupFee, annualFee)
     try {
       const result = await fleekSdk.storage().uploadFile({
