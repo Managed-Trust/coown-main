@@ -107,11 +107,11 @@ const CreateGroup = () => {
 
   const handleSubmit = async () => {
     setLoading(false);
-    if (!principal) {
-      swal('Connect your wallet first', '', 'success');
-      return;
-    }
-      const randomNumber = generateRandom(principal);
+    // if (!principal) {
+    //   swal('Connect your wallet first', '', 'success');
+    //   return;
+    // }
+      const randomNumber = '32323';
       console.log('data', user, randomNumber, groupName, groupType, groupLogo, storage, storageFee, setupFee, annualFee)
     try {
       const result = await fleekSdk.storage().uploadFile({

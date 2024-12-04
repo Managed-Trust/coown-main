@@ -31,6 +31,7 @@ import mygroup1 from '../../../../assets/images/group/mygroup1.svg';
 import mygroup2 from '../../../../assets/images/group/mygroup2.svg';
 import mygroup3 from '../../../../assets/images/group/mygroup3.svg';
 import GroupTable from './GroupTable';
+import { useUser } from "../../../../userContext/UserContext";
 
 // const ledger = ic.local("bkyz2-fmaaa-aaaaa-qaaaq-cai"); // Ledger canister
 
@@ -99,11 +100,12 @@ const initialState = {
 
 const GalleryCard = () => {
   const dispatch = useDispatch();
+  const { user, setUser } = useUser();
 
   const cardData = [
-    { title: "Set-up a private association", desc: "Add  here more user groups as informal private associations, where you are the sole economic beneficiary.", Icon: mygroup1, value: '19 USD', per: 'per year', link: '/create-group/private' },
-    { title: "Set-up a registered company", desc: "Setting up a registered company includes a KYC review of key stakeholder data by an AML Officer to ensure data quality and compliance.", Icon: mygroup2, value: '168 USD', per: 'per year', link: '/create-group/registeredCompany' },
-    { title: "Set-up a public law entitiy", desc: "The setup of a public law entity includes a review of the Know Your Customer (KYC) data by a legal expert to ensure legitimacy and data quality.", Icon: mygroup3, value: '680 USD', per: 'per year', link: '/create-group/publicLawEntitiy' }
+    { title: "Set-up a private association", desc: "Add  more user groups with separate accounts as informal private associations, where you are considered as the sole economic beneficiary. ", Icon: mygroup1, value: '19 USD', per: 'per year', link: '/create-group/private', btn: 'Select' },
+    { title: "Set-up a registered company", desc: "Following the KYC for legal entities, shareholder voting, limited transaction power of executives, and subgroups for business units become available. ", Icon: mygroup2, value: '168 USD', per: 'per year', link: '/create-group/Incorporation', btn: 'Select' },
+    { title: "Set-up a public law entitiy", desc: "Get all the benefits of registered company groups with additional KYC data verification by a legal expert to ensure legitimacy and data quality.", Icon: mygroup3, value: '680 USD', per: 'per year', link: '', btn: 'Send Inquiry' }
   ];
 
   useEffect(() => {
@@ -126,10 +128,6 @@ const GalleryCard = () => {
   const [isPublicLawEntityLoading, setIsPublicLawEntityLoading] = useState(false);
 
   const { principal } = useConnect();
-
-  useEffect(() => {
-    console.log("Principal:", principal);
-  }, [principal]);
 
   const handleInputChange = (e) => {
     const { id, value, name } = e.target;
@@ -161,9 +159,9 @@ const GalleryCard = () => {
   const fetchGroup = async () => {
     setFetchingGroups(true);
     try {
-      if (principal) {
-        const response = await ledger.call("getGroupIdsByUserId", 'horrorshorts645@gmail.com');
-        console.log('res',response);
+      if (user) {
+        const response = await ledger.call("getGroupIdsByUserId", user);
+        console.log('res', response);
         if (response != null) {
           setGroupId(response);
           setGroups(response);
@@ -196,8 +194,10 @@ const GalleryCard = () => {
   };
 
   useEffect(() => {
-    fetchGroup();
-  }, [principal, ledger]);
+    if (user) {
+      fetchGroup();
+    }
+  }, [user]);
 
   const generateGroupId = () => {
     const timestamp = new Date().getTime();
@@ -335,7 +335,7 @@ const GalleryCard = () => {
                 <Chip label={groups.length} color="secondary" size="small" />
               </Typography>
             </Box>
-            <Box ml="auto">
+            {/* <Box ml="auto">
               <Button
                 variant="contained"
                 color="primary"
@@ -344,7 +344,7 @@ const GalleryCard = () => {
               >
                 Add New Group
               </Button>
-            </Box>
+            </Box> */}
           </Stack>
         </Grid>
         {showCreateGroupForm || showInviteUserForm ? (
@@ -760,11 +760,20 @@ const GalleryCard = () => {
                                     <Typography variant="h5" sx={{ fontWeight: 'bold' }}>{card.value}</Typography>
                                     <Typography variant="body1" sx={{ color: 'gray' }}>{card.per}</Typography>
                                   </Box>
-                                  <Link to={card.link} >
-                                    <Button variant="contained" sx={{ textTransform: 'none' }}>
-                                      Select
+                                  {card.btn == 'Select' ?
+                                    <Link to={card.link} >
+                                      <Button variant="contained" sx={{ textTransform: 'none' }}>
+                                        Select
+                                      </Button>
+                                    </Link>
+                                    :
+                                    <Button variant="outlined" sx={{ textTransform: 'none' }}>
+                                      Send Inquiry
                                     </Button>
-                                  </Link>
+
+
+                                  }
+
                                 </Box>
                               </Box>
                             </Stack>

@@ -1,109 +1,291 @@
 import React, { useState } from 'react';
 import Breadcrumb from '../../../layouts/full/shared/breadcrumb/Breadcrumb';
 import PageContainer from '../../../components/container/PageContainer';
+import { Link, useParams } from "react-router-dom";
 import ChildCard from '../../../components/shared/ChildCard';
 import { Box, Paper, Checkbox, Button, RadioGroup, Radio, Grid, TextField, Typography, FormControl, FormControlLabel, Switch, Stack, MenuItem, Stepper, Step, StepLabel } from '@mui/material';
 import CustomFormLabel from '../../../components/forms/theme-elements/CustomFormLabel';
 import { margin } from '@mui/system';
+import ic from "ic0";
+import { set } from 'lodash';
+import {
+  FleekSdk,
+  ApplicationAccessTokenService,
+} from "@fleek-platform/sdk/browser";
+
 const BCrumb = [
   { to: '/', title: 'Home' },
   { title: 'Register Company' },
 ];
 
+// const ledger = ic.local('bkyz2-fmaaa-aaaaa-qaaaq-cai'); //local
+const ledger = ic("speiw-5iaaa-aaaap-ahora-cai"); // Ledger canister
+
 const steps = ['Company details', 'Leadership and ownership', 'Governance and Limitations', 'Auditing'];
-
+const initialState1 = {
+  companyName: "",
+  industrySector: "",
+  groupDescription: "",
+  registrationNumber: "",
+  taxId: "",
+  legalStructure: "",
+  countryOfRegistry: "",
+  incorporationCertificate: null,
+  memorandumArticles: null,
+  isUserManager: false,
+  otherManagers: '',//
+  beneficiaryType: '#Shareholders',
+  shareholderAdditionMethod: '#Manual',
+  digitalShares: false,
+  premiumUpgradeInfo: false, // Not require
+  boardExists: false,
+  canVoteInSystem: false,
+  isAnnualVotingRequired: false,
+  spendingPowerLimitations: false, //
+  dailySpendingPower: '', // REQUIRE
+  monthlySpendingPower: '', //  REQUIRE
+  groupAdminApprovalMethod: '#BoardVoting',
+  groupMemberApprovalMethod: '#GroupAdminApproval',
+  adminAdditionMethod: '#GroupAdmin',
+  boardMemberAdditionMethod: '#GroupAdmin',
+  isAuditingRequired: false,
+  auditScope: '#AllTransactionsIncludingBankAccounts',
+  auditorNominationMethod: '#BoardApproves',
+  auditReportRecipients: '#BoardAndExecutiveManagers',
+  promotionAccepted: false,
+};
 const RegisterCompany = () => {
+  const { groupId } = useParams();
   const [activeStep, setActiveStep] = useState(0);
-  const [selectedManager, setSelectedManager] = useState('self');
-  const [selectedBeneficiary, setSelectedBeneficiary] = useState('shareholders');
-  const [addShareholdersMethod, setAddShareholdersMethod] = useState('manual');
-  const [isUpgradeInformed, setIsUpgradeInformed] = useState(false);
-  const [boardExists, setBoardExists] = useState(false);
-  const [boardCanVote, setBoardCanVote] = useState(false);
-  const [annualVoting, setAnnualVoting] = useState(false);
-  const [annualAuditRequired, setAnnualAuditRequired] = useState(false);
-  const [auditorNomination, setAuditorNomination] = useState('boardApproval');
-  const [auditFocus, setAuditFocus] = useState('option1');
-  const [auditReportRecipient, setAuditReportRecipient] = useState('boardAndManagers');
-  const [operatorEntitled, setOperatorEntitled] = useState(false);
-  const [limitSpending, setLimitSpending] = useState(false);
-  const [dailyLimit, setDailyLimit] = useState('');
-  const [monthlyLimit, setMonthlyLimit] = useState('');
-  const [adminApproval, setAdminApproval] = useState('boardVoting');
-  const [memberApproval, setMemberApproval] = useState('groupAdmin');
-  const [newAdminApproval, setNewAdminApproval] = useState('groupAdmin');
-  const [boardMemberApproval, setBoardMemberApproval] = useState('groupAdmin');
+  const [formData, setFormData] = useState(initialState1);
+  const [firstImage, setFirstImage] = useState('');
+  const [secondImage, setSecondImage] = useState('');
+  const [Addmore, setAddMore] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleBoardMemberApprovalChange = (event) => {
-    setBoardMemberApproval(event.target.value);
+  const applicationService = new ApplicationAccessTokenService({
+    clientId: "client_NSez4i7UHB-0M6r2OJp-", // Use your actual client ID here
+  });
+  const fleekSdk = new FleekSdk({
+    accessTokenService: applicationService,
+  });
+
+  const handleInputChange = (e) => {
+    const { id, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [id]: value,
+    }));
+  };
+
+
+  const handleSelectChange = (id) => (event) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      [id]: event.target.value,
+    }));
+  };
+
+  const handleFile1Change = (e) => {
+    const { name } = e.target;
+    const file = e.target.files[0];
+    setFormData((prev) => ({ ...prev, [name]: file }));
+    setFirstImage(URL.createObjectURL(file));
+  };
+  const handleFile2Change = (e) => {
+    const { name } = e.target;
+    const file = e.target.files[0];
+    setFormData((prev) => ({ ...prev, [name]: file }));
+    setSecondImage(URL.createObjectURL(file));
+  };
+  const handleCheckedChange = (id) => (event) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      [id]: event.target.checked,
+    }));
+  };
+
+  const handleAddmore = () => {
+    setAddMore(!Addmore);
   }
-
-  const handleNewAdminApprovalChange = (event) => {
-    setNewAdminApproval(event.target.value);
+  const mapBeneficiaryType = (value) => {
+    switch (value) {
+      case "Shareholders":
+        return { Shareholders: null };
+      case "OnlyMe":
+        return { OnlyMe: null };
+      case "OtherEntityOrPerson":
+        return { OtherEntityOrPerson: null };
+      default:
+        throw new Error(`Invalid beneficiaryType: ${value}`);
+    }
   };
 
-  const handleAdminApprovalChange = (event) => {
-    setAdminApproval(event.target.value);
+  // Map Shareholder Addition Method
+  const mapShareholderAdditionMethod = (value) => {
+    switch (value) {
+      case "Manual":
+        return { Manual: null };
+      case "UploadShareholderBook":
+        return { UploadShareholderBook: null };
+      default:
+        throw new Error(`Invalid shareholderAdditionMethod: ${value}`);
+    }
   };
 
-  const handleMemberApprovalChange = (event) => {
-    setMemberApproval(event.target.value);
+  const mapGroupAdminApprovalMethod = (value) => {
+    switch (value) {
+      case "BoardVoting":
+        return { BoardVoting: null };
+      case "ShareholderAssemblyVoting":
+        return { ShareholderAssemblyVoting: null };
+      default:
+        throw new Error(`Invalid groupAdminApprovalMethod: ${value}`);
+    }
   };
 
-  const handleLimitSpendingChange = (event) => {
-    setLimitSpending(event.target.checked);
+  const mapGroupMemberApprovalMethod = (value) => {
+    switch (value) {
+      case "GroupAdminApproval":
+        return { GroupAdminApproval: null };
+      case "MemberSpendingPowerApproval":
+        return { MemberSpendingPowerApproval: null };
+      default:
+        throw new Error(`Invalid groupMemberApprovalMethod: ${value}`);
+    }
   };
 
-  const handleDailyLimitChange = (event) => {
-    setDailyLimit(event.target.value);
+  const mapAuditScope = (value) => {
+    switch (value) {
+      case "AllTransactionsIncludingBankAccounts":
+        return { AllTransactionsIncludingBankAccounts: null };
+      case "AllTransactionsWithoutBankAccounts":
+        return { AllTransactionsWithoutBankAccounts: null };
+      case "OnlyCOOWNTransactions":
+        return { OnlyCOOWNTransactions: null };
+      default:
+        throw new Error(`Invalid auditScope: ${value}`);
+    }
   };
 
-  const handleMonthlyLimitChange = (event) => {
-    setMonthlyLimit(event.target.value);
+  const mapAuditorNominationMethod = (value) => {
+    switch (value) {
+      case "BoardApproves":
+        return { BoardApproves: null };
+      case "GroupAdminNominates":
+        return { GroupAdminNominates: null };
+      case "ShareholderAssemblyApproves":
+        return { ShareholderAssemblyApproves: null };
+      default:
+        throw new Error(`Invalid auditorNominationMethod: ${value}`);
+    }
   };
 
-  const handleOperatorEntitledChange = (event) => {
-    setOperatorEntitled(event.target.checked);
+  const mapAuditReportRecipients = (value) => {
+    switch (value) {
+      case "BoardAndExecutiveManagers":
+        return { BoardAndExecutiveManagers: null };
+      case "ShareholdersBoardAndManagers":
+        return { ShareholdersBoardAndManagers: null };
+      default:
+        throw new Error(`Invalid auditReportRecipients: ${value}`);
+    }
   };
 
-  const handleAuditReportRecipientChange = (event) => {
-    setAuditReportRecipient(event.target.value);
+  const mapAdminAdditionMethod = (value) => {
+    switch (value) {
+      case "GroupAdmin":
+        return { GroupAdmin: null };
+      case "BoardVoting":
+        return { BoardVoting: null };
+      case "ShareholderAssemblyVoting":
+        return { ShareholderAssemblyVoting: null };
+      default:
+        throw new Error(`Invalid auditReportRecipients: ${value}`);
+    }
   };
-  const handleAuditFocusChange = (event) => {
-    setAuditFocus(event.target.value);
-  };
-  const handleAuditorNominationChange = (event) => {
-    setAuditorNomination(event.target.value);
-  };
-
-  const handleAnnualAuditChange = (event) => {
-    setAnnualAuditRequired(event.target.checked);
-  };
-  const handleBoardExistsChange = (event) => {
-    setBoardExists(event.target.checked);
-  };
-  const handleAnnualVotingChange = (event) => {
-    setAnnualVoting(event.target.checked);
-  };
-  const handleBoardCanVoteChange = (event) => {
-    setBoardCanVote(event.target.checked);
-  };
-  const handleShareholdersMethodChange = (event) => {
-    setAddShareholdersMethod(event.target.value);
-  };
-
-  const handleUpgradeInformedChange = (event) => {
-    setIsUpgradeInformed(event.target.checked);
-  };
-  const handleManagerChange = (event) => {
-    setSelectedManager(event.target.value);
+  const mapBoardMemberAdditionMethod = (value) => {
+    switch (value) {
+      case "GroupAdmin":
+        return { GroupAdmin: null };
+      case "BoardVoting":
+        return { BoardVoting: null };
+      case "ShareholderAssemblyVoting":
+        return { ShareholderAssemblyVoting: null };
+      default:
+        throw new Error(`Invalid auditReportRecipients: ${value}`);
+    }
   };
 
-  const handleBeneficiaryChange = (event) => {
-    setSelectedBeneficiary(event.target.value);
-  };
-  const handleNext = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep + 1);
+  const handleNext = async () => {
+    console.log('formdata ', formData);
+    if (activeStep === steps.length - 1) {
+      setLoading(true);
+      console.log('saving');
+      try {
+        const result1 = await fleekSdk.storage().uploadFile({
+          file: formData.incorporationCertificate,
+          onUploadProgress: (progress) => {
+            // console.log(`Upload progress: ${(progress.loaded / progress.total) * 100}%`);
+          },
+        });
+        // setHash(result.pin.cid);
+        console.log('result', result1);
+        console.log('params', result1.pin.cid);
+
+        const result2 = await fleekSdk.storage().uploadFile({
+          file: formData.memorandumArticles,
+          onUploadProgress: (progress) => {
+            // console.log(`Upload progress: ${(progress.loaded / progress.total) * 100}%`);
+          },
+        });
+        // setHash(result.pin.cid);
+        console.log('result', result2);
+        console.log('params', result2.pin.cid);
+
+
+        const response = await ledger.call(
+          'updateIncorporationGroup',
+          groupId,
+          formData.companyName,
+          formData.industrySector,
+          formData.groupDescription,
+          formData.registrationNumber,
+          formData.taxId,
+          formData.legalStructure,
+          formData.countryOfRegistry,
+          result1.pin.cid,
+          result2.pin.cid,
+          formData.isUserManager,
+          formData.otherManagers ? formData.otherManagers.split(',') : [], // Ensure array
+          formData.beneficiaryType,
+          mapShareholderAdditionMethod(formData.shareholderAdditionMethod),
+          formData.digitalShares,
+          BigInt(formData.dailySpendingPower || 0),
+          BigInt(formData.monthlySpendingPower || 0),
+          formData.boardExists,
+          formData.canVoteInSystem,
+          formData.isAnnualVotingRequired,
+          formData.spendingPowerLimitations,
+          mapGroupAdminApprovalMethod(formData.groupAdminApprovalMethod),
+          mapGroupMemberApprovalMethod(formData.groupMemberApprovalMethod),
+          mapAdminAdditionMethod(formData.adminAdditionMethod),
+          mapBoardMemberAdditionMethod(formData.boardMemberAdditionMethod),
+          formData.isAuditingRequired,
+          mapAuditScope(formData.auditScope),
+          mapAuditorNominationMethod(formData.auditorNominationMethod),
+          mapAuditReportRecipients(formData.auditReportRecipients),
+          formData.promotionAccepted
+        );
+        console.log('Function call response:', response);
+        swal('Applicaton Submitted', '', 'success')
+      } catch (error) {
+        console.log('Error updating Company', error);
+      }
+      setLoading(false);
+    } else {
+      setActiveStep((prevActiveStep) => prevActiveStep + 1);
+    }
   };
 
   const handleBack = () => {
@@ -130,6 +312,8 @@ const RegisterCompany = () => {
                         id="companyName"
                         fullWidth
                         placeholder='Company name'
+                        onChange={handleInputChange}
+                        value={formData.companyName}
                       />
                     </Grid>
 
@@ -140,6 +324,8 @@ const RegisterCompany = () => {
                         select
                         fullWidth
                         placeholder='Select industry sector'
+                        onChange={handleSelectChange("industrySector")}
+                        value={formData.industrySector}
                       >
                         {/* Add options for industry sectors here */}
                         <MenuItem value="sector1">Sector 1</MenuItem>
@@ -155,6 +341,8 @@ const RegisterCompany = () => {
                         rows={4}
                         variant="outlined"
                         placeholder='Add company purpose '
+                        onChange={handleInputChange}
+                        value={formData.groupDescription}
                       />
                     </Grid>
                     <Grid item xs={12}>
@@ -163,6 +351,8 @@ const RegisterCompany = () => {
                         id="registrationNumber"
                         fullWidth
                         placeholder='Registration number'
+                        onChange={handleInputChange}
+                        value={formData.registrationNumber}
                       />
                     </Grid>
 
@@ -172,6 +362,8 @@ const RegisterCompany = () => {
                         id="taxId"
                         fullWidth
                         placeholder='Tax ID'
+                        onChange={handleInputChange}
+                        value={formData.taxId}
                       />
                     </Grid>
 
@@ -181,6 +373,8 @@ const RegisterCompany = () => {
                         id="legalStructure"
                         fullWidth
                         placeholder='Legal structure'
+                        onChange={handleInputChange}
+                        value={formData.legalStructure}
                       />
                     </Grid>
 
@@ -191,6 +385,8 @@ const RegisterCompany = () => {
                         select
                         fullWidth
                         placeholder='Select country'
+                        onChange={handleSelectChange("countryOfRegistry")}
+                        value={formData.countryOfRegistry}
                       >
                         {/* Add options for countries here */}
                         <MenuItem value="country1">Country 1</MenuItem>
@@ -220,7 +416,9 @@ const RegisterCompany = () => {
                             <input
                               type="file"
                               hidden
+                              name='incorporationCertificate'
                               id="incorporationCertificate"
+                              onChange={handleFile1Change}
                             />
                           </Button>
                         </Grid>
@@ -228,6 +426,13 @@ const RegisterCompany = () => {
                           <Typography variant="body2" color="textSecondary">No file chosen</Typography>
                         </Grid>
                       </Grid>
+                    </Grid>
+                    <Grid item xs={12}>
+                      {firstImage && (
+                        <Box mt={2}>
+                          <img src={firstImage} alt="Document Preview" style={{ width: '100%', maxWidth: '150px', maxHeight: '150px', height: 'auto', borderRadius: '10px', border: '1px solid #ccc' }} />
+                        </Box>
+                      )}
                     </Grid>
 
                     <Grid item xs={12}>
@@ -239,7 +444,9 @@ const RegisterCompany = () => {
                             <input
                               type="file"
                               hidden
+                              name='memorandumArticles'
                               id="memorandumArticles"
+                              onChange={handleFile2Change}
                             />
                           </Button>
                         </Grid>
@@ -247,6 +454,14 @@ const RegisterCompany = () => {
                           <Typography variant="body2" color="textSecondary">No file chosen</Typography>
                         </Grid>
                       </Grid>
+                    </Grid>
+
+                    <Grid item xs={12}>
+                      {secondImage && (
+                        <Box mt={2}>
+                          <img src={secondImage} alt="Document Preview" style={{ width: '100%', maxWidth: '150px', maxHeight: '150px', height: 'auto', borderRadius: '10px', border: '1px solid #ccc' }} />
+                        </Box>
+                      )}
                     </Grid>
                   </Grid>
                 </Grid>
@@ -270,32 +485,60 @@ const RegisterCompany = () => {
                       <CustomFormLabel>Who is the Executive Manager?</CustomFormLabel>
                       <FormControl component="fieldset">
                         <RadioGroup
-                          value={selectedManager}
-                          onChange={handleManagerChange}
+                        // id='isUserManager'
+                        // name='isUserManager'
+                        // onChange={handleSelectChange("isUserManager")}
+                        // value={formData.isUserManager}
                         >
                           <FormControlLabel
-                            value="self"
+                            // value="true"
                             control={<Radio />}
                             label="I am the Executive Manager"
                           />
                           <FormControlLabel
-                            value="other"
+                            // value="false"
                             control={<Radio />}
                             label="Another person is the Executive Manager"
                           />
                         </RadioGroup>
                       </FormControl>
                     </Grid>
+                    {!Addmore ?
+                      <Grid item xs={12}>
+                        <Button
+                          variant="outlined"
+                          onClick={handleAddmore}
+                          startIcon={<Typography component="span">+</Typography>}
+                          sx={{ color: '#5B5B5B', borderColor: '#E0E0E0' }}
+                        >
+                          Add more
+                        </Button>
+                      </Grid>
+                      :
+                      <>
+                        <Grid item xs={12}>
+                          <TextField
+                            label="Add more manager?"
+                            fullWidth
+                            type="text"
+                            placeholder="Add Executive Manager"
+                            id="otherManagers"
+                            onChange={handleInputChange}
+                            value={formData.otherManagers}
+                          />
+                        </Grid>
+                        <Grid item xs={12}>
+                          <Button
+                            variant="outlined"
+                            onClick={handleAddmore}
+                            sx={{ color: '#5B5B5B', borderColor: '#E0E0E0' }}
+                          >
+                            Cancel
+                          </Button>
+                        </Grid>
+                      </>
+                    }
 
-                    <Grid item xs={12}>
-                      <Button
-                        variant="outlined"
-                        startIcon={<Typography component="span">+</Typography>}
-                        sx={{ color: '#5B5B5B', borderColor: '#E0E0E0' }}
-                      >
-                        Add more
-                      </Button>
-                    </Grid>
 
                   </Grid>
                 </Grid>
@@ -316,21 +559,23 @@ const RegisterCompany = () => {
                       <CustomFormLabel>Who is the Economic Beneficiary?</CustomFormLabel>
                       <FormControl component="fieldset">
                         <RadioGroup
-                          value={selectedBeneficiary}
-                          onChange={handleBeneficiaryChange}
+                          id='beneficiaryType'
+                          name='beneficiaryType'
+                          onChange={handleSelectChange("beneficiaryType")}
+                          value={formData.beneficiaryType}
                         >
                           <FormControlLabel
-                            value="shareholders"
+                            value="#Shareholders"
                             control={<Radio />}
                             label="Shareholders"
                           />
                           <FormControlLabel
-                            value="onlyMe"
+                            value="#OnlyMe"
                             control={<Radio />}
                             label="Only me"
                           />
                           <FormControlLabel
-                            value="otherEntity"
+                            value="#OtherEntityOrPerson"
                             control={<Radio />}
                             label="Another entity or person"
                           />
@@ -357,16 +602,18 @@ const RegisterCompany = () => {
                       <CustomFormLabel>How will you add shareholders?</CustomFormLabel>
                       <FormControl component="fieldset">
                         <RadioGroup
-                          value={addShareholdersMethod}
-                          onChange={handleShareholdersMethodChange}
+                          id='shareholderAdditionMethod'
+                          name='shareholderAdditionMethod'
+                          onChange={handleSelectChange("shareholderAdditionMethod")}
+                          value={formData.shareholderAdditionMethod}
                         >
                           <FormControlLabel
-                            value="manual"
+                            value="Manual"
                             control={<Radio />}
                             label="I will add shareholders manually"
                           />
                           <FormControlLabel
-                            value="upload"
+                            value="UploadShareholderBook"
                             control={<Radio />}
                             label="Upload shareholder book as a file"
                           />
@@ -386,8 +633,10 @@ const RegisterCompany = () => {
                         <FormControlLabel
                           control={
                             <Checkbox
-                              checked={isUpgradeInformed}
-                              onChange={handleUpgradeInformedChange}
+                              id='digitalShares'
+                              name='digitalShares'
+                              onChange={handleCheckedChange("digitalShares")}
+                              checked={formData.digitalShares}
                               color="primary"
                             />
                           }
@@ -416,8 +665,10 @@ const RegisterCompany = () => {
                       <FormControlLabel
                         control={
                           <Switch
-                            checked={boardExists}
-                            onChange={handleBoardExistsChange}
+                            id='boardExists'
+                            name='boardExists'
+                            onChange={handleCheckedChange("boardExists")}
+                            checked={formData.boardExists}
                             color="primary"
                           />
                         }
@@ -430,8 +681,10 @@ const RegisterCompany = () => {
                       <FormControlLabel
                         control={
                           <Switch
-                            checked={boardCanVote}
-                            onChange={handleBoardCanVoteChange}
+                            id='canVoteInSystem'
+                            name='canVoteInSystem'
+                            onChange={handleCheckedChange("canVoteInSystem")}
+                            checked={formData.canVoteInSystem}
                             color="primary"
                           />
                         }
@@ -469,8 +722,10 @@ const RegisterCompany = () => {
                       <FormControlLabel
                         control={
                           <Switch
-                            checked={annualVoting}
-                            onChange={handleAnnualVotingChange}
+                            id='isAnnualVotingRequired'
+                            name='isAnnualVotingRequired'
+                            onChange={handleCheckedChange("isAnnualVotingRequired")}
+                            checked={formData.isAnnualVotingRequired}
                             color="primary"
                           />
                         }
@@ -509,8 +764,10 @@ const RegisterCompany = () => {
                       <FormControlLabel
                         control={
                           <Switch
-                            checked={limitSpending}
-                            onChange={handleLimitSpendingChange}
+                            id='spendingPowerLimitations'
+                            name='spendingPowerLimitations'
+                            onChange={handleCheckedChange("spendingPowerLimitations")}
+                            checked={formData.spendingPowerLimitations}
                             color="primary"
                           />
                         }
@@ -523,16 +780,17 @@ const RegisterCompany = () => {
                     </Grid>
 
                     {/* Daily and Monthly Limitation Inputs */}
-                    {limitSpending && (
+                    {formData.spendingPowerLimitations && (
                       <>
                         <Grid item xs={12}>
                           <TextField
                             label="Daily limitation in $"
                             fullWidth
-                            value={dailyLimit}
-                            onChange={handleDailyLimitChange}
                             type="number"
                             placeholder="1000"
+                            id="dailySpendingPower"
+                            onChange={handleInputChange}
+                            value={formData.dailySpendingPower}
                           />
                         </Grid>
 
@@ -540,10 +798,11 @@ const RegisterCompany = () => {
                           <TextField
                             label="Monthly limitation in $"
                             fullWidth
-                            value={monthlyLimit}
-                            onChange={handleMonthlyLimitChange}
                             type="number"
                             placeholder="10000"
+                            id="monthlySpendingPower"
+                            onChange={handleInputChange}
+                            value={formData.monthlySpendingPower}
                           />
                         </Grid>
                       </>
@@ -568,16 +827,18 @@ const RegisterCompany = () => {
                       <CustomFormLabel>Group Admin transactions that exceed spending limit</CustomFormLabel>
                       <FormControl component="fieldset">
                         <RadioGroup
-                          value={adminApproval}
-                          onChange={handleAdminApprovalChange}
+                          id='groupAdminApprovalMethod'
+                          name='groupAdminApprovalMethod'
+                          onChange={handleSelectChange("groupAdminApprovalMethod")}
+                          value={formData.groupAdminApprovalMethod}
                         >
                           <FormControlLabel
-                            value="boardVoting"
+                            value="BoardVoting"
                             control={<Radio />}
                             label="Are approved by a voting of the Board of Directors"
                           />
                           <FormControlLabel
-                            value="shareholderAssembly"
+                            value="ShareholderAssemblyVoting"
                             control={<Radio />}
                             label="Are approved by a voting of the Shareholder Assembly"
                           />
@@ -590,16 +851,18 @@ const RegisterCompany = () => {
                       <CustomFormLabel>Group Member transactions that exceed spending limit</CustomFormLabel>
                       <FormControl component="fieldset">
                         <RadioGroup
-                          value={memberApproval}
-                          onChange={handleMemberApprovalChange}
+                          id='groupMemberApprovalMethod'
+                          name='groupMemberApprovalMethod'
+                          onChange={handleSelectChange("groupMemberApprovalMethod")}
+                          value={formData.groupMemberApprovalMethod}
                         >
                           <FormControlLabel
-                            value="groupAdmin"
+                            value="GroupAdminApproval"
                             control={<Radio />}
                             label="Are approved by the Group Admin"
                           />
                           <FormControlLabel
-                            value="memberWithPower"
+                            value="MemberSpendingPowerApproval"
                             control={<Radio />}
                             label="Are approved by any Member with sufficient spending power"
                           />
@@ -625,21 +888,23 @@ const RegisterCompany = () => {
                       <CustomFormLabel>New Group Admins or Executive Managers</CustomFormLabel>
                       <FormControl component="fieldset">
                         <RadioGroup
-                          value={newAdminApproval}
-                          onChange={handleNewAdminApprovalChange}
+                          id='adminAdditionMethod'
+                          name='adminAdditionMethod'
+                          onChange={handleSelectChange("adminAdditionMethod")}
+                          value={formData.adminAdditionMethod}
                         >
                           <FormControlLabel
-                            value="groupAdmin"
+                            value="GroupAdmin"
                             control={<Radio />}
                             label="Can be added by Group Admin"
                           />
                           <FormControlLabel
-                            value="boardVoting"
+                            value="BoardVoting"
                             control={<Radio />}
                             label="Are approved by a voting of the Board of Directors"
                           />
                           <FormControlLabel
-                            value="shareholderAssembly"
+                            value="ShareholderAssemblyVoting"
                             control={<Radio />}
                             label="Are approved by a voting of the Shareholder Assembly"
                           />
@@ -667,21 +932,23 @@ const RegisterCompany = () => {
                       <CustomFormLabel>New members of the Board of Directors</CustomFormLabel>
                       <FormControl component="fieldset">
                         <RadioGroup
-                          value={boardMemberApproval}
-                          onChange={handleBoardMemberApprovalChange}
+                          id='boardMemberAdditionMethod'
+                          name='boardMemberAdditionMethod'
+                          onChange={handleSelectChange("boardMemberAdditionMethod")}
+                          value={formData.boardMemberAdditionMethod}
                         >
                           <FormControlLabel
-                            value="groupAdmin"
+                            value="GroupAdmin"
                             control={<Radio />}
                             label="Can be added by Group Admin"
                           />
                           <FormControlLabel
-                            value="boardVoting"
+                            value="BoardVoting"
                             control={<Radio />}
                             label="Are approved by a voting of the Board of Directors"
                           />
                           <FormControlLabel
-                            value="shareholderAssembly"
+                            value="ShareholderAssemblyVoting"
                             control={<Radio />}
                             label="Are approved by a voting of the Shareholder Assembly"
                           />
@@ -710,8 +977,10 @@ const RegisterCompany = () => {
                       <FormControlLabel
                         control={
                           <Switch
-                            checked={annualAuditRequired}
-                            onChange={handleAnnualAuditChange}
+                            id='isAuditingRequired'
+                            name='isAuditingRequired'
+                            onChange={handleCheckedChange("isAuditingRequired")}
+                            checked={formData.isAuditingRequired}
                             color="primary"
                           />
                         }
@@ -745,21 +1014,23 @@ const RegisterCompany = () => {
                       <CustomFormLabel>The Audit focuses</CustomFormLabel>
                       <FormControl component="fieldset">
                         <RadioGroup
-                          value={auditFocus}
-                          onChange={handleAuditFocusChange}
+                          id='auditScope'
+                          name='auditScope'
+                          onChange={handleSelectChange("auditScope")}
+                          value={formData.auditScope}
                         >
                           <FormControlLabel
-                            value="option1"
+                            value="AllTransactionsIncludingBankAccounts"
                             control={<Radio />}
                             label="All company’s financial transactions including COOWN and bank accounts"
                           />
                           <FormControlLabel
-                            value="option2"
+                            value="AllTransactionsWithoutBankAccounts"
                             control={<Radio />}
                             label="All company’s financial transactions and the company has no Bank account"
                           />
                           <FormControlLabel
-                            value="option3"
+                            value="OnlyCOOWNTransactions"
                             control={<Radio />}
                             label="Only the company’s financial transactions within COOWN are audited, if other audits are carried they are consolidated outside COOWN"
                           />
@@ -785,21 +1056,23 @@ const RegisterCompany = () => {
                       <CustomFormLabel>How is the Auditor nominated?</CustomFormLabel>
                       <FormControl component="fieldset">
                         <RadioGroup
-                          value={auditorNomination}
-                          onChange={handleAuditorNominationChange}
+                          id='auditorNominationMethod'
+                          name='auditorNominationMethod'
+                          onChange={handleSelectChange("auditorNominationMethod")}
+                          value={formData.auditorNominationMethod}
                         >
                           <FormControlLabel
-                            value="boardApproval"
+                            value="BoardApproves"
                             control={<Radio />}
                             label="Board of Directors approve Auditors"
                           />
                           <FormControlLabel
-                            value="groupAdminNomination"
+                            value="GroupAdminNominates"
                             control={<Radio />}
                             label="Existing Group Admin can nominate an Auditor"
                           />
                           <FormControlLabel
-                            value="shareholderApproval"
+                            value="ShareholderAssemblyApproves"
                             control={<Radio />}
                             label="Shareholder assembly approves Auditors"
                           />
@@ -827,16 +1100,18 @@ const RegisterCompany = () => {
                       <CustomFormLabel>Audit report recipients</CustomFormLabel>
                       <FormControl component="fieldset">
                         <RadioGroup
-                          value={auditReportRecipient}
-                          onChange={handleAuditReportRecipientChange}
+                          id='auditReportRecipients'
+                          name='auditReportRecipients'
+                          onChange={handleSelectChange("auditReportRecipients")}
+                          value={formData.auditReportRecipients}
                         >
                           <FormControlLabel
-                            value="boardAndManagers"
+                            value="BoardAndExecutiveManagers"
                             control={<Radio />}
                             label="Board of Directors and Executive Managers"
                           />
                           <FormControlLabel
-                            value="shareholdersAndBoard"
+                            value="ShareholdersBoardAndManagers"
                             control={<Radio />}
                             label="Shareholders, Board of Directors, and Executive Managers"
                           />
@@ -862,8 +1137,10 @@ const RegisterCompany = () => {
                       <FormControlLabel
                         control={
                           <Switch
-                            checked={operatorEntitled}
-                            onChange={handleOperatorEntitledChange}
+                            id='promotionAccepted'
+                            name='promotionAccepted'
+                            onChange={handleCheckedChange("promotionAccepted")}
+                            checked={formData.promotionAccepted}
                             color="primary"
                           />
                         }
@@ -876,7 +1153,7 @@ const RegisterCompany = () => {
                           </Box>
                         }
                       />
-                      <Typography sx={{marginLeft:'40px'}} variant="body2" color="textSecondary">
+                      <Typography sx={{ marginLeft: '40px' }} variant="body2" color="textSecondary">
                         Profile of Administrator and Group Name will be forwarded to a potential audit firm,
                         that can be mandated by the Corporate Group Management.
                       </Typography>
@@ -917,7 +1194,8 @@ const RegisterCompany = () => {
               color="primary"
               onClick={handleNext}
             >
-              {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
+              {loading ? 'Submitting ...' :
+                activeStep === steps.length - 1 ? 'Submit' : 'Next'}
             </Button>
           </Box>
         </Grid>

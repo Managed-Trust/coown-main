@@ -90,7 +90,7 @@ const FullLayout = () => {
               <Route path="/apps/friends" element={<Friends />} />
               <Route path="/apps/gallery" element={<Gallery />} />
               <Route path="/apps/private" element={<PrivateGroup />} />
-              <Route path="/apps/registerCompany" element={<RegisterCompany />} />
+              <Route path="/group/registerCompany/:groupId" element={<RegisterCompany />} />
               <Route path="/user-profile" element={<Profile />} />
               <Route path="/apps/user-setting" element={<UserSetting/>} />
               <Route path="/app/user-dashboard" element={<UserDashboard/>} />

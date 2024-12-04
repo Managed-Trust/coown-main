@@ -16,6 +16,7 @@ import {
   Avatar
 } from "@mui/material";
 import { useConnect } from "@connect2ic/react";
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import ic from "ic0";
 import DetailComponent from "./DetailComponent";
 import GroupMembers from "./GroupMembers";
@@ -25,8 +26,10 @@ import Setting from "./settingComponent/setting";
 import Stakeholder from "./stakeHolderComponent/index";
 import Accounts from "./accountComponent/account";
 import Rewards from "./rewardComponent/reward";
+import { useUser } from "../../../../userContext/UserContext";
 
-const ledger = ic.local("bkyz2-fmaaa-aaaaa-qaaaq-cai");
+// const ledger = ic.local('bkyz2-fmaaa-aaaaa-qaaaq-cai'); //local
+const ledger = ic("speiw-5iaaa-aaaap-ahora-cai"); // Ledger canister
 
 
 
@@ -97,6 +100,7 @@ const groupDetails = {
 };
 
 const GroupDetailPage = () => {
+  const { user, setUser } = useUser();
   const { groupId } = useParams();
   const [group, setGroup] = useState(null);
   const [fetchingGroup, setFetchingGroup] = useState(true);
@@ -109,17 +113,18 @@ const GroupDetailPage = () => {
 
 
   useEffect(() => {
-    fetchGroup();
-  }, [principal]);
+    if (user) {
+      fetchGroup();
+    }
+  }, [user]);
 
   const fetchGroup = async () => {
     setFetchingGroup(true);
     try {
-      if (principal) {
-        const groupDetailResponse = await ledger.call("getGroup", groupId);
-        setGroup(groupDetailResponse);
-        console.log("Group", groupDetailResponse);
-      }
+      const groupDetailResponse = await ledger.call("getGroup", groupId);
+      setGroup(groupDetailResponse);
+      console.log("Group", groupDetailResponse);
+
     } catch (e) {
       console.log("Error fetching groups:", e);
     } finally {
@@ -202,7 +207,7 @@ const GroupDetailPage = () => {
                                 color: "#3B82F6",
                               }}
                             >
-                              Registered Company
+                              {group[0] && (group[0].groupType)}
                             </Button>
                           </Box>
 
@@ -227,9 +232,51 @@ const GroupDetailPage = () => {
                       </Box>
                     </CardContent>
                   </Card>
+
+                  {group[0] && group[0].groupType == "Incorporation" &&
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      backgroundColor: '#4e84ff',
+                      padding: '10px 20px',
+                      borderRadius: '5px',
+                      color: '#fff',
+                      my: 1,
+                      boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
+                    }}
+                  >
+                    {/* Left side - Info text with an icon */}
+                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                      <InfoOutlinedIcon sx={{ marginRight: '8px', color: '#fff' }} />
+                      <Typography variant="body1">
+                      To begin using your group and accounts, please compete the initial group setup and the KYC verification.
+
+                      </Typography>
+                    </Box>
+                    {groupId &&
+                    <Link to={`/group/registerCompany/${groupId}`} >
+                      <Typography
+                        sx={{
+                          color: '#fff',
+                          borderRadius: '20px',
+                          padding: '6px 16px',
+                          textTransform: 'none',
+                          '&:hover': {
+                            backgroundColor: '#333',
+                          },
+                        }}
+                      >
+                       Start verification 
+                      </Typography>
+                    </Link>
+}
+                  </Box>
+}
                   {group[0] &&
                     <>
-                      {group[0] && group[0].groupType === "Registered Company" ?
+                      {group[0] && group[0].groupType === "Incorporation" ?
                         <>
                           <Card style={{ marginTop: "16px", paddingBottom: "0px" }}>
                             <Box mt={0}>
@@ -239,16 +286,12 @@ const GroupDetailPage = () => {
                                 <Tab label="Account" />
                                 <Tab label="Assets" />
                                 <Tab label="Members" />
-                                <Tab label="Chats" />
                                 <Tab label="Stakeholders" />
                                 <Tab label="Subgroups" />
                                 <Tab label="Rewards" />
+                                <Tab label="Chats" />
                                 <Tab label="Details" />
                                 <Tab label="Settings" />
-                                <Tab label="Rewards" />
-                                <Tab label="Details" />
-                                <Tab label="Settings" />
-
                               </Tabs>
                             </Box>
                           </Card>
@@ -277,28 +320,29 @@ const GroupDetailPage = () => {
                                   </Box>
                                 )}
                                 {tabValue === 4 && (
-                                  <Box>
-                                    <ChatComponent />
-                                  </Box>
-                                )}
-                                {tabValue === 5 && (
                                   <>
                                     <Box>
                                       {/* <Stakeholder groupId={groupId} /> */}
-                                      <Stakeholder groupId={groupId}/>
+                                      <Stakeholder groupId={groupId} />
                                     </Box>
                                   </>
                                 )}
-                                {tabValue === 6 && (
+                                {tabValue === 5 && (
                                   <>
                                     <Box>
                                       <Typography>Subgroups Component</Typography>
                                     </Box>
                                   </>
                                 )}
-                                {tabValue === 7 && (
+                                {tabValue === 6 && (
                                   <Box>
                                     <Rewards />
+                                  </Box>
+                                )}
+
+                                {tabValue === 7 && (
+                                  <Box>
+                                    <ChatComponent />
                                   </Box>
                                 )}
                                 {tabValue === 8 && (
