@@ -155,7 +155,7 @@ function GroupTable({ groups }) {
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {renderGroupRows(groups.filter(group => group[0].groupType === "registeredCompany"))}
+                            {renderGroupRows(groups.filter(group => group[0].groupType === "Incorporation"))}
                         </TableBody>
                     </Table>
                 </ChildCard>
