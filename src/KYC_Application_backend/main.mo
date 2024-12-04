@@ -23,6 +23,11 @@ import Random "mo:base/Random";
 
 actor KYC_Canister {
 
+  //====================================================================
+
+
+  //====================================================================
+
   type Customer = {
     id : Text;
     given_name : Text;
@@ -313,7 +318,7 @@ public query func getFullApplicantCustomers() : async [Customer] {
           groupName = "DefaultGroup";
           groupType = "Default";
           logoHash = "";
-          companyDetails = null;
+          registerCompanyForm = null;
           publicLawEntityDetails = null;
           personalRecords = [];
           accoundId = "";
@@ -368,7 +373,7 @@ public query func getFullApplicantCustomers() : async [Customer] {
           groupName = "DefaultGroup";
           groupType = "Default";
           logoHash = "";
-          companyDetails = null;
+          registerCompanyForm = null;
           publicLawEntityDetails = null;
           personalRecords = [];
           subGroups = [];
@@ -917,6 +922,96 @@ public func removeIIByEmail(email : Text) : async Text {
     beneficialOwner : Text;
   };
 
+type RegisterCompanyForm = {
+  companyDetails: {
+    companyName: Text;
+    industrySector: Text;
+    companyPurpose: Text;
+    registrationNumber: Text;
+    taxId: Text;
+    legalStructure: Text;
+    countryOfRegistry: Text;
+    corporateDocumentation: {
+      incorporationCertificate: ?Text; // Optional Blob for files
+      memorandumAndArticles: ?Text;   // Optional Blob for files
+    };
+  };
+  leadershipAndOwnership: {
+    executiveManager: {
+      isUserManager: Bool;
+      otherManagers: [Text]; // Array of other manager names
+    };
+    economicBeneficiary: {
+      beneficiaryType: {
+        #Shareholders;
+        #OnlyMe;
+        #OtherEntityOrPerson;
+      };
+      shareholderAdditionMethod: {
+        #Manual;
+        #UploadShareholderBook;
+      };
+      digitalShares: Bool;
+    };
+    boardOfDirectors: {
+      exists: Bool;
+      canVoteInSystem: Bool;
+    };
+    annualDischarge: {
+      isAnnualVotingRequired: Bool;
+    };
+  };
+    dailySpendingPower: Nat; // REQUIRE
+  monthlySpendingPower: Nat; //  REQUIRE
+  governanceAndLimitations: {
+    spendingPowerLimitations: Bool;
+    transactionApproval: {
+      groupAdminApprovalMethod: {
+        #BoardVoting;
+        #ShareholderAssemblyVoting;
+      };
+      groupMemberApprovalMethod: {
+        #GroupAdminApproval;
+        #MemberSpendingPowerApproval;
+      };
+    };
+    management: {
+      adminAdditionMethod: {
+        #GroupAdmin;
+        #BoardVoting;
+        #ShareholderAssemblyVoting;
+      };
+    };
+    boardOfDirectors: {
+      memberAdditionMethod: {
+        #GroupAdmin;
+        #BoardVoting;
+        #ShareholderAssemblyVoting;
+      };
+    };
+  };
+  auditing: {
+    isAuditingRequired: Bool;
+    auditScope: {
+      #AllTransactionsIncludingBankAccounts;
+      #AllTransactionsWithoutBankAccounts;
+      #OnlyCOOWNTransactions;
+    };
+    auditorNominationMethod: {
+      #BoardApproves;
+      #GroupAdminNominates;
+      #ShareholderAssemblyApproves;
+    };
+    auditReportRecipients: {
+      #BoardAndExecutiveManagers;
+      #ShareholdersBoardAndManagers;
+    };
+    promotionAccepted: Bool;
+  };
+};
+
+
+
   type EntityInformation = {
     entityName : Text;
     address : Text;
@@ -947,7 +1042,7 @@ public func removeIIByEmail(email : Text) : async Text {
     groupName : Text;
     groupType : Text;
     logoHash:Text;
-    companyDetails : ?CompanyDetails; //null
+  registerCompanyForm: ?RegisterCompanyForm; // Replace `companyDetails` with `registerCompanyForm`
     publicLawEntityDetails : ?PublicLawEntityDetails;
     personalRecords : [PersonalRecord]; //empty
     accoundId : Text;
@@ -1031,7 +1126,7 @@ public func createSubscription(
           groupName = groupName;
           groupType = groupType;
           logoHash = logoHash;
-          companyDetails = null;
+          registerCompanyForm = null;
           publicLawEntityDetails = null;
           personalRecords = [];
           subGroups = [];
@@ -1134,49 +1229,193 @@ public func createSubscription(
     };
   };
 
+  // public func updateIncorporationGroup(
+  //   groupId : Text,
+  //   companyName : Text,
+  //   industrySector : Text,
+  //   registrationNumber : Text,
+  //   taxId : Text,
+  //   legalStructure : Text,
+  //   registeredAddress : Text,
+  //   incorporationCertificate : Text,
+  //   memorandumAndArticles : Text,
+  //   economicOwner : Text,
+  //   beneficialOwner : Text,
+  // ) : async Text {
+  //   switch (groups.get(groupId)) {
+  //     case (null) {
+  //       return "Group does not exist.";
+  //     };
+  //     case (?group) {
+  //       if (group.groupType != "Incorporation") {
+  //         return "Invalid group type for this operation.";
+  //       } else {
+  //         let updatedCompanyDetails = {
+  //           companyName = companyName;
+  //           industrySector = industrySector;
+  //           registrationNumber = registrationNumber;
+  //           taxId = taxId;
+  //           legalStructure = legalStructure;
+  //           registeredAddress = registeredAddress;
+  //           incorporationCertificate = ?incorporationCertificate;
+  //           memorandumAndArticles = ?memorandumAndArticles;
+  //           economicOwner = economicOwner;
+  //           beneficialOwner = beneficialOwner;
+  //         };
+  //         let updatedGroup = {
+  //           group with
+  //           companyDetails = ?updatedCompanyDetails
+  //         };
+  //         groups.put(groupId, updatedGroup);
+  //         return "Incorporation details updated successfully.";
+  //       };
+  //     };
+  //   };
+  // };
+
   public func updateIncorporationGroup(
-    groupId : Text,
-    companyName : Text,
-    industrySector : Text,
-    registrationNumber : Text,
-    taxId : Text,
-    legalStructure : Text,
-    registeredAddress : Text,
-    incorporationCertificate : Text,
-    memorandumAndArticles : Text,
-    economicOwner : Text,
-    beneficialOwner : Text,
-  ) : async Text {
-    switch (groups.get(groupId)) {
-      case (null) {
-        return "Group does not exist.";
-      };
-      case (?group) {
-        if (group.groupType != "Incorporation") {
-          return "Invalid group type for this operation.";
-        } else {
-          let updatedCompanyDetails = {
+  groupId: Text,
+  companyName: Text,
+  industrySector: Text,
+  companyPurpose: Text,
+  registrationNumber: Text,
+  taxId: Text,
+  legalStructure: Text,
+  countryOfRegistry: Text,
+  incorporationCertificate: Text,
+  memorandumAndArticles: Text,
+  isUserManager: Bool,
+  otherManagers: [Text],
+  beneficiaryType: {
+    #Shareholders;
+    #OnlyMe;
+    #OtherEntityOrPerson;
+  },
+  shareholderAdditionMethod: {
+    #Manual;
+    #UploadShareholderBook;
+  },
+  digitalShares: Bool,
+    dailySpendingPower: Nat, // REQUIRE
+  monthlySpendingPower: Nat, //  REQUIRE
+  boardExists: Bool,
+  canVoteInSystem: Bool,
+  isAnnualVotingRequired: Bool,
+  spendingPowerLimitations: Bool,
+  groupAdminApprovalMethod: {
+    #BoardVoting;
+    #ShareholderAssemblyVoting;
+  },
+  groupMemberApprovalMethod: {
+    #GroupAdminApproval;
+    #MemberSpendingPowerApproval;
+  },
+  adminAdditionMethod: {
+    #GroupAdmin;
+    #BoardVoting;
+    #ShareholderAssemblyVoting;
+  },
+  boardMemberAdditionMethod: {
+    #GroupAdmin;
+    #BoardVoting;
+    #ShareholderAssemblyVoting;
+  },
+  isAuditingRequired: Bool,
+  auditScope: {
+    #AllTransactionsIncludingBankAccounts;
+    #AllTransactionsWithoutBankAccounts;
+    #OnlyCOOWNTransactions;
+  },
+  auditorNominationMethod: {
+    #BoardApproves;
+    #GroupAdminNominates;
+    #ShareholderAssemblyApproves;
+  },
+  auditReportRecipients: {
+    #BoardAndExecutiveManagers;
+    #ShareholdersBoardAndManagers;
+  },
+  promotionAccepted: Bool
+) : async Text {
+  switch (groups.get(groupId)) {
+    case (null) {
+      return "Group does not exist.";
+    };
+    case (?group) {
+      if (group.groupType != "Incorporation") {
+        return "Invalid group type for this operation.";
+      } else {
+        // Construct RegisterCompanyForm from the provided fields
+        let registerCompanyForm: RegisterCompanyForm = {
+          companyDetails = {
+            
             companyName = companyName;
             industrySector = industrySector;
+            companyPurpose = companyPurpose;
             registrationNumber = registrationNumber;
             taxId = taxId;
             legalStructure = legalStructure;
-            registeredAddress = registeredAddress;
-            incorporationCertificate = ?incorporationCertificate;
-            memorandumAndArticles = ?memorandumAndArticles;
-            economicOwner = economicOwner;
-            beneficialOwner = beneficialOwner;
+            countryOfRegistry = countryOfRegistry;
+              
+            corporateDocumentation = {
+              incorporationCertificate = ?incorporationCertificate;
+              memorandumAndArticles = ?memorandumAndArticles;
+            };
           };
-          let updatedGroup = {
-            group with
-            companyDetails = ?updatedCompanyDetails
+          dailySpendingPower= dailySpendingPower; // REQUIRE
+          monthlySpendingPower= monthlySpendingPower; //  REQUIRE
+          leadershipAndOwnership = {
+            executiveManager = {
+              isUserManager = isUserManager;
+              otherManagers = otherManagers;
+            };
+            economicBeneficiary = {
+              beneficiaryType = beneficiaryType;
+              shareholderAdditionMethod = shareholderAdditionMethod;
+              digitalShares = digitalShares;
+            };
+            boardOfDirectors = {
+              exists = boardExists;
+              canVoteInSystem = canVoteInSystem;
+            };
+            annualDischarge = {
+              isAnnualVotingRequired = isAnnualVotingRequired;
+            };
           };
-          groups.put(groupId, updatedGroup);
-          return "Incorporation details updated successfully.";
+          governanceAndLimitations = {
+            spendingPowerLimitations = spendingPowerLimitations;
+            transactionApproval = {
+              groupAdminApprovalMethod = groupAdminApprovalMethod;
+              groupMemberApprovalMethod = groupMemberApprovalMethod;
+            };
+            management = {
+              adminAdditionMethod = adminAdditionMethod;
+            };
+            boardOfDirectors = {
+              memberAdditionMethod = boardMemberAdditionMethod;
+            };
+          };
+          auditing = {
+            isAuditingRequired = isAuditingRequired;
+            auditScope = auditScope;
+            auditorNominationMethod = auditorNominationMethod;
+            auditReportRecipients = auditReportRecipients;
+            promotionAccepted = promotionAccepted;
+          };
         };
+
+        // Update the group with the constructed RegisterCompanyForm
+        let updatedGroup = {
+          group with
+          registerCompanyForm = ?registerCompanyForm
+        };
+        groups.put(groupId, updatedGroup);
+        return "Incorporation details updated successfully.";
       };
     };
   };
+};
+
 
   public func getGroup(groupId : Text) : async ?Group {
     return groups.get(groupId);
