@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Breadcrumb from '../../../layouts/full/shared/breadcrumb/Breadcrumb';
 import PageContainer from '../../../components/container/PageContainer';
 import ChildCard from '../../../components/shared/ChildCard';
@@ -36,6 +36,12 @@ const BCrumb = [
     title: 'Create Group',
   },
 ];
+
+const cardData = [
+  { id: 'private', value: 19 },
+  { id: 'Incorporation', value: 168 },
+];
+
 
 const CreateGroup = () => {
   const { groupType } = useParams();
@@ -92,6 +98,14 @@ const CreateGroup = () => {
 
   const handleChange = (event) => {
     setStorage(event.target.value);
+    if(event.target.value == '5GB'){
+      setStorageFee(72);
+    }else if(event.target.value == '25GB'){
+      setStorageFee(262);
+    }else{
+      setStorageFee(0);
+
+    }
   };
 
   const generateRandom = () => {
@@ -105,10 +119,10 @@ const CreateGroup = () => {
   };
 
   const handleSubmit = async () => {
-    setLoading(false);
-    
-      const randomNumber = generateRandom();
-      console.log('data', user, randomNumber, groupName, groupType, groupLogo, storage, storageFee, setupFee, annualFee)
+    setLoading(true);
+
+    const randomNumber = generateRandom();
+    console.log('data', user, randomNumber, groupName, groupType, groupLogo, storage, storageFee, setupFee, annualFee)
     try {
       const result = await fleekSdk.storage().uploadFile({
         file: groupLogo,
@@ -120,14 +134,25 @@ const CreateGroup = () => {
       console.log('result', result);
       console.log('params', user, result.pin.cid);
       const response = await ledger.call('createGroup', user, randomNumber, groupName, groupType, result.pin.cid, storage, storageFee, setupFee, annualFee);
-      console.log('response 1',response);
-      swal('Success',response,'success');
+      console.log('response 1', response);
+      swal('Success', response, 'success');
     } catch (error) {
       console.log('error', error);
     }
-    setLoading(true);
+    setLoading(false);
 
   };
+
+  useEffect(()=>{
+    if(groupType == 'private'){
+      setAnnualFee(19);
+    }
+    else if(groupType == 'Incorporation'){
+      setAnnualFee(168);
+
+    }
+  },[groupType]);
+
   const initialCurrencyData = [
     { coin: "USD", symbol: "ckUSD", balance: "100 000", usd: "100 000 USD" },
     { coin: "Euro", symbol: "ckEURC", balance: "100 000", usd: "100 000 USD" },
@@ -298,14 +323,14 @@ const CreateGroup = () => {
                   <Typography variant="body2" fontSize="14px" color="gray">Annual fee</Typography>
                 </Grid>
                 <Grid item xs={6} textAlign="right">
-                  <Typography variant="body2" fontSize="14px" fontWeight="bold">168 USD</Typography>
+                  <Typography variant="body2" fontSize="14px" fontWeight="bold">{annualFee} USD</Typography>
                 </Grid>
 
                 <Grid item xs={6}>
                   <Typography variant="body2" fontSize="14px" color="gray">Annual storage fee</Typography>
                 </Grid>
                 <Grid item xs={6} textAlign="right">
-                  <Typography variant="body2" fontSize="14px" fontWeight="bold">72 USD</Typography>
+                  <Typography variant="body2" fontSize="14px" fontWeight="bold">{storageFee} USD</Typography>
                 </Grid>
               </Grid>
 
@@ -329,7 +354,7 @@ const CreateGroup = () => {
                 </Grid>
                 <Grid item xs={12} textAlign="right">
                   <Typography variant="h5" fontWeight="bold">
-                    240 USD
+                    {annualFee+storageFee} USD
                   </Typography>
                 </Grid>
               </Grid>
@@ -410,7 +435,7 @@ const CreateGroup = () => {
           <Grid container>
             <Grid item xs={12}>
               <Button sx={{ width: '100%' }} onClick={handleOpenDailog2} variant="contained" color="primary">
-                Pay 240 USD
+                Pay  {annualFee+storageFee} USD
               </Button></Grid>
           </Grid>
         </DialogActions>
@@ -494,7 +519,7 @@ const CreateGroup = () => {
             <Grid item xs={12}>
               <Button
                 startIcon={<CopyIcon />} sx={{ width: '100%' }} onClick={handleSubmit} variant="contained" color="primary">
-                1A1zP1...DivfNa
+               {isLoading ?'Paying ...':'1A1zP1...DivfNa'} 
               </Button>
 
               <Button sx={{ width: '100%', mt: 2 }} onClick={handleCloseDialog2} variant="outlined" color="primary">

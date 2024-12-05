@@ -32,8 +32,9 @@ const initialState1 = {
   countryOfRegistry: "",
   incorporationCertificate: null,
   memorandumArticles: null,
-  isUserManager: false,
-  otherManagers: '',//
+  isUserManager: 'Self',
+  otherManagers: [],
+  otherManagersArray:[],
   beneficiaryType: 'Shareholders',
   shareholderAdditionMethod: 'Manual',
   digitalShares: false,
@@ -59,6 +60,8 @@ const RegisterCompany = () => {
   const [activeStep, setActiveStep] = useState(0);
   const [formData, setFormData] = useState(initialState1);
   const [firstImage, setFirstImage] = useState('');
+  const [hashOne, setHashOne] = useState('');
+  const [hashTwo, setHashTwo] = useState('');
   const [secondImage, setSecondImage] = useState('');
   const [Addmore, setAddMore] = useState('');
   const [loading, setLoading] = useState(false);
@@ -108,6 +111,16 @@ const RegisterCompany = () => {
   const handleAddmore = () => {
     setAddMore(!Addmore);
   }
+  const mapUserManager = (value) => {
+    switch (value) {
+      case "Self":
+        return { Self: null };
+      case "OtherPerson":
+        return { OtherPerson: null };
+      default:
+        throw new Error(`Invalid beneficiaryType: ${value}`);
+    }
+  };
   const mapBeneficiaryType = (value) => {
     switch (value) {
       case "Shareholders":
@@ -217,32 +230,53 @@ const RegisterCompany = () => {
     }
   };
 
+  const handleArrayInput = (event) => {
+    const { id, value } = event.target;
+
+    // Update the state with the array formed by splitting the input value by commas
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      [id]: value, // Store the raw input string for display purposes
+      [`${id}Array`]: value.split(',').map((item) => item.trim()).filter(Boolean), // Processed array
+    }));
+  };
+
+
   const handleNext = async () => {
     console.log('formdata ', formData);
     if (activeStep === steps.length - 1) {
       setLoading(true);
       console.log('saving');
       try {
-        const result1 = await fleekSdk.storage().uploadFile({
-          file: formData.incorporationCertificate,
-          onUploadProgress: (progress) => {
-            // console.log(`Upload progress: ${(progress.loaded / progress.total) * 100}%`);
-          },
-        });
-        // setHash(result.pin.cid);
-        console.log('result', result1);
-        console.log('params', result1.pin.cid);
-
-        const result2 = await fleekSdk.storage().uploadFile({
-          file: formData.memorandumArticles,
-          onUploadProgress: (progress) => {
-            // console.log(`Upload progress: ${(progress.loaded / progress.total) * 100}%`);
-          },
-        });
-        // setHash(result.pin.cid);
-        console.log('result', result2);
-        console.log('params', result2.pin.cid);
-
+        if (formData.incorporationCertificate) {
+          const result1 = await fleekSdk.storage().uploadFile({
+            file: formData.incorporationCertificate,
+            onUploadProgress: (progress) => {
+              // console.log(`Upload progress: ${(progress.loaded / progress.total) * 100}%`);
+            },
+          });
+          // setHash(result.pin.cid);
+          console.log('result', result1);
+          console.log('params', result1.pin.cid);
+          setHashOne(result1.pin.cid);
+        }
+        else {
+          setHashOne('');
+        }
+        if (formData.memorandumArticles) {
+          const result2 = await fleekSdk.storage().uploadFile({
+            file: formData.memorandumArticles,
+            onUploadProgress: (progress) => {
+              // console.log(`Upload progress: ${(progress.loaded / progress.total) * 100}%`);
+            },
+          });
+          // setHash(result.pin.cid);
+          console.log('result', result2);
+          console.log('params', result2.pin.cid);
+          setHashTwo(result2.pin.cid);
+        } else {
+          setHashTwo('');
+        }
 
         const response = await ledger.call(
           'updateIncorporationGroup',
@@ -254,10 +288,10 @@ const RegisterCompany = () => {
           formData.taxId,
           formData.legalStructure,
           formData.countryOfRegistry,
-          result1.pin.cid,
-          result2.pin.cid,
-          formData.isUserManager,
-          formData.otherManagers ? formData.otherManagers.split(',') : [], // Ensure array
+          hashOne,
+          hashTwo,
+          mapUserManager(formData.isUserManager),
+          formData.otherManagersArray || [] , // Ensure array
           mapBeneficiaryType(formData.beneficiaryType),
           mapShareholderAdditionMethod(formData.shareholderAdditionMethod),
           formData.digitalShares,
@@ -485,18 +519,18 @@ const RegisterCompany = () => {
                       <CustomFormLabel>Who is the Executive Manager?</CustomFormLabel>
                       <FormControl component="fieldset">
                         <RadioGroup
-                        // id='isUserManager'
-                        // name='isUserManager'
-                        // onChange={handleSelectChange("isUserManager")}
-                        // value={formData.isUserManager}
+                          id='isUserManager'
+                          name='isUserManager'
+                          onChange={handleSelectChange("isUserManager")}
+                          value={formData.isUserManager}
                         >
                           <FormControlLabel
-                            // value="true"
+                            value="Self"
                             control={<Radio />}
                             label="I am the Executive Manager"
                           />
                           <FormControlLabel
-                            // value="false"
+                            value="OtherPerson"
                             control={<Radio />}
                             label="Another person is the Executive Manager"
                           />
@@ -523,8 +557,8 @@ const RegisterCompany = () => {
                             type="text"
                             placeholder="Add Executive Manager"
                             id="otherManagers"
-                            onChange={handleInputChange}
-                            value={formData.otherManagers}
+                            value={formData.otherManagers || ''} // Display raw input
+                            onChange={handleArrayInput}
                           />
                         </Grid>
                         <Grid item xs={12}>
