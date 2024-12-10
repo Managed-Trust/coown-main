@@ -21,6 +21,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import InfoOutlined from "@mui/icons-material/InfoOutlined";
 import ic from "ic0";
 import WebcamCapture from "../../../WebCapture";
+import Webcam from 'react-webcam';
 import CustomFormLabel from "../theme-elements/CustomFormLabel";
 import ParentCard from "../../../components/shared/ParentCard";
 import PageContainer from "../../../components/container/PageContainer";
@@ -94,7 +95,7 @@ const steps = [
 const FormTabs = () => {
   const { user, setUser } = useUser();
   const [userId, setUserId] = useState(null);
-  const [activeStep, setActiveStep] = useState(0);
+  const [activeStep, setActiveStep] = useState(4);
   const [formData, setFormData] = useState(initialState);
   const [documentPreview, setDocumentPreview] = useState(null);
   const [addressDocumentPreview, setAddressDocumentPreview] = useState(null);
@@ -103,8 +104,72 @@ const FormTabs = () => {
   const [skipped, setSkipped] = useState(new Set());
   const [loading, setLoading] = useState(false);
   const [file, setFile] = useState(null);
-  const [hash, setHash] = useState("");
+  const webcamRef = useRef(null);
+  const intervalRef = useRef(null);
+  const mediaRecorderRef = useRef(null);
+  const [capturing, setCapturing] = useState(false);
+  const [recorded, setRecorded] = useState(false);
+  const [recordedChunks, setRecordedChunks] = useState([]);
+  const [preview, setPreview] = useState(null);
+  const timeoutRef = useRef(null);
+  const startTimeRef = useRef(null);
+  const [elapsedTime, setElapsedTime] = useState(0);
 
+  const handleDataAvailable = useCallback((event) => {
+    if (event.data.size > 0) {
+      setRecordedChunks((prev) => [...prev, event.data]);
+    }
+  }, []);
+
+  const handleStartCaptureClick = useCallback(() => {
+    setCapturing(true);
+    setElapsedTime(0); // Reset elapsed time
+    startTimeRef.current = new Date().getTime(); // Record the start time
+
+    const options = { mimeType: 'video/webm' };
+    mediaRecorderRef.current = new MediaRecorder(webcamRef.current.stream, options);
+    mediaRecorderRef.current.addEventListener('dataavailable', handleDataAvailable);
+    mediaRecorderRef.current.start();
+
+    // Start interval to calculate elapsed time
+    intervalRef.current = setInterval(() => {
+      const now = new Date().getTime();
+      const elapsed = Math.floor((now - startTimeRef.current) / 1000); // Calculate elapsed seconds
+      if (elapsed >= 60) {
+        handleStopCaptureClick(); // Stop recording after 60 seconds
+      } else {
+        setElapsedTime(elapsed); // Update elapsed time
+      }
+    }, 1000);
+  }, [handleDataAvailable]);
+
+  const handleStopCaptureClick = useCallback(() => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current); // Clear timeout
+      timeoutRef.current = null;
+    }
+    if (mediaRecorderRef.current) {
+      mediaRecorderRef.current.stop();
+    }
+    setCapturing(false);
+    setRecorded(true);
+  }, []);
+  // Generate video preview
+  const handlePreview = useCallback(() => {
+    if (recordedChunks.length) {
+      const blob = new Blob(recordedChunks, { type: 'video/webm' });
+      const url = URL.createObjectURL(blob);
+      setPreview(url);
+    }
+  }, [recordedChunks]);
+
+  const handleRetake = (() => {
+    setRecordedChunks([]);
+    setPreview(null);
+    setCapturing(false);
+    setRecorded(false);
+    setElapsedTime(0);
+  });
 
   const isStepOptional = (step) => false;
   const isStepSkipped = (step) => skipped.has(step);
@@ -313,7 +378,7 @@ const FormTabs = () => {
       case 3:
         return file;
       case 4:
-        return image;
+        return preview;
       default:
         return false;
     }
@@ -331,7 +396,7 @@ const FormTabs = () => {
   }
 
   const handleCapture = async (imageSrc) => {
-        setImage(imageSrc);
+    setImage(imageSrc);
     try {
       console.log("Captured Image: ", imageSrc);
     } catch (error) {
@@ -472,7 +537,7 @@ const FormTabs = () => {
   };
 
   const handleCaptureImageSubmit = async () => {
-    
+
     const file = base64ToFile(image, 'live-image.jpg');
     console.log('params', userId, image);
     setLoading(true);
@@ -511,7 +576,56 @@ const FormTabs = () => {
       setLoading(false);
     }
   };
+  const handleCaptureVideoSubmit = async () => {
+    if (!preview) {
+      console.error('No video to upload.');
+      return;
+    }
+    console.log('preview',preview);
+    setLoading(true);
+    try {
 
+    const response = await fetch(preview);
+    const blob = await response.blob(); // Retrieve the actual blob data
+
+    // Optionally, convert the blob to a file with a filename
+    const file = new File([blob], 'recording.webm', { type: 'video/webm' });
+    console.log('file',file);
+
+      const result = await fleekSdk.storage().uploadFile({
+        file: file,
+        onUploadProgress: (progress) => {
+        },
+      });
+      console.log('result', result);
+      console.log('params', result.pin.cid);
+      const response1 = await ledger.call("addImage", userId, result.pin.cid);
+      // setResults(response.data.data);
+      console.log('response', response1);
+
+      if (response1 == 'Success') {
+        swal({
+          title: 'Success',
+          text: 'Image Stored Successfully!',
+          icon: 'success',
+        });
+        handleNext();
+      } else {
+        swal({
+          title: 'Info',
+          text: response1,
+          icon: 'info',
+        });
+      }
+    } catch (e) {
+      // Convert the error to a string
+      console.log('error', e);
+      const errorMessage = e.message || 'An unexpected error occurred.';
+      swal("Error", errorMessage, "error");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSteps = (step) => {
     switch (step) {
@@ -1105,7 +1219,46 @@ const FormTabs = () => {
                 </Typography>
               </Grid>
               <Grid item xs={12} lg={8}>
-                {!image ? (
+                {preview ? (
+                  <div className="video-preview">
+                    <video src={preview} controls />
+                  </div>
+                ) :
+                  <>
+                    <Webcam audio={false} ref={webcamRef} />
+                  </>
+                }
+                <Box display='flex' justifyContent='center' mt={2} gap={2} >
+                  {!preview ? <>
+                    {capturing ? (
+                      <>
+                        <Box display='flex' flexDirection='column' justifyContent='center'>
+                          <Typography sx={{ textAlign: 'center', color: 'blue' }}>0:{elapsedTime}s</Typography>
+
+                          <Button onClick={handleStopCaptureClick} color="primary" variant="contained" >Stop Recording</Button>
+                        </Box>
+                      </>
+                    ) : (
+                      <Box display='flex' flexDirection='row' justifyContent='center' gap={2}>
+
+                        {recorded ?
+                          <>
+                            <Button onClick={handlePreview} color="primary" variant="contained">Preview</Button>
+                          </> :
+
+                          <Button onClick={handleStartCaptureClick} color="primary" variant="contained" >Start Recording</Button>
+                        }
+                      </Box>
+                    )}
+                  </> :
+                    <Box display='flex' flexDirection='row' justifyContent='center' gap={2}>
+
+                      <Button  onClick={handleRetake}  color="primary" variant="contained">Retake</Button>
+
+                    </Box>
+                  }
+                </Box>
+                {/* {!image ? (
                   <div style={{ borderRadius: "10px" }}>
                     <WebcamCapture onCapture={handleCapture} />
                   </div>
@@ -1115,7 +1268,7 @@ const FormTabs = () => {
                     <img src={image} alt="Captured" />
                     <Button onClick={() => setImage(null)}>Retake</Button>
                   </div>
-                )}
+                )} */}
               </Grid>
             </Grid>
             <Box mt={3} display="flex" justifyContent="space-between">
@@ -1125,7 +1278,8 @@ const FormTabs = () => {
               <Button
                 variant="contained"
                 color="primary"
-                onClick={handleCaptureImageSubmit}
+                // onClick={handleCaptureImageSubmit}
+                onClick={handleCaptureVideoSubmit}
                 disabled={!isFormValid(4) || loading}
               >
                 {loading ? <CircularProgress size={24} /> : "Finish"}

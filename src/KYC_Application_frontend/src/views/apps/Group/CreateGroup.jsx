@@ -40,7 +40,8 @@ import {
 import { Principal } from "@dfinity/principal";
 import { AuthClient } from "@dfinity/auth-client";
 // import { createActor } from "../../../declarations/Token";
-import { createActor } from "../../../declarations/Token";
+import { createActor } from "../../../../../declarations/Token";
+// import { createActor } from "../../../declarations/Token";
 
 // const ledger = ic.local('bkyz2-fmaaa-aaaaa-qaaaq-cai'); //local
 const ledger = ic("speiw-5iaaa-aaaap-ahora-cai"); // Ledger canister
