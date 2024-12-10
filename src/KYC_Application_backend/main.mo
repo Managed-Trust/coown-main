@@ -4,7 +4,7 @@ import Cycles "mo:base/ExperimentalCycles";
 import HashMap "mo:base/HashMap";
 import List "mo:base/List";
 import Iter "mo:base/Iter";
-import Map "mo:base/HashMap";
+import Map "mo:base/HashMap"; 
 import Text "mo:base/Text";
 import Bool "mo:base/Bool";
 import Error "mo:base/Error";
@@ -20,13 +20,9 @@ import Float "mo:base/Float";
 import ExperimentalStableMemory "mo:base/ExperimentalStableMemory";
 import StableMemory "mo:base/ExperimentalStableMemory";
 import Random "mo:base/Random";
+import AccountActorClass "./Account";
 
 actor KYC_Canister {
-
-  //====================================================================
-
-
-  //====================================================================
 
   type Customer = {
     id : Text;
@@ -318,6 +314,7 @@ public query func getFullApplicantCustomers() : async [Customer] {
           groupName = "DefaultGroup";
           groupType = "Default";
           logoHash = "";
+          groupAuthorization = null;
           registerCompanyForm = null;
           publicLawEntityDetails = null;
           personalRecords = [];
@@ -373,6 +370,7 @@ public query func getFullApplicantCustomers() : async [Customer] {
           groupName = "DefaultGroup";
           groupType = "Default";
           logoHash = "";
+          groupAuthorization = null;
           registerCompanyForm = null;
           publicLawEntityDetails = null;
           personalRecords = [];
@@ -762,9 +760,6 @@ public func removeIIByEmail(email : Text) : async Text {
   };
 };
 
-
-
-
   private stable var userEntries : [(Text, User)] = [];
   var users = HashMap.HashMap<Text, User>(0, Text.equal, Text.hash);
   //==================================================================================
@@ -825,8 +820,6 @@ public func removeIIByEmail(email : Text) : async Text {
         };
     };
 };
-
-
   //==============================================================
   //OTP logic
   //==============================================================
@@ -938,7 +931,8 @@ type RegisterCompanyForm = {
   };
   leadershipAndOwnership: {
     executiveManager: {
-      isUserManager: Bool;
+      isUserManager: { #Self;
+    #OtherPerson};
       otherManagers: [Text]; // Array of other manager names
     };
     economicBeneficiary: {
@@ -1010,8 +1004,6 @@ type RegisterCompanyForm = {
   };
 };
 
-
-
   type EntityInformation = {
     entityName : Text;
     address : Text;
@@ -1041,8 +1033,9 @@ type RegisterCompanyForm = {
     adminId : Text;
     groupName : Text;
     groupType : Text;
-    logoHash:Text;
-  registerCompanyForm: ?RegisterCompanyForm; // Replace `companyDetails` with `registerCompanyForm`
+    logoHash :  Text;
+    groupAuthorization :?Text; // Foundation, developers, Treasury
+    registerCompanyForm: ?RegisterCompanyForm; // Replace `companyDetails` with `registerCompanyForm`
     publicLawEntityDetails : ?PublicLawEntityDetails;
     personalRecords : [PersonalRecord]; //empty
     accoundId : Text;
@@ -1126,6 +1119,7 @@ public func createSubscription(
           groupName = groupName;
           groupType = groupType;
           logoHash = logoHash;
+          groupAuthorization = null;
           registerCompanyForm = null;
           publicLawEntityDetails = null;
           personalRecords = [];
@@ -1284,8 +1278,9 @@ public func createSubscription(
   countryOfRegistry: Text,
   incorporationCertificate: Text,
   memorandumAndArticles: Text,
-  isUserManager: Bool,
-  otherManagers: [Text],
+ isUserManager: { #Self;
+    #OtherPerson},
+      otherManagers: [Text],
   beneficiaryType: {
     #Shareholders;
     #OnlyMe;
@@ -1296,7 +1291,7 @@ public func createSubscription(
     #UploadShareholderBook;
   },
   digitalShares: Bool,
-    dailySpendingPower: Nat, // REQUIRE
+    dailySpendingPower: Nat, // REQUIRE Add to account
   monthlySpendingPower: Nat, //  REQUIRE
   boardExists: Bool,
   canVoteInSystem: Bool,
@@ -2536,8 +2531,46 @@ public func participateInVote(userId : Text) : async Text {
     };
   };
 };
+//======================================================================
+//======================================================================
+  private stable var accounts : [Principal] = [];
 
+    private stable var accountGroupEntries : [(Text, [Principal])] = [];
+    var accountGroups = HashMap.HashMap<Text, [Principal]>(0, Text.equal, Text.hash);
 
+    public func createAccount(accountId : Text, groupId : Text, initialBalance : Nat) : async Principal {
+        Cycles.add(20_000_000_000); // Since this value increases as time passes, change this value according to error in console.
+
+        let newAccountActor = await AccountActorClass.AccountActor(accountId, groupId, initialBalance, "", "");
+        accounts := Array.append(accounts, [Principal.fromActor(newAccountActor)]);
+        switch (accountGroups.get(groupId)) {
+            case (null) {
+                accountGroups.put(groupId, [Principal.fromActor(newAccountActor)]);
+            };
+            case (?val) {
+                var newVal = Array.append(val, [Principal.fromActor(newAccountActor)]);
+                accountGroups.put(groupId, newVal);
+            };
+        };
+        return Principal.fromActor(newAccountActor);
+    };
+
+    public query func getGroupWallets(groupId : Text) : async ?[Principal] {
+        return accountGroups.get(groupId);
+    };
+
+    public query func listAccounts() : async [Principal] {
+        accounts;
+    };
+
+    public query func getAllAccountGroups() : async [(Text, [Principal])] {
+        return Iter.toArray(accountGroups.entries());
+    };
+
+    public query func getGroupIds() : async [Text] {
+        return Iter.toArray(accountGroups.keys());
+    };
+    
   // Function to get the total number of users
   system func preupgrade() {
     mapEntries := Iter.toArray(map.entries());
@@ -2566,6 +2599,8 @@ public func participateInVote(userId : Text) : async Text {
     referralCodeEntries := Iter.toArray(referralCodes.entries());
 
     // groupIdEntries := Iter.toArray(groupIds.entries());
+    accountGroupEntries := Iter.toArray(accountGroups.entries());
+
 
   };
   system func postupgrade() {
@@ -2591,6 +2626,7 @@ public func participateInVote(userId : Text) : async Text {
     referralCodes := HashMap.fromIter<Text, ReferralCode>(referralCodeEntries.vals(), 1, Text.equal, Text.hash);
 
     // groupIds := HashMap.fromIter<Text, Buffer.Buffer<Text>>(groupIdEntries.vals(), 1, Text.equal, Text.hash);
+    accountGroups := HashMap.fromIter<Text, [Principal]>(accountGroupEntries.vals(), 1, Text.equal, Text.hash);
 
   };
 };
