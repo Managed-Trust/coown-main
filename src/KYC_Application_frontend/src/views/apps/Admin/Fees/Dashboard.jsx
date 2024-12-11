@@ -103,7 +103,7 @@ const affiliatesData = [
 ];
 
 
-function Row({ row }) {
+function Row({ row, openDrawer }) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -126,7 +126,7 @@ function Row({ row }) {
           <IconButton size="small" sx={{ color: '#94a3b8', '&:hover': { color: '#6366f1' } }}>
             <EditIcon fontSize="small" />
           </IconButton>
-          <IconButton size="small" sx={{ color: '#94a3b8', '&:hover': { color: '#6366f1' } }}>
+          <IconButton size="small" sx={{ color: '#94a3b8', '&:hover': { color: '#6366f1' } }} onClick={openDrawer}>
             <ArrowForwardIcon fontSize="small" />
           </IconButton>
         </TableCell>
@@ -135,7 +135,7 @@ function Row({ row }) {
   );
 }
 
-export default function Dashboard() {
+export default function Dashboard({openDrawer}) {
   return (
     <Box mt={4} sx={{ width: '100%', bgcolor: 'background.paper', borderRadius: 2, overflow: 'hidden', boxShadow: '0 0 10px rgba(0,0,0,0.1)' }}>
       <Box sx={{ p: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #e2e8f0' }}>
@@ -158,7 +158,7 @@ export default function Dashboard() {
           </TableHead>
           <TableBody>
             {affiliatesData.map((row) => (
-              <Row key={row.id} row={row} />
+              <Row key={row.id} row={row} openDrawer={openDrawer}/>
             ))}
           </TableBody>
         </Table>
