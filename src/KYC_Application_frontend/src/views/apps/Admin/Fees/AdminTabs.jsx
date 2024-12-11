@@ -22,6 +22,10 @@ const AdminTabs = () => {
       to: '/pages/admin-fees',
     },
     {
+      label: 'Products',
+      to: '/pages/admin-products',
+    },
+    {
       label: 'Management',
       to: '/pages/admin-management',
     }

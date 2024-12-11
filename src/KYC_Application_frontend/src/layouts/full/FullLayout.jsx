@@ -30,6 +30,7 @@ import RegisterCompany from '../../views/apps/Group/RegisterCompany.jsx';
 import AdminMain from '../../views/apps/Admin/Dashboard/main.jsx';
 import LocalizationMain from '../../views/apps/Admin/Localization/main.jsx';
 import Fees from '../../views/apps/Admin/Fees/main.jsx';
+import Products from '../../views/apps/Admin/Products/main.jsx';
 import Management from '../../views/apps/Admin/Management/main.jsx';
 import OperatorMain from '../../views/apps/Operator/Dashboard/main.jsx';
 import OperatorTransectionFees from '../../views/apps/Operator/Transection_Rules/main.jsx';
@@ -112,6 +113,7 @@ const FullLayout = () => {
               <Route path="/pages/admin-dashboard" element={<AdminMain />} />
               <Route path="/pages/admin-localization" element={<LocalizationMain />} />
               <Route path="/pages/admin-fees" element={<Fees />} />
+              <Route path="/pages/admin-products" element={<Products />} />
               <Route path="/pages/admin-management" element={<Management />} />
               <Route path="/pages/operator-dashboard" element={<OperatorMain />} />
               <Route path="/pages/operator-transection-rules" element={<OperatorTransectionFees />} />

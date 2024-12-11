@@ -1,5 +1,5 @@
 import React from 'react';
-import { Tabs, Tab, Box,Card } from '@mui/material';
+import { Tabs, Tab, Box, Card } from '@mui/material';
 import { Link, useLocation } from 'react-router-dom';
 
 const AdminTabs = () => {
@@ -33,7 +33,7 @@ const AdminTabs = () => {
 
   return (
     <Box mt={1} sx={{ mt: 1, backgroundColor: 'white' }}>
-      <Card justifyContent={'start'} display="flex" style={{paddingBottom:"0px"}} sx={{ overflow: 'auto', width: { xs: '333px', sm: 'auto' } }}>
+      <Card justifyContent={'start'} display="flex" style={{ paddingBottom: "0px" }} sx={{ overflow: 'auto', width: { xs: '333px', sm: 'auto' } }}>
         <Tabs value={value} onChange={handleChange} aria-label="scrollable prevent tabs example" variant="scrollable"
           scrollButtons="auto">
           {ProfileTabs.map((tab) => {
