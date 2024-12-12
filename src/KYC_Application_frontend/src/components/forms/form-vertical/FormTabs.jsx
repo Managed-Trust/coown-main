@@ -95,7 +95,7 @@ const steps = [
 const FormTabs = () => {
   const { user, setUser } = useUser();
   const [userId, setUserId] = useState(null);
-  const [activeStep, setActiveStep] = useState(4);
+  const [activeStep, setActiveStep] = useState(0);
   const [formData, setFormData] = useState(initialState);
   const [documentPreview, setDocumentPreview] = useState(null);
   const [addressDocumentPreview, setAddressDocumentPreview] = useState(null);

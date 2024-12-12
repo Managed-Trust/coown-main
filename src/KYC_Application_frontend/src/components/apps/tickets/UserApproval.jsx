@@ -62,7 +62,7 @@ const UserApproval = () => {
         }
         setLoading(false);
     };
-     const checkDocumentStatus = async () => {
+    const checkDocumentStatus = async () => {
         try {
             const result = await ledger.call("isDocumentVerified", id);
             console.log('result document', result);
@@ -330,7 +330,7 @@ const UserApproval = () => {
                                             </Grid>
 
                                             <Grid item xs={12}>
-                                            <img
+                                                <img
                                                     src={`https://ipfs.io/ipfs/${profile.residency_doc[0]}`}
                                                     alt="Identity Document"
                                                     style={{ maxWidth: '100%', width: '150px', height: 'auto', marginTop: 10 }}
@@ -423,13 +423,34 @@ const UserApproval = () => {
                                                     style={{ maxWidth: '100%', width: '150px', height: 'auto', marginTop: 10 }}
                                                 />
                                             </Grid>
-                                            <Grid item xs={12} mt={0.5}>
-                                                <img                                                    
+                                            <Grid item xs={12} mt={0.5} style={{ textAlign: 'center', marginTop: '20px' }}>
+                                                <video
                                                     src={`https://ipfs.io/ipfs/${profile.live_photo[0]}`}
-                                                    alt="Identity Document"
-                                                    style={{ maxWidth: '100%', width: '250px', height: 'auto', marginTop: 10 }}
-                                                />
+                                                    controls
+                                                    style={{
+                                                        maxWidth: '100%',
+                                                        width: '450px',
+                                                        height: 'auto',
+                                                        marginTop: 10,
+                                                        borderRadius: '12px',
+                                                        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)',
+                                                        transition: 'transform 0.2s, box-shadow 0.2s',
+                                                    }}
+                                                    onMouseOver={(e) => {
+                                                        e.currentTarget.style.transform = 'scale(1.02)';
+                                                        e.currentTarget.style.boxShadow =
+                                                            '0 6px 12px rgba(0, 0, 0, 0.15), 0 3px 6px rgba(0, 0, 0, 0.1)';
+                                                    }}
+                                                    onMouseOut={(e) => {
+                                                        e.currentTarget.style.transform = 'scale(1)';
+                                                        e.currentTarget.style.boxShadow =
+                                                            '0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)';
+                                                    }}
+                                                >
+                                                    Your browser does not support the video tag.
+                                                </video>
                                             </Grid>
+
                                         </Grid>
                                     </Grid>
                                 </Box>
