@@ -413,12 +413,15 @@ const UserApproval = () => {
                                             </Grid>
 
                                             <Grid item xs={12} mt={0.5}>
-                                                <img
+                                                <video
                                                     src={`${profile.live_photo[0]}`}
-                                                    alt="Identity Document"
+                                                    controls
                                                     style={{ maxWidth: '100%', width: '150px', height: 'auto', marginTop: 10 }}
-                                                />
+                                                >
+                                                    Your browser does not support the video tag.
+                                                </video>
                                             </Grid>
+
                                         </Grid>
                                     </Grid>
                                 </Box>
@@ -438,11 +441,11 @@ const UserApproval = () => {
                                                     <Switch /> <Typography variant="body1" p={0.2}>Address matches user's data</Typography>
                                                 </Grid>
                                                 <Grid item xs={12} display={'flex'}>
-                                                {documentLoader ? <CircularProgress style={{ color: 'black' }} size={24} /> : <Switch checked={document} onClick={toggleDocument} /> }  <Typography variant="body1" p={0.2}>Document matches user's data</Typography>
+                                                    {documentLoader ? <CircularProgress style={{ color: 'black' }} size={24} /> : <Switch checked={document} onClick={toggleDocument} />}  <Typography variant="body1" p={0.2}>Document matches user's data</Typography>
                                                 </Grid>
                                                 <Grid item xs={12} display={'flex'}>
-                                                {identityLoader ? <CircularProgress style={{ color: 'black' }} size={24} /> : <Switch checked={identity} onClick={toggleIdentity} /> }
-                                                     <Typography variant="body1" p={0.2}>Face matches document</Typography>
+                                                    {identityLoader ? <CircularProgress style={{ color: 'black' }} size={24} /> : <Switch checked={identity} onClick={toggleIdentity} />}
+                                                    <Typography variant="body1" p={0.2}>Face matches document</Typography>
                                                 </Grid>
                                                 <Grid item xs={12}>
                                                     <Box mt={2} p={2} bgcolor="#fce4ec">
