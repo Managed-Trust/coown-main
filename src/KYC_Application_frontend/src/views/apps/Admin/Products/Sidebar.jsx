@@ -1,45 +1,43 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Box,
   Typography,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  Divider,
   Switch,
   TextField,
   Drawer,
   Fab,
   Tooltip,
   IconButton,
-  Chip
+  Tabs,
+  Tab,
+  Checkbox,
 } from '@mui/material';
-import { styled } from '@mui/system';
 import { IconX, IconSettings } from '@tabler/icons';
 import Scrollbar from '../../../../components/custom-scroll/Scrollbar';
-
+import Coown_Logo from '../../../../assets/images/profile/user-5.jpg';
 const SidebarWidth = '420px';
 
-const StyledTableCell = styled(TableCell)(({ theme }) => ({
-  borderBottom: 'none',
-  padding: theme.spacing(1, 2),
-  '&.MuiTableCell-head': {
-    backgroundColor: theme.palette.action.hover,
-    fontWeight: 'bold',
-  },
-}));
-
-const StyledTableRow = styled(TableRow)(({ theme }) => ({
-  '&:nth-of-type(even)': {
-    backgroundColor: theme.palette.action.hover,
-  },
-}));
+const TabPanel = ({ children, value, index }) => {
+  return (
+    <Box
+      role="tabpanel"
+      hidden={value !== index}
+      id={`tabpanel-${index}`}
+      aria-labelledby={`tab-${index}`}
+      sx={{ p: 3 }}
+    >
+      {value === index && children}
+    </Box>
+  );
+};
 
 const Sidebar = ({ openDrawer, drawer }) => {
+  const [tabIndex, setTabIndex] = useState(0);
+
+  const handleTabChange = (event, newIndex) => {
+    setTabIndex(newIndex);
+  };
+
   return (
     <div>
       {/* Floating Button to Open Sidebar */}
@@ -48,7 +46,7 @@ const Sidebar = ({ openDrawer, drawer }) => {
           color="primary"
           aria-label="settings"
           sx={{ position: 'fixed', right: '25px', bottom: '15px' }}
-          onClick={openDrawer} // Open the drawer
+          onClick={openDrawer}
         >
           <IconSettings stroke={1.5} />
         </Fab>
@@ -58,7 +56,7 @@ const Sidebar = ({ openDrawer, drawer }) => {
       <Drawer
         anchor="right"
         open={drawer}
-        onClose={openDrawer} // Close the drawer
+        onClose={openDrawer}
         PaperProps={{
           sx: {
             width: SidebarWidth,
@@ -66,177 +64,277 @@ const Sidebar = ({ openDrawer, drawer }) => {
         }}
       >
         <Scrollbar sx={{ height: 'calc(100vh - 5px)' }}>
-          <Box px={3} pt={3} display="flex" justifyContent={'space-between'} alignItems="start" mt={3}>
-            <Typography variant="h4">Send unlimited wrapped bitcoin to a system user</Typography>
+          {/* Header */}
+          <Box
+            px={3}
+            pt={3}
+            display="flex"
+            justifyContent="space-between"
+            alignItems="start"
+          >
+            <Typography variant="h5">Enterprise license for corporations</Typography>
             <IconButton color="inherit" onClick={openDrawer}>
               <IconX size="1rem" />
             </IconButton>
           </Box>
-          <Typography variant="subtitle1" gutterBottom px={3} pt={1}>
-            <Chip
-              label="0.8 BTC"
-              style={{
-                backgroundColor: '#F4EFFF', color: '#9C80FF'
-              }}
-              sx={{
-                fontWeight: '400',
-                fontSize: '0.9rem',
-                padding: '0 6px',
-                height: '32px',
-              }}
-            />
-          </Typography>
-          {/* Sidebar Content */}
-          <Box sx={{ maxWidth: 600, margin: 'auto', p: 3 }}>
 
-            <TableContainer component={Paper} elevation={0} sx={{ mb: 3 }}>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <StyledTableCell colSpan={2}>
-                      <Typography variant="h6">Rules</Typography>
-                    </StyledTableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  <StyledTableRow>
-                    <StyledTableCell style={{ fontSize:'14px',color:'#5A6A85'}}>Operator acceptance</StyledTableCell>
-                    <StyledTableCell style={{ fontSize:'14px',fontWeight:'700'}}>All operators</StyledTableCell>
-                  </StyledTableRow>
-                  <StyledTableRow>
-                    <StyledTableCell style={{ fontSize:'14px',color:'#5A6A85'}}>Sending areas</StyledTableCell>
-                    <StyledTableCell style={{ fontSize:'14px',fontWeight:'700'}}>All</StyledTableCell>
-                  </StyledTableRow>
-                  <StyledTableRow>
-                    <StyledTableCell style={{ fontSize:'14px',color:'#5A6A85'}}>Withdrawal/crypto</StyledTableCell>
-                    <StyledTableCell style={{ fontSize:'14px',fontWeight:'700'}}>Allowed</StyledTableCell>
-                  </StyledTableRow>
-                  <StyledTableRow>
-                    <StyledTableCell style={{ fontSize:'14px',color:'#5A6A85'}}>Receiving areas</StyledTableCell>
-                    <StyledTableCell style={{ fontSize:'14px',fontWeight:'700'}}>All</StyledTableCell>
-                  </StyledTableRow>
-                  <StyledTableRow>
-                    <StyledTableCell style={{ fontSize:'14px',color:'#5A6A85'}}>Receiving industry</StyledTableCell>
-                    <StyledTableCell style={{ fontSize:'14px',fontWeight:'700'}}>All</StyledTableCell>
-                  </StyledTableRow>
-                  <StyledTableRow>
-                    <StyledTableCell style={{ fontSize:'14px',color:'#5A6A85'}}>$ amount range</StyledTableCell>
-                    <StyledTableCell style={{ fontSize:'14px',fontWeight:'700'}}>$0 - $1000</StyledTableCell>
-                  </StyledTableRow>
-                </TableBody>
-              </Table>
-            </TableContainer>
+          {/* Tabs */}
+          <Tabs
+            value={tabIndex}
+            onChange={handleTabChange}
+            indicatorColor="primary"
+            textColor="primary"
+            variant="fullWidth"
+            sx={{ mt: 2, p: 3 }}
+          >
+            <Tab label="Payments" />
+            <Tab label="Terms" />
+            <Tab label="CRM" />
+            <Tab label="Localization" />
+          </Tabs>
 
-            <Divider sx={{ my: 3 }} />
-
+          {/* Tab Panels */}
+          <TabPanel value={tabIndex} index={0}>
+            {/* Payments Section */}
             <Typography variant="h6" gutterBottom>
-              Foundation fees
+              Payments
             </Typography>
-            <TableContainer component={Paper} elevation={0} sx={{ mb: 3 }}>
-              <Table>
-                <TableBody>
-                  <StyledTableRow>
-                    <StyledTableCell style={{ fontSize:'14px',color:'#5A6A85'}}>Fee %</StyledTableCell>
-                    <StyledTableCell style={{ fontSize:'14px',fontWeight:'700'}}>n/a</StyledTableCell>
-                  </StyledTableRow>
-                  <StyledTableRow>
-                    <StyledTableCell style={{ fontSize:'14px',color:'#5A6A85'}}>Fee per transaction</StyledTableCell>
-                    <StyledTableCell style={{ fontSize:'14px',fontWeight:'700'}}>0.00001 xBTC</StyledTableCell>
-                  </StyledTableRow>
-                  <StyledTableRow>
-                    <StyledTableCell style={{ fontSize:'14px',color:'#5A6A85'}}>ICP fee per transaction</StyledTableCell>
-                    <StyledTableCell style={{ fontSize:'14px',fontWeight:'700'}}>n/a</StyledTableCell>
-                  </StyledTableRow>
-                  <StyledTableRow>
-                    <StyledTableCell style={{ fontSize:'14px',color:'#5A6A85'}}>Treasury escrow</StyledTableCell>
-                    <StyledTableCell>
-                      <Switch checked={true} />
-                    </StyledTableCell>
-                  </StyledTableRow>
-                </TableBody>
-              </Table>
-            </TableContainer>
 
-            {/* Additional Sections */}
-            <Typography variant="h6" gutterBottom>
-              DAO fees
-            </Typography>
-            <TableContainer component={Paper} elevation={0} sx={{ mb: 3 }}>
-              <Table>
-                <TableBody>
-                  <StyledTableRow>
-                    <StyledTableCell style={{ fontSize:'14px',color:'#5A6A85'}}>Fee %</StyledTableCell>
-                    <StyledTableCell style={{ fontSize:'14px',fontWeight:'700'}}>0.01%</StyledTableCell>
-                  </StyledTableRow>
-                  <StyledTableRow>
-                    <StyledTableCell style={{ fontSize:'14px',color:'#5A6A85'}}>Fee per transaction</StyledTableCell>
-                    <StyledTableCell style={{ fontSize:'14px',fontWeight:'700'}}>0.001ICP</StyledTableCell>
-                  </StyledTableRow>
-                  <StyledTableRow>
-                    <StyledTableCell style={{ fontSize:'14px',color:'#5A6A85'}}>Treasury escrow</StyledTableCell>
-                    <StyledTableCell>
-                      <Switch checked={true} />
-                    </StyledTableCell>
-                  </StyledTableRow>
-                </TableBody>
-              </Table>
-            </TableContainer>
+            <Box mt={2}>
+              <Typography variant="subtitle2" color="textSecondary">
+                Actual price (USD/year)
+              </Typography>
+              <TextField
+                fullWidth
+                size="small"
+                variant="outlined"
+                defaultValue="249"
+                sx={{ mt: 1 }}
+              />
+              <Typography variant="body2" color="textSecondary" sx={{ mt: 1 }}>
+                Default price: $169 / year
+              </Typography>
+            </Box>
 
-            {/* Additional Sections */}
-            <Typography variant="h6" gutterBottom>
-              Operator fees
-            </Typography>
-            <TableContainer component={Paper} elevation={0} sx={{ mb: 3 }}>
-              <Table>
-                <TableBody>
-                  <StyledTableRow>
-                    <StyledTableCell style={{ fontSize:'14px',color:'#5A6A85'}}>Fee %</StyledTableCell>
-                    <StyledTableCell style={{ fontSize:'14px',fontWeight:'700'}}>n/a</StyledTableCell>
-                  </StyledTableRow>
-                  <StyledTableRow>
-                    <StyledTableCell style={{ fontSize:'14px',color:'#5A6A85'}}>Fee per transaction</StyledTableCell>
-                    <StyledTableCell style={{ fontSize:'14px',fontWeight:'700'}}>-0.001 ckUSDC</StyledTableCell>
-                  </StyledTableRow>
-                  <StyledTableRow>
-                    <StyledTableCell style={{ fontSize:'14px',color:'#5A6A85'}}>Treasury escrow</StyledTableCell>
-                    <StyledTableCell style={{ fontSize:'14px',fontWeight:'700'}}>n/a</StyledTableCell>
-                  </StyledTableRow>
-                  <StyledTableRow>
-                    <StyledTableCell style={{ fontSize:'14px',color:'#5A6A85'}}>Operator reference</StyledTableCell>
-                    <StyledTableCell style={{ fontSize:'14px',fontWeight:'700'}}>Sender's operator</StyledTableCell>
-                  </StyledTableRow>
-                </TableBody>
-              </Table>
-            </TableContainer>
+            <Box mt={3}>
+              <Box display="flex" alignItems="center" justifyContent="space-between">
+                <Typography variant="body2" sx={{ fontSize: '14px', fontWeight: 'bold' }}>Allow instant payments in crypto</Typography>
+                <Switch defaultChecked />
+              </Box>
+              <Typography variant="caption" color="#7C8FAC" sx={{ fontSize: '13px' }}>
+                to Internet Identity of Operator Group, e.g., for sending ckUSDC
+              </Typography>
+            </Box>
 
-            {/* Additional Sections */}
+            <Box mt={2}>
+              <Box display="flex" alignItems="center" justifyContent="space-between">
+                <Typography variant="body2" sx={{ fontSize: '14px', fontWeight: 'bold' }}>Allow instant payments with Credit Card</Typography>
+                <Switch />
+              </Box>
+              <Typography variant="caption" color="#7C8FAC" sx={{ fontSize: '13px' }}>
+                to the Treasury, using a reference code
+              </Typography>
+            </Box>
+
+            <Box mt={2}>
+              <Box display="flex" alignItems="center" justifyContent="space-between">
+                <Typography variant="body2" sx={{ fontSize: '14px', fontWeight: 'bold' }}>
+                  Allow payments using bank wire transfers
+                </Typography>
+                <Switch />
+              </Box>
+              <Typography variant="caption" color="#7C8FAC" sx={{ fontSize: '13px' }}>
+                to bank account of Treasury, using a reference code
+              </Typography>
+            </Box>
+
+            <Box mt={2}>
+              <Box display="flex" alignItems="center" justifyContent="space-between">
+                <Typography variant="body2" sx={{ fontSize: '14px', fontWeight: 'bold' }}>The product can be paid using a Voucher</Typography>
+                <Switch />
+              </Box>
+              <Typography variant="caption" color="#7C8FAC" sx={{ fontSize: '13px' }}>
+                only available if enabled by the Software Developer
+              </Typography>
+            </Box>
+
+            <Box mt={2}>
+              <Typography variant="subtitle2" color="textSecondary">
+                Reference to Voucher Code
+              </Typography>
+              <TextField
+                fullWidth
+                variant="outlined"
+                placeholder="https://"
+                sx={{ mt: 1, fontSize: '14px', fontWeight: 'bold' }}
+              />
+              <Typography variant="caption" color="textSecondary" sx={{ mt: 1 }}>
+                Used to communicate with external databases
+              </Typography>
+            </Box>
+          </TabPanel>
+
+          <TabPanel value={tabIndex} index={1} pt={0}>
+
+            {/* Payments Section */}
             <Typography variant="h6" gutterBottom>
-              Third party fees
+              Terms
             </Typography>
-            <TableContainer component={Paper} elevation={0} sx={{ mb: 3 }}>
-              <Table>
-                <TableBody>
-                  <StyledTableRow>
-                    <StyledTableCell style={{ fontSize:'14px',color:'#5A6A85'}}>Fee %</StyledTableCell>
-                    <StyledTableCell style={{ fontSize:'14px',fontWeight:'700'}}>n/a</StyledTableCell>
-                  </StyledTableRow>
-                  <StyledTableRow>
-                    <StyledTableCell style={{ fontSize:'14px',color:'#5A6A85'}}>Fee per transaction</StyledTableCell>
-                    <StyledTableCell style={{ fontSize:'14px',fontWeight:'700'}}>0.001 ckUSDC</StyledTableCell>
-                  </StyledTableRow>
-                  <StyledTableRow>
-                    <StyledTableCell style={{ fontSize:'14px',color:'#5A6A85'}}>Treasury escrow</StyledTableCell>
-                    <StyledTableCell style={{ fontSize:'14px',fontWeight:'700'}}>n/a</StyledTableCell>
-                  </StyledTableRow>
-                  <StyledTableRow>
-                    <StyledTableCell style={{ fontSize:'14px',color:'#5A6A85'}}>Operator reference</StyledTableCell>
-                    <StyledTableCell style={{ fontSize:'14px',fontWeight:'700'}}>ID_1903889556</StyledTableCell>
-                  </StyledTableRow>
-                </TableBody>
-              </Table>
-            </TableContainer>
-            {/* Add Operator and Third Party Fees sections as necessary */}
-          </Box>
+            {/* Terms Section */}
+            <Box display="flex" alignItems="center" justifyContent="space-between">
+              <Typography variant="body2" sx={{ fontSize: '14px', fontWeight: 'bold' }}>Apply general Terms of Service</Typography>
+              <Switch />
+            </Box>
+
+            <Box mt={2}>
+              <TextField
+                fullWidth
+                variant="outlined"
+                placeholder="https://"
+                sx={{ mt: 1, fontSize: '14px', fontWeight: 'bold' }}
+              />
+              <Typography variant="caption" color="textSecondary" sx={{ mt: 1 }}>
+                Add here link to operator specific Terms of Service, if any.
+              </Typography>
+            </Box>
+          </TabPanel>
+
+          <TabPanel value={tabIndex} index={2}>
+            {/* CRM Section */}
+            <Typography variant="h6" gutterBottom>
+              CRM
+            </Typography>
+
+            {/* Key Account Manager Section */}
+            <Box mt={2}>
+              <Typography variant="subtitle2" sx={{ fontSize: '14px', color: '#000', mb: 2 }}>
+                Nominated Key Account Manager Supporting the Customer Experience
+              </Typography>
+              <Box display="flex" alignItems="center" gap={2} mb={1}>
+                <Box
+                  component="img"
+                  src={Coown_Logo}
+                  alt="Profile"
+                  sx={{ width: 32, height: 32, borderRadius: '50%' }}
+                />
+                <Box flex={1}>
+                  <Typography variant="subtitle2">Alice Johnson</Typography>
+                  <Typography variant="body2" color="textSecondary">
+                    alice.johnson@example.com
+                  </Typography>
+                </Box>
+                <IconButton size="small">
+                  <IconX size="1rem" />
+                </IconButton>
+              </Box>
+              <Typography variant="caption" color="textSecondary" sx={{ display: 'block', mt: 1 }}>
+                The Key Account Manager is an individual member of the Operator group nominated by the group owner or admin for supporting the customer experience. As focal point the Key Account Manager is primarily responsible for serving customers who have purchased this product by monitoring the invoices, by providing a first response to support requests, and by assisting the marketing activities of products owners e.g. for upselling additional products and services.
+              </Typography>
+            </Box>
+
+            {/* Supervisor Section */}
+            <Box mt={4}>
+              <Typography variant="subtitle2" sx={{ fontSize: '14px', color: '#000', mb: 2 }}>
+                Supervisor of Key Account Manager
+              </Typography>
+              <Box display="flex" alignItems="center" gap={2} mb={1}>
+                <Box
+                  component="img"
+                  src={Coown_Logo}
+                  alt="Profile"
+                  sx={{ width: 32, height: 32, borderRadius: '50%' }}
+                />
+                <Box flex={1}>
+                  <Typography variant="subtitle2">Alice Johnson</Typography>
+                  <Typography variant="body2" color="textSecondary">
+                    alice.johnson@example.com
+                  </Typography>
+                </Box>
+                <IconButton size="small">
+                  <IconX size="1rem" />
+                </IconButton>
+              </Box>
+              <Typography variant="caption" color="textSecondary" sx={{ display: 'block', mt: 1 }}>
+                The owner or an administrator of the Operator group, or the related subgroup shall be set as Supervisor of Key Account Manager ensuring supervision and quality management. The Supervisor also serves as substitute of the Key Account Manager to avoid any service interruption.
+              </Typography>
+            </Box>
+
+            {/* CRM Team Section */}
+            <Box mt={4}>
+              <Typography variant="subtitle2" sx={{ fontSize: '14px', color: '#000', mb: 2 }}>
+                CRM team
+              </Typography>
+              <Box display="flex" alignItems="center" gap={2} mb={1}>
+                <Box
+                  component="img"
+                  src="/images/logos/tech-logo.jpg"
+                  alt="Company"
+                  sx={{ width: 32, height: 32, borderRadius: '50%' }}
+                />
+                <Box flex={1}>
+                  <Typography variant="subtitle2">Tech Innovators</Typography>
+                  <Typography variant="body2" color="textSecondary">
+                    crm@techinnovators.com
+                  </Typography>
+                </Box>
+                <IconButton size="small">
+                  <IconX size="1rem" />
+                </IconButton>
+              </Box>
+              <Box mt={2} display="flex" alignItems="start" gap={1}>
+                <Checkbox size="small" />
+                <Typography variant="caption" color="textSecondary">
+                  Operator should specify a subgroup of members who are involved in the sales and marketing activities including invoicing, customer support, and customer experience management in general. The Supervisor and all Key Account Managers are grouped therein
+                </Typography>
+              </Box>
+            </Box>
+
+            {/* CRM Settings */}
+            <Box mt={4}>
+              <Box display="flex" alignItems="start" gap={1} mb={2}>
+                <Checkbox size="small" />
+                <Typography variant="caption" color="textSecondary">
+                  CRM is automatically updated after a payment in Crypto is received
+                </Typography>
+              </Box>
+              <Box display="flex" alignItems="start" gap={1} mb={2}>
+                <Checkbox size="small" />
+                <Typography variant="caption" color="textSecondary">
+                  only available if enabled by the Software Developer
+                </Typography>
+              </Box>
+            </Box>
+
+            {/* CRM Tool Section */}
+            <Box mt={4}>
+              <Typography variant="subtitle2" sx={{ fontSize: '14px', color: '#000', mb: 2 }}>
+                CRM tool
+              </Typography>
+              <TextField
+                fullWidth
+                size="small"
+                placeholder="https://"
+                variant="outlined"
+                sx={{ mb: 2 }}
+              />
+              <Box display="flex" alignItems="start" gap={1}>
+                <Checkbox size="small" />
+                <Typography variant="caption" color="textSecondary">
+                  External database where CRM tasks are handled
+                </Typography>
+              </Box>
+            </Box>
+          </TabPanel>
+
+          <TabPanel value={tabIndex} index={3}>
+            {/* Localization Section */}
+            <Typography variant="h6" gutterBottom>
+              Localization
+            </Typography>
+            <Typography variant="body2">
+              Add localization settings and configurations here.
+            </Typography>
+          </TabPanel>
         </Scrollbar>
       </Drawer>
     </div>
