@@ -2,10 +2,12 @@ import Principal "mo:base/Principal";
 import Debug "mo:base/Debug";
 import Cycles "mo:base/ExperimentalCycles";
 import HashMap "mo:base/HashMap";
+import List "mo:base/List";
 import Iter "mo:base/Iter";
 import Map "mo:base/HashMap"; 
 import Text "mo:base/Text";
 import Bool "mo:base/Bool";
+import Error "mo:base/Error";
 import Option "mo:base/Option";
 import Time "mo:base/Time";
 import Array "mo:base/Array";
@@ -14,6 +16,9 @@ import Buffer "mo:base/Buffer";
 import Nat64 "mo:base/Nat64";
 import Nat "mo:base/Nat";
 import Blob "mo:base/Blob";
+import Float "mo:base/Float";
+import ExperimentalStableMemory "mo:base/ExperimentalStableMemory";
+import StableMemory "mo:base/ExperimentalStableMemory";
 import Random "mo:base/Random";
 import AccountActorClass "./Account";
 
@@ -309,7 +314,6 @@ public query func getFullApplicantCustomers() : async [Customer] {
           groupName = "DefaultGroup";
           groupType = "Default";
           logoHash = "";
-          specialGroupType = null;
           groupAuthorization = null;
           registerCompanyForm = null;
           publicLawEntityDetails = null;
@@ -366,7 +370,6 @@ public query func getFullApplicantCustomers() : async [Customer] {
           groupName = "DefaultGroup";
           groupType = "Default";
           logoHash = "";
-                    specialGroupType = null;
           groupAuthorization = null;
           registerCompanyForm = null;
           publicLawEntityDetails = null;
@@ -1026,12 +1029,10 @@ type RegisterCompanyForm = {
     legalFramework : LegalFramework;
   };
 
-
   type Group = {
     adminId : Text;
     groupName : Text;
     groupType : Text;
-    specialGroupType: ?SpecialGroupType;
     logoHash :  Text;
     groupAuthorization :?Text; // Foundation, developers, Treasury
     registerCompanyForm: ?RegisterCompanyForm; // Replace `companyDetails` with `registerCompanyForm`
@@ -1118,7 +1119,6 @@ public func createSubscription(
           groupName = groupName;
           groupType = groupType;
           logoHash = logoHash;
-          specialGroupType = null;
           groupAuthorization = null;
           registerCompanyForm = null;
           publicLawEntityDetails = null;
@@ -1171,950 +1171,6 @@ public func createSubscription(
     };
   };
 
-  //  ====================Foundation==================================//
-  //==================================================================//
-  //  ====================Foundation==================================//
-
-  type FoundationDetails = {
-    foundationPurpose: Text;                    // Purpose of the foundation
-    boardMembers: [Text];                       // List of board members
-    executiveOfficers: [Text];                  // List of executive officers
-    projects: [Text];                           // List of projects managed by the foundation
-    assetsUnderManagement: Nat;                 // Total assets managed by the foundation
-    additionalDocuments: ?Blob;                 // Optional additional documents
-    startDate: ?Text;                           // Foundation start date (if available)
-    endowmentFund: Nat;                         // Endowment fund allocated for operations
-    regionalOperators: [Text];                  // List of associated regional operators
-    exclusiveAreas: [Text];                     // List of exclusive areas of operation
-    nonExclusiveAreas: [Text];                  // List of non-exclusive areas of operation
-    crmTeam: ?Text;                             // CRM team responsible for the foundation
-    licenseDetails: ?Text;                      // Details of the foundation's operational license
-    complianceOfficer: ?Text;                   // Compliance officer for the foundation
-    annualBudget: Nat;                          // Annual budget allocated for the foundation's operations
-    fundingSources: [Text];                     // List of funding sources (e.g., donations, grants)
-    keyAccountManager: ?Text;                   // Nominated key account manager
-    supervisorAccountManager: ?Text;            // Supervisor of the key account manager
-    termsOfService: ?Text;                      // Link to terms of service, if applicable
-    localization: [Text];                       // Supported countries/regions
-    transactionRules: [TransactionFee];         // Rules for transactions associated with the foundation
-  };
-  type SpecialGroupType = {
-    #Foundation: FoundationDetails;        // Foundation-specific data
-    #Treasury;                             // Treasury-specific type details can be added later
-    #Developers;                           // Developers-specific type details can be added later
-  };
-
-  public func createFoundation(
-  foundationPurpose: Text,
-  boardMembers: [Text],
-  executiveOfficers: [Text],
-  projects: [Text],
-  assetsUnderManagement: Nat,
-  additionalDocuments: ?Blob,
-  startDate: ?Text,
-  endowmentFund: Nat,
-  regionalOperators: [Text],
-  exclusiveAreas: [Text],
-  nonExclusiveAreas: [Text],
-  crmTeam: ?Text,
-  licenseDetails: ?Text,
-  complianceOfficer: ?Text,
-  annualBudget: Nat,
-  fundingSources: [Text],
-  keyAccountManager: ?Text,
-  supervisorAccountManager: ?Text,
-  termsOfService: ?Text,
-  localization: [Text],
-  transactionRules: [TransactionFee]
-) : async Text {
-  // Check if a foundation already exists
-
-  // Generate a unique foundation group ID
-  let foundationGroupId = "foundation-" # Int.toText(Time.now());
-
-  // Populate the foundation details
-  let foundationDetails: FoundationDetails = {
-    foundationPurpose = foundationPurpose;
-    boardMembers = boardMembers;
-    executiveOfficers = executiveOfficers;
-    projects = projects;
-    assetsUnderManagement = assetsUnderManagement;
-    additionalDocuments = additionalDocuments;
-    startDate = startDate;
-    endowmentFund = endowmentFund;
-    regionalOperators = regionalOperators;
-    exclusiveAreas = exclusiveAreas;
-    nonExclusiveAreas = nonExclusiveAreas;
-    crmTeam = crmTeam;
-    licenseDetails = licenseDetails;
-    complianceOfficer = complianceOfficer;
-    annualBudget = annualBudget;
-    fundingSources = fundingSources;
-    keyAccountManager = keyAccountManager;
-    supervisorAccountManager = supervisorAccountManager;
-    termsOfService = termsOfService;
-    localization = localization;
-    transactionRules = transactionRules;
-  };
-
-  // Populate the group details
-  let newGroup: Group = {
-    adminId = "admin"; // Assign a suitable admin ID
-    groupName = "Foundation";
-    groupType = "Foundation";
-    specialGroupType = ?#Foundation(foundationDetails);
-    logoHash = ""; // Update with a logo hash if available
-    groupAuthorization = null;
-    registerCompanyForm = null;
-    publicLawEntityDetails = null;
-    personalRecords = [];
-    subGroups = [];
-    accoundId = "";
-    logo = "";
-  };
-
-  // Save the new group in the groups map
-  groups.put(foundationGroupId, newGroup);
-
-  return "Foundation created successfully with ID: " # foundationGroupId;
-};
-
-
- // Type Definitions
-  type Affiliate = {
-    id: Text;
-    name: Text;
-    function: Text; // e.g., "Foundation", "IT", etc.
-    totalMembers: Nat;
-    since: Text; // Date of affiliation
-  };
-
-  type FoundationOperator = {
-    id: Text;
-    name: Text;
-    staffCount: Nat;
-    balance: Nat;
-    totalRevenue: Nat;
-    license: Text; // License information
-    nonExclusiveAreas: [Text];
-    exclusiveAreas: [Text];
-    since: Text; // Date of operation start
-  };
-
-  type TransactionFee = {
-    id: Text;
-    ruleName: Text;
-    totalFees: Nat;
-    assetType: Text; // e.g., "ckUSD", "ckBTC", etc.
-    operator: Text; // Operator or group associated
-    description: Text;
-  };
-
-  type Product = {
-    id: Text;
-    name: Text;
-    price: Nat;
-    productOwner: Text; // Owner of the product/service
-    salesChannel: Text; // e.g., "DAO", "dApp", "Coming soon"
-    description: Text;
-  };
-
-  // HashMap Storage
-  let affiliates = HashMap.HashMap<Text, Affiliate>(0, Text.equal, Text.hash);
-  let foundationOperators = HashMap.HashMap<Text, FoundationOperator>(0, Text.equal, Text.hash);
-  let transactionFees = HashMap.HashMap<Text, TransactionFee>(0, Text.equal, Text.hash);
-  let products = HashMap.HashMap<Text, Product>(0, Text.equal, Text.hash);
-
-
-  //======Page 1 Functions===========//
-  // ===== Affiliates Management =====
-  public func addAffiliate(id: Text, name: Text, function: Text, totalMembers: Nat, since: Text): async Text {
-    let newAffiliate = {
-      id = id;
-      name = name;
-      function = function;
-      totalMembers = totalMembers;
-      since = since;
-    };
-    affiliates.put(id, newAffiliate);
-    return "Affiliate added successfully.";
-  };
-
-  public query func getAffiliates(): async [Affiliate] {
-    return Iter.toArray(affiliates.vals());
-  };
-
-  public func editAffiliate(id: Text, name: ?Text, function: ?Text, totalMembers: ?Nat, since: ?Text): async Text {
-    switch (affiliates.get(id)) {
-        case (null) {
-            return "Affiliate does not exist.";
-        };
-        case (?affiliate) {
-            let updatedAffiliate = {
-                affiliate with
-                name = Option.get(name, affiliate.name);
-                function = Option.get(function, affiliate.function);
-                totalMembers = Option.get(totalMembers, affiliate.totalMembers);
-                since = Option.get(since, affiliate.since);
-            };
-            affiliates.put(id, updatedAffiliate);
-            return "Affiliate updated successfully.";
-        };
-    };
-};
-
-public func deleteAffiliate(id: Text): async Text {
-    switch (affiliates.get(id)) {
-        case (null) {
-            return "Affiliate does not exist.";
-        };
-        case (_) {
-            affiliates.delete(id);
-            return "Affiliate deleted successfully.";
-        };
-    };
-};
-public func updateFoundationMetrics(
-    totalUsers: ?Nat,
-    totalEnterprises: ?Nat,
-    totalTransactions: ?Nat,
-    totalRevenue: ?Nat
-): async Text {
-    // Assuming these metrics are stored in some global variables
-    var updatedUsers = Option.get(totalUsers, 36000); // Default value as placeholder
-    var updatedEnterprises = Option.get(totalEnterprises, 8000);
-    var updatedTransactions = Option.get(totalTransactions, 10000000);
-    var updatedRevenue = Option.get(totalRevenue, 500000);
-
-    // Apply updates
-    // Logic to store or update these values in state
-
-    return "Foundation metrics updated successfully.";
-};
-
-public func editTransactionFee(
-    id: Text,
-    ruleName: ?Text,
-    totalFees: ?Nat,
-    assetType: ?Text,
-    operator: ?Text,
-    description: ?Text
-): async Text {
-    switch (transactionFees.get(id)) {
-        case (null) {
-            return "Transaction fee does not exist.";
-        };
-        case (?fee) {
-            let updatedFee = {
-                fee with
-                ruleName = Option.get(ruleName, fee.ruleName);
-                totalFees = Option.get(totalFees, fee.totalFees);
-                assetType = Option.get(assetType, fee.assetType);
-                operator = Option.get(operator, fee.operator);
-                description = Option.get(description, fee.description);
-            };
-            transactionFees.put(id, updatedFee);
-            return "Transaction fee updated successfully.";
-        };
-    };
-};
-
-  //======Page 2 Functions===========//
-  // ===== Operators Management =====
-  public func addOperatorFoundation(
-    id: Text,
-    name: Text,
-    staffCount: Nat,
-    balance: Nat,
-    totalRevenue: Nat,
-    license: Text,
-    nonExclusiveAreas: [Text],
-    exclusiveAreas: [Text],
-    since: Text
-  ): async Text {
-    let newOperator = {
-      id = id;
-      name = name;
-      staffCount = staffCount;
-      balance = balance;
-      totalRevenue = totalRevenue;
-      license = license;
-      nonExclusiveAreas = nonExclusiveAreas;
-      exclusiveAreas = exclusiveAreas;
-      since = since;
-    };
-    foundationOperators.put(id, newOperator);
-    return "Operator added successfully.";
-  };
-
-
-  public func editFoundationOperator(
-      id: Text,
-      name: ?Text,
-      staffCount: ?Nat,
-      balance: ?Nat,
-      totalRevenue: ?Nat,
-      license: ?Text,
-      nonExclusiveAreas: ?[Text],
-      exclusiveAreas: ?[Text],
-      since: ?Text
-  ) : async Text {
-      switch (foundationOperators.get(id)) {
-          case (null) { return "Operator not found."; };
-          case (?existingOperator) {
-              let updatedOperator = {
-                  existingOperator with
-                  name = Option.get(name, existingOperator.name);
-                  staffCount = Option.get(staffCount, existingOperator.staffCount);
-                  balance = Option.get(balance, existingOperator.balance);
-                  totalRevenue = Option.get(totalRevenue, existingOperator.totalRevenue);
-                  license = Option.get(license, existingOperator.license);
-                  nonExclusiveAreas = Option.get(nonExclusiveAreas, existingOperator.nonExclusiveAreas);
-                  exclusiveAreas = Option.get(exclusiveAreas, existingOperator.exclusiveAreas);
-                  since = Option.get(since, existingOperator.since);
-              };
-              foundationOperators.put(id, updatedOperator);
-              return "Foundation Operator updated successfully.";
-          };
-      };
-  };
-  public func deleteFoundationOperator(id: Text) : async Text {
-      switch (foundationOperators.get(id)) {
-          case (null) { return "Operator not found."; };
-          case (_) {
-              foundationOperators.delete(id);
-              return "Foundation Operator deleted successfully.";
-          };
-      };
-  };
-  public query func getFoundationOperatorById(id: Text) : async ?FoundationOperator {
-      return foundationOperators.get(id);
-  };
-
-    public query func getFoundationOperators(): async [FoundationOperator] {
-      return Iter.toArray(foundationOperators.vals());
-    };
-
-    //================Page 3 Simple =========
-    // ===== Transaction Fees Management =====
-
-  public query func getTransactionFeeMetrics() : async {
-      totalCollected: Nat;
-      totalAllocated: Nat;
-      totalPending: Nat;
-  } {
-      var totalCollected: Nat = 0;
-      var totalAllocated: Nat = 0;
-      var totalPending: Nat = 0;
-
-      // Convert the array to an iterable using Iter.fromArray
-      let transactionFeeIter = Iter.fromArray(Iter.toArray(transactionFees.vals()));
-
-      for (fee in transactionFeeIter) {
-          totalCollected += fee.totalFees; // Sum all fees
-      };
-
-      // Example logic for allocated and pending amounts
-      totalAllocated := totalCollected / 2; // Divide by 2 for demonstration
-      totalPending := totalCollected - totalAllocated;
-
-      return {
-          totalCollected = totalCollected;
-          totalAllocated = totalAllocated;
-          totalPending = totalPending;
-      };
-  };
-
-  public query func getTransactionFeesByOperator(operator: Text) : async [TransactionFee] {
-      return Iter.toArray(
-          Iter.filter<TransactionFee>(
-              transactionFees.vals(),
-              func(fee: TransactionFee) : Bool {
-                  fee.operator == operator;
-              }
-          )
-      );
-  };
-  public func addTransactionRule(
-      id: Text,
-      ruleName: Text,
-      totalFees: Nat,
-      assetType: Text,
-      operator: Text,
-      description: Text
-  ) : async Text {
-      let newRule: TransactionFee = {
-          id = id;
-          ruleName = ruleName;
-          totalFees = totalFees;
-          assetType = assetType;
-          operator = operator;
-          description = description;
-      };
-      transactionFees.put(id, newRule);
-      return "Transaction rule added successfully.";
-  };
-
-  public func deleteTransactionRule(id: Text) : async Text {
-      switch (transactionFees.get(id)) {
-          case (null) { return "Rule not found."; };
-          case (_) {
-              transactionFees.delete(id);
-              return "Rule deleted successfully.";
-          };
-      };
-  };
-
-  public func assignRuleToOperators(ruleId: Text, operators: [Text]) : async Text {
-      switch (transactionFees.get(ruleId)) {
-          case (null) {
-              return "Transaction rule not found.";
-          };
-          case (?fee) {
-              for (operator in operators.vals()) {
-                  // You can add logic here to verify if the operator exists
-                  let updatedFee = {
-                      fee with operator = Text.concat(fee.operator, ", " # operator)
-                  };
-                  transactionFees.put(ruleId, updatedFee);
-              };
-              return "Rule assigned to operators successfully.";
-          };
-      };
-  };
-
-  public func updateDashboardMetrics(
-      collectedFees: ?Nat,
-      allocatedFees: ?Nat,
-      pendingFees: ?Nat
-  ) : async Text {
-      var updatedCollectedFees = Option.get(collectedFees, 0);
-      var updatedAllocatedFees = Option.get(allocatedFees, 0);
-      var updatedPendingFees = Option.get(pendingFees, 0);
-
-      // Logic to store or update these values in state
-
-      return "Dashboard metrics updated successfully.";
-  };
-
-
-  public query func getOperatorMetrics(operatorId: Text) : async {
-      totalRevenue: Nat;
-      totalBalance: Nat;
-      totalFeesCollected: Nat;
-  } {
-      var totalRevenue: Nat = 0;
-      var totalBalance: Nat = 0;
-      var totalFeesCollected: Nat = 0;
-
-      // Fetch operator details and update revenue and balance
-      switch (foundationOperators.get(operatorId)) {
-          case (null) { 
-              return { totalRevenue = 0; totalBalance = 0; totalFeesCollected = 0 }; 
-          };
-          case (?op) {
-              totalRevenue := op.totalRevenue;
-              totalBalance := op.balance;
-          };
-      };
-
-      // Iterate through transaction fees and calculate total fees collected for the operator
-      for (fee in Iter.fromArray(Iter.toArray(transactionFees.vals()))) {
-          if (fee.operator == operatorId) { // Compare directly to operatorId
-              totalFeesCollected += fee.totalFees;
-          };
-      };
-
-      return {
-          totalRevenue = totalRevenue;
-          totalBalance = totalBalance;
-          totalFeesCollected = totalFeesCollected;
-      };
-  };
-
-  public func addTransactionFee(
-    id: Text,
-    ruleName: Text,
-    totalFees: Nat,
-    assetType: Text,
-    operator: Text,
-    description: Text
-  ): async Text {
-    let newFee = {
-      id = id;
-      ruleName = ruleName;
-      totalFees = totalFees;
-      assetType = assetType;
-      operator = operator;
-      description = description;
-    };
-    transactionFees.put(id, newFee);
-    return "Transaction fee added successfully.";
-  };
-
-  public query func getTransactionFees(): async [TransactionFee] {
-    return Iter.toArray(transactionFees.vals());
-  };
-
-      //================Page 3 Details =========
-
-  public query func getFeeDetails(ruleId: Text) : async ?TransactionFee {
-      return transactionFees.get(ruleId);
-  };
-
-  public func addGeolocationRule(
-      id: Text,
-      ruleName: Text,
-      totalFees: Nat,
-      assetType: Text,
-      operator: Text,
-      sendingAreas: [Text], // e.g., ["All", "Except BY, RU"]
-      receivingAreas: [Text],
-      description: Text
-  ) : async Text {
-      // Helper function to join a list of Text with a separator
-      let joinText = func(arr: [Text], separator: Text) : Text {
-          if (Array.size(arr) == 0) {
-              return ""; // Return empty string if the array is empty
-          } else {
-              var result = arr[0];
-              for (i in Iter.range(1, Array.size(arr) - 1)) {
-                  result #= separator # arr[i];
-              };
-              return result;
-          }
-      };
-
-      // Convert the sending and receiving areas into Text
-      let sendingAreasText = joinText(sendingAreas, ", ");
-      let receivingAreasText = joinText(receivingAreas, ", ");
-
-      // Create the new rule
-      let newRule: TransactionFee = {
-          id = id;
-          ruleName = ruleName;
-          totalFees = totalFees;
-          assetType = assetType;
-          operator = operator;
-          description = description # 
-                        " | Sending Areas: " # sendingAreasText # 
-                        " | Receiving Areas: " # receivingAreasText;
-      };
-      transactionFees.put(id, newRule);
-      return "Geolocation rule added successfully.";
-  };
-
-
-  public query func getFeesByCategory(category: Text) : async [TransactionFee] {
-      return Iter.toArray(
-          Iter.filter<TransactionFee>(
-              transactionFees.vals(),
-              func(fee: TransactionFee) : Bool {
-                  fee.operator == category; // Match category (e.g., "Foundation Fees")
-              }
-          )
-      );
-  };
-
-  public func linkFeeToTreasury(ruleId: Text, treasuryId: Text) : async Text {
-      switch (transactionFees.get(ruleId)) {
-          case (null) { return "Rule not found."; };
-          case (?fee) {
-              let updatedFee = { fee with description = fee.description # " | Treasury: " # treasuryId };
-              transactionFees.put(ruleId, updatedFee);
-              return "Fee linked to treasury successfully.";
-          };
-      };
-  };
-
-  public func addFeeRangeRule(
-      id: Text,
-      ruleName: Text,
-      minAmount: Nat,
-      maxAmount: Nat,
-      totalFees: Nat,
-      assetType: Text,
-      operator: Text,
-      description: Text
-  ) : async Text {
-      let newRule: TransactionFee = {
-          id = id;
-          ruleName = ruleName # " ($" # Nat.toText(minAmount) # " - $" # Nat.toText(maxAmount) # ")";
-          totalFees = totalFees;
-          assetType = assetType;
-          operator = operator;
-          description = description;
-      };
-      transactionFees.put(id, newRule);
-      return "Fee range rule added successfully.";
-  };
-
-  // ===============================================//
-  //================Page 4 Section 1 =========
-  // ===============================================//
-
-
-  // ===== Products Management =====
-  public func addProduct(id: Text, name: Text, price: Nat, productOwner: Text, salesChannel: Text): async Text {
-    let newProduct = {
-      id = id;
-      name = name;
-      price = price;
-      productOwner = productOwner;
-      salesChannel = salesChannel;
-      description = "";
-    };
-    products.put(id, newProduct);
-    return "Product added successfully.";
-  };
-
-  public query func getProducts(): async [Product] {
-    return Iter.toArray(products.vals());
-  };
-
-
-    // ===============================================//
-  //================Page 4 Section 2 =========
-  // ===============================================//
-
-  public func updatePriceConfiguration(
-      productId: Text,
-      actualPrice: Nat,
-      defaultPrice: Nat
-  ) : async Text {
-      switch (products.get(productId)) {
-          case null { return "Product does not exist."; };
-          case (?product) {
-              let updatedProduct = {
-                  product with
-                  price = actualPrice; // Set the actual price
-                  description = Text.concat(product.description, 
-                      " | Default Price: $" # Nat.toText(defaultPrice)
-                  );
-              };
-              products.put(productId, updatedProduct);
-              return "Price configuration updated successfully.";
-          };
-      };
-  };
-public func configurePaymentMethods(
-    productId: Text,
-    enableCrypto: Bool,
-    enableCreditCard: Bool,
-    enableBankTransfer: Bool
-) : async Text {
-    switch (products.get(productId)) {
-        case null { return "Product does not exist."; };
-        case (?product) {
-            let updatedProduct = {
-                product with
-                description = Text.concat(product.description, 
-                    " | Payment Methods: " #
-                    (if enableCrypto { "Crypto " } else { "" }) #
-                    (if enableCreditCard { "Credit Card " } else { "" }) #
-                    (if enableBankTransfer { "Bank Transfer" } else { "" })
-                );
-            };
-            products.put(productId, updatedProduct);
-            return "Payment methods configured successfully.";
-        };
-    };
-};
-
-
-public func setVoucherPayment(
-    productId: Text,
-    enableVoucher: Bool,
-    voucherReference: ?Text
-) : async Text {
-    switch (products.get(productId)) {
-        case null { return "Product does not exist."; };
-        case (?product) {
-            let updatedProduct = {
-                product with
-                salesChannel = if enableVoucher {
-                    Option.get(voucherReference, product.salesChannel)
-                } else {
-                    product.salesChannel
-                };
-            };
-            products.put(productId, updatedProduct);
-            return "Voucher payment configured successfully.";
-        };
-    };
-};
-
-public func configureRecurringFees(
-    productId: Text,
-    recurrenceOption: Text // "1st of January" or "Initial Purchase Day"
-) : async Text {
-    switch (products.get(productId)) {
-        case null { return "Product does not exist."; };
-        case (?product) {
-            let updatedProduct = {
-                product with
-                description = Text.concat(product.description, 
-                    " | Recurrence: " # recurrenceOption
-                );
-            };
-            products.put(productId, updatedProduct);
-            return "Recurring fee settings updated successfully.";
-        };
-    };
-};
-
-  // ===============================================//
-  //================Page 4 Section 3 =========
-  // ===============================================//
-public func configureTabs(
-    productId: Text,
-    tabs: [Text]
-) : async Text {
-    switch (products.get(productId)) {
-        case null { return "Product does not exist."; };
-        case (?product) {
-            // Join the array of tabs into a single Text using Array.fold
-            let tabsText = Array.foldLeft<Text, Text>(
-                tabs, 
-                "", 
-                func(acc: Text, tab: Text): Text {
-                    if (acc == "") {
-                        tab // First element, no separator
-                    } else {
-                        acc # ", " # tab // Add separator for subsequent elements
-                    }
-                }
-            );
-            let updatedProduct = {
-                product with
-                description = product.description # " | Tabs: " # tabsText
-            };
-            products.put(productId, updatedProduct);
-            return "Tabs configured successfully.";
-        };
-    };
-};
-
-public func configureTermsOfService(
-    productId: Text,
-    applyGeneralTerms: Bool,
-    termsLink: ?Text
-) : async Text {
-    switch (products.get(productId)) {
-        case null { 
-            return "Product does not exist."; 
-        };
-        case (?product) {
-            let updatedDescription = product.description #
-                (if (applyGeneralTerms) { " | General Terms: Applied" } else { " | General Terms: Not Applied" }) #
-                (switch termsLink {
-                    case null { "" };
-                    case (?link) { " | Terms Link: " # link };
-                });
-            let updatedProduct = {
-                product with
-                description = updatedDescription
-            };
-            products.put(productId, updatedProduct);
-            return "Terms of Service configuration updated successfully.";
-        };
-    };
-};
-
-
-  // ===============================================//
-  //================Page 4 Section 4 =========
-  // ===============================================//
-// Stable variable for storing Key Account Managers
-private var keyAccountManagers : HashMap.HashMap<Text, Text> = HashMap.HashMap<Text, Text>(0, Text.equal, Text.hash);
-
-// Stable variable for storing Supervisors
-private var supervisors : HashMap.HashMap<Text, Text> = HashMap.HashMap<Text, Text>(0, Text.equal, Text.hash);
-
-// Stable variable for CRM Teams
-private  var crmTeams : HashMap.HashMap<Text, { name: Text; email: Text }> = HashMap.HashMap<Text, { name: Text; email: Text }>(0, Text.equal, Text.hash);
-
-// Stable variable for CRM Automation settings
-private  var crmAutomation : HashMap.HashMap<Text, Bool> = HashMap.HashMap<Text, Bool>(0, Text.equal, Text.hash);
-
-// Stable variable for CRM Tool Integration
-private  var crmToolIntegration : HashMap.HashMap<Text, Text> = HashMap.HashMap<Text, Text>(0, Text.equal, Text.hash);
-
-public func assignKeyAccountManager(userId: Text, managerEmail: Text) : async Text {
-  if (users1.get(userId) == null) {
-    return "User not found.";
-  };
-  keyAccountManagers.put(userId, managerEmail);
-  return "Key Account Manager assigned successfully.";
-};
-
-public func assignSupervisor(userId: Text, supervisorEmail: Text) : async Text {
-  if (users1.get(userId) == null) {
-    return "User not found.";
-  };
-  supervisors.put(userId, supervisorEmail);
-  return "Supervisor assigned successfully.";
-};
-
-public func addCRMTeam(email: Text, teamName: Text) : async Text {
-  switch (crmTeams.get(email)) {
-    case(?data){
-      return "already exsists";
-    };
-    case null
-    {
-      crmTeams.put(email, { name = teamName; email = email });
-    };
-  };
-  crmTeams.put(email, { name = teamName; email = email });
-  return "CRM Team added successfully.";
-};
-
-public func updateCRMTeam(email: Text, newTeamName: Text) : async Text {
-  switch (crmTeams.get(email)) {
-    case null {
-      return "CRM Team not found.";
-    };
-    case (?team) {
-      crmTeams.put(email, { team with name = newTeamName });
-      return "CRM Team updated successfully.";
-    };
-  };
-};
-
-public query func getKeyAccountManager(userId: Text) : async ?Text {
-  return keyAccountManagers.get(userId);
-};
-
-public query func getSupervisor(userId: Text) : async ?Text {
-  return supervisors.get(userId);
-};
-public query func getCRMTeam(email: Text) : async ?{ name: Text; email: Text } {
-  return crmTeams.get(email);
-};
-
-public query func listCRMTeams() : async [{ name: Text; email: Text }] {
-  return Iter.toArray(crmTeams.vals());
-};
-
-public func integrateCRMTool(userId: Text, crmUrl: Text) : async Text {
-  if (users1.get(userId) == null) {
-    return "User not found.";
-  };
- 
-  crmToolIntegration.put(userId, crmUrl);
-  return "CRM tool integrated successfully.";
-};
-
-public query func getCRMToolIntegration(userId: Text) : async ?Text {
-  return crmToolIntegration.get(userId);
-};
-
-public func toggleCRMAutomation(userId: Text, enable: Bool) : async Text {
-  if (users1.get(userId) == null) {
-    return "User not found.";
-  };
-  crmAutomation.put(userId, enable);
-  return if (enable) {
-    "CRM automation enabled."
-  } else {
-    "CRM automation disabled.";
-  };
-};
-
-public query func isCRMAutomationEnabled(userId: Text) : async ?Bool {
-  return crmAutomation.get(userId);
-};
-
-  // ===== Foundation Overview =====
-  public query func getFoundationOverview(): async {
-    totalUsers: Nat;
-    totalEnterprises: Nat;
-    totalTransactions: Nat;
-    totalRevenue: Nat;
-  } {
-    return {
-      totalUsers = 36000; // Placeholder for actual logic
-      totalEnterprises = 8000; // Placeholder for actual logic
-      totalTransactions = 10000000; // Placeholder for actual logic
-      totalRevenue = 500000; // Placeholder for actual logic
-    };
-  };
-
-  // ===============================================//
-  //================Page 4 Section 5 =========
-  // ===============================================//
-
-
-// ===== Dynamic Localization =====
-public query func getLocalizationData(): async {
-    totalOperatorGroups: Nat;
-    totalOperators: Nat;
-    totalBalance: Nat;
-} {
-    var totalOperators: Nat = 0;
-    var totalBalance: Nat = 0;
-
-    // Convert iterator to an array and loop over it
-    let operatorArray = Iter.toArray(foundationOperators.vals());
-
-    for (op in operatorArray.vals()) {
-        totalOperators += op.staffCount;
-        totalBalance += op.balance;
-    };
-
-    return {
-        totalOperatorGroups = operators.size();
-        totalOperators = totalOperators;
-        totalBalance = totalBalance;
-    };
-};
-
-  //================================
-  //================================
-  // Initialize supportedCountries as a HashMap with unique country codes
-   var supportedCountries: HashMap.HashMap<Text, Bool> = HashMap.HashMap<Text, Bool>(
-        0, // Initial capacity
-        Text.equal, // Equality function for Text keys
-        Text.hash // Hash function for Text keys
-    );
-    /// Adds a country to the HashMap if it doesn't already exist.
-    public func addCountry(countryCode: Text): async Bool {
-        switch (supportedCountries.get(countryCode)) {
-            case (null) {
-                supportedCountries.put(countryCode, true); // Add to the map
-                return true; // Country added
-            };
-            case (_) {
-                return false; // Country already exists
-            };
-        };
-    };
-
-    /// Removes a country from the HashMap if it exists.
-    public func removeCountry(countryCode: Text): async Bool {
-        switch (supportedCountries.remove(countryCode)) {
-            case (null) {
-                return false; // Country not found
-            };
-            case (_) {
-                return true; // Country removed
-            };
-        };
-    };
-
-     /// Retrieves the list of supported countries as an array.
-    public func getSupportedCountries(): async [Text] {
-        // Convert the iterator to an array
-        var countries: [Text] = [];
-        let iter = supportedCountries.keys();
-        var next = iter.next();
-        while (Option.isSome(next)) {
-            countries := Array.append(countries, [Option.unwrap(next)]);
-            next := iter.next();
-        };
-        return countries;
-    };
   // Function to update public law entity details
   public func updatePublicLawEntityGroup(
     groupId : Text,
@@ -2166,6 +1222,50 @@ public query func getLocalizationData(): async {
       };
     };
   };
+
+  // public func updateIncorporationGroup(
+  //   groupId : Text,
+  //   companyName : Text,
+  //   industrySector : Text,
+  //   registrationNumber : Text,
+  //   taxId : Text,
+  //   legalStructure : Text,
+  //   registeredAddress : Text,
+  //   incorporationCertificate : Text,
+  //   memorandumAndArticles : Text,
+  //   economicOwner : Text,
+  //   beneficialOwner : Text,
+  // ) : async Text {
+  //   switch (groups.get(groupId)) {
+  //     case (null) {
+  //       return "Group does not exist.";
+  //     };
+  //     case (?group) {
+  //       if (group.groupType != "Incorporation") {
+  //         return "Invalid group type for this operation.";
+  //       } else {
+  //         let updatedCompanyDetails = {
+  //           companyName = companyName;
+  //           industrySector = industrySector;
+  //           registrationNumber = registrationNumber;
+  //           taxId = taxId;
+  //           legalStructure = legalStructure;
+  //           registeredAddress = registeredAddress;
+  //           incorporationCertificate = ?incorporationCertificate;
+  //           memorandumAndArticles = ?memorandumAndArticles;
+  //           economicOwner = economicOwner;
+  //           beneficialOwner = beneficialOwner;
+  //         };
+  //         let updatedGroup = {
+  //           group with
+  //           companyDetails = ?updatedCompanyDetails
+  //         };
+  //         groups.put(groupId, updatedGroup);
+  //         return "Incorporation details updated successfully.";
+  //       };
+  //     };
+  //   };
+  // };
 
   public func updateIncorporationGroup(
   groupId: Text,
@@ -2949,21 +2049,21 @@ public query func getLocalizationData(): async {
   };
 
   // Foundation Functions
-  // public func createFoundation(superAdmin : Principal, superAdminNo2 : Principal, groupOwner : Principal, groupAdmin : Principal) : async Text {
-  //   if (foundation != null) {
-  //     return "Foundation already exists.";
-  //   };
-  //   foundation := ?{
-  //     superAdmin = superAdmin;
-  //     superAdminNo2 = superAdminNo2;
-  //     streamingCommittee = [];
-  //     executiveCommittee = [];
-  //     basicUserGroup = [];
-  //     groupOwner = groupOwner;
-  //     groupAdmin = groupAdmin;
-  //   };
-  //   return "Foundation created successfully.";
-  // };
+  public func createFoundation(superAdmin : Principal, superAdminNo2 : Principal, groupOwner : Principal, groupAdmin : Principal) : async Text {
+    if (foundation != null) {
+      return "Foundation already exists.";
+    };
+    foundation := ?{
+      superAdmin = superAdmin;
+      superAdminNo2 = superAdminNo2;
+      streamingCommittee = [];
+      executiveCommittee = [];
+      basicUserGroup = [];
+      groupOwner = groupOwner;
+      groupAdmin = groupAdmin;
+    };
+    return "Foundation created successfully.";
+  };
 
   // Regional Operators Functions
   public func createRegionalOperators(owner : Principal, admin : Principal) : async Text {
