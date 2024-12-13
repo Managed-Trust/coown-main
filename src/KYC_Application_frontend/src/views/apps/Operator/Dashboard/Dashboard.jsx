@@ -27,6 +27,9 @@ import {
 import { ArrowUpward, Settings, ArrowForward, Group, AccountTree, FiberManualRecord } from '@mui/icons-material';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import Chart from 'react-apexcharts';
+import ComplianceActivity from "./ComplianceActivity";
+import CRMActivity from './CRMActivity';
+import Management from './Management';
 
 const theme = createTheme({
   palette: {
@@ -266,6 +269,19 @@ function Dashboard() {
             </CardContent>
           </Card>
         </Grid>
+
+        <Grid container spacing={3} p={3}>
+          <Grid item xs={12} sm={6} lg={4}>
+            <ComplianceActivity />
+          </Grid>
+          <Grid item xs={12} sm={6} lg={4}>
+            <CRMActivity />
+          </Grid>
+          <Grid item xs={12} sm={6} lg={4}>
+            <Management />
+          </Grid>
+        </Grid>
+
         <Grid item xs={12}>
           <Paper elevation={1} sx={{ p: 3, borderRadius: 2, boxShadow: 3 }}>
             <Box
@@ -344,6 +360,7 @@ function Dashboard() {
             </Box>
           </Paper>
         </Grid>
+
         <Grid item xs={12}>
           <Paper elevation={1} sx={{ p: 3, borderRadius: 2, boxShadow: 3 }}>
             <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
