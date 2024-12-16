@@ -5,7 +5,8 @@ import LinkedInIcon from '@mui/icons-material/LinkedIn';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import TelegramIcon from '@mui/icons-material/Telegram';
 
-const AboutCard = () => {
+const AboutCard = ({profile}) => {
+    console.log("About Profile:",profile);
     return (
         <Box sx={{ py: 2, borderRadius: '12px' }}>
             <Grid container spacing={2}>
@@ -56,29 +57,29 @@ const AboutCard = () => {
                             {/* Email */}
                             <Box display="flex" alignItems="center">
                                 <Email sx={{ color: 'textSecondary', mr: 1 }} />
-                                <Link href="mailto:h.muster@gmail.com" underline="hover" sx={{ color: '#1a73e8' }}>
-                                    h.muster@gmail.com
+                                <Link href={`mailto:`+profile.id} underline="hover" sx={{ color: '#1a73e8' }}>
+                                    {profile.id}
                                 </Link>
                             </Box>
 
                             {/* Phone */}
                             <Box display="flex" alignItems="center">
                                 <Phone sx={{ color: 'textSecondary', mr: 1 }} />
-                                <Link href="tel:+123456789" underline="hover" sx={{ color: '#1a73e8' }}>
-                                    +123 456789
+                                <Link href={`tel:`+profile.phone} underline="hover" sx={{ color: '#1a73e8' }}>
+                                    {profile.phone}
                                 </Link>
                             </Box>
 
                             {/* Job Title */}
                             <Box display="flex" alignItems="center">
                                 <Work sx={{ color: 'textSecondary', mr: 1 }} />
-                                <Typography variant="body1">Front-end developer</Typography>
+                                <Typography variant="body1">{profile.role}</Typography>
                             </Box>
 
                             {/* Location */}
                             <Box display="flex" alignItems="center">
                                 <LocationOn sx={{ color: 'textSecondary', mr: 1 }} />
-                                <Typography variant="body1">Amsterdam, Netherlands</Typography>
+                                <Typography variant="body1">{profile.resident_country}</Typography>
                             </Box>
 
                             {/* Education */}

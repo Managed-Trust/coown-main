@@ -167,9 +167,9 @@ const ProfileBanner = () => {
                       }}
                     />
                   </ProfileImage>
-                  <Box mt={2} ml={2}>
+                  <Box mt={4} ml={2}>
                     <Typography fontWeight={600} variant="h6">
-                      {profile.given_name}
+                      {profile.given_name} {profile.family_name}
                     </Typography>
                     <Typography color="textSecondary" variant="body2">
                       {profile.role}

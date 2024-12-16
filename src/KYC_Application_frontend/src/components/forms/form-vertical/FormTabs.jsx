@@ -1215,7 +1215,7 @@ const FormTabs = () => {
                   Verify your document
                 </Typography>
                 <Typography variant="body2" component="div" fontSize={16} lineHeight={1.5}>
-                  Capture the photo of you holding the document you uploaded
+                  Capture your video while holding your ID for live test
                 </Typography>
               </Grid>
               <Grid item xs={12} lg={8}>
@@ -1282,7 +1282,7 @@ const FormTabs = () => {
                 onClick={handleCaptureVideoSubmit}
                 disabled={!isFormValid(4) || loading}
               >
-                {loading ? <CircularProgress size={24} /> : "Finish"}
+                {loading ? <CircularProgress size={24} /> : "Proceed"}
               </Button>
             </Box>
           </Box>
