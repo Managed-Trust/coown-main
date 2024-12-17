@@ -193,7 +193,7 @@ function Row({ row }) {
   );
 }
 
-export default function Dashboard() {
+export default function Dashboard({ openDrawer }) {
   return (
     <Box mt={4} sx={{ width: '100%', bgcolor: 'background.paper', borderRadius: 2, overflow: 'hidden', boxShadow: '0 0 10px rgba(0,0,0,0.1)' }}>
       <Box sx={{ p: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #e2e8f0' }}>
@@ -205,7 +205,7 @@ export default function Dashboard() {
             Groups of affiliates of the inner and outer circles
           </Typography>
         </Box>
-        <Button
+        <Button onClick={openDrawer}
           variant="outlined"
           startIcon={<AddIcon />}
           sx={{
