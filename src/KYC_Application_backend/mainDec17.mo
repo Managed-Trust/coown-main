@@ -19,10 +19,6 @@ import AccountActorClass "./Account";
 
 actor KYC_Canister {
 
-  //===========================================================
-  //Customer Info
-  //=========================================================
-
   type Customer = {
     id : Text;
     given_name : Text;
@@ -49,9 +45,6 @@ actor KYC_Canister {
     limitation_reason : ?Text;
     role : Text;
   };
-
-  private stable var mapEntries : [(Text, Customer)] = [];
-  var map = HashMap.HashMap<Text, Customer>(0, Text.equal, Text.hash);
 
   public func addBasicInfoCustomer(
     id : Text,
@@ -163,6 +156,11 @@ actor KYC_Canister {
       };
     };
   };
+
+  private stable var mapEntries : [(Text, Customer)] = [];
+  var map = HashMap.HashMap<Text, Customer>(0, Text.equal, Text.hash);
+
+  // Function to add a new customer
 
   public func addDocumentDetailsCustomer(
     id : Text,
@@ -276,19 +274,21 @@ actor KYC_Canister {
     );
     // Convert the filtered iterator to an array and return
     return Iter.toArray(applicantCustomers);
-  };
+};
 
-  public query func getFullApplicantCustomers() : async [Customer] {
-      // Use Iter.filter to filter customers by the role "applicant"
-      let applicantCustomers = Iter.filter<Customer>(
-          map.vals(), // Iterate over all customers in the HashMap
-          func(customer) : Bool {
-              customer.role == "fullapplicant"; // Check if the customer's role is "applicant"
-          },
-      );
-      // Convert the filtered iterator to an array and return
-      return Iter.toArray(applicantCustomers);
-  };
+public query func getFullApplicantCustomers() : async [Customer] {
+    // Use Iter.filter to filter customers by the role "applicant"
+    let applicantCustomers = Iter.filter<Customer>(
+        map.vals(), // Iterate over all customers in the HashMap
+        func(customer) : Bool {
+            customer.role == "fullapplicant"; // Check if the customer's role is "applicant"
+        },
+    );
+    // Convert the filtered iterator to an array and return
+    return Iter.toArray(applicantCustomers);
+};
+
+
 
   // Function to verify a customer
   public func verifyCustomer(id : Text) : async Text {
@@ -428,7 +428,7 @@ actor KYC_Canister {
     };
   };
   // Function to set the role of a customer
-  public func setRole(id : Text, setRole : Text) : async Text {
+  public shared (msg) func setRole(id : Text, setRole : Text) : async Text {
     switch (map.get(id)) {
       case (null) {
         return "User profile does not exist.";
@@ -493,6 +493,8 @@ actor KYC_Canister {
   };
 
   // Function to update customer information
+
+  // // Function to check if the customer is an admin
   public query func isAdmin(id : Text) : async Bool {
     switch (map.get(id)) {
       case (null) {
@@ -646,112 +648,8 @@ actor KYC_Canister {
   };
 
   //====================================================================================
-  // Internet Identity Code
-  //=====================================================================================
- 
-  public type UserInternetIdentity = {
-    ii : Text;         // Internet Identity
-    email : Text;      // Email address
-    iiCode: ?Text;     // Optional II Code
-  };
+  // Code from here
 
-  // Stable variable for storing II associations
-  private stable var userIIEntries : [(Text, UserInternetIdentity)] = [];
-  var usersII = HashMap.HashMap<Text, UserInternetIdentity>(0, Text.equal, Text.hash);
-
-  public func associateIIWithEmail(email : Text, ii : Text) : async Text {
-    // Convert the HashMap values into an array and check if the II exists
-    let iiExists = Array.filter(
-      Iter.toArray(usersII.vals()),
-      func(entry : UserInternetIdentity) : Bool {
-        entry.ii == ii;
-      },
-    );
-
-    if (Array.size(iiExists) > 0) {
-      // If the II exists, return an error message with the associated email
-      return "Internet Identity (II) is already associated with another email: " # iiExists[0].email;
-    } else {
-      // If II doesn't exist, check if the email already has an II
-      switch (usersII.get(email)) {
-        case (?user) {
-          return "This email already has an associated Internet Identity (II): " # user.ii;
-        };
-        case null {
-          // Create a new UserInternetIdentity entry
-          let newUserII : UserInternetIdentity = {
-            ii = ii;
-            email = email;
-            iiCode = null;
-          };
-
-          usersII.put(email, newUserII); // Associate II with the email
-          return "Internet Identity (II) successfully associated with the email.";
-        };
-      };
-    };
-  };
-
-  public func updateIICode(email : Text, iiCode : Text) : async Text {
-    // Check if the email exists in the usersII HashMap
-    switch (usersII.get(email)) {
-      case null {
-        return "No Internet Identity (II) is associated with this email.";
-      };
-      case (?userII) {
-        // Update the iiCode for the existing UserInternetIdentity
-        let updatedUserII : UserInternetIdentity = {
-          userII with iiCode = ?iiCode;
-        };
-        usersII.put(email, updatedUserII); // Save the updated entry
-        return "iiCode updated successfully for the associated email.";
-      };
-    };
-  };
-
-
-  public query func isIIAssociated(ii : Text) : async ?Text {
-    // Convert HashMap values to an array and filter to check for the II
-    let iiExists = Array.filter(
-      Iter.toArray(usersII.vals()),
-      func(entry : UserInternetIdentity) : Bool {
-        entry.ii == ii;
-      },
-    );
-
-    if (Array.size(iiExists) > 0) {
-      return ?iiExists[0].email; // Return the email associated with this II
-    } else {
-      return null; // II is not associated with any email
-    };
-  };
-
-  // Function to get the Internet Identity (II) associated with an email
-  public query func getIIByEmail(email : Text) : async ?UserInternetIdentity {
-    return usersII.get(email);
-  };
-
-  // Function to list all II associations (For Debugging)
-  public query func listAllIIAssociations() : async [UserInternetIdentity] {
-    return Iter.toArray(usersII.vals());
-  };
-
-  // Function to remove II association for an email
-  public func removeIIByEmail(email : Text) : async Text {
-    switch (usersII.get(email)) {
-      case (null) {
-        return "No Internet Identity (II) associated with this email.";
-      };
-      case (?entry) {
-        usersII.delete(email);
-        return "Internet Identity (II) association removed successfully.";
-      };
-    };
-  };
-
-  //====================================================================================
-  // User OTP Code
-  //=====================================================================================
   public type User = {
     emailAuth : Text;
     email : Text;
@@ -761,9 +659,109 @@ actor KYC_Canister {
     authMethod: ?Text;
   };
 
+  public type UserInternetIdentity = {
+  ii : Text;         // Internet Identity
+  email : Text;      // Email address
+  iiCode: ?Text;     // Optional II Code
+};
+
+// Stable variable for storing II associations
+private stable var userIIEntries : [(Text, UserInternetIdentity)] = [];
+var usersII = HashMap.HashMap<Text, UserInternetIdentity>(0, Text.equal, Text.hash);
+
+public func associateIIWithEmail(email : Text, ii : Text) : async Text {
+  // Convert the HashMap values into an array and check if the II exists
+  let iiExists = Array.filter(
+    Iter.toArray(usersII.vals()),
+    func(entry : UserInternetIdentity) : Bool {
+      entry.ii == ii;
+    },
+  );
+
+  if (Array.size(iiExists) > 0) {
+    // If the II exists, return an error message with the associated email
+    return "Internet Identity (II) is already associated with another email: " # iiExists[0].email;
+  } else {
+    // If II doesn't exist, check if the email already has an II
+    switch (usersII.get(email)) {
+      case (?user) {
+        return "This email already has an associated Internet Identity (II): " # user.ii;
+      };
+      case null {
+        // Create a new UserInternetIdentity entry
+        let newUserII : UserInternetIdentity = {
+          ii = ii;
+          email = email;
+          iiCode = null;
+        };
+
+        usersII.put(email, newUserII); // Associate II with the email
+        return "Internet Identity (II) successfully associated with the email.";
+      };
+    };
+  };
+};
+public func updateIICode(email : Text, iiCode : Text) : async Text {
+  // Check if the email exists in the usersII HashMap
+  switch (usersII.get(email)) {
+    case null {
+      return "No Internet Identity (II) is associated with this email.";
+    };
+    case (?userII) {
+      // Update the iiCode for the existing UserInternetIdentity
+      let updatedUserII : UserInternetIdentity = {
+        userII with iiCode = ?iiCode;
+      };
+      usersII.put(email, updatedUserII); // Save the updated entry
+      return "iiCode updated successfully for the associated email.";
+    };
+  };
+};
+
+
+public query func isIIAssociated(ii : Text) : async ?Text {
+  // Convert HashMap values to an array and filter to check for the II
+  let iiExists = Array.filter(
+    Iter.toArray(usersII.vals()),
+    func(entry : UserInternetIdentity) : Bool {
+      entry.ii == ii;
+    },
+  );
+
+  if (Array.size(iiExists) > 0) {
+    return ?iiExists[0].email; // Return the email associated with this II
+  } else {
+    return null; // II is not associated with any email
+  };
+};
+// Function to get the Internet Identity (II) associated with an email
+public query func getIIByEmail(email : Text) : async ?UserInternetIdentity {
+  return usersII.get(email);
+};
+
+// Function to list all II associations (For Debugging)
+public query func listAllIIAssociations() : async [UserInternetIdentity] {
+  return Iter.toArray(usersII.vals());
+};
+
+// Function to remove II association for an email
+public func removeIIByEmail(email : Text) : async Text {
+  switch (usersII.get(email)) {
+    case (null) {
+      return "No Internet Identity (II) associated with this email.";
+    };
+    case (?entry) {
+      usersII.delete(email);
+      return "Internet Identity (II) association removed successfully.";
+    };
+  };
+};
+
   private stable var userEntries : [(Text, User)] = [];
   var users = HashMap.HashMap<Text, User>(0, Text.equal, Text.hash);
+  //==================================================================================
 
+  // Check if user is available
   public func getUser(userId : Text) : async ?User {
     return users.get(userId);
   };
@@ -888,7 +886,6 @@ actor KYC_Canister {
       };
     };
   };
-
   //==============================================================
   //Group logic
   //==============================================================
@@ -1029,6 +1026,7 @@ type RegisterCompanyForm = {
     legalFramework : LegalFramework;
   };
 
+
   type Group = {
     adminId : Text;
     groupName : Text;
@@ -1044,6 +1042,62 @@ type RegisterCompanyForm = {
     //============================================
     logo : Text;
   };
+
+  //====================================================================================
+  //new subscriptions
+  //====================================================================================
+
+  type SubscriptionType = {
+    storageCapacity : Text; // e.g., "500MB", "5GB", "25GB"
+    storageFee : Nat;       // e.g., 0 USD, 72 USD, etc.
+    setupFee : Nat;         // Initial setup fee, if any
+    annualFee : Nat;        // e.g., 168 USD
+    totalCost : Nat;        // Total cost (sum of fees)
+    subscriptionDate : Int; // Subscription start date
+    expiryDate : Int;      // Expiry date (one year from subscription date)
+};
+
+type UserSubscription = {
+  groupId : Text;
+    userId : Text;
+    subscription : SubscriptionType;
+};
+
+private stable var subscriptions : [(Text, UserSubscription)] = []; // Store user subscriptions
+var subscriptionMap = HashMap.HashMap<Text, UserSubscription>(0, Text.equal, Text.hash);
+
+
+public func createSubscription(
+    userId : Text,
+    storageCapacity : Text,
+    groupId:Text,
+    storageFee : Nat,
+    setupFee : Nat,
+    annualFee : Nat
+) : async Text {
+    let totalCost = storageFee + setupFee + annualFee; // Calculate total cost
+    let now = Time.now();
+    let expiry = now + (365 * 24 * 60 * 60 * 1_000_000_000); // Expiry: 1 year from now
+
+    let newSubscription : SubscriptionType = {
+        storageCapacity = storageCapacity;
+        storageFee = storageFee;
+        setupFee = setupFee;
+        annualFee = annualFee;
+        totalCost = totalCost;
+        subscriptionDate = now;
+        expiryDate = expiry;
+    };
+
+    let userSubscription : UserSubscription = {
+        groupId = groupId;
+        userId = userId;
+        subscription = newSubscription;
+    };
+
+    subscriptionMap.put(userId, userSubscription);
+    return "Subscription created successfully.";
+};
 
   public func createGroup(
     adminId : Text,
@@ -1116,268 +1170,6 @@ type RegisterCompanyForm = {
       };
     };
   };
-
-  public func updatePublicLawEntityGroup(
-    groupId : Text,
-    entityName : Text,
-    address : Text,
-    businessEmail : Text,
-    website : Text,
-    jobTitle : Text,
-    ownerBusinessEmail : Text,
-    descriptionOfPurpose : Text,
-    linkToConstitutingLegislation : Text,
-    linkToSupervisoryBody : Text,
-
-  ) : async Text {
-    switch (groups.get(groupId)) {
-      case (null) {
-        "Group does not exist.";
-      };
-      case (?group) {
-        if (group.groupType != "Public Law Entity") {
-          return "Invalid group type for this operation.";
-        } else {
-          let updatedPublicLawEntityDetails = {
-
-            entityInfo = {
-              entityName = entityName;
-              address = address;
-              businessEmail = businessEmail;
-              website = website;
-            };
-
-            groupOwner = ?{
-              jobTitle = jobTitle;
-              ownerBusinessEmail = ownerBusinessEmail;
-            };
-            legalFramework = {
-              descriptionOfPurpose = descriptionOfPurpose;
-              linkToConstitutingLegislation = linkToConstitutingLegislation;
-              linkToSupervisoryBody = linkToSupervisoryBody;
-            };
-          };
-          let updatedGroup = {
-            group with
-            publicLawEntityDetails = ?updatedPublicLawEntityDetails
-          };
-          groups.put(groupId, updatedGroup);
-          return "Public law entity details added successfully.";
-        };
-      };
-    };
-  };
-
-  public func updateIncorporationGroup(
-      groupId: Text,
-      companyName: Text,
-      industrySector: Text,
-      companyPurpose: Text,
-      registrationNumber: Text,
-      taxId: Text,
-      legalStructure: Text,
-      countryOfRegistry: Text,
-      incorporationCertificate: Text,
-      memorandumAndArticles: Text,
-      isUserManager: { #Self;
-        #OtherPerson},
-          otherManagers: [Text],
-      beneficiaryType: {
-        #Shareholders;
-        #OnlyMe;
-        #OtherEntityOrPerson;
-      },
-      shareholderAdditionMethod: {
-        #Manual;
-        #UploadShareholderBook;
-      },
-      digitalShares: Bool,
-        dailySpendingPower: Nat, // REQUIRE Add to account
-      monthlySpendingPower: Nat, //  REQUIRE
-      boardExists: Bool,
-      canVoteInSystem: Bool,
-      isAnnualVotingRequired: Bool,
-      spendingPowerLimitations: Bool,
-      groupAdminApprovalMethod: {
-        #BoardVoting;
-        #ShareholderAssemblyVoting;
-      },
-      groupMemberApprovalMethod: {
-        #GroupAdminApproval;
-        #MemberSpendingPowerApproval;
-      },
-      adminAdditionMethod: {
-        #GroupAdmin;
-        #BoardVoting;
-        #ShareholderAssemblyVoting;
-      },
-      boardMemberAdditionMethod: {
-        #GroupAdmin;
-        #BoardVoting;
-        #ShareholderAssemblyVoting;
-      },
-      isAuditingRequired: Bool,
-      auditScope: {
-        #AllTransactionsIncludingBankAccounts;
-        #AllTransactionsWithoutBankAccounts;
-        #OnlyCOOWNTransactions;
-      },
-      auditorNominationMethod: {
-        #BoardApproves;
-        #GroupAdminNominates;
-        #ShareholderAssemblyApproves;
-      },
-      auditReportRecipients: {
-        #BoardAndExecutiveManagers;
-        #ShareholdersBoardAndManagers;
-      },
-      promotionAccepted: Bool
-     ) : async Text {
-    switch (groups.get(groupId)) {
-      case (null) {
-        return "Group does not exist.";
-      };
-      case (?group) {
-        if (group.groupType != "Incorporation") {
-          return "Invalid group type for this operation.";
-        } else {
-          // Construct RegisterCompanyForm from the provided fields
-          let registerCompanyForm: RegisterCompanyForm = {
-            companyDetails = {
-              
-              companyName = companyName;
-              industrySector = industrySector;
-              companyPurpose = companyPurpose;
-              registrationNumber = registrationNumber;
-              taxId = taxId;
-              legalStructure = legalStructure;
-              countryOfRegistry = countryOfRegistry;
-                
-              corporateDocumentation = {
-                incorporationCertificate = ?incorporationCertificate;
-                memorandumAndArticles = ?memorandumAndArticles;
-              };
-            };
-            dailySpendingPower= dailySpendingPower; // REQUIRE
-            monthlySpendingPower= monthlySpendingPower; //  REQUIRE
-            leadershipAndOwnership = {
-              executiveManager = {
-                isUserManager = isUserManager;
-                otherManagers = otherManagers;
-              };
-              economicBeneficiary = {
-                beneficiaryType = beneficiaryType;
-                shareholderAdditionMethod = shareholderAdditionMethod;
-                digitalShares = digitalShares;
-              };
-              boardOfDirectors = {
-                exists = boardExists;
-                canVoteInSystem = canVoteInSystem;
-              };
-              annualDischarge = {
-                isAnnualVotingRequired = isAnnualVotingRequired;
-              };
-            };
-            governanceAndLimitations = {
-              spendingPowerLimitations = spendingPowerLimitations;
-              transactionApproval = {
-                groupAdminApprovalMethod = groupAdminApprovalMethod;
-                groupMemberApprovalMethod = groupMemberApprovalMethod;
-              };
-              management = {
-                adminAdditionMethod = adminAdditionMethod;
-              };
-              boardOfDirectors = {
-                memberAdditionMethod = boardMemberAdditionMethod;
-              };
-            };
-            auditing = {
-              isAuditingRequired = isAuditingRequired;
-              auditScope = auditScope;
-              auditorNominationMethod = auditorNominationMethod;
-              auditReportRecipients = auditReportRecipients;
-              promotionAccepted = promotionAccepted;
-            };
-          };
-
-          // Update the group with the constructed RegisterCompanyForm
-          let updatedGroup = {
-            group with
-            registerCompanyForm = ?registerCompanyForm
-          };
-          groups.put(groupId, updatedGroup);
-          return "Incorporation details updated successfully.";
-        };
-      };
-    };
-  };
-
-
-  public func getGroup(groupId : Text) : async ?Group {
-    return groups.get(groupId);
-  };
-  public func getAllGroups() : async [Group] {
-    let allGroups = Iter.toArray(groups.vals());
-    return allGroups;
-  };
-
-  //====================================================================================
-  //new subscriptions
-  //====================================================================================
-
-  type SubscriptionType = {
-    storageCapacity : Text; // e.g., "500MB", "5GB", "25GB"
-    storageFee : Nat;       // e.g., 0 USD, 72 USD, etc.
-    setupFee : Nat;         // Initial setup fee, if any
-    annualFee : Nat;        // e.g., 168 USD
-    totalCost : Nat;        // Total cost (sum of fees)
-    subscriptionDate : Int; // Subscription start date
-    expiryDate : Int;      // Expiry date (one year from subscription date)
-  };
-
-  type UserSubscription = {
-    groupId : Text;
-      userId : Text;
-      subscription : SubscriptionType;
-  };
-
-  private stable var subscriptions : [(Text, UserSubscription)] = []; // Store user subscriptions
-  var subscriptionMap = HashMap.HashMap<Text, UserSubscription>(0, Text.equal, Text.hash);
-
-
-  public func createSubscription(
-      userId : Text,
-      storageCapacity : Text,
-      groupId:Text,
-      storageFee : Nat,
-      setupFee : Nat,
-      annualFee : Nat
-  ) : async Text {
-      let totalCost = storageFee + setupFee + annualFee; // Calculate total cost
-      let now = Time.now();
-      let expiry = now + (365 * 24 * 60 * 60 * 1_000_000_000); // Expiry: 1 year from now
-
-      let newSubscription : SubscriptionType = {
-          storageCapacity = storageCapacity;
-          storageFee = storageFee;
-          setupFee = setupFee;
-          annualFee = annualFee;
-          totalCost = totalCost;
-          subscriptionDate = now;
-          expiryDate = expiry;
-      };
-
-      let userSubscription : UserSubscription = {
-          groupId = groupId;
-          userId = userId;
-          subscription = newSubscription;
-      };
-
-      subscriptionMap.put(userId, userSubscription);
-      return "Subscription created successfully.";
-  };
-
-
 
   //  ====================Foundation==================================//
   //==================================================================//
@@ -1483,7 +1275,61 @@ type RegisterCompanyForm = {
     totalMembers: Nat;
     since: Text; // Date of affiliation
   };
+
+  // type FoundationOperator = {
+  //   id: Text;
+  //   name: Text;
+  //   staffCount: Nat;
+  //   balance: Nat;
+  //   totalRevenue: Nat;
+  //   license: Text; // License information
+  //   nonExclusiveAreas: [Text];
+  //   exclusiveAreas: [Text];
+  //   since: Text; // Date of operation start
+  // };
+
   // Parent type for operators
+type OperatorNew = {
+  id: Text;                          // Unique identifier for the operator
+  name: Text;                        // Name of the operator
+  operatorType: OperatorType;        // Type of the operator (Regional or Foundation)
+};
+
+// Enum to differentiate operator types
+type OperatorType = {
+  #RegionalOperator: RegionalOperator;
+  #FoundationOperator: FoundationOperator;
+};
+
+// Regional Operator subtype
+type RegionalOperator = {
+  id: Text;                          // Unique identifier for the regional operator
+  name: Text;                        // Name of the regional operator
+  staffCount: Nat;                   // Number of staff
+  balance: Nat;                      // Financial balance
+  totalRevenue: Nat;                 // Total revenue generated
+  license: Text;                     // License information
+  nonExclusiveAreas: [Text];         // List of non-exclusive areas of operation
+  exclusiveAreas: [Text];            // List of exclusive areas of operation
+  crmTeam: ?Text;                    // CRM team responsible for the operator
+  since: Text;                       // Start date of operations
+};
+
+// Foundation Operator subtype
+type FoundationOperator = {
+  id: Text;                          // Unique identifier for the foundation operator
+  name: Text;                        // Name of the foundation operator
+  staffCount: Nat;                   // Number of staff
+  balance: Nat;                      // Financial balance
+  totalRevenue: Nat;                 // Total revenue generated
+  license: Text;                     // License information
+  nonExclusiveAreas: [Text];         // List of non-exclusive areas of operation
+  exclusiveAreas: [Text];            // List of exclusive areas of operation
+  crmTeam: ?Text;                    // CRM team responsible for the operator
+  since: Text;                       // Start date of operations
+  complianceOfficer: ?Text;          // Compliance officer responsible
+  termsOfService: ?Text;             // Link to terms of service
+};
 
 
   type TransactionFee = {
@@ -1506,8 +1352,10 @@ type RegisterCompanyForm = {
 
   // HashMap Storage
   let affiliates = HashMap.HashMap<Text, Affiliate>(0, Text.equal, Text.hash);
+  let foundationOperators = HashMap.HashMap<Text, FoundationOperator>(0, Text.equal, Text.hash);
   let transactionFees = HashMap.HashMap<Text, TransactionFee>(0, Text.equal, Text.hash);
   let products = HashMap.HashMap<Text, Product>(0, Text.equal, Text.hash);
+  let newOperators = HashMap.HashMap<Text, OperatorNew>(0, Text.equal, Text.hash);
 
 
   //======Page 1 Functions===========//
@@ -1604,7 +1452,124 @@ public func editTransactionFee(
 };
 
   //======Page 2 Functions===========//
+  // ===== Operators Management =====
+  // public func addOperatorFoundation(
+  //   id: Text,
+  //   name: Text,
+  //   staffCount: Nat,
+  //   balance: Nat,
+  //   totalRevenue: Nat,
+  //   license: Text,
+  //   nonExclusiveAreas: [Text],
+  //   exclusiveAreas: [Text],
+  //   since: Text
+  // ): async Text {
+  //   let newOperator = {
+  //     id = id;
+  //     name = name;
+  //     staffCount = staffCount;
+  //     balance = balance;
+  //     totalRevenue = totalRevenue;
+  //     license = license;
+  //     nonExclusiveAreas = nonExclusiveAreas;
+  //     exclusiveAreas = exclusiveAreas;
+  //     since = since;
+  //   };
+  //   foundationOperators.put(id, newOperator);
+  //   return "Operator added successfully.";
+  // };
 
+public func addOperatorFoundation(
+  id: Text,
+  name: Text,
+  staffCount: Nat,
+  balance: Nat,
+  totalRevenue: Nat,
+  license: Text,
+  nonExclusiveAreas: [Text],
+  exclusiveAreas: [Text],
+  crmTeam: ?Text,
+  since: Text,
+  complianceOfficer: ?Text,
+  termsOfService: ?Text
+): async Text {
+  // Create a FoundationOperator subtype
+  let foundationOperator: FoundationOperator = {
+    id = id;
+    name = name;
+    staffCount = staffCount;
+    balance = balance;
+    totalRevenue = totalRevenue;
+    license = license;
+    nonExclusiveAreas = nonExclusiveAreas;
+    exclusiveAreas = exclusiveAreas;
+    crmTeam = crmTeam;
+    since = since;
+    complianceOfficer = complianceOfficer;
+    termsOfService = termsOfService;
+  };
+
+  // Wrap the FoundationOperator in the parent Operator type
+  let operator: OperatorNew = {
+    id = id;
+    name = name;
+    operatorType = #FoundationOperator(foundationOperator);
+  };
+
+  // Save the operator in the storage map
+  newOperators.put(id, operator);
+
+  return "Foundation operator added successfully.";
+};
+
+
+
+  public func editFoundationOperator(
+      id: Text,
+      name: ?Text,
+      staffCount: ?Nat,
+      balance: ?Nat,
+      totalRevenue: ?Nat,
+      license: ?Text,
+      nonExclusiveAreas: ?[Text],
+      exclusiveAreas: ?[Text],
+      since: ?Text
+  ) : async Text {
+      switch (foundationOperators.get(id)) {
+          case (null) { return "Operator not found."; };
+          case (?existingOperator) {
+              let updatedOperator = {
+                  existingOperator with
+                  name = Option.get(name, existingOperator.name);
+                  staffCount = Option.get(staffCount, existingOperator.staffCount);
+                  balance = Option.get(balance, existingOperator.balance);
+                  totalRevenue = Option.get(totalRevenue, existingOperator.totalRevenue);
+                  license = Option.get(license, existingOperator.license);
+                  nonExclusiveAreas = Option.get(nonExclusiveAreas, existingOperator.nonExclusiveAreas);
+                  exclusiveAreas = Option.get(exclusiveAreas, existingOperator.exclusiveAreas);
+                  since = Option.get(since, existingOperator.since);
+              };
+              foundationOperators.put(id, updatedOperator);
+              return "Foundation Operator updated successfully.";
+          };
+      };
+  };
+  public func deleteFoundationOperator(id: Text) : async Text {
+      switch (foundationOperators.get(id)) {
+          case (null) { return "Operator not found."; };
+          case (_) {
+              foundationOperators.delete(id);
+              return "Foundation Operator deleted successfully.";
+          };
+      };
+  };
+  public query func getFoundationOperatorById(id: Text) : async ?FoundationOperator {
+      return foundationOperators.get(id);
+  };
+
+    public query func getFoundationOperators(): async [FoundationOperator] {
+      return Iter.toArray(foundationOperators.vals());
+    };
 
     //================Page 3 Simple =========
     // ===== Transaction Fees Management =====
@@ -1708,6 +1673,40 @@ public func editTransactionFee(
       return "Dashboard metrics updated successfully.";
   };
 
+
+  public query func getOperatorMetrics(operatorId: Text) : async {
+      totalRevenue: Nat;
+      totalBalance: Nat;
+      totalFeesCollected: Nat;
+  } {
+      var totalRevenue: Nat = 0;
+      var totalBalance: Nat = 0;
+      var totalFeesCollected: Nat = 0;
+
+      // Fetch operator details and update revenue and balance
+      switch (foundationOperators.get(operatorId)) {
+          case (null) { 
+              return { totalRevenue = 0; totalBalance = 0; totalFeesCollected = 0 }; 
+          };
+          case (?op) {
+              totalRevenue := op.totalRevenue;
+              totalBalance := op.balance;
+          };
+      };
+
+      // Iterate through transaction fees and calculate total fees collected for the operator
+      for (fee in Iter.fromArray(Iter.toArray(transactionFees.vals()))) {
+          if (fee.operator == operatorId) { // Compare directly to operatorId
+              totalFeesCollected += fee.totalFees;
+          };
+      };
+
+      return {
+          totalRevenue = totalRevenue;
+          totalBalance = totalBalance;
+          totalFeesCollected = totalFeesCollected;
+      };
+  };
 
   public func addTransactionFee(
     id: Text,
@@ -2122,6 +2121,31 @@ public query func isCRMAutomationEnabled(userId: Text) : async ?Bool {
   //================Page 4 Section 5 =========
   // ===============================================//
 
+
+// ===== Dynamic Localization =====
+public query func getLocalizationData(): async {
+    totalOperatorGroups: Nat;
+    totalOperators: Nat;
+    totalBalance: Nat;
+} {
+    var totalOperators: Nat = 0;
+    var totalBalance: Nat = 0;
+
+    // Convert iterator to an array and loop over it
+    let operatorArray = Iter.toArray(foundationOperators.vals());
+
+    for (op in operatorArray.vals()) {
+        totalOperators += op.staffCount;
+        totalBalance += op.balance;
+    };
+
+    return {
+        totalOperatorGroups = operators.size();
+        totalOperators = totalOperators;
+        totalBalance = totalBalance;
+    };
+};
+
   //================================
   //================================
   // Initialize supportedCountries as a HashMap with unique country codes
@@ -2168,7 +2192,209 @@ public query func isCRMAutomationEnabled(userId: Text) : async ?Bool {
         return countries;
     };
   // Function to update public law entity details
-  
+  public func updatePublicLawEntityGroup(
+    groupId : Text,
+    entityName : Text,
+    address : Text,
+    businessEmail : Text,
+    website : Text,
+    jobTitle : Text,
+    ownerBusinessEmail : Text,
+    descriptionOfPurpose : Text,
+    linkToConstitutingLegislation : Text,
+    linkToSupervisoryBody : Text,
+
+  ) : async Text {
+    switch (groups.get(groupId)) {
+      case (null) {
+        "Group does not exist.";
+      };
+      case (?group) {
+        if (group.groupType != "Public Law Entity") {
+          return "Invalid group type for this operation.";
+        } else {
+          let updatedPublicLawEntityDetails = {
+
+            entityInfo = {
+              entityName = entityName;
+              address = address;
+              businessEmail = businessEmail;
+              website = website;
+            };
+
+            groupOwner = ?{
+              jobTitle = jobTitle;
+              ownerBusinessEmail = ownerBusinessEmail;
+            };
+            legalFramework = {
+              descriptionOfPurpose = descriptionOfPurpose;
+              linkToConstitutingLegislation = linkToConstitutingLegislation;
+              linkToSupervisoryBody = linkToSupervisoryBody;
+            };
+          };
+          let updatedGroup = {
+            group with
+            publicLawEntityDetails = ?updatedPublicLawEntityDetails
+          };
+          groups.put(groupId, updatedGroup);
+          return "Public law entity details added successfully.";
+        };
+      };
+    };
+  };
+
+  public func updateIncorporationGroup(
+  groupId: Text,
+  companyName: Text,
+  industrySector: Text,
+  companyPurpose: Text,
+  registrationNumber: Text,
+  taxId: Text,
+  legalStructure: Text,
+  countryOfRegistry: Text,
+  incorporationCertificate: Text,
+  memorandumAndArticles: Text,
+ isUserManager: { #Self;
+    #OtherPerson},
+      otherManagers: [Text],
+  beneficiaryType: {
+    #Shareholders;
+    #OnlyMe;
+    #OtherEntityOrPerson;
+  },
+  shareholderAdditionMethod: {
+    #Manual;
+    #UploadShareholderBook;
+  },
+  digitalShares: Bool,
+    dailySpendingPower: Nat, // REQUIRE Add to account
+  monthlySpendingPower: Nat, //  REQUIRE
+  boardExists: Bool,
+  canVoteInSystem: Bool,
+  isAnnualVotingRequired: Bool,
+  spendingPowerLimitations: Bool,
+  groupAdminApprovalMethod: {
+    #BoardVoting;
+    #ShareholderAssemblyVoting;
+  },
+  groupMemberApprovalMethod: {
+    #GroupAdminApproval;
+    #MemberSpendingPowerApproval;
+  },
+  adminAdditionMethod: {
+    #GroupAdmin;
+    #BoardVoting;
+    #ShareholderAssemblyVoting;
+  },
+  boardMemberAdditionMethod: {
+    #GroupAdmin;
+    #BoardVoting;
+    #ShareholderAssemblyVoting;
+  },
+  isAuditingRequired: Bool,
+  auditScope: {
+    #AllTransactionsIncludingBankAccounts;
+    #AllTransactionsWithoutBankAccounts;
+    #OnlyCOOWNTransactions;
+  },
+  auditorNominationMethod: {
+    #BoardApproves;
+    #GroupAdminNominates;
+    #ShareholderAssemblyApproves;
+  },
+  auditReportRecipients: {
+    #BoardAndExecutiveManagers;
+    #ShareholdersBoardAndManagers;
+  },
+  promotionAccepted: Bool
+) : async Text {
+  switch (groups.get(groupId)) {
+    case (null) {
+      return "Group does not exist.";
+    };
+    case (?group) {
+      if (group.groupType != "Incorporation") {
+        return "Invalid group type for this operation.";
+      } else {
+        // Construct RegisterCompanyForm from the provided fields
+        let registerCompanyForm: RegisterCompanyForm = {
+          companyDetails = {
+            
+            companyName = companyName;
+            industrySector = industrySector;
+            companyPurpose = companyPurpose;
+            registrationNumber = registrationNumber;
+            taxId = taxId;
+            legalStructure = legalStructure;
+            countryOfRegistry = countryOfRegistry;
+              
+            corporateDocumentation = {
+              incorporationCertificate = ?incorporationCertificate;
+              memorandumAndArticles = ?memorandumAndArticles;
+            };
+          };
+          dailySpendingPower= dailySpendingPower; // REQUIRE
+          monthlySpendingPower= monthlySpendingPower; //  REQUIRE
+          leadershipAndOwnership = {
+            executiveManager = {
+              isUserManager = isUserManager;
+              otherManagers = otherManagers;
+            };
+            economicBeneficiary = {
+              beneficiaryType = beneficiaryType;
+              shareholderAdditionMethod = shareholderAdditionMethod;
+              digitalShares = digitalShares;
+            };
+            boardOfDirectors = {
+              exists = boardExists;
+              canVoteInSystem = canVoteInSystem;
+            };
+            annualDischarge = {
+              isAnnualVotingRequired = isAnnualVotingRequired;
+            };
+          };
+          governanceAndLimitations = {
+            spendingPowerLimitations = spendingPowerLimitations;
+            transactionApproval = {
+              groupAdminApprovalMethod = groupAdminApprovalMethod;
+              groupMemberApprovalMethod = groupMemberApprovalMethod;
+            };
+            management = {
+              adminAdditionMethod = adminAdditionMethod;
+            };
+            boardOfDirectors = {
+              memberAdditionMethod = boardMemberAdditionMethod;
+            };
+          };
+          auditing = {
+            isAuditingRequired = isAuditingRequired;
+            auditScope = auditScope;
+            auditorNominationMethod = auditorNominationMethod;
+            auditReportRecipients = auditReportRecipients;
+            promotionAccepted = promotionAccepted;
+          };
+        };
+
+        // Update the group with the constructed RegisterCompanyForm
+        let updatedGroup = {
+          group with
+          registerCompanyForm = ?registerCompanyForm
+        };
+        groups.put(groupId, updatedGroup);
+        return "Incorporation details updated successfully.";
+      };
+    };
+  };
+};
+
+
+  public func getGroup(groupId : Text) : async ?Group {
+    return groups.get(groupId);
+  };
+  public func getAllGroups() : async [Group] {
+    let allGroups = Iter.toArray(groups.vals());
+    return allGroups;
+  };
 
   //==============================================================
   //Personal Record logic
@@ -2240,6 +2466,9 @@ public query func isCRMAutomationEnabled(userId: Text) : async ?Bool {
         let updatedUsers = Array.map(
           group.personalRecords,
           func(user : PersonalRecord) : PersonalRecord {
+            // Debug.print(debug_show (user.email));
+            // Debug.print(debug_show (email));
+            // Debug.print(debug_show ("email"));
             if (user.email == email) {
               updated := true;
               userSetId := user.userId;
@@ -2328,128 +2557,99 @@ public query func isCRMAutomationEnabled(userId: Text) : async ?Bool {
   };
 
   //=====================================================================================
-  //Operator Logic
+  //Operator
   //=====================================================================================
 
-  // Enum to differentiate operator types
-
-  type UnifiedOperator = {
-  id: Text;                          // Unique identifier for the operator
-  name: Text;                        // Name of the operator
-  operatorType: OperatorType;        // Type of the operator (Regional or Foundation)
-  exclusiveCountries: [Text];        // Exclusive countries for the operator
-  superAdminId: ?Text;               // Optional super admin ID
-  defaultGroupId: ?Text;             // Optional default group ID
-  nominatedCEO: ?Text;               // Nominated CEO
-  nominatedComplianceOfficer: ?Text; // Nominated Compliance Officer
-  nominatedDirector: ?Text;          // Nominated Director
-  knownUsers: ?[Text];               // Known users for the operator
-  clients: ?[Text];                  // Clients associated with the operator
-  records: ?[Text];                  // Records associated with the operator
-};
-
-// Define the OperatorType enum for Regional and Foundation Operators
-type OperatorType = {
-  #RegionalOperator: RegionalOperator;
-  #FoundationOperator: FoundationOperator;
-};
-
-// Define RegionalOperator subtype
-type RegionalOperator = {
-  staffCount: Nat;
-  balance: Nat;
-  totalRevenue: Nat;
-  license: Text;                     // License information
-  nonExclusiveAreas: [Text];
-  exclusiveAreas: [Text];
-  crmTeam: ?Text;                    // CRM team responsible for the operator
-  since: Text;                       // Date of operation start
-};
-
-
-// Define FoundationOperator subtype
-type FoundationOperator = {
-  staffCount: Nat;
-  balance: Nat;
-  totalRevenue: Nat;
-  license: Text;                     // License information
-  nonExclusiveAreas: [Text];
-  exclusiveAreas: [Text];
-  crmTeam: ?Text;
-  since: Text;
-  complianceOfficer: ?Text;          // Compliance officer for the foundation
-  termsOfService: ?Text;             // Terms of service for the foundation
-};
-
- type OperatorNew = {
-    id: Text;                          // Unique identifier for the operator
-    name: Text;                        // Name of the operator
-    operatorType: OperatorType;        // Type of the operator (Regional or Foundation)
+  type Operator = {
+    operatorId : Text;
+    operatorName : Text;
+    exclusiveCountries : [Text];
+    superAdminId : ?Text;
+    defaultGroupId : ?Text;
+    nominatedCEO : ?Text;
+    nominatedComplianceOfficer : ?Text;
+    nominatedDirector : ?Text;
+    knownUsers : ?[Text];
+    clients : ?[Text];
+    records : ?[Text];
   };
 
-  let operators = HashMap.HashMap<Text, UnifiedOperator>(0, Text.equal, Text.hash);
+  private stable var operatorEntries : [(Text, Operator)] = [];
+  var operators : HashMap.HashMap<Text, Operator> = HashMap.HashMap<Text, Operator>(0, Text.equal, Text.hash);
 
-  // Function to add a new operator
-  public func addOperator(
-    id: Text,
-    name: Text,
-    operatorType: OperatorType,
-    exclusiveCountries: [Text],
-    superAdminId: ?Text,
-    defaultGroupId: ?Text,
-    nominatedCEO: ?Text,
-    nominatedComplianceOfficer: ?Text,
-    nominatedDirector: ?Text,
-    knownUsers: ?[Text],
-    clients: ?[Text],
-    records: ?[Text]
-  ): async Text {
-  switch(operators.get(id)){
-    case(?value)
-    {
-      return "Already exsists";
-    };
-    case(null)
-    {
-    let newOperator: UnifiedOperator = {
-        id = id;
-        name = name;
-        operatorType = operatorType;
-        exclusiveCountries = exclusiveCountries;
-        superAdminId = superAdminId;
-        defaultGroupId = defaultGroupId;
-        nominatedCEO = nominatedCEO;
-        nominatedComplianceOfficer = nominatedComplianceOfficer;
-        nominatedDirector = nominatedDirector;
-        knownUsers = knownUsers;
-        clients = clients;
-        records = records;
+  public func addOperator(operatorId : Text, operatorName : Text, exclusiveCountries : [Text]) : async Text {
+    let existingOperator = operators.get(operatorId);
+    switch (existingOperator) {
+      case (null) {
+        let newOperator : Operator = {
+          operatorId = operatorId;
+          operatorName = operatorName;
+          exclusiveCountries = exclusiveCountries;
+          superAdminId = null;
+          defaultGroupId = null;
+          nominatedCEO = null;
+          nominatedComplianceOfficer = null;
+          nominatedDirector = null;
+          knownUsers = null;
+          clients = null;
+          records = null;
+        };
+        operators.put(operatorId, newOperator);
+        return "Operator added successfully.";
       };
-
-      operators.put(id, newOperator);
-      return "Operator added successfully.";
-    }
+      case (_) {
+        return "Operator with this ID already exists.";
+      };
+    };
+  };
+  // Function to update an existing operator with optional fields
+  public func updateOperator(
+    operatorId : Text,
+    superAdminId : ?Text,
+    defaultGroupId : ?Text,
+    nominatedCEO : ?Text,
+    nominatedComplianceOfficer : ?Text,
+    nominatedDirector : ?Text,
+    knownUsers : ?[Text],
+    clients : ?[Text],
+    records : ?[Text],
+  ) : async Text {
+    let existingOperator = operators.get(operatorId);
+    switch (existingOperator) {
+      case (null) {
+        return "Operator not found.";
+      };
+      case (?existing) {
+        // Update only the fields that are provided
+        let updatedOperator : Operator = {
+          existing with
+          operatorId = operatorId;
+          superAdminId = superAdminId;
+          defaultGroupId = defaultGroupId;
+          nominatedCEO = nominatedCEO;
+          nominatedComplianceOfficer = nominatedComplianceOfficer;
+          nominatedDirector = nominatedDirector;
+          knownUsers = knownUsers;
+          clients = clients;
+          records = records;
+        };
+        operators.put(operatorId, updatedOperator);
+        return "Operator updated successfully.";
+      };
+    };
   };
 
-  };
-
-  // Query function to get an operator by ID
-  public query func getOperator(id: Text): async ?UnifiedOperator {
+  public query func getOperator(id : Text) : async ?Operator {
     return operators.get(id);
   };
-
-  // Query function to get all operators
-  public query func getOperators(): async [UnifiedOperator] {
-    return Iter.toArray(operators.vals());
-  };
-
-  // Function to delete an operator
-  public func deleteOperator(id: Text): async Text {
-    if (operators.remove(id) == null) {
-      return "Operator not found.";
+  public func isOperator(operatorId : Text) : async Bool {
+    let operator = operators.get(operatorId);
+    switch (operator) {
+      case (null) { return false }; // Operator ID does not exist
+      case (_) { return true }; // Operator ID exists
     };
-    return "Operator deleted successfully.";
   };
+
   //============================================================
 
   type ReferralCode = {
@@ -2583,6 +2783,38 @@ type FoundationOperator = {
     privileges : [Text];
   };
 
+  // Function to create a subgroup within a specified parent group
+  // public func createSubGroup(parentGroupId : Text, groupId : Text, name : Text, subgroupType : SubgroupType, roles : [Role]) : async Text {
+  //   switch (roleGroups.get(parentGroupId)) {
+  //     case (null) {
+  //       return "Parent group does not exist";
+  //     };
+  //     // case (?parent) {
+  //     //   // Create the subgroup with specified type
+  //     //   let newGroup = {
+  //     //     id = groupId;
+  //     //     name = name;
+  //     //     groupType = subgroupType;
+  //     //     roles = roles;
+  //     //     privileges = [];
+  //     //     // subGroups = [];
+  //     //   };
+
+  //       // Add the new subgroup to the hashmap
+  //       // roleGroups.put(groupId, newGroup);
+
+  //       // Update the parent group with the new subgroup ID and type
+  //       // let updatedSubGroups = Array.append(parent.subGroups, (groupId, subgroupType));
+  //       // let updatedParent = {
+  //       //   parent with subGroups = updatedSubGroups
+  //       // };
+  //       // roleGroups.put(parentGroupId, updatedParent);
+
+  //       return "Subgroup created successfully under parent group ";
+  //     };
+  //   };
+  // };
+
   public func createRoleGroup(groupId : Text, name : Text, groupType : GroupTypeRole, roles : [Role]) : async Text {
     let newGroup = {
       id = groupId;
@@ -2665,6 +2897,20 @@ type FoundationOperator = {
     };
   };
 
+  // Helper function to remove a role or subgroup
+  // public func removeRole(groupId : Text, role : Role) : async Bool {
+  //   switch (roleGroups.get(groupId)) {
+  //     case (null) { return false };
+  //     case (?group) {
+  //       let remainingRoles = Array.filter(group.roles, func(r) { r != role });
+  //       let updatedGroup = {
+  //         group with roles = remainingRoles
+  //       };
+  //       roleGroups.put(groupId, updatedGroup);
+  //       return true;
+  //     };
+  //   };
+  // };
 
   private stable var subGroupEntries : [(Text, SubGroup)] = [];
   var subGroups = HashMap.HashMap<Text, SubGroup>(0, Text.equal, Text.hash);
