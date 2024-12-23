@@ -44,6 +44,7 @@ import UserAccount from '../../views/apps/user-account/UserAccount.jsx';
 import Profile from '../../views/apps/user-profile/Profile.jsx';
 import UserSetting from '../../views/apps/user-setting/UserSetting.jsx';
 
+import WarningBanner from './WarningBanner';
 
 const MainWrapper = styled('div')(() => ({
   display: 'flex',
@@ -66,65 +67,71 @@ const FullLayout = () => {
   const theme = useTheme();
 
   return (
-    <MainWrapper className={customizer.activeMode === 'dark' ? 'darkbg mainwrapper' : 'mainwrapper'}>
-      {!customizer.isHorizontal && <Sidebar />}
-      <PageWrapper
-        className="page-wrapper"
-        sx={{
-          ...(customizer.isCollapse && {
-            [theme.breakpoints.up('lg')]: { ml: `${customizer.MiniSidebarWidth}px` },
-          }),
-        }}
-      >
-        {customizer.isHorizontal ? <HorizontalHeader /> : <Header />}
-        {customizer.isHorizontal && <Navigation />}
-        <Container
+    <>
+
+      <MainWrapper className={customizer.activeMode === 'dark' ? 'darkbg mainwrapper' : 'mainwrapper'}>
+        {!customizer.isHorizontal && <Sidebar />}
+
+        <PageWrapper
+          className="page-wrapper"
           sx={{
-            maxWidth: customizer.isLayout === 'boxed' ? 'lg' : '100%!important',
+            ...(customizer.isCollapse && {
+              [theme.breakpoints.up('lg')]: { ml: `${customizer.MiniSidebarWidth}px` },
+            }),
           }}
         >
-          <Box sx={{ minHeight: 'calc(100vh - 170px)' }}>
-            <Routes>
-              <Route path="/dashboards/ecommerce" element={<EcommerceDash />} />
-              <Route path="/dashboards/modern" element={<Modern />} />
-              <Route path="/apps/followers" element={<Followers />} />
-              <Route path="/apps/friends" element={<Friends />} />
-              <Route path="/apps/gallery" element={<Gallery />} />
-              <Route path="/apps/private" element={<PrivateGroup />} />
-              <Route path="/group/registerCompany/:groupId" element={<RegisterCompany />} />
-              <Route path="/user-profile" element={<Profile />} />
-              <Route path="/apps/user-setting" element={<UserSetting/>} />
-              <Route path="/app/user-dashboard" element={<UserDashboard/>} />
-              <Route path="/app/user-accounts" element={<UserAccount />} />
-              <Route path="/referral" element={<Galleryr />} />
-              <Route path="/account" element={<Account />} />
-              <Route path="/user-profile/Settings" element={<Settings />} />
-              <Route path="/forms/form-horizontal" element={<FormHorizontal />} />
-              <Route path="/create-group/:groupType" element={<PrivateGroup />} />
-              <Route path="/group/:groupId" element={<GroupDetailPage />} />
-              <Route path="/group/:groupId/add-stakeholder" element={<AddStakeHolder />} />
-              <Route path="/group/create-group" element={<CreateGroup />} />
-              <Route path="/apps/chats" element={<Chats />} />
-              <Route path="/group-invitation/:groupId/:email" element={<GroupInvitation />} />
-              <Route path="/apps/tickets" element={<Tickets />} />
-              <Route path="/apps/aml-setting" element={<AmlSetting/>} />
-              <Route path="/apps/tickets/user-detail/:id" element={<UserApproval />} />
-              <Route path="/pages/faq" element={<Faq />} />
-              <Route path="/pages/admin-dashboard" element={<AdminMain />} />
-              <Route path="/pages/admin-localization" element={<LocalizationMain />} />
-              <Route path="/pages/admin-fees" element={<Fees />} />
-              <Route path="/pages/admin-products" element={<Products />} />
-              <Route path="/pages/admin-management" element={<Management />} />
-              <Route path="/pages/operator-dashboard" element={<OperatorMain />} />
-              <Route path="/pages/operator-transection-rules" element={<OperatorTransectionFees />} />
-              <Route path="*" element={<Navigate to="/404" />} /> {/* Catch-all route for 404 */}
-            </Routes>
-          </Box>
-        </Container>
-        <Customizer />
-        <ConnectDialog dark={false} />
-      </PageWrapper>
-    </MainWrapper>
+          <WarningBanner />
+          {customizer.isHorizontal ? <HorizontalHeader /> : <Header />}
+          {customizer.isHorizontal && <Navigation />}
+          <Container
+            sx={{
+              maxWidth: customizer.isLayout === 'boxed' ? 'lg' : '100%!important',
+            }}
+          >
+            <Box sx={{ minHeight: 'calc(100vh - 170px)' }}>
+              <Routes>
+                <Route path="/dashboards/ecommerce" element={<EcommerceDash />} />
+                <Route path="/dashboards/modern" element={<Modern />} />
+                <Route path="/apps/followers" element={<Followers />} />
+                <Route path="/apps/friends" element={<Friends />} />
+                <Route path="/apps/gallery" element={<Gallery />} />
+                <Route path="/apps/private" element={<PrivateGroup />} />
+                <Route path="/group/registerCompany/:groupId" element={<RegisterCompany />} />
+                <Route path="/user-profile" element={<Profile />} />
+                <Route path="/apps/user-setting" element={<UserSetting />} />
+                <Route path="/app/user-dashboard" element={<UserDashboard />} />
+                <Route path="/app/user-accounts" element={<UserAccount />} />
+                <Route path="/referral" element={<Galleryr />} />
+                <Route path="/account" element={<Account />} />
+                <Route path="/user-profile/Settings" element={<Settings />} />
+                <Route path="/forms/form-horizontal" element={<FormHorizontal />} />
+                <Route path="/create-group/:groupType" element={<PrivateGroup />} />
+                <Route path="/group/:groupId" element={<GroupDetailPage />} />
+                <Route path="/group/:groupId/add-stakeholder" element={<AddStakeHolder />} />
+                <Route path="/group/create-group" element={<CreateGroup />} />
+                <Route path="/apps/chats" element={<Chats />} />
+                <Route path="/group-invitation/:groupId/:email" element={<GroupInvitation />} />
+                <Route path="/apps/tickets" element={<Tickets />} />
+                <Route path="/apps/aml-setting" element={<AmlSetting />} />
+                <Route path="/apps/tickets/user-detail/:id" element={<UserApproval />} />
+                <Route path="/pages/faq" element={<Faq />} />
+                <Route path="/pages/admin-dashboard" element={<AdminMain />} />
+                <Route path="/pages/admin-localization" element={<LocalizationMain />} />
+                <Route path="/pages/admin-fees" element={<Fees />} />
+                <Route path="/pages/admin-products" element={<Products />} />
+                <Route path="/pages/admin-management" element={<Management />} />
+                <Route path="/pages/operator-dashboard" element={<OperatorMain />} />
+                <Route path="/pages/operator-transection-rules" element={<OperatorTransectionFees />} />
+                <Route path="*" element={<Navigate to="/404" />} /> {/* Catch-all route for 404 */}
+              </Routes>
+            </Box>
+          </Container>
+          <Customizer />
+          <ConnectDialog dark={false} />
+        </PageWrapper>
+      </MainWrapper>
+    </>
+
   );
 };
 
