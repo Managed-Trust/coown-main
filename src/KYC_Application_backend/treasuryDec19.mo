@@ -668,7 +668,6 @@
 //     };
 // };
 
-
 import Principal "mo:base/Principal";
 import HashMap "mo:base/HashMap";
 import Iter "mo:base/Iter";
@@ -773,4 +772,167 @@ actor Treasury {
             case (?t) { return ?t.remainingBalance };
         };
     };
+
+    //========================Transafer Type================================//
+
+    public type Subaccount = Blob;
+    public type Tokens = Nat;
+    public type Memo = Blob;
+    public type Timestamp = Nat64;
+    public type Duration = Nat64;
+    public type TxIndex = Nat;
+    public type Account = { owner : Principal; subaccount : ?Subaccount };
+    public type Result<T, E> = { #Ok : T; #Err : E };
+
+    type Account__1 = {
+        owner : Principal;
+        subaccount : Blob;
+    };
+    public type Account__2 = { owner : Principal; subaccount : ?Subaccount };
+
+    type TransferType = {
+        from_subaccount : ?Subaccount;
+        to : Account;
+        amount : Tokens;
+        fee : ?Tokens;
+        memo : ?Memo;
+        created_at_time : ?Int;
+    };
+    public type CommonError = {
+        #InsufficientFunds : { balance : Tokens };
+        #BadFee : { expected_fee : Tokens };
+        #TemporarilyUnavailable;
+        #GenericError : { error_code : Nat; message : Text };
+    };
+
+    public type DeduplicationError = {
+        #TooOld;
+        #Duplicate : { duplicate_of : TxIndex };
+        #CreatedInFuture : { ledger_time : Timestamp };
+    };
+
+    public type TransferError = DeduplicationError or CommonError or {
+        #BadBurn : { min_burn_amount : Tokens };
+    };
+
+    // Helper function to fetch total ICP in the liquidity pool
+    public type Balance__1 = Nat;
+
+    public func getTotalICPBalanceOfCanister() : async Nat {
+        let euronActor = actor ("ryjl3-tyaaa-aaaaa-aaaba-cai") : actor {
+            // icrc1_transfer : (TransferType) -> async Result<TxIndex, TransferError>;
+            icrc1_balance_of : (Account__2) -> async Balance__1;
+        };
+        let store : Account__2 = {
+            owner = Principal.fromText("speiw-5iaaa-aaaap-ahora-cai");
+            subaccount = null;
+        };
+        let result = await euronActor.icrc1_balance_of(
+            store
+        );
+        return result; // Example value, replace with actual call or calculation
+    };
+
+    // Define threshold limit for ICP balance
+    private let thresholdLimit : Nat = 1000; // Example threshold, update as needed
+
+    // Define recipients for ICP distribution
+    type Recipient = {
+        account : Account;
+        percentage : Float; // Percentage of the total balance to be released
+    };
+
+    private let recipients : [Recipient] = [
+        {
+            account = {
+                owner = Principal.fromText("recipient-1-principal");
+                subaccount = null;
+            };
+            percentage = 50.0;
+        },
+        {
+            account = {
+                owner = Principal.fromText("recipient-2-principal");
+                subaccount = null;
+            };
+            percentage = 30.0;
+        },
+        {
+            account = {
+                owner = Principal.fromText("recipient-3-principal");
+                subaccount = null;
+            };
+            percentage = 20.0;
+        },
+    ];
+
+    // Function to check and release ICP
+    public func releaseICPIfThresholdMet() : async Text {
+        // Fetch the current ICP balance of the canister
+        let currentBalance = await getTotalICPBalanceOfCanister();
+
+        if (currentBalance >= thresholdLimit) {
+            Debug.print("Threshold met. Releasing funds...");
+
+            // Calculate 50% for Foundation and 50% for Staking Holders
+            let foundationAmount = currentBalance / 2;
+            let stakingAmount = currentBalance / 2;
+
+            // Example accounts for Foundation and Staking Holders
+            let foundationAccount : Account = {
+                owner = Principal.fromText("foundation-principal-id");
+                subaccount = null;
+            };
+
+            let stakingAccount : Account = {
+                owner = Principal.fromText("staking-principal-id");
+                subaccount = null;
+            };
+
+            // Distribute to Foundation
+            let foundationTransferResult = await performICPTransfer(foundationAccount, foundationAmount);
+            switch foundationTransferResult {
+                case (#Ok(_)) {
+                    // Debug.print("Transfer successful to Foundation: " # Principal.toText(foundationAccount.owner) # " Amount: " # Nat.toText(foundationAmount));
+                };
+                case (#Err(err)) {
+                    // Debug.print("Transfer failed to Foundation: " # Principal.toText(foundationAccount.owner) # " Error: " # Debug.show(err));
+                };
+            };
+
+            // Distribute to Staking Holders
+            let stakingTransferResult = await performICPTransfer(stakingAccount, stakingAmount);
+            switch stakingTransferResult {
+                case (#Ok(_)) {
+                    // Debug.print("Transfer successful to Staking Holders: " # Principal.toText(stakingAccount.owner) # " Amount: " # Nat.toText(stakingAmount));
+                };
+                case (#Err(err)) {
+                    // Debug.print("Transfer failed to Staking Holders: " # Principal.toText(stakingAccount.owner) # " Error: " # Debug.show(err));
+                };
+            };
+
+            return "Funds released successfully.";
+        } else {
+            return "Threshold not met. Current balance: " # Nat.toText(currentBalance);
+        };
+    };
+
+    // Helper function to perform ICP transfer
+    private func performICPTransfer(to : Account, amount : Nat) : async Result<TxIndex, TransferError> {
+        let euronActor = actor ("ryjl3-tyaaa-aaaaa-aaaba-cai") : actor {
+            icrc1_transfer : (TransferType) -> async Result<TxIndex, TransferError>;
+        };
+
+        let transferDetails : TransferType = {
+            from_subaccount = null;
+            to = to;
+            amount = amount;
+            fee = ?10_000; // Example fee, update as needed
+            memo = null;
+            created_at_time = ?Time.now();
+        };
+
+        return await euronActor.icrc1_transfer(transferDetails);
+    };
+
 };

@@ -1475,7 +1475,16 @@ type RegisterCompanyForm = {
 };
 
 
- // Type Definition
+ // Type Definitions
+  // type Affiliate = {
+  //   id: Text;
+  //   name: Text;
+  //   function: Text; // e.g., "Foundation", "IT", etc.
+  //   totalMembers: Nat;
+  //   since: Text; // Date of affiliation
+  // };
+  // Parent type for operators
+
 
   type TransactionFee = {
     id: Text;
@@ -1496,20 +1505,13 @@ type RegisterCompanyForm = {
   };
 
   // HashMap Storage
+  // let affiliates = HashMap.HashMap<Text, Affiliate>(0, Text.equal, Text.hash);
   let transactionFees = HashMap.HashMap<Text, TransactionFee>(0, Text.equal, Text.hash);
   let products = HashMap.HashMap<Text, Product>(0, Text.equal, Text.hash);
 
-//====================================
+
   //======Page 1 Functions===========//
   // ===== Affiliates Management =====
-//====================================
-
-  type AffiliateDetails = {
-    affiliate: ?Affiliate;
-    focalPoint: ?FocalPoint; // Optional if not provided
-    sla: ?SLA; // Optional if not provided
-    localization: ?Localization; // Optional if not provided
-  };
 
    type Affiliate = {
     affiliateGroup: Text;
@@ -1539,42 +1541,18 @@ type RegisterCompanyForm = {
   };
 
   type Localization = {
-    actsInSpecificAreas: Bool;
-    licensedIn: [Text]; // List of country codes where the affiliate is licensed
-    exclusiveAreas: [Text]; // List of exclusive areas (country codes)
-    nonExclusiveAreas: [Text]; // List of non-exclusive areas (country codes)
-  };
-  var affiliates = HashMap.HashMap<Text, AffiliateDetails>(0, Text.equal, Text.hash);
-  private stable var affiliateEntries : [(Text, AffiliateDetails)] = [];
+  actsInSpecificAreas: Bool;
+  licensedIn: [Text]; // List of country codes where the affiliate is licensed
+  exclusiveAreas: [Text]; // List of exclusive areas (country codes)
+  nonExclusiveAreas: [Text]; // List of non-exclusive areas (country codes)
+};
 
-  public func createAffiliateDetails(key: Text): async Bool {
-  switch (affiliates.get(key)) {
-      
-      case(null)
-      {
-        affiliates.put(
-        key,
-      {
-        affiliate = null;
-        focalPoint = null;
-        sla = null;
-        localization = null;
-      }
-    );
-    return true;
-
-      };
-      case(?_)
-      {
-        return false;
-      }
-    };
-
-  
-  };
+  stable var affiliates: [Affiliate] = [];
+  stable var focalPoints: [FocalPoint] = [];
+  stable var slas: [SLA] = [];
+  stable var localizations: [Localization] = [];
 
   public func addAffiliate(
-    key: Text,
     affiliateGroup: Text,
     associateType: Text,
     affiliateWebsite: Text,
@@ -1584,34 +1562,25 @@ type RegisterCompanyForm = {
     coordinationDelegate: ?Text,
     coordinationDeputy: ?Text
   ): async Bool {
-    switch (affiliates.get(key)) {
-      case (?details) {
-        affiliates.put(
-          key,
-          {
-            details with
-            affiliate = ?{
-              affiliateGroup = affiliateGroup;
-              associateType = associateType;
-              affiliateWebsite = affiliateWebsite;
-              representedInSteering = representedInSteering;
-              steeringDelegate = steeringDelegate;
-              representedInCoordination = representedInCoordination;
-              coordinationDelegate = coordinationDelegate;
-              coordinationDeputy = coordinationDeputy;
-            }
-          }
-        );
-        return true;
-      };
-      case null {
-        return false; // Key not found
-      };
-    };
+    affiliates := Array.append(
+      affiliates,
+      [
+        {
+          affiliateGroup = affiliateGroup;
+          associateType = associateType;
+          affiliateWebsite = affiliateWebsite;
+          representedInSteering = representedInSteering;
+          steeringDelegate = steeringDelegate;
+          representedInCoordination = representedInCoordination;
+          coordinationDelegate = coordinationDelegate;
+          coordinationDeputy = coordinationDeputy;
+        }
+      ]
+    );
+    return true;
   };
 
   public func addFocalPoint(
-    key: Text,
     mainContact: Text,
     role: Text,
     email: Text,
@@ -1619,479 +1588,153 @@ type RegisterCompanyForm = {
     preferredMessenger: Text,
     messengerIdentifier: Text
   ): async Bool {
-    switch (affiliates.get(key)) {
-      case (?details) {
-        affiliates.put(
-          key,
-          {
-            details with
-            focalPoint = ?{
-              mainContact = mainContact;
-              role = role;
-              email = email;
-              phone = phone;
-              preferredMessenger = preferredMessenger;
-              messengerIdentifier = messengerIdentifier;
-            }
-          }
-        );
-        return true;
-      };
-      case null {
-        return false; // Key not found
-      };
-    };
+    focalPoints := Array.append(
+      focalPoints,
+      [
+        {
+          mainContact = mainContact;
+          role = role;
+          email = email;
+          phone = phone;
+          preferredMessenger = preferredMessenger;
+          messengerIdentifier = messengerIdentifier;
+        }
+      ]
+    );
+    return true;
   };
 
   public func addSLA(
-    key: Text,
     slaDocument: Text,
     workingDraft: Text,
     managementSystemActivities: Text,
     comments: Text
   ): async Bool {
-    switch (affiliates.get(key)) {
-      case (?details) {
-        affiliates.put(
-          key,
-          {
-            details with
-            sla = ?{
-              slaDocument = slaDocument;
-              workingDraft = workingDraft;
-              managementSystemActivities = managementSystemActivities;
-              comments = comments;
-            }
-          }
-        );
-        return true;
-      };
-      case null {
-        return false; // Key not found
-      };
-    };
-  };
-
-  public func addLocalization(
-    key: Text,
-    actsInSpecificAreas: Bool,
-    licensedIn: [Text],
-    exclusiveAreas: [Text],
-    nonExclusiveAreas: [Text]
-  ): async Bool {
-    switch (affiliates.get(key)) {
-      case (?details) {
-        affiliates.put(
-          key,
-          {
-            details with
-            localization = ?{
-              actsInSpecificAreas = actsInSpecificAreas;
-              licensedIn = licensedIn;
-              exclusiveAreas = exclusiveAreas;
-              nonExclusiveAreas = nonExclusiveAreas;
-            }
-          }
-        );
-        return true;
-      };
-      case null {
-        return false; // Key not found
-      };
-    };
-  };
-  //================================================================================
-  //=================================================================================
-  //====================================
-  //======Page 2 Functions===========//
-  // ===== Localization Management =====
-//====================================
-
-  // Function to retrieve affiliate details by key
-  public query func getAffiliateDetails(key: Text): async ?AffiliateDetails {
-    return affiliates.get(key);
-  };
-
-  public func updateAffiliateDetails(
-    key: Text,
-    affiliate: Affiliate,
-    focalPoint: FocalPoint,
-    sla: SLA,
-    localization: Localization
-  ): async Bool {
-  switch (affiliates.get(key)) {
-    case (?existingDetails) {
-      affiliates.put(
-        key,
+    slas := Array.append(
+      slas,
+      [
         {
-          affiliate =  ?affiliate;
-          focalPoint =  ?focalPoint;
-          sla = ?sla;
-          localization =  ?localization;
+          slaDocument = slaDocument;
+          workingDraft = workingDraft;
+          managementSystemActivities = managementSystemActivities;
+          comments = comments;
         }
-      );
-      return true;
-    };
-    case null {
-      return false; // Key not found
-    };
-    };
-  };
-
-  public query func getLocalizationDetails(key: Text): async ?Localization {
-    switch (affiliates.get(key)) {
-      case (?details) { return details.localization; };
-      case null { return null; };
-    };
-  };
-
-
-  //=================================================================================
-  //====================================
-  //======Page 3  Functions===========//
-  // ===== Transacntion Management =====
-  //====================================
-
-  // Define the structure for TransactionRule
-  type TransactionRule = {
-    id: Text;
-    ruleName: Text;
-    description: Text;
-    totalFees: Text; // Represented as a range (e.g., "0.01% - 0.05%")
-    assetType: Text;
-    operatorAcceptance: [Text];
-  };
-
-  // Define the structure for TransactionRuleDetails
-  type TransactionRuleDetails = {
-    ruleName: Text;
-    assetType: Text;
-    operatorAcceptance: [Text];
-    sendingAreas: [Text];
-    withdrawalCrypto: Bool;
-    receivingAreas: [Text];
-    receivingIndustry: Text;
-    amountRange: Text;
-    foundationFees: { feePerTransaction: Text; allocationGroup: Text };
-    stakingFees: { feePerTransaction: Text; allocationGroup: Text };
-    operatorFees: { feePerTransaction: Text; allocationGroup: Text };
-    thirdPartyFees: { feePerTransaction: Text; allocationGroup: Text; thirdPartyIdentifier: Text };
-  };
-
-  // HashMaps to store transaction rules and their details
-   var transactionRulesMap = HashMap.HashMap<Text, TransactionRule>(0, Text.equal, Text.hash);
-   var transactionRuleDetailsMap = HashMap.HashMap<Text, TransactionRuleDetails>(0, Text.equal, Text.hash);
-
-  // Query function to retrieve all transaction rules
-  public query func getTransactionRules(): async [TransactionRule] {
-    return Iter.toArray(transactionRulesMap.vals());
-  };
-
-  // Query function to retrieve transaction rule details by ID
-  public query func getTransactionRuleDetails(ruleId: Text): async ?TransactionRuleDetails {
-    return transactionRuleDetailsMap.get(ruleId);
-  };
-
-  // Add or update a transaction rule
-  public func addOrUpdateTransactionRule(
-    ruleId: Text,
-    rule: TransactionRule,
-    ruleDetails: TransactionRuleDetails
-  ): async Bool {
-    // Add or update the transaction rule
-    transactionRulesMap.put(ruleId, rule);
-
-    // Add or update the transaction rule details
-    transactionRuleDetailsMap.put(ruleId, ruleDetails);
-
+      ]
+    );
     return true;
   };
 
-  // Delete a transaction rule and its details
-  public func deleteTransactionRule(ruleId: Text): async Bool {
-    let ruleRemoved = transactionRulesMap.remove(ruleId) != null;
-    let detailsRemoved = transactionRuleDetailsMap.remove(ruleId) != null;
-    return ruleRemoved and detailsRemoved;
-  };
-
-
-  //=================================================================================
-  //====================================
-  //======Page 5  Management===========//
-  // ===== Transacntion Management =====
-  //====================================
-
-type Announcement = {
-  id: Text; // Unique ID for the announcement
-  message: Text; // The content of the announcement
-  createdBy: Text; // The user who created the announcement
-  createdAt: Int; // Timestamp of creation
-  updatedAt: ?Int; // Optional timestamp of the last update
-  isPublished: Bool; // Indicates whether the announcement is published
-};
-
- var internalAnnouncements: HashMap.HashMap<Text, Announcement> = HashMap.HashMap<Text, Announcement>(0, Text.equal, Text.hash);
- var publicAnnouncements: HashMap.HashMap<Text, Announcement> = HashMap.HashMap<Text, Announcement>(0, Text.equal, Text.hash);
-
-// Add or update an internal announcement
-public func addOrUpdateInternalAnnouncement(id: Text, message: Text, createdBy: Text, isPublished: Bool): async Bool {
-  let timestamp = Time.now();
-  let announcement = {
-    id = id;
-    message = message;
-    createdBy = createdBy;
-    createdAt = timestamp;
-    updatedAt = ?timestamp;
-    isPublished = isPublished;
-  };
-  internalAnnouncements.put(id, announcement);
-  return true;
-};
-
-// Get all internal announcements
-public query func getInternalAnnouncements(): async [Announcement] {
-  return Iter.toArray(internalAnnouncements.vals());
-};
-
-// Publish an internal announcement
-public func publishInternalAnnouncement(id: Text): async Bool {
-  switch (internalAnnouncements.get(id)) {
-    case (?announcement) {
-      internalAnnouncements.put(
-        id,
-        {
-          announcement with
-          isPublished = true;
-          updatedAt = ?Time.now();
-        }
-      );
-      return true;
-    };
-    case null { return false; };
-  };
-};
-
-// Unpublish an internal announcement
-public func unpublishInternalAnnouncement(id: Text): async Bool {
-  switch (internalAnnouncements.get(id)) {
-    case (?announcement) {
-      internalAnnouncements.put(
-        id,
-        {
-          announcement with
-          isPublished = false;
-          updatedAt = ?Time.now();
-        }
-      );
-      return true;
-    };
-    case null { return false; };
-  };
-};
-// Add or update a public announcement
-public func addOrUpdatePublicAnnouncement(id: Text, message: Text, createdBy: Text, isPublished: Bool): async Bool {
-  let timestamp = Time.now();
-  let announcement = {
-    id = id;
-    message = message;
-    createdBy = createdBy;
-    createdAt = timestamp;
-    updatedAt =  ?timestamp;
-    isPublished = isPublished;
-  };
-  publicAnnouncements.put(id, announcement);
-  return true;
-};
-
-// Get all public announcements
-public query func getPublicAnnouncements(): async [Announcement] {
-  return Iter.toArray(publicAnnouncements.vals());
-};
-
-// Publish a public announcement
-public func publishPublicAnnouncement(id: Text): async Bool {
-  switch (publicAnnouncements.get(id)) {
-    case (?announcement) {
-      publicAnnouncements.put(
-        id,
-        {
-          announcement with
-          isPublished = true;
-          updatedAt = ?Time.now();
-        }
-      );
-      return true;
-    };
-    case null { return false; };
-  };
-};
-
-// Unpublish a public announcement
-public func unpublishPublicAnnouncement(id: Text): async Bool {
-  switch (publicAnnouncements.get(id)) {
-    case (?announcement) {
-      publicAnnouncements.put(
-        id,
-        {
-          announcement with
-          isPublished = false;
-          updatedAt = ?Time.now();
-        }
-      );
-      return true;
-    };
-    case null { return false; };
-  };
-};
-
-
-//===================================================================//
-
-type QuickLink = {
-  id: Text;           // Unique ID for the link
-  name: Text;         // Link name
-  url: Text;          // Link URL
-  createdAt: Int;     // Timestamp of creation
-  updatedAt: ?Int;    // Optional timestamp of last update
-};
-
-var quickLinks: HashMap.HashMap<Text, QuickLink> = HashMap.HashMap<Text, QuickLink>(0, Text.equal, Text.hash);
-
-// Add or update a quick link
-public func addOrUpdateQuickLink(id: Text, name: Text, url: Text): async Bool {
-  let timestamp = Time.now();
-  let quickLink = {
-    id = id;
-    name = name;
-    url = url;
-    createdAt =timestamp;
-    updatedAt = ?timestamp;
-  };
-  quickLinks.put(id, quickLink);
-  return true;
-};
-
-// Get all quick links
-public query func getQuickLinks(): async [QuickLink] {
-  return Iter.toArray(quickLinks.vals());
-};
-
-// Delete a quick link
-public func deleteQuickLink(id: Text): async Bool {
-  return quickLinks.remove(id) != null;
-};
-
-// Retrieve a specific quick link by ID
-public query func getQuickLinkById(id: Text): async ?QuickLink {
-  return quickLinks.get(id);
-};
-
-// Update the URL of an existing link
-public func updateQuickLinkUrl(id: Text, url: Text): async Bool {
-  switch (quickLinks.get(id)) {
-    case (?link) {
-      quickLinks.put(
-        id,
-        {
-          link with
-          url = url;
-          updatedAt = ?Time.now();
-        }
-      );
-      return true;
-    };
-    case null {
-      return false; // Link not found
-    };
-  };
-};
-
-// Define a type for Policies
-type Policy = {
-  id: Text; // Unique ID for the policy
-  name: Text; // Policy name
-  applicability: Text; // Applicability of the policy (e.g., Regional Operators)
-  responsibleEntity: Text; // Responsible entity for the policy
-  link: Text; // Link to the policy document
-  workingDirectory: ?Text; // Optional working directory link
-  focalPoint: ?Text; // Email of the focal point
-  createdAt: Int; // Timestamp of creation
-  updatedAt: ?Int; // Optional timestamp for updates
-};
-
-// HashMap to store policies
- var policies: HashMap.HashMap<Text, Policy> = HashMap.HashMap<Text, Policy>(0, Text.equal, Text.hash);
-
-// Function to add or update a policy
-public func addOrUpdatePolicy(
-  id: Text,
-  name: Text,
-  applicability: Text,
-  responsibleEntity: Text,
-  link: Text,
-  workingDirectory: ?Text,
-  focalPoint: ?Text
+public func addLocalization(
+  actsInSpecificAreas: Bool,
+  licensedIn: [Text],
+  exclusiveAreas: [Text],
+  nonExclusiveAreas: [Text]
 ): async Bool {
-  let timestamp = Time.now();
-  let policy = {
-    id = id;
-    name = name;
-    applicability = applicability;
-    responsibleEntity = responsibleEntity;
-    link = link;
-    workingDirectory = workingDirectory;
-    focalPoint = focalPoint;
-    createdAt = timestamp;
-    updatedAt =  ?timestamp;
-  };
-  policies.put(id, policy);
+  localizations := Array.append(
+    localizations,
+    [
+      {
+        actsInSpecificAreas = actsInSpecificAreas;
+        licensedIn = licensedIn;
+        exclusiveAreas = exclusiveAreas;
+        nonExclusiveAreas = nonExclusiveAreas;
+      }
+    ]
+  );
   return true;
 };
+//   public func addAffiliate(id: Text, name: Text, function: Text, totalMembers: Nat, since: Text): async Text {
+//     let newAffiliate = {
+//       id = id;
+//       name = name;
+//       function = function;
+//       totalMembers = totalMembers;
+//       since = since;
+//     };
+//     affiliates.put(id, newAffiliate);
+//     return "Affiliate added successfully.";
+//   };
 
-// Function to retrieve all policies
-public query func getPolicies(): async [Policy] {
-  return Iter.toArray(policies.vals());
+//   public query func getAffiliates(): async [Affiliate] {
+//     return Iter.toArray(affiliates.vals());
+//   };
+
+//   public func editAffiliate(id: Text, name: ?Text, function: ?Text, totalMembers: ?Nat, since: ?Text): async Text {
+//     switch (affiliates.get(id)) {
+//         case (null) {
+//             return "Affiliate does not exist.";
+//         };
+//         case (?affiliate) {
+//             let updatedAffiliate = {
+//                 affiliate with
+//                 name = Option.get(name, affiliate.name);
+//                 function = Option.get(function, affiliate.function);
+//                 totalMembers = Option.get(totalMembers, affiliate.totalMembers);
+//                 since = Option.get(since, affiliate.since);
+//             };
+//             affiliates.put(id, updatedAffiliate);
+//             return "Affiliate updated successfully.";
+//         };
+//     };
+// };
+
+// public func deleteAffiliate(id: Text): async Text {
+//     switch (affiliates.get(id)) {
+//         case (null) {
+//             return "Affiliate does not exist.";
+//         };
+//         case (_) {
+//             affiliates.delete(id);
+//             return "Affiliate deleted successfully.";
+//         };
+//     };
+// };
+public func updateFoundationMetrics(
+    totalUsers: ?Nat,
+    totalEnterprises: ?Nat,
+    totalTransactions: ?Nat,
+    totalRevenue: ?Nat
+): async Text {
+    // Assuming these metrics are stored in some global variables
+    var updatedUsers = Option.get(totalUsers, 36000); // Default value as placeholder
+    var updatedEnterprises = Option.get(totalEnterprises, 8000);
+    var updatedTransactions = Option.get(totalTransactions, 10000000);
+    var updatedRevenue = Option.get(totalRevenue, 500000);
+
+    // Apply updates
+    // Logic to store or update these values in state
+
+    return "Foundation metrics updated successfully.";
 };
 
-// Function to retrieve a policy by ID
-public query func getPolicyById(id: Text): async ?Policy {
-  return policies.get(id);
+public func editTransactionFee(
+    id: Text,
+    ruleName: ?Text,
+    totalFees: ?Nat,
+    assetType: ?Text,
+    operator: ?Text,
+    description: ?Text
+): async Text {
+    switch (transactionFees.get(id)) {
+        case (null) {
+            return "Transaction fee does not exist.";
+        };
+        case (?fee) {
+            let updatedFee = {
+                fee with
+                ruleName = Option.get(ruleName, fee.ruleName);
+                totalFees = Option.get(totalFees, fee.totalFees);
+                assetType = Option.get(assetType, fee.assetType);
+                operator = Option.get(operator, fee.operator);
+                description = Option.get(description, fee.description);
+            };
+            transactionFees.put(id, updatedFee);
+            return "Transaction fee updated successfully.";
+        };
+    };
 };
 
-// Function to delete a policy
-public func deletePolicy(id: Text): async Bool {
-  return policies.remove(id) != null;
-};
-
-
-
-//======================Old==========================================//
-  public func editTransactionFee(
-      id: Text,
-      ruleName: ?Text,
-      totalFees: ?Nat,
-      assetType: ?Text,
-      operator: ?Text,
-      description: ?Text
-  ): async Text {
-      switch (transactionFees.get(id)) {
-          case (null) {
-              return "Transaction fee does not exist.";
-          };
-          case (?fee) {
-              let updatedFee = {
-                  fee with
-                  ruleName = Option.get(ruleName, fee.ruleName);
-                  totalFees = Option.get(totalFees, fee.totalFees);
-                  assetType = Option.get(assetType, fee.assetType);
-                  operator = Option.get(operator, fee.operator);
-                  description = Option.get(description, fee.description);
-              };
-              transactionFees.put(id, updatedFee);
-              return "Transaction fee updated successfully.";
-          };
-      };
-  };
+  //======Page 2 Functions===========//
 
 
     //================Page 3 Simple =========
@@ -2154,15 +1797,15 @@ public func deletePolicy(id: Text): async Bool {
       return "Transaction rule added successfully.";
   };
 
-  // public func deleteTransactionRule(id: Text) : async Text {
-  //     switch (transactionFees.get(id)) {
-  //         case (null) { return "Rule not found."; };
-  //         case (_) {
-  //             transactionFees.delete(id);
-  //             return "Rule deleted successfully.";
-  //         };
-  //     };
-  // };
+  public func deleteTransactionRule(id: Text) : async Text {
+      switch (transactionFees.get(id)) {
+          case (null) { return "Rule not found."; };
+          case (_) {
+              transactionFees.delete(id);
+              return "Rule deleted successfully.";
+          };
+      };
+  };
 
   public func assignRuleToOperators(ruleId: Text, operators: [Text]) : async Text {
       switch (transactionFees.get(ruleId)) {
@@ -2319,122 +1962,7 @@ public func deletePolicy(id: Text): async Bool {
   // ===============================================//
 
 
-  // Define types for different aspects of the product
-  type Product2 = {
-    id: Text;
-    name: Text;
-    price: Nat;
-    productOwner: Text;
-    salesChannel: Text;
-  };
-
-  type PaymentDetails = {
-    actualPrice: Nat;
-    allowCryptoPayments: Bool;
-    allowCardPayments: Bool;
-    allowBankTransfer: Bool;
-    voucherReference: ?Text;
-    externalDatabaseLink: ?Text;
-    annualRenewalFee: Bool;
-  };
-
-  type ProfitSplit = {
-    foundationPart: Nat;
-    operatorPart: Nat;
-    stakingPart: Nat;
-    thirdPartyPart: Nat;
-    thirdPartyIdentifier: ?Text;
-  };
-
-  type Terms = {
-    applyGeneralTerms: Bool;
-    termsLink: ?Text;
-  };
-
-  type LocalizationDetails = {
-    countries: [Text];
-  };
-
-  type ProductDetails = {
-    product: Product2;
-    payment: ?PaymentDetails;
-    profitSplit: ?ProfitSplit;
-    terms: ?Terms;
-    localization: ?LocalizationDetails;
-  };
-
-  // Stable HashMaps to store products and their details
-   var productsMap = HashMap.HashMap<Text, Product2>(0, Text.equal, Text.hash);
-   var productDetailsMap = HashMap.HashMap<Text, ProductDetails>(0, Text.equal, Text.hash);
-
-  // ============================================================
-  // Functions for managing products and services
-  // ============================================================
-
-  // Add or update a product
-  public func addOrUpdateProduct(
-    id: Text,
-    name: Text,
-    price: Nat,
-    productOwner: Text,
-    salesChannel: Text,
-    payment: ?PaymentDetails,
-    profitSplit: ?ProfitSplit,
-    terms: ?Terms,
-    localization: ?LocalizationDetails
-  ): async Bool {
-    // Add or update product details in the HashMap
-    productsMap.put(
-      id,
-      {
-        id = id;
-        name = name;
-        price = price;
-        productOwner = productOwner;
-        salesChannel = salesChannel;
-      }
-    );
-
-    productDetailsMap.put(
-      id,
-      {
-        product = {
-          id = id;
-          name = name;
-          price = price;
-          productOwner = productOwner;
-          salesChannel = salesChannel;
-        };
-        payment = payment;
-        profitSplit = profitSplit;
-        terms = terms;
-        localization = localization;
-      }
-    );
-
-    return true;
-  };
-
-  // Get all products
-  public query func getAllProducts(): async [Product2] {
-    return Iter.toArray(productsMap.vals());
-  };
-
-  // Get product details by ID
-  public query func getProductDetails(id: Text): async ?ProductDetails {
-    return productDetailsMap.get(id);
-  };
-
-  // Delete a product
-  public func deleteProduct(id: Text): async Bool {
-    let removedProduct = productsMap.remove(id) != null;
-    let removedDetails = productDetailsMap.remove(id) != null;
-    return removedProduct and removedDetails;
-  };
-
-
-
-  // ===== Old Products Management =====
+  // ===== Products Management =====
   public func addProduct(id: Text, name: Text, price: Nat, productOwner: Text, salesChannel: Text): async Text {
     let newProduct = {
       id = id;
@@ -2546,60 +2074,60 @@ public func configureRecurringFees(
   // ===============================================//
   //================Page 4 Section 3 =========
   // ===============================================//
-  public func configureTabs(
-      productId: Text,
-      tabs: [Text]
-  ) : async Text {
-      switch (products.get(productId)) {
-          case null { return "Product does not exist."; };
-          case (?product) {
-              // Join the array of tabs into a single Text using Array.fold
-              let tabsText = Array.foldLeft<Text, Text>(
-                  tabs, 
-                  "", 
-                  func(acc: Text, tab: Text): Text {
-                      if (acc == "") {
-                          tab // First element, no separator
-                      } else {
-                          acc # ", " # tab // Add separator for subsequent elements
-                      }
-                  }
-              );
-              let updatedProduct = {
-                  product with
-                  description = product.description # " | Tabs: " # tabsText
-              };
-              products.put(productId, updatedProduct);
-              return "Tabs configured successfully.";
-          };
-      };
-  };
+public func configureTabs(
+    productId: Text,
+    tabs: [Text]
+) : async Text {
+    switch (products.get(productId)) {
+        case null { return "Product does not exist."; };
+        case (?product) {
+            // Join the array of tabs into a single Text using Array.fold
+            let tabsText = Array.foldLeft<Text, Text>(
+                tabs, 
+                "", 
+                func(acc: Text, tab: Text): Text {
+                    if (acc == "") {
+                        tab // First element, no separator
+                    } else {
+                        acc # ", " # tab // Add separator for subsequent elements
+                    }
+                }
+            );
+            let updatedProduct = {
+                product with
+                description = product.description # " | Tabs: " # tabsText
+            };
+            products.put(productId, updatedProduct);
+            return "Tabs configured successfully.";
+        };
+    };
+};
 
-  public func configureTermsOfService(
-      productId: Text,
-      applyGeneralTerms: Bool,
-      termsLink: ?Text
-  ) : async Text {
-      switch (products.get(productId)) {
-          case null { 
-              return "Product does not exist."; 
-          };
-          case (?product) {
-              let updatedDescription = product.description #
-                  (if (applyGeneralTerms) { " | General Terms: Applied" } else { " | General Terms: Not Applied" }) #
-                  (switch termsLink {
-                      case null { "" };
-                      case (?link) { " | Terms Link: " # link };
-                  });
-              let updatedProduct = {
-                  product with
-                  description = updatedDescription
-              };
-              products.put(productId, updatedProduct);
-              return "Terms of Service configuration updated successfully.";
-          };
-      };
-  };
+public func configureTermsOfService(
+    productId: Text,
+    applyGeneralTerms: Bool,
+    termsLink: ?Text
+) : async Text {
+    switch (products.get(productId)) {
+        case null { 
+            return "Product does not exist."; 
+        };
+        case (?product) {
+            let updatedDescription = product.description #
+                (if (applyGeneralTerms) { " | General Terms: Applied" } else { " | General Terms: Not Applied" }) #
+                (switch termsLink {
+                    case null { "" };
+                    case (?link) { " | Terms Link: " # link };
+                });
+            let updatedProduct = {
+                product with
+                description = updatedDescription
+            };
+            products.put(productId, updatedProduct);
+            return "Terms of Service configuration updated successfully.";
+        };
+    };
+};
 
 
   // ===============================================//
@@ -3934,7 +3462,6 @@ public func participateInVote(userId : Text) : async Text {
     // groupIdEntries := Iter.toArray(groupIds.entries());
     accountGroupEntries := Iter.toArray(accountGroups.entries());
 
-    affiliateEntries := Iter.toArray(affiliates.entries());
 
   };
   system func postupgrade() {
@@ -3961,7 +3488,6 @@ public func participateInVote(userId : Text) : async Text {
 
     // groupIds := HashMap.fromIter<Text, Buffer.Buffer<Text>>(groupIdEntries.vals(), 1, Text.equal, Text.hash);
     accountGroups := HashMap.fromIter<Text, [Principal]>(accountGroupEntries.vals(), 1, Text.equal, Text.hash);
-    affiliates := HashMap.fromIter<Text, AffiliateDetails>(affiliateEntries.vals(), 1, Text.equal, Text.hash);
 
   };
 };
