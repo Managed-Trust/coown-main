@@ -11,6 +11,7 @@ import EnterpriseEdtionComponent from '../../../components/pricing/EnterpriseEdt
 import AssetMiningComponent from '../../../components/pricing/AssetMiningComponent/AssetMiningComponent';
 import LiveSupportComponent from '../../../components/pricing/LiveSupportComponent/LiveSupportComponent';
 import CustomSolution from '../../../components/pricing/CustomSolution/CustomSolution';
+import Card from '../../../components/pricing/Card/card';
 
 const Pricing = () => {
     return (
@@ -20,6 +21,7 @@ const Pricing = () => {
                 <Banner/>
                 <CommunityEdition/>
                 <EnterpriseEdtionComponent />
+                <Card/>
                 <FileSharingComponent />
                 <AssetMiningComponent />
                 <LiveSupportComponent />

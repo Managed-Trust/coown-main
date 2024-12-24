@@ -16,8 +16,8 @@ const ContactUs = () => {
                 <LpHeader />
                 <Banner/>
                 {/* <Contact /> */}
-                <OpenChatCommunity />
                 <ContactDetails />
+                <OpenChatCommunity />
                 <FAQs />
                 <C2a2 />
                 <Footer />

@@ -43,7 +43,7 @@ const C2a2 = () => {
               </Typography>
 
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={3} mt={3}>
-                <StyledButton variant="contained" color="inherit" component={NavLink} to="/auth/login">
+                <StyledButton variant="contained" color="inherit" component={NavLink} to="/contact-us">
                   Contact now
                 </StyledButton>
               </Stack>

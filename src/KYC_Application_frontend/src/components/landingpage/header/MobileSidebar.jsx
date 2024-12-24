@@ -27,7 +27,7 @@ const MobileSidebar = () => {
                     
                     <Button color="inherit" href="/ico" sx={{
                         justifyContent: 'start'
-                    }}>ICO</Button>
+                    }}>Token</Button>
                     <Button color="inherit" href="/pricing" sx={{
                         justifyContent: 'start'
                     }}>Pricing</Button>

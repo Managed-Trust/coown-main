@@ -46,7 +46,7 @@ const SwapComponent = () => {
                 </Typography>
               </Box>
               <Button variant="contained" color="primary" sx={{ py: 1.5,px:3,mt:3, borderRadius:'5px' }}>
-                Swap
+                Swap (Comming Soon)
               </Button>
             </Paper>
             <Box mt={3} display="flex" gap={2}>

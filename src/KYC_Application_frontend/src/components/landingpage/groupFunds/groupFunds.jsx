@@ -1,11 +1,21 @@
-import { Box, Typography, Paper, Grid } from '@mui/material'
+import { Box, Typography, Container, Grid } from '@mui/material'
 
 export default function GroupFunds() {
 
   return (
-    <Grid container spacing={4} sx={{ p: 4, maxWidth: 1200, mx: 'auto' }}>
+    <Container maxWidth="lg">
+    <Grid container spacing={4} sx={{ p: 4 }}>
       <Grid item xs={12} md={6}>
-        <img src='/images/landingPage/simple_control_over_group.jpg' />
+        <Box sx={{ overflow: 'hidden', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+          <img src='/images/landingPage/simple_control_over_group.jpg'
+            style={{
+              maxWidth: '100%',
+              height: 'auto',
+              objectFit: 'contain',
+            }}
+            alt="Easy Payments"
+          />
+        </Box>
       </Grid>
 
       <Grid item xs={12} md={6}>
@@ -26,17 +36,11 @@ export default function GroupFunds() {
             fontSize={16}
             sx={{ lineHeight: 1.5 }}
           >
-            COOWN helps families, companies, and public groups share and control
-            digital assets easily. Managers can set daily and monthly spending
-            limits for each group member. If someone needs to spend more, approvals
-            can be given quickly on a smartphone by designated people like
-            executive managers. For large transactions, shareholders can vote to
-            approve them as an optional feature. COOWN makes managing group
-            finances straightforward and transparent, all while staying secure and
-            following national laws.
+            COOWN helps families, companies, and public groups share and control digital assets easily. Managers can set daily and monthly spending limits for each group member. If someone needs to spend more, approvals can be given quickly on a smartphone by designated people like executive managers. For large transactions, shareholders can vote to approve them as an optional feature. COOWN makes managing group finances straightforward and transparent, all while staying secure and following national laws.
           </Typography>
         </Box>
       </Grid>
     </Grid>
+    </Container>
   )
 }

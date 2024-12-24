@@ -40,7 +40,7 @@ const EnterpriseEdtionComponent = () => {
                         Suitable for larger structures and enterprises.
                     </Typography>
                 </Box>
-                <Grid container spacing={4} sx={{padding:'30px' }}>
+                <Grid container spacing={4} sx={{ padding: '30px' }}>
                     {cardData.map((card) => (
                         <Grid item xs={12} sm={4} md={4} lg={4} key={card.title}>
                             <BlankCard className="hoverCard" sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
@@ -49,7 +49,7 @@ const EnterpriseEdtionComponent = () => {
                                     <Stack direction="row" gap={1}>
                                         <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', marginTop: 1 }}>
                                             <Typography variant="h6">{card.title}</Typography>
-                                            <Typography variant="caption" sx={{ minHeight: '60px', color: '#5A6A85', fontSize:'13px' , display: 'block', overflow: 'hidden', marginTop: 1, textOverflow: 'ellipsis', whiteSpace: 'normal', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical' }}>
+                                            <Typography variant="caption" sx={{ minHeight: '60px', color: '#5A6A85', fontSize: '13px', display: 'block', overflow: 'hidden', marginTop: 1, textOverflow: 'ellipsis', whiteSpace: 'normal', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical' }}>
                                                 {card.desc}
                                             </Typography>
                                             <Box>
@@ -57,13 +57,13 @@ const EnterpriseEdtionComponent = () => {
                                                 <Typography variant="body1" sx={{ color: 'gray' }}>{card.per}</Typography>
                                             </Box>
 
-                                            <Box sx={{ width: '100%', marginTop: 2 }}>
+                                            {/* <Box sx={{ width: '100%', marginTop: 2 }}>
                                                 <Link to={card.link} >
                                                     <Button variant="contained" sx={{ width: '100%', marginTop: 2, textTransform: 'none' }}>
                                                         Get Started
                                                     </Button>
                                                 </Link>
-                                            </Box>
+                                            </Box> */}
                                         </Box>
                                     </Stack>
                                 </Box>
@@ -73,10 +73,8 @@ const EnterpriseEdtionComponent = () => {
                 </Grid>
                 <Box>
                     <Typography variant="caption" color="textSecondary">
-                        * The above prices are applied by the sandbox operator to early adopters for testing and launching the product with residents and companies of selected countries. Prices provided by your regional operator may differ.
-                    </Typography>
-                    <Typography variant="caption" color="textSecondary" display="block" mt={1}>
-                        * Transaction fees apply (starting from $0.008) <Link to="/learn-more">Learn more</Link>
+                        * The above prices are applied by the       <Typography variant="caption" gutterBottom sx={{ color: '#5D87FF' }}>
+                            sandbox operator  </Typography>to early adopters for testing and launching the product with residents and companies of selected countries. Prices provided by your regional operator may differ.
                     </Typography>
                 </Box>
             </Container>

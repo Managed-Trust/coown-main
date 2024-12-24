@@ -26,7 +26,7 @@ function Banner() {
                 <Typography variant="body1" align="center" paragraph sx={{ color: '#5A6A85', mb: 4 }}>
                     Invest in our platform for governing and benefitting from performance based staking rewards
                 </Typography>
-                <Grid container spacing={2} justifyContent="center">
+                {/* <Grid container spacing={2} justifyContent="center">
                     <Grid item>
                         <Button
                             variant="contained"
@@ -53,7 +53,7 @@ function Banner() {
                             Swap tokens
                         </Button>
                     </Grid>
-                </Grid>
+                </Grid> */}
             </Box>
         </Box>
     );

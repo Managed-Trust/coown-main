@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Typography, Card, CardContent, useMediaQuery, useTheme } from '@mui/material';
+import { Box, Typography, Card, CardContent, useMediaQuery, useTheme, Button } from '@mui/material';
 import { ConnectButton, ConnectDialog, useConnect } from "@connect2ic/react";
 
 export default function Connect() {
@@ -85,7 +85,23 @@ export default function Connect() {
               </Typography>
             </Box>
           </Box>
-          <ConnectButton />
+          <Button
+            variant="contained"
+            sx={{
+              backgroundColor: '#000',
+              color: '#fff',
+              borderRadius: '20px',
+              padding: '6px 16px',
+              textTransform: 'none',
+              '&:hover': {
+                backgroundColor: '#333',
+              },
+            }}
+          >
+            Coming Soon
+          </Button>
+
+          {/* <ConnectButton /> */}
           <ConnectDialog dark={false} />
         </CardContent>
       </Card>

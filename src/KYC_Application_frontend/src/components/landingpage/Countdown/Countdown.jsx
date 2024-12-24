@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import {Link} from 'react-router-dom';
 import { Container,Grid, Box, Typography, Button } from '@mui/material';
 
 const Countdown = () => {
   // Set initial time for the countdown (e.g., 1 day, 12 hours, 35 minutes, and 41 seconds from now)
-  const targetDate = new Date("12/21/2024")
+  const targetDate = new Date("01/21/2025")
   const calculateTimeLeft = () => {
     const now = new Date().getTime();
     const difference = targetDate - now;
@@ -38,9 +39,9 @@ const Countdown = () => {
             <Typography variant="h2" sx={{ fontWeight: 'bold' }}>
               Next token sale phase starts in
             </Typography>
-            <Button variant="outlined" sx={{ mt: 1 }}>
+            <Link to="/ico"><Button variant="outlined" sx={{ mt: 1 }}>
               Learn more
-            </Button>
+            </Button></Link>
           </Grid>
           <Grid item   xs={6} >
             <Grid container spacing={1} alignItems="center">

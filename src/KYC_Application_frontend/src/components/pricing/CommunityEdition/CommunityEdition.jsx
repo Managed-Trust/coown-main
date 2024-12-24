@@ -38,7 +38,7 @@ const CommunityEdition = () => {
                                 <ListItemIcon>
                                     <CheckCircleIcon color="primary" />
                                 </ListItemIcon>
-                                <ListItemText primary="Low transaction fees" />
+                                <ListItemText primary="Instant transactions for $0.05 or less" />
                             </ListItem>
                         </List>
                     </Grid>

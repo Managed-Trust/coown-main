@@ -15,12 +15,13 @@ import COOWN from '../../../components/ico/Coown/coown';
 import Connect from '../../../components/ico/Connect/connect';
 import RewardsAndAffiliate from '../../../components/ico/rewardsAndAffiliate/RewardsAndAffiliate';
 import NFTSwap from '../../../components/ico/NFTSwap/nftswap';
+import { Container } from '@mui/system';
 
 const StyledTab = styled(Tab)(({ theme }) => ({
   color: '#94a3b8',
   minWidth: '120px', // Reduce width to bring tabs closer
   minHeight: '60px', // Increase height
-  fontSize: '16px',  // Increase font size for better readability
+  fontSize: '16px', // Increase font size for better readability
   '&.Mui-selected': {
     color: '#60a5fa',
     borderBottom: '2px solid #60a5fa',
@@ -29,8 +30,11 @@ const StyledTab = styled(Tab)(({ theme }) => ({
     color: '#60a5fa', // Match hover color to selected tab color
     borderBottom: '2px solid #60a5fa', // Match hover border to selected tab border
   },
+  '&.Mui-disabled': {
+    color: '#64748b', // Light gray color for disabled tabs
+    cursor: 'not-allowed', // Change cursor for disabled tabs
+  },
 }));
-
 const ICO = () => {
   const [value, setValue] = useState(0);
   const theme = useTheme();
@@ -47,28 +51,30 @@ const ICO = () => {
       <Countdown />
       <COOWN />
 
-      <AppBar position="static" color="transparent" elevation={0} sx={{ marginTop: '30px' }}>
-        <Tabs
-          value={value}
-          onChange={handleChange}
-          indicatorColor="primary"
-          textColor="primary"
-          variant={isMobile ? 'scrollable' : 'fullWidth'} // Switch to scrollable for mobile
-          scrollButtons={isMobile ? 'auto' : 'off'} // Enable scroll buttons in mobile view
-          sx={{
-            bgcolor: '#1e293b',
-            '& .MuiTabs-indicator': { display: 'none' },
-            '& .MuiTabs-flexContainer': {
-              justifyContent: isMobile ? 'flex-start' : 'space-around', // Align tabs for mobile and desktop
-              overflowX: isMobile ? 'auto' : 'visible', // Allow horizontal scrolling on mobile
-            },
-          }}
-        >
-          <StyledTab label="Token Swap" />
-          <StyledTab label="Social Rewards" />
-          <StyledTab label="NFT" />
-          <StyledTab label="About" />
-        </Tabs>
+      <AppBar position="static" color="transparent" elevation={0} sx={{ bgcolor: '#1e293b', marginTop: '30px' }}>
+        <Container maxWidth='lg'>
+          <Tabs
+            value={value}
+            onChange={handleChange}
+            indicatorColor="primary"
+            textColor="primary"
+            variant={isMobile ? 'scrollable' : 'fullWidth'} // Switch to scrollable for mobile
+            scrollButtons={isMobile ? 'auto' : 'off'} // Enable scroll buttons in mobile view
+            sx={{
+
+              '& .MuiTabs-indicator': { display: 'none' },
+              '& .MuiTabs-flexContainer': {
+                justifyContent: isMobile ? 'flex-start' : 'space-around', // Align tabs for mobile and desktop
+                overflowX: isMobile ? 'auto' : 'visible', // Allow horizontal scrolling on mobile
+              },
+            }}
+          >
+            <StyledTab label="Token Swap" />
+            <StyledTab label="Social Rewards" disabled /> {/* Disable this tab */}
+            <StyledTab label="NFT" disabled /> {/* Disable this tab */}
+            <StyledTab label="About" disabled /> {/* Disable this tab */}
+          </Tabs>
+        </Container>
       </AppBar>
 
       <Connect />

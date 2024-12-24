@@ -44,7 +44,7 @@ const Navigations = () => {
         Organization
       </StyledButton>
       <StyledButton color="inherit" variant="text" href="/ico">
-        ICO
+        Token
       </StyledButton>
       <StyledButton color="inherit" variant="text" href="/pricing">
       Pricing

@@ -9,9 +9,9 @@ export default function COOWN() {
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        minHeight: '100vh', // Full viewport height
+        minHeight: '70vh', // Full viewport height
         paddingX: 2,  // Padding from the left and right
-        paddingY: 4,  // Padding on top and bottom
+        paddingY: 2,  // Padding on top and bottom
         bgcolor: '#f9fafb', // Light background for better contrast
       }}
     >
