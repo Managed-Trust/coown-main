@@ -34,63 +34,17 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
 }));
 
-const affiliatesData = [
-  {
-    id: '132456789',
-    name: 'COOWN Foundation',
-    totalMembers: 12,
-    function: 'Foundation',
-    since: 'Jan 1, 2024',
-    isMain: true,
-    subRows: [
-      { id: '132456789', name: 'Steering committee', totalMembers: 4, function: 'Foundation - BU', since: 'Jan 1, 2024' },
-      { id: '132456789', name: 'CEO office', totalMembers: 2, function: 'Foundation - BU', since: 'Jan 1, 2024' },
-      { id: '132456789', name: 'Marketing', totalMembers: 5, function: 'Foundation - BU', since: 'Jan 1, 2024' },
-      { id: '132456789', name: 'Advisory board', totalMembers: 7, function: 'Foundation - BU', since: 'Jan 1, 2024' },
-      { id: '132456789', name: 'Quality', totalMembers: 2, function: 'Foundation - BU', since: 'Jan 1, 2024' },
-    ],
-  },
-  {
-    id: '987654321',
-    name: 'Software Developers',
-    totalMembers: 15,
-    function: 'IT',
-    since: 'Jan 1, 2024',
-    isMain: true,
-    subRows: [],
-  },
-  {
-    id: '123456789',
-    name: 'Regional Operator "Sandbox"',
-    totalMembers: 15,
-    function: 'Regional Operator "Sandbox"',
-    since: 'Jan 1, 2024',
-    isMain: true,
-    subRows: [],
-  },
-  {
-    id: '1122334455',
-    name: 'Auditor company',
-    totalMembers: 15,
-    function: 'IT',
-    since: 'Jan 1, 2024',
-    isMain: true,
-    subRows: [],
-  },
-  {
-    id: '9988776655',
-    name: 'Banking partner',
-    totalMembers: 15,
-    function: 'Regional Operator',
-    since: 'Jan 1, 2024',
-    isMain: true,
-    subRows: [],
-  },
-];
-
 function Row({ row }) {
   const [open, setOpen] = useState(false);
-  console.log("Row:",row[1].affiliate[0].affiliateGroup);
+
+  // Add safety checks for accessing nested properties
+  const affiliateGroup = row[1]?.affiliate?.[0]?.affiliateGroup || "Unknown Group";
+  const affiliateWebsite = row[1]?.affiliate?.[0]?.affiliateWebsite || "Unknown Website";
+  const associateType = row[1]?.affiliate?.[0]?.associateType || "Unknown Type";
+  const representedInCoordination = row[1]?.affiliate?.[0]?.representedInCoordination ? "Yes" : "No";
+  const representedInSteering = row[1]?.affiliate?.[0]?.representedInSteering ? "Yes" : "No";
+  const id = row[0] || "Unknown ID";
+
   return (
     <>
       <StyledTableRow>
@@ -104,58 +58,93 @@ function Row({ row }) {
           </IconButton>
           <Box>
             <Typography variant="body2" sx={{ color: '#1e293b', fontWeight: 500 }}>
-              {row[1].affiliate[0].affiliateGroup}
+              {affiliateGroup}
             </Typography>
             <Typography variant="caption" sx={{ color: '#64748b' }}>
-              #{row[0]}
+              #{id}
             </Typography>
           </Box>
         </TableCell>
-        {/* <TableCell sx={{ color: '#1e293b' }}>{row[1].affiliat[0].affiliateWebsite}</TableCell>
-        <TableCell sx={{ color: '#1e293b' }}>{row[1].associateType}</TableCell>
-        <TableCell sx={{ color: '#1e293b' }}>{row.representedInCoordination ? "Yes" : "No"}</TableCell>
-        <TableCell sx={{ color: '#1e293b' }}>{row.representedInSteering ? "Yes" : "No"}</TableCell> */}
+        <TableCell sx={{ color: '#1e293b' }}>{affiliateWebsite}</TableCell>
+        <TableCell sx={{ color: '#1e293b' }}>{associateType}</TableCell>
+        <TableCell sx={{ color: '#1e293b' }}>{representedInCoordination}</TableCell>
+        <TableCell sx={{ color: '#1e293b' }}>{representedInSteering}</TableCell>
       </StyledTableRow>
-      {/* <TableRow>
+      <TableRow>
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
           <Collapse in={open} timeout="auto" unmountOnExit>
             <Box sx={{ margin: 1 }}>
-              <Typography variant="h6" gutterBottom component="div">
-                Sub Rows
+              <Typography variant="h6" gutterBottom component="div" sx={{ fontWeight: 600, mb: 1, color: '#374151' }}>
+                Focal Point
               </Typography>
-              <Table size="small" aria-label="sub-rows">
+              <Table size="small" aria-label="focal-point">
+                <TableHead>
+                  <TableRow>
+                    <TableCell sx={{ fontWeight: 'bold', color: '#4B5563' }}>Email</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold', color: '#4B5563' }}>Main Contact</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold', color: '#4B5563' }}>Phone</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold', color: '#4B5563' }}>Preferred Messenger</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold', color: '#4B5563' }}>Messenger Identifier</TableCell>
+                  </TableRow>
+                </TableHead>
                 <TableBody>
-                  {row.focalPoint.map((fp, index) => (
-                    <StyledTableRow key={`focalPoint-${index}`}>
-                      <TableCell sx={{ pl: 8 }}>Focal Point</TableCell>
-                      <TableCell>{fp.email}</TableCell>
-                      <TableCell>{fp.mainContact}</TableCell>
-                      <TableCell>{fp.phone}</TableCell>
-                      <TableCell>{fp.preferredMessenger}</TableCell>
-                      <TableCell>{fp.messengerIdentifier}</TableCell>
-                    </StyledTableRow>
-                  ))}
-                  {row.sla.map((sla, index) => (
-                    <StyledTableRow key={`sla-${index}`}>
-                      <TableCell sx={{ pl: 8 }}>SLA</TableCell>
-                      <TableCell>{sla.comments}</TableCell>
-                      <TableCell>{sla.managementSystemActivities}</TableCell>
-                      <TableCell>{sla.slaDocument}</TableCell>
-                      <TableCell>{sla.workingDraft}</TableCell>
-                    </StyledTableRow>
-                  ))}
-                  {row.localization.map((loc, index) => (
-                    <StyledTableRow key={`localization-${index}`}>
-                      <TableCell sx={{ pl: 8 }}>Localization</TableCell>
-                      <TableCell colSpan={5}>{JSON.stringify(loc)}</TableCell>
-                    </StyledTableRow>
-                  ))}
+                  <StyledTableRow>
+                    <TableCell>{row[1]?.focalPoint?.[0]?.email || "N/A"}</TableCell>
+                    <TableCell>{row[1]?.focalPoint?.[0]?.mainContact || "N/A"}</TableCell>
+                    <TableCell>{row[1]?.focalPoint?.[0]?.phone || "N/A"}</TableCell>
+                    <TableCell>{row[1]?.focalPoint?.[0]?.preferredMessenger || "N/A"}</TableCell>
+                    <TableCell>{row[1]?.focalPoint?.[0]?.messengerIdentifier || "N/A"}</TableCell>
+                  </StyledTableRow>
+                </TableBody>
+              </Table>
+
+              <Typography variant="h6" gutterBottom component="div" sx={{ fontWeight: 600, marginTop: 2, color: '#374151' }}>
+                SLA
+              </Typography>
+              <Table size="small" aria-label="sla">
+                <TableHead>
+                  <TableRow>
+                    <TableCell sx={{ fontWeight: 'bold', color: '#4B5563' }}>Comments</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold', color: '#4B5563' }}>Management Activities</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold', color: '#4B5563' }}>SLA Document</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold', color: '#4B5563' }}>Working Draft</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  <StyledTableRow>
+                    <TableCell>{row[1]?.sla?.[0]?.comments || "N/A"}</TableCell>
+                    <TableCell>{row[1]?.sla?.[0]?.managementSystemActivities || "N/A"}</TableCell>
+                    <TableCell>{row[1]?.sla?.[0]?.slaDocument || "N/A"}</TableCell>
+                    <TableCell>{row[1]?.sla?.[0]?.workingDraft || "N/A"}</TableCell>
+                  </StyledTableRow>
+                </TableBody>
+              </Table>
+
+              <Typography variant="h6" gutterBottom component="div" sx={{ fontWeight: 600, marginTop: 2, color: '#374151' }}>
+                Localization
+              </Typography>
+              <Table size="small" aria-label="localization">
+                <TableHead>
+                  <TableRow>
+                    <TableCell sx={{ fontWeight: 'bold', color: '#4B5563' }}>Acts in Specific Areas</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold', color: '#4B5563' }}>Licensed In</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold', color: '#4B5563' }}>Exclusive Areas</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold', color: '#4B5563' }}>Non-Exclusive Areas</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  <StyledTableRow>
+                    <TableCell>{row[1]?.localization?.[0]?.actsInSpecificAreas ? "Yes" : "No"}</TableCell>
+                    <TableCell>{row[1]?.localization?.[0]?.licensedIn?.join(", ") || "N/A"}</TableCell>
+                    <TableCell>{row[1]?.localization?.[0]?.exclusiveAreas?.join(", ") || "N/A"}</TableCell>
+                    <TableCell>{row[1]?.localization?.[0]?.nonExclusiveAreas?.join(", ") || "N/A"}</TableCell>
+                  </StyledTableRow>
                 </TableBody>
               </Table>
             </Box>
           </Collapse>
         </TableCell>
-      </TableRow> */}
+      </TableRow>
     </>
   );
 }
