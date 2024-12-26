@@ -3,6 +3,19 @@ import { Container, Grid, Box, Typography, TextField, Button, Link, Paper } from
 import InfoOutlined from '@mui/icons-material/InfoOutlined';
 
 const SwapComponent = () => {
+  
+  const handleClick = () => {
+    swal({
+      title: 'Swap Coming Soon!',
+      text: 'Stay tuned, the swap feature will be available soon.',
+      icon: 'info',
+      button: {
+        text: 'OK',
+        className: 'btn btn-primary',
+      },
+    });
+  };
+
   return (
     <Box mt={10} mb={15}>
       <Container maxWidth="lg">
@@ -45,7 +58,8 @@ const SwapComponent = () => {
                   You will receive  <Link href="#" color="primary" underline="hover">100 $COOWN</Link> tokens
                 </Typography>
               </Box>
-              <Button variant="contained" color="primary" sx={{ py: 1.5,px:3,mt:3, borderRadius:'5px' }}>
+              <Button 
+            onClick={handleClick} variant="contained" color="primary" sx={{ py: 1.5,px:3,mt:3, borderRadius:'5px' }}>
                 Swap (Comming Soon)
               </Button>
             </Paper>

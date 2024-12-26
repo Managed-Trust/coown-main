@@ -1,6 +1,7 @@
 import React from 'react';
 import { Box, Typography, Card, CardContent, useMediaQuery, useTheme, Button } from '@mui/material';
 import { ConnectButton, ConnectDialog, useConnect } from "@connect2ic/react";
+import swal from 'sweetalert';
 
 export default function Connect() {
   const theme = useTheme();
@@ -14,6 +15,18 @@ export default function Connect() {
       // Signed out
     },
   });
+
+  const handleClick = () => {
+    swal({
+      title: 'Swap Coming Soon!',
+      text: 'Stay tuned, the swap feature will be available soon.',
+      icon: 'info',
+      button: {
+        text: 'OK',
+        className: 'btn btn-primary',
+      },
+    });
+  };
 
   // Function to determine which provider is connected
   const getConnectedProvider = () => {
@@ -86,6 +99,7 @@ export default function Connect() {
             </Box>
           </Box>
           <Button
+            onClick={handleClick}
             variant="contained"
             sx={{
               backgroundColor: '#000',
