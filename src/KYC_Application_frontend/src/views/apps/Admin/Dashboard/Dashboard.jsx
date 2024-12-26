@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Table,
@@ -21,6 +21,9 @@ import GroupsIcon from '@mui/icons-material/Groups';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import Coown_Logo from '../../../../assets/images/logos/coown-logo-group.jpg';
+import AddAffilities from './AddAffilities';
+import ic from "ic0";
+const ledger = ic("speiw-5iaaa-aaaap-ahora-cai"); // Ledger canister
 
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
   '&:hover': {
@@ -87,7 +90,7 @@ const affiliatesData = [
 
 function Row({ row }) {
   const [open, setOpen] = useState(false);
-
+  console.log("Row:",row[1].affiliate[0].affiliateGroup);
   return (
     <>
       <StyledTableRow>
@@ -96,91 +99,55 @@ function Row({ row }) {
             aria-label="expand row"
             size="small"
             onClick={() => setOpen(!open)}
-            sx={{ visibility: row.subRows.length > 0 ? 'visible' : 'hidden' }}
           >
             {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
           </IconButton>
-          {row.isMain && (
-            <Box sx={{ display: 'flex', gap: 0.5 }}>
-              <img src={Coown_Logo} />
-            </Box>
-          )}
           <Box>
             <Typography variant="body2" sx={{ color: '#1e293b', fontWeight: 500 }}>
-              {row.name}
+              {row[1].affiliate[0].affiliateGroup}
             </Typography>
             <Typography variant="caption" sx={{ color: '#64748b' }}>
-              #{row.id}
+              #{row[0]}
             </Typography>
           </Box>
         </TableCell>
-        <TableCell sx={{ color: '#1e293b' }}>{row.totalMembers}</TableCell>
-        <TableCell sx={{ color: '#1e293b', display: 'flex', alignItems: 'center', gap: 1 }}>
-          {row.function}
-          {row.name === 'Marketing' && (
-            <Box
-              component="span"
-              sx={{
-                width: 6,
-                height: 6,
-                borderRadius: '50%',
-                backgroundColor: '#ef4444',
-                display: 'inline-block',
-                animation: 'pulse 2s infinite',
-                '@keyframes pulse': {
-                  '0%': {
-                    boxShadow: '0 0 0 0 rgba(239, 68, 68, 0.4)',
-                  },
-                  '70%': {
-                    boxShadow: '0 0 0 10px rgba(239, 68, 68, 0)',
-                  },
-                  '100%': {
-                    boxShadow: '0 0 0 0 rgba(239, 68, 68, 0)',
-                  },
-                },
-              }}
-            />
-          )}
-        </TableCell>
-        <TableCell sx={{ color: '#1e293b' }}>{row.since}</TableCell>
-        <TableCell align="right">
-          <IconButton size="small" sx={{ color: '#94a3b8', '&:hover': { color: '#6366f1' } }}>
-            <EditIcon fontSize="small" />
-          </IconButton>
-          <IconButton size="small" sx={{ color: '#94a3b8', '&:hover': { color: '#6366f1' } }}>
-            <ArrowForwardIcon fontSize="small" />
-          </IconButton>
-        </TableCell>
+        {/* <TableCell sx={{ color: '#1e293b' }}>{row[1].affiliat[0].affiliateWebsite}</TableCell>
+        <TableCell sx={{ color: '#1e293b' }}>{row[1].associateType}</TableCell>
+        <TableCell sx={{ color: '#1e293b' }}>{row.representedInCoordination ? "Yes" : "No"}</TableCell>
+        <TableCell sx={{ color: '#1e293b' }}>{row.representedInSteering ? "Yes" : "No"}</TableCell> */}
       </StyledTableRow>
-      <TableRow>
+      {/* <TableRow>
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
           <Collapse in={open} timeout="auto" unmountOnExit>
             <Box sx={{ margin: 1 }}>
-              <Table size="small" aria-label="purchases">
+              <Typography variant="h6" gutterBottom component="div">
+                Sub Rows
+              </Typography>
+              <Table size="small" aria-label="sub-rows">
                 <TableBody>
-                  {row.subRows.map((subRow) => (
-                    <StyledTableRow key={subRow.name}>
-                      <TableCell sx={{ pl: 8, display: 'flex', alignItems: 'center', gap: 1, py: 2 }}>
-                        <Box>
-                          <Typography variant="body2" sx={{ color: '#1e293b', fontWeight: 500 }}>
-                            {subRow.name}
-                          </Typography>
-                          <Typography variant="caption" sx={{ color: '#64748b' }}>
-                            #{subRow.id}
-                          </Typography>
-                        </Box>
-                      </TableCell>
-                      <TableCell sx={{ color: '#1e293b' }}>{subRow.totalMembers}</TableCell>
-                      <TableCell sx={{ color: '#1e293b' }}>{subRow.function}</TableCell>
-                      <TableCell sx={{ color: '#1e293b' }}>{subRow.since}</TableCell>
-                      <TableCell align="right">
-                        <IconButton size="small" sx={{ color: '#94a3b8', '&:hover': { color: '#6366f1' } }}>
-                          <EditIcon fontSize="small" />
-                        </IconButton>
-                        <IconButton size="small" sx={{ color: '#94a3b8', '&:hover': { color: '#6366f1' } }}>
-                          <ArrowForwardIcon fontSize="small" />
-                        </IconButton>
-                      </TableCell>
+                  {row.focalPoint.map((fp, index) => (
+                    <StyledTableRow key={`focalPoint-${index}`}>
+                      <TableCell sx={{ pl: 8 }}>Focal Point</TableCell>
+                      <TableCell>{fp.email}</TableCell>
+                      <TableCell>{fp.mainContact}</TableCell>
+                      <TableCell>{fp.phone}</TableCell>
+                      <TableCell>{fp.preferredMessenger}</TableCell>
+                      <TableCell>{fp.messengerIdentifier}</TableCell>
+                    </StyledTableRow>
+                  ))}
+                  {row.sla.map((sla, index) => (
+                    <StyledTableRow key={`sla-${index}`}>
+                      <TableCell sx={{ pl: 8 }}>SLA</TableCell>
+                      <TableCell>{sla.comments}</TableCell>
+                      <TableCell>{sla.managementSystemActivities}</TableCell>
+                      <TableCell>{sla.slaDocument}</TableCell>
+                      <TableCell>{sla.workingDraft}</TableCell>
+                    </StyledTableRow>
+                  ))}
+                  {row.localization.map((loc, index) => (
+                    <StyledTableRow key={`localization-${index}`}>
+                      <TableCell sx={{ pl: 8 }}>Localization</TableCell>
+                      <TableCell colSpan={5}>{JSON.stringify(loc)}</TableCell>
                     </StyledTableRow>
                   ))}
                 </TableBody>
@@ -188,58 +155,99 @@ function Row({ row }) {
             </Box>
           </Collapse>
         </TableCell>
-      </TableRow>
+      </TableRow> */}
     </>
   );
 }
 
-export default function Dashboard({ openDrawer }) {
+
+export default function Dashboard() {
+  const [showForm, setShowForm] = useState(false);
+  const [affiliates, setAffiliates] = useState(null);
+
+  useEffect(() => {
+    const fetchAfiliates = async () => {
+      try {
+        const response = await ledger.call("getAllDetails");
+        console.log("Affiliate Response:", response);
+        if (response.length > 0) {
+          setAffiliates(response);
+        }
+      } catch (e) {
+        console.log("Error Fetching Affiliates:", e);
+      }
+    }
+    fetchAfiliates();
+  }, [])
   return (
     <Box mt={4} sx={{ width: '100%', bgcolor: 'background.paper', borderRadius: 2, overflow: 'hidden', boxShadow: '0 0 10px rgba(0,0,0,0.1)' }}>
-      <Box sx={{ p: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #e2e8f0' }}>
-        <Box>
-          <Typography variant="h5" component="h2" sx={{ fontWeight: 600, color: '#1e293b', mb: 0.5 }}>
-            Affiliates
+      {showForm ? (
+        <Box sx={{ p: 3 }}>
+          <Typography variant="h5" component="h2" sx={{ fontWeight: 600, color: '#1e293b', mb: 2 }}>
+            Add Affiliate
           </Typography>
-          <Typography variant="body2" sx={{ color: '#64748b' }}>
-            Groups of affiliates of the inner and outer circles
-          </Typography>
+          <Button
+            onClick={() => setShowForm(false)}
+            variant="outlined"
+            sx={{
+              mt: 2,
+              textTransform: 'none',
+              '&:hover': { backgroundColor: '#5d87ff', color: 'white' },
+            }}
+          >
+            Back to Affiliates
+          </Button>
+          <AddAffilities onFormShow={setShowForm} />
         </Box>
-        <Button onClick={openDrawer}
-          variant="outlined"
-          startIcon={<AddIcon />}
-          sx={{
-            borderRadius: 1,
-            textTransform: 'none',
-            '&:hover': {
-              backgroundColor: '#5d87ff',
-            },
-            boxShadow: 'none',
-            padding: '8px 16px',
-          }}
-        >
-          Add affiliate
-        </Button>
-      </Box>
+      ) : (
+        <>
+          <Box sx={{ p: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #e2e8f0' }}>
+            <Box>
+              <Typography variant="h5" component="h2" sx={{ fontWeight: 600, color: '#1e293b', mb: 0.5 }}>
+                Affiliates
+              </Typography>
+              <Typography variant="body2" sx={{ color: '#64748b' }}>
+                Groups of affiliates of the inner and outer circles
+              </Typography>
+            </Box>
+            <Button
+              onClick={() => setShowForm(true)}
+              variant="outlined"
+              startIcon={<AddIcon />}
+              sx={{
+                borderRadius: 1,
+                textTransform: 'none',
+                '&:hover': {
+                  backgroundColor: '#5d87ff',
+                },
+                boxShadow: 'none',
+                padding: '8px 16px',
+              }}
+            >
+              Add Affiliate
+            </Button>
+          </Box>
 
-      <TableContainer component={Paper} elevation={0}>
-        <Table sx={{ minWidth: 650 }}>
-          <TableHead>
-            <TableRow>
-              <TableCell sx={{ color: '#64748b', fontWeight: 600, fontSize: '0.875rem' }}>Group name</TableCell>
-              <TableCell sx={{ color: '#64748b', fontWeight: 600, fontSize: '0.875rem' }}>Total members</TableCell>
-              <TableCell sx={{ color: '#64748b', fontWeight: 600, fontSize: '0.875rem' }}>Function</TableCell>
-              <TableCell sx={{ color: '#64748b', fontWeight: 600, fontSize: '0.875rem' }}>Since</TableCell>
-              <TableCell align="right" sx={{ color: '#64748b', fontWeight: 600, fontSize: '0.875rem' }}></TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {affiliatesData.map((row) => (
-              <Row key={row.name} row={row} />
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+          <TableContainer component={Paper}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Affiliate Group</TableCell>
+                  <TableCell>Affiliate Website</TableCell>
+                  <TableCell>Associate Type</TableCell>
+                  <TableCell>Represented in Coordination</TableCell>
+                  <TableCell>Represented in Steering</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {affiliates && affiliates.map((affiliate, index) => (
+                  <Row key={`affiliate-${index}`} row={affiliate} />
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </>
+      )}
     </Box>
   );
 }
