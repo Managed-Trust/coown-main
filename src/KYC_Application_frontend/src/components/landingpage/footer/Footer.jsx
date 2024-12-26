@@ -34,19 +34,19 @@ const Footer = () => {
             <Typography variant="h6" fontWeight="bold" mb={2}>
               Resources
             </Typography>
-            <Link href="#" color="textSecondary" underline="none" mb={1} display="block">
+            <Link href="/product" color="textSecondary" underline="none" mb={1} display="block">
               Product
             </Link>
-            <Link href="#" color="textSecondary" underline="none" mb={1} display="block">
+            <Link href="/organization" color="textSecondary" underline="none" mb={1} display="block">
               Organization
             </Link>
-            <Link href="#" color="textSecondary" underline="none" mb={1} display="block">
-              ICO
+            <Link href="/ico" color="textSecondary" underline="none" mb={1} display="block">
+              Token
             </Link>
-            <Link href="#" color="textSecondary" underline="none" mb={1} display="block">
+            <Link href="/pricing" color="textSecondary" underline="none" mb={1} display="block">
               Pricing
             </Link>
-            <Link href="#" color="textSecondary" underline="none" mb={1} display="block">
+            <Link href="/contact-us" color="textSecondary" underline="none" mb={1} display="block">
               Contact
             </Link>
           </Grid>
