@@ -13,6 +13,7 @@ import {
   Paper,
   Collapse,
   styled,
+  CircularProgress,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
@@ -149,10 +150,10 @@ function Row({ row }) {
   );
 }
 
-
 export default function Dashboard() {
   const [showForm, setShowForm] = useState(false);
   const [affiliates, setAffiliates] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchAfiliates = async () => {
@@ -161,13 +162,19 @@ export default function Dashboard() {
         console.log("Affiliate Response:", response);
         if (response.length > 0) {
           setAffiliates(response);
+        } else {
+          setAffiliates([]);
         }
       } catch (e) {
         console.log("Error Fetching Affiliates:", e);
+        setAffiliates([]);
+      } finally {
+        setLoading(false);
       }
-    }
+    };
     fetchAfiliates();
-  }, [])
+  }, []);
+
   return (
     <Box mt={4} sx={{ width: '100%', bgcolor: 'background.paper', borderRadius: 2, overflow: 'hidden', boxShadow: '0 0 10px rgba(0,0,0,0.1)' }}>
       {showForm ? (
@@ -217,24 +224,36 @@ export default function Dashboard() {
             </Button>
           </Box>
 
-          <TableContainer component={Paper}>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Affiliate Group</TableCell>
-                  <TableCell>Affiliate Website</TableCell>
-                  <TableCell>Associate Type</TableCell>
-                  <TableCell>Represented in Coordination</TableCell>
-                  <TableCell>Represented in Steering</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {affiliates && affiliates.map((affiliate, index) => (
-                  <Row key={`affiliate-${index}`} row={affiliate} />
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+          {loading ? (
+            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>
+              <CircularProgress />
+            </Box>
+          ) : affiliates && affiliates.length > 0 ? (
+            <TableContainer component={Paper}>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Affiliate Group</TableCell>
+                    <TableCell>Affiliate Website</TableCell>
+                    <TableCell>Associate Type</TableCell>
+                    <TableCell>Represented in Coordination</TableCell>
+                    <TableCell>Represented in Steering</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {affiliates.map((affiliate, index) => (
+                    <Row key={`affiliate-${index}`} row={affiliate} />
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          ) : (
+            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>
+              <Typography variant="body1" sx={{ color: '#64748b' }}>
+                No data found.
+              </Typography>
+            </Box>
+          )}
         </>
       )}
     </Box>
