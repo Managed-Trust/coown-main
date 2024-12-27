@@ -1383,9 +1383,9 @@ type RegisterCompanyForm = {
   //==================================================================//
   //  ====================Foundation==================================//
 
- type FoundationDetails = {
-   
-   id: Text;                  			 // Group ID Number
+ type FoundationDetails = {   
+   id: Text;
+   affiliateId:Text;                  			 // Group ID Number
    name: Text;                  			 // Group Name (info only, not editable in admin dashboard)
    staffCount: Nat;
    balance: Nat;
@@ -1410,70 +1410,78 @@ type RegisterCompanyForm = {
   };
 
   public func createFoundation(
+    key:Text,
   name: Text,
   staffCount: Nat,
   balance: Nat,
   regionalOperators: [Text],
   exclusiveAreas: [Text],
   nonExclusiveAreas: [Text],
-  licenseDetails: ?Text,
-  complianceOfficer: ?Text,
+  licenseDetails: Text,
+  complianceOfficer: Text,
   annualBudget: Nat,
   fundingSources: [Text],
-  keyAccountManager: ?Text,
-  supervisorAccountManager: ?Text,
-  termsOfService: ?Text,
+  keyAccountManager: Text,
+  supervisorAccountManager: Text,
+  termsOfService: Text,
   localization: [Text],
   transactionRules: [TransactionFee]
 ) : async Text {
   // Check if a foundation already exists
 
   // Generate a unique foundation group ID
-  let foundationGroupId = "foundation-" # Int.toText(Time.now());
+  // let foundationGroupId = "foundation-" # Int.toText(Time.now());
+  let foundationGroupId= "foundation";
+  switch(groups.get(foundationGroupId)){
+    case(?data){
+      return "foundation exsists";
+    };
+    case(null){
+    let foundationDetails: FoundationDetails = {
+      id = foundationGroupId;
+      name = name;
+      affiliateId = key;
+      staffCount = staffCount;
+      balance = balance;
+      regionalOperators = regionalOperators;
+      exclusiveAreas = exclusiveAreas;
+      nonExclusiveAreas = nonExclusiveAreas;
+      licenseDetails = ?licenseDetails;
+      complianceOfficer = ?complianceOfficer;
+      annualBudget = annualBudget;
+      fundingSources = fundingSources;
+      keyAccountManager = ?keyAccountManager;
+      supervisorAccountManager = ?supervisorAccountManager;
+      termsOfService = ?termsOfService;
+      localization = localization;
+      transactionRules = transactionRules;
+    };
 
+    // Populate the group details
+    let newGroup: Group = {
+      adminId = "admin"; // Assign a suitable admin ID
+      groupName = "Foundation";
+      groupType = "Foundation";
+      specialGroupType = ?#Foundation(foundationDetails);
+      logoHash = ""; // Update with a logo hash if available
+      groupAuthorization = null;
+      registerCompanyForm = null;
+      publicLawEntityDetails = null;
+      personalRecords = [];
+      subGroups = [];
+      accoundId = "";
+      logo = "";
+    };
+
+    // Save the new group in the groups map
+    groups.put(foundationGroupId, newGroup);
+
+    return "Foundation created successfully with ID: " # foundationGroupId;
+      };
+  };
   // Populate the foundation details
-  let foundationDetails: FoundationDetails = {
-    id = foundationGroupId;
-    name = name;
-    staffCount = staffCount;
-    balance = balance;
-    regionalOperators = regionalOperators;
-    exclusiveAreas = exclusiveAreas;
-    nonExclusiveAreas = nonExclusiveAreas;
-    licenseDetails = licenseDetails;
-    complianceOfficer = complianceOfficer;
-    annualBudget = annualBudget;
-    fundingSources = fundingSources;
-    keyAccountManager = keyAccountManager;
-    supervisorAccountManager = supervisorAccountManager;
-    termsOfService = termsOfService;
-    localization = localization;
-    transactionRules = transactionRules;
-  };
 
-
-  // Populate the group details
-  let newGroup: Group = {
-    adminId = "admin"; // Assign a suitable admin ID
-    groupName = "Foundation";
-    groupType = "Foundation";
-    specialGroupType = ?#Foundation(foundationDetails);
-    logoHash = ""; // Update with a logo hash if available
-    groupAuthorization = null;
-    registerCompanyForm = null;
-    publicLawEntityDetails = null;
-    personalRecords = [];
-    subGroups = [];
-    accoundId = "";
-    logo = "";
-  };
-
-  // Save the new group in the groups map
-  groups.put(foundationGroupId, newGroup);
-
-  return "Foundation created successfully with ID: " # foundationGroupId;
 };
-
 
  // Type Definition
 
@@ -1579,10 +1587,10 @@ type RegisterCompanyForm = {
     associateType: Text,
     affiliateWebsite: Text,
     representedInSteering: Bool,
-    steeringDelegate: ?Text,
+    steeringDelegate: Text,
     representedInCoordination: Bool,
-    coordinationDelegate: ?Text,
-    coordinationDeputy: ?Text
+    coordinationDelegate: Text,
+    coordinationDeputy: Text
   ): async Bool {
     switch (affiliates.get(key)) {
       case (?details) {
@@ -1595,10 +1603,10 @@ type RegisterCompanyForm = {
               associateType = associateType;
               affiliateWebsite = affiliateWebsite;
               representedInSteering = representedInSteering;
-              steeringDelegate = steeringDelegate;
+              steeringDelegate = ?steeringDelegate;
               representedInCoordination = representedInCoordination;
-              coordinationDelegate = coordinationDelegate;
-              coordinationDeputy = coordinationDeputy;
+              coordinationDelegate = ?coordinationDelegate;
+              coordinationDeputy = ?coordinationDeputy;
             }
           }
         );
@@ -1745,28 +1753,75 @@ type RegisterCompanyForm = {
     };
   };
 
+  // Function to retrieve all affiliate details
+public query func getAllDetails(): async [(Text, AffiliateDetails)] {
+  var allDetails: [(Text, AffiliateDetails)] = [];
+  let entries = affiliates.entries(); // Get all entries from the HashMap
+  for ((key, value) in entries) {
+    allDetails := Array.append(allDetails, [(key, value)]);
+  };
+  return allDetails;
+};
+
+
 
   //=================================================================================
   //====================================
   //======Page 3  Functions===========//
   // ===== Transacntion Management =====
   //====================================
-
-  // Define the structure for TransactionRule
   type TransactionRule = {
-    id: Text;
-    ruleName: Text;
-    description: Text;
-    totalFees: Text; // Represented as a range (e.g., "0.01% - 0.05%")
-    assetType: Text;
-    operatorAcceptance: [Text];
+    id: Text;                        // Unique identifier for the rule
+    ruleName: Text;                  // Name of the rule
+    description: Text;               // Description of the rule
+    totalFees: Text;                 // Represented as a range (e.g., "0.01% - 0.05%")
+    assetType: Text;                 // Type of asset (e.g., "crypto")
+    operatorAcceptance: [Text];      // Operators that accept this rule
+    // Detailed information (initially empty)
+    sendingAreas: ?[Text];           // Optional areas for sending transactions
+    withdrawalCrypto: ?Bool;         // Whether crypto withdrawal is allowed
+    receivingAreas: ?[Text];         // Optional receiving areas
+    receivingIndustry: ?Text;        // Optional targeted industry
+    amountRange: ?Text;              // Optional range of transaction amounts
+    foundationFees: ?{ feePerTransaction: Text; allocationGroup: Text };
+    stakingFees: ?{ feePerTransaction: Text; allocationGroup: Text };
+    operatorFees: ?{ feePerTransaction: Text; allocationGroup: Text };
+    thirdPartyFees: ?{ feePerTransaction: Text; allocationGroup: Text; thirdPartyIdentifier: Text };
   };
 
-  // Define the structure for TransactionRuleDetails
-  type TransactionRuleDetails = {
-    ruleName: Text;
-    assetType: Text;
-    operatorAcceptance: [Text];
+  var transactionRulesMap = HashMap.HashMap<Text, TransactionRule>(0, Text.equal, Text.hash);
+
+  public func addTransactionRuleNew(ruleId: Text,ruleName:Text,description:Text,totalFees:Text,assetType:Text,operatorAcceptance:[Text]): async Bool {
+    switch (transactionRulesMap.get(ruleId)) {
+        case (null) {
+        transactionRulesMap.put(ruleId, {
+        id = ruleId;
+        ruleName = ruleName;
+        description = description;
+        totalFees = totalFees;
+        assetType = assetType;
+        operatorAcceptance = operatorAcceptance;
+        // Initialize optional fields as null
+        sendingAreas = null;
+        withdrawalCrypto = null;
+        receivingAreas = null;
+        receivingIndustry = null;
+        amountRange = null;
+        foundationFees = null;
+        stakingFees = null;
+        operatorFees = null;
+        thirdPartyFees = null;
+    });
+    return true;
+        };
+        case(?val){
+          return false; // Cannot update details for a rule that doesn't exist
+        };
+    };
+  
+  };
+
+  public func addTransactionRuleDetails(ruleId: Text, details: {
     sendingAreas: [Text];
     withdrawalCrypto: Bool;
     receivingAreas: [Text];
@@ -1776,44 +1831,45 @@ type RegisterCompanyForm = {
     stakingFees: { feePerTransaction: Text; allocationGroup: Text };
     operatorFees: { feePerTransaction: Text; allocationGroup: Text };
     thirdPartyFees: { feePerTransaction: Text; allocationGroup: Text; thirdPartyIdentifier: Text };
+  }): async Bool {
+    switch (transactionRulesMap.get(ruleId)) {
+      case (null) {
+        return false; // Cannot update details for a rule that doesn't exist
+      };
+      case (?rule) {
+        transactionRulesMap.put(ruleId, {
+          id = rule.id;
+          ruleName = rule.ruleName;
+          description = rule.description;
+          totalFees = rule.totalFees;
+          assetType = rule.assetType;
+          operatorAcceptance = rule.operatorAcceptance;
+          // Update the details
+          sendingAreas = ?details.sendingAreas;
+          withdrawalCrypto = ?details.withdrawalCrypto;
+          receivingAreas = ?details.receivingAreas;
+          receivingIndustry = ?details.receivingIndustry;
+          amountRange = ?details.amountRange;
+          foundationFees = ?details.foundationFees;
+          stakingFees = ?details.stakingFees;
+          operatorFees = ?details.operatorFees;
+          thirdPartyFees = ?details.thirdPartyFees;
+        });
+        return true;
+      };
+    };
   };
 
-  // HashMaps to store transaction rules and their details
-   var transactionRulesMap = HashMap.HashMap<Text, TransactionRule>(0, Text.equal, Text.hash);
-   var transactionRuleDetailsMap = HashMap.HashMap<Text, TransactionRuleDetails>(0, Text.equal, Text.hash);
-
-  // Query function to retrieve all transaction rules
-  public query func getTransactionRules(): async [TransactionRule] {
+  public query func getTransactionRule(ruleId: Text): async ?TransactionRule {
+    return transactionRulesMap.get(ruleId);
+  };
+  public query func getAllTransactionRules(): async [TransactionRule] {
     return Iter.toArray(transactionRulesMap.vals());
   };
-
-  // Query function to retrieve transaction rule details by ID
-  public query func getTransactionRuleDetails(ruleId: Text): async ?TransactionRuleDetails {
-    return transactionRuleDetailsMap.get(ruleId);
-  };
-
-  // Add or update a transaction rule
-  public func addOrUpdateTransactionRule(
-    ruleId: Text,
-    rule: TransactionRule,
-    ruleDetails: TransactionRuleDetails
-  ): async Bool {
-    // Add or update the transaction rule
-    transactionRulesMap.put(ruleId, rule);
-
-    // Add or update the transaction rule details
-    transactionRuleDetailsMap.put(ruleId, ruleDetails);
-
-    return true;
-  };
-
-  // Delete a transaction rule and its details
   public func deleteTransactionRule(ruleId: Text): async Bool {
-    let ruleRemoved = transactionRulesMap.remove(ruleId) != null;
-    let detailsRemoved = transactionRuleDetailsMap.remove(ruleId) != null;
-    return ruleRemoved and detailsRemoved;
+    return transactionRulesMap.remove(ruleId) != null;
   };
-
+  //=================================================================
 
   //=================================================================================
   //====================================
@@ -1821,14 +1877,14 @@ type RegisterCompanyForm = {
   // ===== Transacntion Management =====
   //====================================
 
-type Announcement = {
-  id: Text; // Unique ID for the announcement
-  message: Text; // The content of the announcement
-  createdBy: Text; // The user who created the announcement
-  createdAt: Int; // Timestamp of creation
-  updatedAt: ?Int; // Optional timestamp of the last update
-  isPublished: Bool; // Indicates whether the announcement is published
-};
+  type Announcement = {
+    id: Text; // Unique ID for the announcement
+    message: Text; // The content of the announcement
+    createdBy: Text; // The user who created the announcement
+    createdAt: Int; // Timestamp of creation
+    updatedAt: ?Int; // Optional timestamp of the last update
+    isPublished: Bool; // Indicates whether the announcement is published
+  };
 
  var internalAnnouncements: HashMap.HashMap<Text, Announcement> = HashMap.HashMap<Text, Announcement>(0, Text.equal, Text.hash);
  var publicAnnouncements: HashMap.HashMap<Text, Announcement> = HashMap.HashMap<Text, Announcement>(0, Text.equal, Text.hash);
@@ -2062,7 +2118,6 @@ public query func getPolicyById(id: Text): async ?Policy {
 public func deletePolicy(id: Text): async Bool {
   return policies.remove(id) != null;
 };
-
 
 
 //======================Old==========================================//
@@ -2318,230 +2373,298 @@ public func deletePolicy(id: Text): async Bool {
   //================Page 4 Section 1 =========
   // ===============================================//
 
-
-  // Define types for different aspects of the product
+// Define unified product type
   type Product2 = {
-    id: Text;
-    name: Text;
-    price: Nat;
-    productOwner: Text;
-    salesChannel: Text;
+      id: Text;
+      name: Text;
+      price: Nat;
+      productOwner: Text;
+      salesChannel: Text;
+      payment: ?PaymentDetails;
+      profitSplit: ?ProfitSplit;
+      terms: ?Terms;
+      localization: ?LocalizationDetails;
   };
 
+  // Define payment details type
   type PaymentDetails = {
-    actualPrice: Nat;
-    allowCryptoPayments: Bool;
-    allowCardPayments: Bool;
-    allowBankTransfer: Bool;
-    voucherReference: ?Text;
-    externalDatabaseLink: ?Text;
-    annualRenewalFee: Bool;
+      actualPrice: Nat;
+      allowCryptoPayments: Bool;
+      allowCardPayments: Bool;
+      allowBankTransfer: Bool;
+      voucherReference: ?Text;
+      externalDatabaseLink: ?Text;
+      annualRenewalFee: Bool;
   };
 
+  // Define profit split type
   type ProfitSplit = {
-    foundationPart: Nat;
-    operatorPart: Nat;
-    stakingPart: Nat;
-    thirdPartyPart: Nat;
-    thirdPartyIdentifier: ?Text;
+      foundationPart: Nat;
+      operatorPart: Nat;
+      stakingPart: Nat;
+      thirdPartyPart: Nat;
+      thirdPartyIdentifier: ?Text;
   };
 
+  // Define terms type
   type Terms = {
-    applyGeneralTerms: Bool;
-    termsLink: ?Text;
+      applyGeneralTerms: Bool;
+      termsLink: ?Text;
   };
 
+  // Define localization details type
   type LocalizationDetails = {
-    countries: [Text];
+      countries: [Text];
   };
 
-  type ProductDetails = {
-    product: Product2;
-    payment: ?PaymentDetails;
-    profitSplit: ?ProfitSplit;
-    terms: ?Terms;
-    localization: ?LocalizationDetails;
-  };
+  // Single HashMap to store products and their details
+  var productsMap = HashMap.HashMap<Text, Product2>(0, Text.equal, Text.hash);
 
-  // Stable HashMaps to store products and their details
-   var productsMap = HashMap.HashMap<Text, Product2>(0, Text.equal, Text.hash);
-   var productDetailsMap = HashMap.HashMap<Text, ProductDetails>(0, Text.equal, Text.hash);
-
-  // ============================================================
-  // Functions for managing products and services
-  // ============================================================
-
-  // Add or update a product
   public func addOrUpdateProduct(
-    id: Text,
-    name: Text,
-    price: Nat,
-    productOwner: Text,
-    salesChannel: Text,
-    payment: ?PaymentDetails,
-    profitSplit: ?ProfitSplit,
-    terms: ?Terms,
-    localization: ?LocalizationDetails
-  ): async Bool {
-    // Add or update product details in the HashMap
-    productsMap.put(
-      id,
-      {
+      id: Text,
+      name: Text,
+      price: Nat,
+      productOwner: Text,
+      salesChannel: Text,
+
+    ): async Bool {
+        productsMap.put(
+            id,
+            {
+                id = id;
+                name = name;
+                price = price;
+                productOwner = productOwner;
+                salesChannel = salesChannel;
+                payment = null;
+                profitSplit = null;
+                terms = null;
+                localization = null;
+            }
+        );
+        return true;
+    };
+
+    public query func getAllProducts(): async [Product2] {
+      return Iter.toArray(productsMap.vals());
+    };
+    public query func getProduct(id: Text): async ?Product2 {
+        return productsMap.get(id);
+    };
+    public func deleteProduct(id: Text): async Bool {
+        return productsMap.remove(id) != null;
+    };
+
+  public func configurePaymentOptions(
+      productId: Text,
+      actualPrice: Nat,
+      allowCryptoPayments: Bool,
+      allowCardPayments: Bool,
+      allowBankTransfer: Bool,
+      voucherReference: ?Text,
+      externalDatabaseLink: ?Text,
+      annualRenewalFee: Bool
+  ): async Text {
+      switch (productsMap.get(productId)) {
+          case null {
+              return "Product not found.";
+          };
+          case (?product) {
+              let updatedPaymentDetails = {
+                  actualPrice = actualPrice;
+                  allowCryptoPayments = allowCryptoPayments;
+                  allowCardPayments = allowCardPayments;
+                  allowBankTransfer = allowBankTransfer;
+                  voucherReference = voucherReference;
+                  externalDatabaseLink = externalDatabaseLink;
+                  annualRenewalFee = annualRenewalFee;
+              };
+
+              let updatedProduct = { product with payment = ?updatedPaymentDetails };
+              productsMap.put(productId, updatedProduct);
+              return "Payment options updated successfully.";
+            };
+        };
+    };
+
+    public func configureProfitSplit(
+        productId: Text,
+        foundationPart: Nat,
+        operatorPart: Nat,
+        stakingPart: Nat,
+        thirdPartyPart: Nat,
+        thirdPartyIdentifier: ?Text
+    ): async Text {
+        switch (productsMap.get(productId)) {
+            case null {
+                return "Product not found.";
+            };
+            case (?product) {
+                let updatedProfitSplit = {
+                    foundationPart = foundationPart;
+                    operatorPart = operatorPart;
+                    stakingPart = stakingPart;
+                    thirdPartyPart = thirdPartyPart;
+                    thirdPartyIdentifier = thirdPartyIdentifier;
+                };
+
+                let updatedProduct = { product with profitSplit = ?updatedProfitSplit };
+                productsMap.put(productId, updatedProduct);
+                return "Profit split updated successfully.";
+            };
+        };
+    };
+
+      public func configureTerms(
+          productId: Text,
+          applyGeneralTerms: Bool,
+          termsLink: ?Text
+      ): async Text {
+          switch (productsMap.get(productId)) {
+              case null {
+                  return "Product not found.";
+              };
+              case (?product) {
+                  let updatedTerms = {
+                      applyGeneralTerms = applyGeneralTerms;
+                      termsLink = termsLink;
+                  };
+
+                  let updatedProduct = { product with terms = ?updatedTerms };
+                  productsMap.put(productId, updatedProduct);
+                  return "Terms updated successfully.";
+              };
+          };
+      };
+
+    public func configureLocalization(
+        productId: Text,
+        countries: [Text]
+      ): async Text {
+          switch (productsMap.get(productId)) {
+              case null {
+                  return "Product not found.";
+              };
+              case (?product) {
+                  let updatedLocalization = {
+                      countries = countries;
+                  };
+
+                  let updatedProduct = { product with localization = ?updatedLocalization };
+                  productsMap.put(productId, updatedProduct);
+                  return "Localization updated successfully.";
+              };
+          };
+      };
+
+    // ===== Old Products Management =====
+    public func addProduct(id: Text, name: Text, price: Nat, productOwner: Text, salesChannel: Text): async Text {
+      let newProduct = {
         id = id;
         name = name;
         price = price;
         productOwner = productOwner;
         salesChannel = salesChannel;
-      }
-    );
-
-    productDetailsMap.put(
-      id,
-      {
-        product = {
-          id = id;
-          name = name;
-          price = price;
-          productOwner = productOwner;
-          salesChannel = salesChannel;
-        };
-        payment = payment;
-        profitSplit = profitSplit;
-        terms = terms;
-        localization = localization;
-      }
-    );
-
-    return true;
-  };
-
-  // Get all products
-  public query func getAllProducts(): async [Product2] {
-    return Iter.toArray(productsMap.vals());
-  };
-
-  // Get product details by ID
-  public query func getProductDetails(id: Text): async ?ProductDetails {
-    return productDetailsMap.get(id);
-  };
-
-  // Delete a product
-  public func deleteProduct(id: Text): async Bool {
-    let removedProduct = productsMap.remove(id) != null;
-    let removedDetails = productDetailsMap.remove(id) != null;
-    return removedProduct and removedDetails;
-  };
-
-
-
-  // ===== Old Products Management =====
-  public func addProduct(id: Text, name: Text, price: Nat, productOwner: Text, salesChannel: Text): async Text {
-    let newProduct = {
-      id = id;
-      name = name;
-      price = price;
-      productOwner = productOwner;
-      salesChannel = salesChannel;
-      description = "";
+        description = "";
+      };
+      products.put(id, newProduct);
+      return "Product added successfully.";
     };
-    products.put(id, newProduct);
-    return "Product added successfully.";
-  };
 
-  public query func getProducts(): async [Product] {
-    return Iter.toArray(products.vals());
-  };
+    public query func getProducts(): async [Product] {
+      return Iter.toArray(products.vals());
+    };
 
 
+      // ===============================================//
+    //================Page 4 Section 2 =========
     // ===============================================//
-  //================Page 4 Section 2 =========
-  // ===============================================//
 
-  public func updatePriceConfiguration(
+    public func updatePriceConfiguration(
+        productId: Text,
+        actualPrice: Nat,
+        defaultPrice: Nat
+    ) : async Text {
+        switch (products.get(productId)) {
+            case null { return "Product does not exist."; };
+            case (?product) {
+                let updatedProduct = {
+                    product with
+                    price = actualPrice; // Set the actual price
+                    description = Text.concat(product.description, 
+                        " | Default Price: $" # Nat.toText(defaultPrice)
+                    );
+                };
+                products.put(productId, updatedProduct);
+                return "Price configuration updated successfully.";
+            };
+        };
+    };
+  public func configurePaymentMethods(
       productId: Text,
-      actualPrice: Nat,
-      defaultPrice: Nat
+      enableCrypto: Bool,
+      enableCreditCard: Bool,
+      enableBankTransfer: Bool
   ) : async Text {
       switch (products.get(productId)) {
           case null { return "Product does not exist."; };
           case (?product) {
               let updatedProduct = {
                   product with
-                  price = actualPrice; // Set the actual price
                   description = Text.concat(product.description, 
-                      " | Default Price: $" # Nat.toText(defaultPrice)
+                      " | Payment Methods: " #
+                      (if enableCrypto { "Crypto " } else { "" }) #
+                      (if enableCreditCard { "Credit Card " } else { "" }) #
+                      (if enableBankTransfer { "Bank Transfer" } else { "" })
                   );
               };
               products.put(productId, updatedProduct);
-              return "Price configuration updated successfully.";
+              return "Payment methods configured successfully.";
           };
       };
   };
-public func configurePaymentMethods(
-    productId: Text,
-    enableCrypto: Bool,
-    enableCreditCard: Bool,
-    enableBankTransfer: Bool
-) : async Text {
-    switch (products.get(productId)) {
-        case null { return "Product does not exist."; };
-        case (?product) {
-            let updatedProduct = {
-                product with
-                description = Text.concat(product.description, 
-                    " | Payment Methods: " #
-                    (if enableCrypto { "Crypto " } else { "" }) #
-                    (if enableCreditCard { "Credit Card " } else { "" }) #
-                    (if enableBankTransfer { "Bank Transfer" } else { "" })
-                );
-            };
-            products.put(productId, updatedProduct);
-            return "Payment methods configured successfully.";
-        };
-    };
-};
 
 
-public func setVoucherPayment(
-    productId: Text,
-    enableVoucher: Bool,
-    voucherReference: ?Text
-) : async Text {
-    switch (products.get(productId)) {
-        case null { return "Product does not exist."; };
-        case (?product) {
-            let updatedProduct = {
-                product with
-                salesChannel = if enableVoucher {
-                    Option.get(voucherReference, product.salesChannel)
-                } else {
-                    product.salesChannel
-                };
-            };
-            products.put(productId, updatedProduct);
-            return "Voucher payment configured successfully.";
-        };
-    };
-};
+  public func setVoucherPayment(
+      productId: Text,
+      enableVoucher: Bool,
+      voucherReference: ?Text
+  ) : async Text {
+      switch (products.get(productId)) {
+          case null { return "Product does not exist."; };
+          case (?product) {
+              let updatedProduct = {
+                  product with
+                  salesChannel = if enableVoucher {
+                      Option.get(voucherReference, product.salesChannel)
+                  } else {
+                      product.salesChannel
+                  };
+              };
+              products.put(productId, updatedProduct);
+              return "Voucher payment configured successfully.";
+          };
+      };
+  };
 
-public func configureRecurringFees(
-    productId: Text,
-    recurrenceOption: Text // "1st of January" or "Initial Purchase Day"
-) : async Text {
-    switch (products.get(productId)) {
-        case null { return "Product does not exist."; };
-        case (?product) {
-            let updatedProduct = {
-                product with
-                description = Text.concat(product.description, 
-                    " | Recurrence: " # recurrenceOption
-                );
-            };
-            products.put(productId, updatedProduct);
-            return "Recurring fee settings updated successfully.";
-        };
-    };
-};
+  public func configureRecurringFees(
+      productId: Text,
+      recurrenceOption: Text // "1st of January" or "Initial Purchase Day"
+  ) : async Text {
+      switch (products.get(productId)) {
+          case null { return "Product does not exist."; };
+          case (?product) {
+              let updatedProduct = {
+                  product with
+                  description = Text.concat(product.description, 
+                      " | Recurrence: " # recurrenceOption
+                  );
+              };
+              products.put(productId, updatedProduct);
+              return "Recurring fee settings updated successfully.";
+          };
+      };
+  };
 
   // ===============================================//
   //================Page 4 Section 3 =========
@@ -3868,13 +3991,13 @@ public func participateInVote(userId : Text) : async Text {
 //======================================================================
   private stable var accounts : [Principal] = [];
 
-    private stable var accountGroupEntries : [(Text, [Principal])] = [];
-    var accountGroups = HashMap.HashMap<Text, [Principal]>(0, Text.equal, Text.hash);
+  private stable var accountGroupEntries : [(Text, [Principal])] = [];
+  var accountGroups = HashMap.HashMap<Text, [Principal]>(0, Text.equal, Text.hash);
 
-    public func createAccount(accountId : Text, groupId : Text, initialBalance : Nat) : async Principal {
+  public func createAccount(accountId : Text, groupId : Text, initialBalance : Nat,owner:Principal) : async Principal {
         Cycles.add(20_000_000_000); // Since this value increases as time passes, change this value according to error in console.
 
-        let newAccountActor = await AccountActorClass.AccountActor(accountId, groupId, initialBalance, "", "");
+        let newAccountActor = await AccountActorClass.AccountActor(accountId, groupId, initialBalance, "", "",owner);
         accounts := Array.append(accounts, [Principal.fromActor(newAccountActor)]);
         switch (accountGroups.get(groupId)) {
             case (null) {

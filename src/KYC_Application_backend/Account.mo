@@ -8,7 +8,7 @@ import Float "mo:base/Float";
 import HashMap "mo:base/HashMap";
 import Text "mo:base/Text";
 
-actor class AccountActor(accountId : Text, groupId : Text, initialBalance : Nat, groupType : Text, groupLevel : Text) {
+actor class AccountActor(accountId : Text, groupId : Text, initialBalance : Nat, groupType : Text, groupLevel : Text, ownerId : Principal) {
 
     //=================================Types======================================//
     type Role = {
@@ -21,6 +21,7 @@ actor class AccountActor(accountId : Text, groupId : Text, initialBalance : Nat,
         userId : Principal; // Using Principal to uniquely identify users
         role : Role;
         ownership : Float; // Ownership percentage
+        dailyLimit : Nat;
     };
 
     type Transaction = {
@@ -44,6 +45,7 @@ actor class AccountActor(accountId : Text, groupId : Text, initialBalance : Nat,
     var transactions : [Transaction] = [];
     var transactionLimits : [TransactionLimit] = [];
     var requiredProposals : Nat = 1;
+    var dailyWithdrawals : HashMap.HashMap<Principal, Nat> = HashMap.HashMap<Principal, Nat>(0, Principal.equal, Principal.hash);
 
     //=================================HashMaps======================================//
     var balanceMap = HashMap.HashMap<Principal, Float>(0, Principal.equal, Principal.hash);
@@ -70,7 +72,7 @@ actor class AccountActor(accountId : Text, groupId : Text, initialBalance : Nat,
         if (userExists != null) {
             return "User already exists in the account.";
         } else {
-            users := Array.append(users, [{ userId = userId; role = role; ownership = ownership }]);
+            users := Array.append(users, [{ userId = userId; role = role; ownership = ownership; dailyLimit = 100 }]);
             return "User added successfully.";
         };
     };
@@ -113,10 +115,10 @@ actor class AccountActor(accountId : Text, groupId : Text, initialBalance : Nat,
     public shared (msg) func setTransactionMode(adminOnly : Bool, daily : Nat, monthly : Nat) : async Text {
         // if (await isAdmin(msg.caller)) {
         // if (true) {
-            isAdminOnlyMode := adminOnly;
-            dailyLimit := daily;
-            monthlyLimit := monthly;
-            return "Transaction mode and limits set successfully.";
+        isAdminOnlyMode := adminOnly;
+        dailyLimit := daily;
+        monthlyLimit := monthly;
+        return "Transaction mode and limits set successfully.";
         // } else {
         //     return "Only admin can set transaction mode and limits.";
         // };
@@ -125,7 +127,7 @@ actor class AccountActor(accountId : Text, groupId : Text, initialBalance : Nat,
     //=================================Transaction Handling======================================//
     //Board of directors
     //Voting
-    //Email Based Voting // Email managemenet 
+    //Email Based Voting // Email managemenet
     // OPT code for security
     public shared (msg) func recordTransaction(amount : Nat, description : Text) : async Text {
         let currentDay = Time.now() / (24 * 60 * 60); // Calculate the current day
@@ -360,5 +362,101 @@ actor class AccountActor(accountId : Text, groupId : Text, initialBalance : Nat,
         };
 
         return report;
+    };
+    //=================================Initialization======================================//
+    public shared (msg) func withdrawFunds(amount : Nat, description : Text) : async Text {
+        let caller = msg.caller;
+
+        // Check if the caller is authorized
+        let authorizedUser = Array.find(
+            users,
+            func(u : AccountUser) : Bool {
+                u.userId == caller and (u.role == #Owner or u.dailyLimit >= amount);
+            },
+        );
+
+        if (authorizedUser == null) {
+            return "Unauthorized: You do not have permission to withdraw funds.";
+        };
+
+        // Enforce daily limit for non-owners
+        switch (authorizedUser) {
+            case (?user) {
+                if (user.role != #Owner) {
+                    let currentDailyWithdrawal = switch (dailyWithdrawals.get(caller)) {
+                        case null { 0 };
+                        case (?amt) { amt };
+                    };
+
+                    if (currentDailyWithdrawal + amount > user.dailyLimit) {
+                        return "Unauthorized: Daily withdrawal limit exceeded.";
+                    };
+
+                    // Update the daily withdrawal record
+                    dailyWithdrawals.put(caller, currentDailyWithdrawal + amount);
+                };
+            };
+            case (null) {
+
+            };
+        };
+
+        // Proceed with the withdrawal
+        if (balance < amount) {
+            return "Insufficient funds.";
+        };
+
+        balance := balance - amount;
+
+        transactions := Array.append(
+            transactions,
+            [{
+                accountId = accountId;
+                groupId = groupId;
+                amount = amount; // Ensure the type matches (e.g., Nat or Int)
+                timestamp = Time.now();
+                description = description;
+                approvedBy = [];
+            }],
+        );
+
+        return "Withdrawal successful.";
+    };
+
+    // Check if the caller is the owner
+    private func isOwner(caller : Principal) : async Bool {
+        return Array.find(
+            users,
+            func(u : AccountUser) : Bool {
+                u.userId == caller and u.role == #Owner;
+            },
+        ) != null;
+    };
+
+    // Update a user's daily limit
+    public shared (msg) func updateUserDailyLimit(userId : Principal, newDailyLimit : Nat) : async Text {
+        if (not (await isOwner(msg.caller))) {
+            return "Only the owner can update user limits.";
+        };
+
+        var updated = false;
+
+        users := Array.map<AccountUser, AccountUser>(
+            users,
+            func(u : AccountUser) : AccountUser {
+                if (u.userId == userId) {
+                    updated := true;
+                    return { u with dailyLimit = newDailyLimit };
+                } else {
+                    return u;
+                };
+            },
+        );
+
+        return if (updated) {
+            "User daily limit updated successfully.";
+        } else {
+            "User not found.";
+        };
     };
 };
