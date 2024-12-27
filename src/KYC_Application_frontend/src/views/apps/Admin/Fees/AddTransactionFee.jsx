@@ -137,7 +137,8 @@ const AddTransactionFee = () => {
             }
             setLoading(true);
             console.log('saving');
-            const ruleId = Math.floor(10000 + Math.random() * 90000).toString();
+            const ruleId = `Rule-${Math.floor(100000 + Math.random() * 900000).toString()}`;
+
             console.log('Sending data to backend:', {
                 ruleId,
                 details: {

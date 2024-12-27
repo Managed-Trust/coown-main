@@ -38,7 +38,6 @@ export default function Dashboard({ openDrawer,transactionRules }) {
     try {
       const response = await ledger.call('deleteTransactionRule', id);
       console.log('Transaction Rule Deleted:', response);
-      setTransactionRule(transactionRule.filter((rule) => rule.id !== id));
 
     } catch (e) {
       console.log('Error deleting Transaction Rule:', e);
@@ -133,7 +132,7 @@ export default function Dashboard({ openDrawer,transactionRules }) {
                         <EditIcon fontSize="small" />
                       </IconButton>
                       <IconButton 
-                      // onClick={() => deleteTransactionRule(row.id)} 
+                      onClick={() => deleteTransactionRule(row.id)} 
                       size="small" sx={{ color: '#94a3b8', '&:hover': { color: '#6366f1' } }}>
                         <DeleteIcon fontSize="small" />
                       </IconButton>

@@ -31,7 +31,7 @@ const TabPanel = ({ children, value, index }) => {
   );
 };
 
-const Sidebar = ({ openDrawer, drawer }) => {
+const Sidebar = ({ openDrawer, drawer ,product}) => {
   const [tabIndex, setTabIndex] = useState(0);
 
   const handleTabChange = (event, newIndex) => {
@@ -40,23 +40,23 @@ const Sidebar = ({ openDrawer, drawer }) => {
 
   return (
     <div>
-      {/* Floating Button to Open Sidebar */}
+      {product && (
+        <>
       <Tooltip title="Settings">
         <Fab
           color="primary"
           aria-label="settings"
           sx={{ position: 'fixed', right: '25px', bottom: '15px' }}
-          onClick={openDrawer}
+          onClick={() => openDrawer(null)}
         >
           <IconSettings stroke={1.5} />
         </Fab>
       </Tooltip>
 
-      {/* Sidebar Drawer */}
       <Drawer
         anchor="right"
         open={drawer}
-        onClose={openDrawer}
+        onClose={() => openDrawer(null)}
         PaperProps={{
           sx: {
             width: SidebarWidth,
@@ -73,7 +73,7 @@ const Sidebar = ({ openDrawer, drawer }) => {
             alignItems="start"
           >
             <Typography variant="h5">Enterprise license for corporations</Typography>
-            <IconButton color="inherit" onClick={openDrawer}>
+            <IconButton color="inherit" onClick={() => openDrawer(null)}>
               <IconX size="1rem" />
             </IconButton>
           </Box>
@@ -337,6 +337,7 @@ const Sidebar = ({ openDrawer, drawer }) => {
           </TabPanel>
         </Scrollbar>
       </Drawer>
+      </>)}
     </div>
   );
 };
