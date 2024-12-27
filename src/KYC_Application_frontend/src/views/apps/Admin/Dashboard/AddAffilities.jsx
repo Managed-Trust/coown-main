@@ -14,6 +14,7 @@ import {
     ListItem,
     ListItemIcon,
     ListItemText,
+    CircularProgress,
 } from '@mui/material';
 import CustomFormLabel from '../../../../components/forms/theme-elements/CustomFormLabel';
 import IconButton from '@mui/material/IconButton';
@@ -22,6 +23,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { styled } from '@mui/material/styles';
 import ic from "ic0";
 const ledger = ic("speiw-5iaaa-aaaap-ahora-cai"); // Ledger canister
+import swal from 'sweetalert';
 const settingsOptions = [
     { label: 'Affiliated Group', number: 1 },
     { label: 'Focal Point', number: 2 },
@@ -42,9 +44,11 @@ const NumberIcon = styled(Box)(({ theme }) => ({
     fontSize: '14px',
 }));
 
-const AddAffilities = ({onFormShow}) => {
+const AddAffilities = ({ onFormShow }) => {
     const [activeStep, setActiveStep] = useState(0);
     const [afiliateKey, setKey] = useState(generateRandomKey());
+    const [completedSteps, setCompletedSteps] = useState([]);
+    const [loading, setLoading] = useState(false);
     // State for form data
     const [formData, setFormData] = useState({
         associateType: '',
@@ -75,6 +79,8 @@ const AddAffilities = ({onFormShow}) => {
 
     const handleNext = () => {
         if (activeStep < settingsOptions.length - 1) {
+            // Mark the current step as completed
+            setCompletedSteps((prevSteps) => [...prevSteps, activeStep]);
             setActiveStep((prevStep) => prevStep + 1);
         }
     };
@@ -82,6 +88,13 @@ const AddAffilities = ({onFormShow}) => {
     const handleBack = () => {
         if (activeStep > 0) {
             setActiveStep((prevStep) => prevStep - 1);
+        }
+    };
+
+    const handleTabClick = (index) => {
+        // Allow navigation only to completed steps or the current step
+        if (completedSteps.includes(index) || index === activeStep) {
+            setActiveStep(index);
         }
     };
 
@@ -133,7 +146,7 @@ const AddAffilities = ({onFormShow}) => {
 
     const handleAffiliateGroup = async () => {
         console.log('Affiliate Group Data:', formData);
-
+        setLoading(true);
         try {
             const res = await ledger.call("createAffiliateDetails", afiliateKey);
             console.log("Key added:", afiliateKey);
@@ -147,6 +160,8 @@ const AddAffilities = ({onFormShow}) => {
             console.log("Error adding affiliates:", e);
         } finally {
             console.log("affiliates added done");
+            swal("Success", 'Affiliate Added Successfully!', "success");
+            setLoading(false);
             handleNext();
         }
     };
@@ -154,6 +169,7 @@ const AddAffilities = ({onFormShow}) => {
     const handleFocalPointStepNext = async () => {
         console.log('Focal Point Data:', formData);
         console.log("Key added:", afiliateKey);
+        setLoading(true);
         try {
             const response = await ledger.call("addFocalPoint", afiliateKey, formData.mainContact, formData.role, formData.email, formData.phone, formData.preferredMessenger, formData.messengerIdentifier);
 
@@ -161,6 +177,8 @@ const AddAffilities = ({onFormShow}) => {
         } catch (e) {
             console.log("Error adding Focal Point:", e)
         } finally {
+            swal("Success", 'Focal Point Added Successfully!', "success");
+            setLoading(false);
             handleNext();
         }
     };
@@ -168,6 +186,7 @@ const AddAffilities = ({onFormShow}) => {
     const handleSLA = async () => {
         console.log('SLA Data:', formData);
         console.log("Key added:", afiliateKey);
+        setLoading(true);
         try {
             const response = await ledger.call("addSLA", afiliateKey, formData.latestOriginalFile, formData.workingDraft, formData.managementSystemLink, formData.comments);
 
@@ -175,13 +194,15 @@ const AddAffilities = ({onFormShow}) => {
         } catch (e) {
             console.log("Error adding SLA response:", e)
         } finally {
+            swal("Success", 'SLA Added Successfully!', "success");
             handleNext();
+            setLoading(false);
         }
     };
 
     const handleLocalization = async () => {
         console.log('Localization Data:', formData);
-
+        setLoading(true);
         console.log("Key added:", afiliateKey);
         try {
             const response = await ledger.call("addLocalization", afiliateKey, formData.localization, formData.licensedIn, formData.exclusiveAreas, formData.nonExclusiveAreas);
@@ -190,9 +211,11 @@ const AddAffilities = ({onFormShow}) => {
         } catch (e) {
             console.log("Error adding SLA response:", e)
         } finally {
+            swal("Success", 'Localization Added Successfully!', "success");
             onFormShow(false);
+            setLoading(false);
         }
-   
+
     };
 
     const renderStepContent = (step) => {
@@ -331,7 +354,11 @@ const AddAffilities = ({onFormShow}) => {
                                 Cancel
                             </Button>
                             <Button variant="contained" color="primary" onClick={handleAffiliateGroup}>
-                                Next
+                                {loading ? (
+                                    <CircularProgress size={24} color="inherit" />
+                                ) : (
+                                    'Next'
+                                )}
                             </Button>
                         </Box>
                     </Box>
@@ -453,7 +480,11 @@ const AddAffilities = ({onFormShow}) => {
                                 Back
                             </Button>
                             <Button variant="contained" color="primary" onClick={handleFocalPointStepNext}>
-                                Next
+                                {loading ? (
+                                    <CircularProgress size={24} color="inherit" />
+                                ) : (
+                                    'Next'
+                                )}
                             </Button>
                         </Box>
                     </Box>
@@ -566,7 +597,11 @@ const AddAffilities = ({onFormShow}) => {
                                 Back
                             </Button>
                             <Button variant="contained" color="primary" onClick={handleSLA}>
-                                Next
+                                {loading ? (
+                                    <CircularProgress size={24} color="inherit" />
+                                ) : (
+                                    'Next'
+                                )}
                             </Button>
                         </Box>
                     </Box>
@@ -739,7 +774,11 @@ const AddAffilities = ({onFormShow}) => {
                                 Back
                             </Button>
                             <Button variant="contained" color="primary" onClick={handleLocalization}>
-                                Create affiliate
+                                {loading ? (
+                                    <CircularProgress size={24} color="inherit" />
+                                ) : (
+                                    'Create'
+                                )}
                             </Button>
                         </Box>
                     </Box>
@@ -760,7 +799,8 @@ const AddAffilities = ({onFormShow}) => {
                                 button
                                 key={option.label}
                                 selected={activeStep === index}
-                                onClick={() => setActiveStep(index)}
+                                onClick={() => handleTabClick(index)} // Use the handleTabClick function
+                                disabled={!completedSteps.includes(index) && index !== activeStep} // Disable uncompleted tabs
                             >
                                 <ListItemIcon>
                                     <NumberIcon>{option.number}</NumberIcon>
