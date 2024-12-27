@@ -55,7 +55,9 @@ const AddAffilities = ({ onFormShow }) => {
         affiliateGroup: '',
         affiliateWebsite: '',
         localization: false,
+        steeringCommittee: false,
         steeringDelegatedUser: '',
+        coordinationCommitee: false,
         coordinationDelegatedUser: '',
         coordinationDeputy: '',
         focalPoint: '',
@@ -151,7 +153,7 @@ const AddAffilities = ({ onFormShow }) => {
             const res = await ledger.call("createAffiliateDetails", afiliateKey);
             console.log("Key added:", afiliateKey);
             if (res) {
-                const response = await ledger.call("addAffiliate", afiliateKey, formData.affiliateGroup, formData.associateType, formData.affiliateWebsite, true, formData.steeringDelegatedUser, true, formData.coordinationDelegatedUser, formData.coordinationDeputy);
+                const response = await ledger.call("addAffiliate", afiliateKey, formData.affiliateGroup, formData.associateType, formData.affiliateWebsite, formData.steeringCommittee, formData.steeringDelegatedUser, formData.coordinationCommitee, formData.coordinationDelegatedUser, formData.coordinationDeputy);
 
                 console.log("Add Affiliates Response:", response);
             }
@@ -285,25 +287,35 @@ const AddAffilities = ({ onFormShow }) => {
                                 Steering Committee
                             </Typography>
                             <FormControlLabel
-                                control={<Switch color="primary" />}
+                                control={
+                                    <Switch
+                                        color="primary"
+                                        id="steeringCommittee" // Ensure the id matches the key in formData
+                                        checked={formData.steeringCommittee} // Bind to the current state value
+                                        onChange={handleChange} // Use the existing handleChange function
+                                    />
+                                }
                                 label="Represented in the Steering Committee"
                             />
-                            <Grid container spacing={2} sx={{ marginTop: '10px' }}>
-                                <Grid item xs={12} sm={6}>
-                                    <CustomFormLabel htmlFor="steeringDelegatedUser">Delegated user</CustomFormLabel>
-                                    <TextField
-                                        id="steeringDelegatedUser"
-                                        name="steeringDelegatedUser"
-                                        select
-                                        fullWidth
-                                        value={formData.steeringDelegatedUser}
-                                        onChange={handleChange}
-                                    >
-                                        <MenuItem value="User1">User 1</MenuItem>
-                                        <MenuItem value="User2">User 2</MenuItem>
-                                    </TextField>
+                            {formData.steeringCommittee &&
+                                <Grid container spacing={2} sx={{ marginTop: '10px' }}>
+                                    <Grid item xs={12} sm={6}>
+                                        <CustomFormLabel htmlFor="steeringDelegatedUser">Delegated user</CustomFormLabel>
+                                        <TextField
+                                            id="steeringDelegatedUser"
+                                            name="steeringDelegatedUser"
+                                            select
+                                            fullWidth
+                                            value={formData.steeringDelegatedUser}
+                                            onChange={handleChange}
+                                        >
+                                            <MenuItem value="User1">User 1</MenuItem>
+                                            <MenuItem value="User2">User 2</MenuItem>
+                                        </TextField>
+                                    </Grid>
                                 </Grid>
-                            </Grid>
+                            }
+
                         </Box>
 
                         {/* Coordination Commitee Section */}
@@ -312,40 +324,49 @@ const AddAffilities = ({ onFormShow }) => {
                                 Coordination Commitee
                             </Typography>
                             <FormControlLabel
-                                control={<Switch color="primary" />}
-                                label="Represented in the Steering Committee"
+                                control={<Switch
+                                    color="primary"
+                                    id="coordinationCommitee"
+                                    checked={formData.coordinationCommitee}
+                                    onChange={handleChange}
+                                />
+                                }
+                                label="Represented in the Coordination Commitee"
                             />
-                            <Grid container spacing={2} sx={{ marginTop: '10px' }}>
-                                <Grid item xs={12} sm={6}>
-                                    <CustomFormLabel htmlFor="coordinationDelegatedUser">Delegated user</CustomFormLabel>
-                                    <TextField
-                                        id="coordinationDelegatedUser"
-                                        name="coordinationDelegatedUser"
-                                        select
-                                        fullWidth
-                                        value={formData.coordinationDelegatedUser}
-                                        onChange={handleChange}
-                                    >
-                                        <MenuItem value="User1">User 1</MenuItem>
-                                        <MenuItem value="User2">User 2</MenuItem>
-                                    </TextField>
-                                </Grid>
+                            {formData.coordinationCommitee &&
+                                <Grid container spacing={2} sx={{ marginTop: '10px' }}>
+                                    <Grid item xs={12} sm={6}>
+                                        <CustomFormLabel htmlFor="coordinationDelegatedUser">Delegated user</CustomFormLabel>
+                                        <TextField
+                                            id="coordinationDelegatedUser"
+                                            name="coordinationDelegatedUser"
+                                            select
+                                            fullWidth
+                                            value={formData.coordinationDelegatedUser}
+                                            onChange={handleChange}
+                                        >
+                                            <MenuItem value="User1">User 1</MenuItem>
+                                            <MenuItem value="User2">User 2</MenuItem>
+                                        </TextField>
+                                    </Grid>
 
-                                <Grid item xs={12} sm={6}>
-                                    <CustomFormLabel htmlFor="coordinationDeputy">Deputy</CustomFormLabel>
-                                    <TextField
-                                        id="coordinationDeputy"
-                                        name="coordinationDeputy"
-                                        select
-                                        fullWidth
-                                        value={formData.coordinationDeputy}
-                                        onChange={handleChange}
-                                    >
-                                        <MenuItem value="User1">User 1</MenuItem>
-                                        <MenuItem value="User2">User 2</MenuItem>
-                                    </TextField>
+                                    <Grid item xs={12} sm={6}>
+                                        <CustomFormLabel htmlFor="coordinationDeputy">Deputy</CustomFormLabel>
+                                        <TextField
+                                            id="coordinationDeputy"
+                                            name="coordinationDeputy"
+                                            select
+                                            fullWidth
+                                            value={formData.coordinationDeputy}
+                                            onChange={handleChange}
+                                        >
+                                            <MenuItem value="User1">User 1</MenuItem>
+                                            <MenuItem value="User2">User 2</MenuItem>
+                                        </TextField>
+                                    </Grid>
                                 </Grid>
-                            </Grid>
+                            }
+
                         </Box>
 
                         {/* Action Buttons */}
@@ -636,136 +657,139 @@ const AddAffilities = ({ onFormShow }) => {
                         </Grid>
 
                         {/* Localization Fields */}
-                        <Grid container spacing={2} sx={{ marginTop: '20px' }}>
-                            {/* Licensed In */}
-                            <Grid item xs={12}>
-                                <CustomFormLabel htmlFor="licensedIn" sx={{ color: '#9499a3' }}>
-                                    Licensed in
-                                </CustomFormLabel>
-                                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                    <TextField
-                                        id="licensedIn"
-                                        name="licensedIn"
-                                        fullWidth
-                                        placeholder="Add country code"
-                                        onKeyDown={(e) => {
-                                            if (e.key === 'Enter' && e.target.value.trim() !== '') {
-                                                e.preventDefault();
-                                                handleAddToArray('licensedIn', e.target.value.trim());
-                                                e.target.value = '';
-                                            }
-                                        }}
-                                    />
-                                    <IconButton
-                                        onClick={() => {
-                                            const input = document.getElementById('licensedIn');
-                                            if (input && input.value.trim() !== '') {
-                                                handleAddToArray('licensedIn', input.value.trim());
-                                                input.value = '';
-                                            }
-                                        }}
-                                    >
-                                        <AddIcon />
-                                    </IconButton>
-                                </Box>
-                                <Box sx={{ marginTop: '10px', display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                                    {formData.licensedIn.map((value, index) => (
-                                        <Chip
-                                            key={index}
-                                            label={value}
-                                            onDelete={() => handleRemoveFromArray('licensedIn', index)}
-                                            deleteIcon={<DeleteIcon />}
+                        {formData.localization &&
+                            <Grid container spacing={2} sx={{ marginTop: '20px' }}>
+                                {/* Licensed In */}
+                                <Grid item xs={12}>
+                                    <CustomFormLabel htmlFor="licensedIn" sx={{ color: '#9499a3' }}>
+                                        Licensed in
+                                    </CustomFormLabel>
+                                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                        <TextField
+                                            id="licensedIn"
+                                            name="licensedIn"
+                                            fullWidth
+                                            placeholder="Add country code"
+                                            onKeyDown={(e) => {
+                                                if (e.key === 'Enter' && e.target.value.trim() !== '') {
+                                                    e.preventDefault();
+                                                    handleAddToArray('licensedIn', e.target.value.trim());
+                                                    e.target.value = '';
+                                                }
+                                            }}
                                         />
-                                    ))}
-                                </Box>
-                            </Grid>
+                                        <IconButton
+                                            onClick={() => {
+                                                const input = document.getElementById('licensedIn');
+                                                if (input && input.value.trim() !== '') {
+                                                    handleAddToArray('licensedIn', input.value.trim());
+                                                    input.value = '';
+                                                }
+                                            }}
+                                        >
+                                            <AddIcon />
+                                        </IconButton>
+                                    </Box>
+                                    <Box sx={{ marginTop: '10px', display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                                        {formData.licensedIn.map((value, index) => (
+                                            <Chip
+                                                key={index}
+                                                label={value}
+                                                onDelete={() => handleRemoveFromArray('licensedIn', index)}
+                                                deleteIcon={<DeleteIcon />}
+                                            />
+                                        ))}
+                                    </Box>
+                                </Grid>
 
-                            {/* Exclusive Areas */}
-                            <Grid item xs={12}>
-                                <CustomFormLabel htmlFor="exclusiveAreas" sx={{ color: '#9499a3' }}>
-                                    Exclusive areas
-                                </CustomFormLabel>
-                                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                    <TextField
-                                        id="exclusiveAreas"
-                                        name="exclusiveAreas"
-                                        fullWidth
-                                        placeholder="Add country code"
-                                        onKeyDown={(e) => {
-                                            if (e.key === 'Enter' && e.target.value.trim() !== '') {
-                                                e.preventDefault();
-                                                handleAddToArray('exclusiveAreas', e.target.value.trim());
-                                                e.target.value = '';
-                                            }
-                                        }}
-                                    />
-                                    <IconButton
-                                        onClick={() => {
-                                            const input = document.getElementById('exclusiveAreas');
-                                            if (input && input.value.trim() !== '') {
-                                                handleAddToArray('exclusiveAreas', input.value.trim());
-                                                input.value = '';
-                                            }
-                                        }}
-                                    >
-                                        <AddIcon />
-                                    </IconButton>
-                                </Box>
-                                <Box sx={{ marginTop: '10px', display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                                    {formData.exclusiveAreas.map((value, index) => (
-                                        <Chip
-                                            key={index}
-                                            label={value}
-                                            onDelete={() => handleRemoveFromArray('exclusiveAreas', index)}
-                                            deleteIcon={<DeleteIcon />}
+                                {/* Exclusive Areas */}
+                                <Grid item xs={12}>
+                                    <CustomFormLabel htmlFor="exclusiveAreas" sx={{ color: '#9499a3' }}>
+                                        Exclusive areas
+                                    </CustomFormLabel>
+                                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                        <TextField
+                                            id="exclusiveAreas"
+                                            name="exclusiveAreas"
+                                            fullWidth
+                                            placeholder="Add country code"
+                                            onKeyDown={(e) => {
+                                                if (e.key === 'Enter' && e.target.value.trim() !== '') {
+                                                    e.preventDefault();
+                                                    handleAddToArray('exclusiveAreas', e.target.value.trim());
+                                                    e.target.value = '';
+                                                }
+                                            }}
                                         />
-                                    ))}
-                                </Box>
-                            </Grid>
+                                        <IconButton
+                                            onClick={() => {
+                                                const input = document.getElementById('exclusiveAreas');
+                                                if (input && input.value.trim() !== '') {
+                                                    handleAddToArray('exclusiveAreas', input.value.trim());
+                                                    input.value = '';
+                                                }
+                                            }}
+                                        >
+                                            <AddIcon />
+                                        </IconButton>
+                                    </Box>
+                                    <Box sx={{ marginTop: '10px', display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                                        {formData.exclusiveAreas.map((value, index) => (
+                                            <Chip
+                                                key={index}
+                                                label={value}
+                                                onDelete={() => handleRemoveFromArray('exclusiveAreas', index)}
+                                                deleteIcon={<DeleteIcon />}
+                                            />
+                                        ))}
+                                    </Box>
+                                </Grid>
 
-                            {/* Non-exclusive Areas */}
-                            <Grid item xs={12}>
-                                <CustomFormLabel htmlFor="nonExclusiveAreas" sx={{ color: '#9499a3' }}>
-                                    Non-exclusive areas
-                                </CustomFormLabel>
-                                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                    <TextField
-                                        id="nonExclusiveAreas"
-                                        name="nonExclusiveAreas"
-                                        fullWidth
-                                        placeholder="Add country code"
-                                        onKeyDown={(e) => {
-                                            if (e.key === 'Enter' && e.target.value.trim() !== '') {
-                                                e.preventDefault();
-                                                handleAddToArray('nonExclusiveAreas', e.target.value.trim());
-                                                e.target.value = '';
-                                            }
-                                        }}
-                                    />
-                                    <IconButton
-                                        onClick={() => {
-                                            const input = document.getElementById('nonExclusiveAreas');
-                                            if (input && input.value.trim() !== '') {
-                                                handleAddToArray('nonExclusiveAreas', input.value.trim());
-                                                input.value = '';
-                                            }
-                                        }}
-                                    >
-                                        <AddIcon />
-                                    </IconButton>
-                                </Box>
-                                <Box sx={{ marginTop: '10px', display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                                    {formData.nonExclusiveAreas.map((value, index) => (
-                                        <Chip
-                                            key={index}
-                                            label={value}
-                                            onDelete={() => handleRemoveFromArray('nonExclusiveAreas', index)}
-                                            deleteIcon={<DeleteIcon />}
+                                {/* Non-exclusive Areas */}
+                                <Grid item xs={12}>
+                                    <CustomFormLabel htmlFor="nonExclusiveAreas" sx={{ color: '#9499a3' }}>
+                                        Non-exclusive areas
+                                    </CustomFormLabel>
+                                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                        <TextField
+                                            id="nonExclusiveAreas"
+                                            name="nonExclusiveAreas"
+                                            fullWidth
+                                            placeholder="Add country code"
+                                            onKeyDown={(e) => {
+                                                if (e.key === 'Enter' && e.target.value.trim() !== '') {
+                                                    e.preventDefault();
+                                                    handleAddToArray('nonExclusiveAreas', e.target.value.trim());
+                                                    e.target.value = '';
+                                                }
+                                            }}
                                         />
-                                    ))}
-                                </Box>
+                                        <IconButton
+                                            onClick={() => {
+                                                const input = document.getElementById('nonExclusiveAreas');
+                                                if (input && input.value.trim() !== '') {
+                                                    handleAddToArray('nonExclusiveAreas', input.value.trim());
+                                                    input.value = '';
+                                                }
+                                            }}
+                                        >
+                                            <AddIcon />
+                                        </IconButton>
+                                    </Box>
+                                    <Box sx={{ marginTop: '10px', display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                                        {formData.nonExclusiveAreas.map((value, index) => (
+                                            <Chip
+                                                key={index}
+                                                label={value}
+                                                onDelete={() => handleRemoveFromArray('nonExclusiveAreas', index)}
+                                                deleteIcon={<DeleteIcon />}
+                                            />
+                                        ))}
+                                    </Box>
+                                </Grid>
                             </Grid>
-                        </Grid>
+                        }
+
 
 
                         {/* Action Buttons */}

@@ -16,6 +16,7 @@ import {
   CircularProgress,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
+import EditIcon from '@mui/icons-material/Edit';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import Coown_Logo from '../../../../assets/images/logos/coown-logo-group.jpg';
@@ -32,7 +33,7 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
 }));
 
-function Row({ row }) {
+function Row({ row, openDrawer }) {
   const [open, setOpen] = useState(false);
 
   // Add safety checks for accessing nested properties
@@ -67,6 +68,14 @@ function Row({ row }) {
         <TableCell sx={{ color: '#1e293b' }}>{associateType}</TableCell>
         <TableCell sx={{ color: '#1e293b' }}>{representedInCoordination}</TableCell>
         <TableCell sx={{ color: '#1e293b' }}>{representedInSteering}</TableCell>
+        <TableCell>
+          <IconButton
+            aria-label="edit"
+            onClick={() => openDrawer()}
+          >
+            <EditIcon />
+          </IconButton>
+        </TableCell>
       </StyledTableRow>
       <TableRow>
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
@@ -147,7 +156,7 @@ function Row({ row }) {
   );
 }
 
-export default function Dashboard() {
+export default function Dashboard({openDrawer}) {
   const [showForm, setShowForm] = useState(false);
   const [affiliates, setAffiliates] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -235,11 +244,12 @@ export default function Dashboard() {
                     <TableCell>Associate Type</TableCell>
                     <TableCell>Represented in Coordination</TableCell>
                     <TableCell>Represented in Steering</TableCell>
+                    <TableCell>Action</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {affiliates.map((affiliate, index) => (
-                    <Row key={`affiliate-${index}`} row={affiliate} />
+                    <Row key={`affiliate-${index}`} row={affiliate} openDrawer={openDrawer} />
                   ))}
                 </TableBody>
               </Table>
