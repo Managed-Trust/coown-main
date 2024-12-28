@@ -6,7 +6,6 @@ import AdminTabs from './AdminTabs';
 import Dashboard from './Dashboard';
 import Sidebar from './Sidebar';
 import ic from "ic0";
-import { set } from 'lodash';
 const ledger = ic("speiw-5iaaa-aaaap-ahora-cai");
 
 function Products() {

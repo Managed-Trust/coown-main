@@ -80,8 +80,7 @@ const AddProduct = () => {
         <form onSubmit={handleSubmit}>
             <Grid container spacing={2}>
                 <Box>
-                    <ChildCard>
-                        <Grid container spacing={2}>
+                        <Grid container spacing={2} p={3}>
                             <Grid item xs={12} sm={12} md={4}>
                                 <Typography sx={{ paddingTop: '30px' }} variant="h6" gutterBottom>
                                     Product Details
@@ -151,7 +150,6 @@ const AddProduct = () => {
                                 </Grid>
                             </Grid>
                         </Grid>
-                    </ChildCard>
                 </Box>
             </Grid>
         </form>
