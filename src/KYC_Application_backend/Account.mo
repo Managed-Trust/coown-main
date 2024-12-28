@@ -3,7 +3,6 @@ import Array "mo:base/Array";
 import Time "mo:base/Time";
 import Nat "mo:base/Nat";
 import Int "mo:base/Int";
-import Nat64 "mo:base/Nat64";
 import Float "mo:base/Float";
 import HashMap "mo:base/HashMap";
 import Text "mo:base/Text";
@@ -22,6 +21,7 @@ actor class AccountActor(accountId : Text, groupId : Text, initialBalance : Nat,
         role : Role;
         ownership : Float; // Ownership percentage
         dailyLimit : Nat;
+        monthlyLimit : Nat;
     };
 
     type Transaction = {
@@ -40,6 +40,10 @@ actor class AccountActor(accountId : Text, groupId : Text, initialBalance : Nat,
     };
 
     //=================================Arrays======================================//
+    stable var owner : Principal = ownerId;
+    stable var groupTypeVal : Text = groupType;
+    stable var groupLevelVal : Text = groupLevel;
+
     var balance : Nat = initialBalance;
     var users : [AccountUser] = [];
     var transactions : [Transaction] = [];
@@ -51,30 +55,38 @@ actor class AccountActor(accountId : Text, groupId : Text, initialBalance : Nat,
     var balanceMap = HashMap.HashMap<Principal, Float>(0, Principal.equal, Principal.hash);
     var dailyTransactions : HashMap.HashMap<Principal, Nat> = HashMap.HashMap<Principal, Nat>(0, Principal.equal, Principal.hash);
     var monthlyTransactions : HashMap.HashMap<Principal, Nat> = HashMap.HashMap<Principal, Nat>(0, Principal.equal, Principal.hash);
+    var monthlyWithdrawals : HashMap.HashMap<Principal, Nat> = HashMap.HashMap<Principal, Nat>(0, Principal.equal, Principal.hash);
 
     //=================================Settings======================================//
-    private var dailyLimit : Nat = 0;
-    private var monthlyLimit : Nat = 0;
+    private var dailyLimit : Nat = 100;
+    private var monthlyLimit : Nat = 2000;
     private var isAdminOnlyMode : Bool = true; // By default, admin has all rights
+    var maxWithdrawLimit : Nat = 999; // Max withdrawal limit for users without requiring approval
 
     //=================================Functions======================================//
 
     //=================================Users Fuctions======================================//
 
-    public func addUser(userId : Principal, role : Role, ownership : Float) : async Text {
-        let userExists = Array.find(
-            users,
-            func(u : AccountUser) : Bool {
-                return u.userId == userId;
-            },
-        );
+    // Function to add users to the account
 
+    public func addUser(userId : Principal, role : Role, dailyLimit : Nat, monthlyLimit : Nat, ownership : Float) : async Text {
+        // Check if the user already exists
+        let userExists = Array.find(users, func(u : AccountUser) : Bool { u.userId == userId });
         if (userExists != null) {
             return "User already exists in the account.";
-        } else {
-            users := Array.append(users, [{ userId = userId; role = role; ownership = ownership; dailyLimit = 100 }]);
-            return "User added successfully.";
         };
+
+        // Check if the role is 'Owner' and if there is already an owner
+        if (role == #Owner) {
+            let existingOwner = Array.find(users, func(u : AccountUser) : Bool { u.role == #Owner });
+            if (existingOwner != null) {
+                return "There can only be one owner in the account.";
+            };
+        };
+
+        // Add the new user
+        users := Array.append(users, [{ userId = userId; role = role; dailyLimit = dailyLimit; monthlyLimit = monthlyLimit; ownership = ownership }]);
+        return "User added successfully.";
     };
 
     public func updateUserRole(userId : Principal, newRole : Role) : async Text {
@@ -101,6 +113,61 @@ actor class AccountActor(accountId : Text, groupId : Text, initialBalance : Nat,
         return (balance, users, transactions);
     };
 
+    // Update a user's daily limit
+    public shared (msg) func updateUserDailyLimit(userId : Principal, newDailyLimit : Nat) : async Text {
+        if (not (await isOwner(msg.caller))) {
+            return "Only the owner can update user limits.";
+        };
+
+        var updated = false;
+
+        users := Array.map<AccountUser, AccountUser>(
+            users,
+            func(u : AccountUser) : AccountUser {
+                if (u.userId == userId) {
+                    updated := true;
+                    return { u with dailyLimit = newDailyLimit };
+                } else {
+                    return u;
+                };
+            },
+        );
+
+        return if (updated) {
+            "User daily limit updated successfully.";
+        } else {
+            "User not found.";
+        };
+    };
+    // Update a user's monthly limit
+    public shared (msg) func updateUserMonthlyLimit(userId : Principal, newMonthlyLimit : Nat) : async Text {
+        // Ensure that only the owner can update the monthly limit
+        if (not (await isOwner(msg.caller))) {
+            return "Only the owner can update user limits.";
+        };
+
+        var updated = false;
+
+        // Update the monthly limit for the user
+        users := Array.map<AccountUser, AccountUser>(
+            users,
+            func(u : AccountUser) : AccountUser {
+                if (u.userId == userId) {
+                    updated := true;
+                    return { u with monthlyLimit = newMonthlyLimit };
+                } else {
+                    return u;
+                };
+            },
+        );
+
+        return if (updated) {
+            "User monthly limit updated successfully.";
+        } else {
+            "User not found.";
+        };
+    };
+    
     //=================================Admin Functions======================================//
 
     private func isAdmin(caller : Principal) : async Bool {
@@ -111,17 +178,112 @@ actor class AccountActor(accountId : Text, groupId : Text, initialBalance : Nat,
             },
         ) != null;
     };
+    // Check if the caller is the owner
+    private func isOwner(caller : Principal) : async Bool {
+        return Array.find(
+            users,
+            func(u : AccountUser) : Bool {
+                u.userId == caller and u.role == #Owner;
+            },
+        ) != null;
+    };
 
-    public shared (msg) func setTransactionMode(adminOnly : Bool, daily : Nat, monthly : Nat) : async Text {
-        // if (await isAdmin(msg.caller)) {
-        // if (true) {
-        isAdminOnlyMode := adminOnly;
-        dailyLimit := daily;
-        monthlyLimit := monthly;
-        return "Transaction mode and limits set successfully.";
-        // } else {
-        //     return "Only admin can set transaction mode and limits.";
-        // };
+    public shared (msg) func updateSettings(newDailyLimit : Nat, newMonthlyLimit : Nat, newMaxWithdrawLimit : Nat, newIsAdminOnlyMode : Bool) : async Text {
+        // Check if the caller is an admin
+        if (not (await isAdmin(msg.caller))) {
+            return "Error: Only admin can update the settings.";
+        };
+        // Update the settings
+        dailyLimit := newDailyLimit;
+        monthlyLimit := newMonthlyLimit;
+        maxWithdrawLimit := newMaxWithdrawLimit;
+        isAdminOnlyMode := newIsAdminOnlyMode;
+        return "Settings updated successfully.";
+    };
+
+    // Shared function for withdrawing funds
+    public shared (msg) func withdrawFundsNew(amount : Nat, description : Text) : async Text {
+        let caller = msg.caller;
+        let user = Array.find(users, func(u : AccountUser) : Bool { u.userId == caller });
+
+        switch (user) {
+            case null { return "User not found." };
+            case (?u) {
+                // Check if the amount exceeds the max withdraw limit (999 EUR)
+                if (amount > maxWithdrawLimit) {
+                    // For amounts greater than max limit, need admin and user approvals
+                    return await processLargeTransaction(amount, description, caller);
+                } else {
+                    // Ensure the user is within their daily and monthly limits
+                    return await processNormalTransaction(amount, description, caller, u);
+                };
+            };
+        };
+    };
+
+    // Function to process large transactions (greater than maxWithdrawLimit)
+    public shared (msg) func processLargeTransaction(amount : Nat, description : Text, caller : Principal) : async Text {
+        // Collect approvals from admin and other users
+        let admin = Array.find(users, func(u : AccountUser) : Bool { u.role == #Admin });
+        if (admin == null) {
+            return "No admin found to approve the transaction.";
+        };
+
+        // Request approval from users (excluding the caller)
+        let approvals = Array.filter(users, func(u : AccountUser) : Bool { u.userId != caller });
+        let requiredApprovalsCount = requiredApprovals;
+
+        // Create the initial transaction
+        var updatedTransaction = {
+            accountId = accountId;
+            groupId = groupId;
+            amount = amount;
+            description = description;
+            timestamp = Time.now();
+            approvedBy = [caller]; // Start the approval chain with the caller
+        };
+
+        // Check if required approvals are met (including admin and other users)
+        if (Array.size(updatedTransaction.approvedBy) >= requiredApprovals()) {
+            balance := balance - amount;
+            transactions := Array.append(transactions, [updatedTransaction]);
+
+            return "Transaction approved and processed.";
+        } else {
+            // Add the caller to the approved list
+            updatedTransaction := {
+                updatedTransaction with
+                approvedBy = Array.append(updatedTransaction.approvedBy, [caller])
+            };
+
+            return "Transaction requires more approvals.";
+        };
+    };
+
+    // Function to process normal transactions within limits
+    private func processNormalTransaction(amount : Nat, description : Text, caller : Principal, user : AccountUser) : async Text {
+        let currentDailyWithdraw = switch (dailyWithdrawals.get(caller)) {
+            case null { 0 };
+            case (?amt) { amt };
+        };
+        let currentMonthlyWithdraw = switch (monthlyWithdrawals.get(caller)) {
+            case null { 0 };
+            case (?amt) { amt };
+        };
+
+        if ((currentDailyWithdraw + amount <= user.dailyLimit) and (currentMonthlyWithdraw + amount <= user.monthlyLimit)) {
+            // Deduct balance and record transaction
+            balance := balance - amount;
+            transactions := Array.append(transactions, [{ accountId = accountId; groupId = groupId; amount = amount; description = description; timestamp = Time.now(); approvedBy = [] }]);
+
+            // Update daily and monthly withdrawals
+            dailyWithdrawals.put(caller, currentDailyWithdraw + amount);
+            monthlyWithdrawals.put(caller, currentMonthlyWithdraw + amount);
+
+            return "Withdrawal successful.";
+        } else {
+            return "Exceeded withdrawal limits. Requires approval.";
+        };
     };
 
     //=================================Transaction Handling======================================//
@@ -225,10 +387,15 @@ actor class AccountActor(accountId : Text, groupId : Text, initialBalance : Nat,
             return "Error: Only admin can set the required number of proposals.";
         };
     };
+
     private func requiredApprovals() : Nat {
         return requiredProposals;
     };
+
     //=============================================================================================//
+    // Other functions
+    //=============================================================================================//
+
     public shared (msg) func approveTransactionLimit(limitId : Text) : async Text {
         let limitOpt = Array.find<TransactionLimit>(
             transactionLimits,
@@ -287,6 +454,7 @@ actor class AccountActor(accountId : Text, groupId : Text, initialBalance : Nat,
             };
         };
     };
+
     public func distributeDividends() : async Text {
         // Calculate the total ownership by summing up all user ownership values
         let totalOwnership = Array.foldLeft<AccountUser, Float>(
@@ -319,24 +487,6 @@ actor class AccountActor(accountId : Text, groupId : Text, initialBalance : Nat,
         return "Dividends distributed successfully.";
     };
 
-    // Placeholder function to update user balance
-    private func updateUserBalance(userId : Principal, amount : Float) : async Text {
-        // Retrieve the current balance of the user
-        let currentBalance = balanceMap.get(userId);
-
-        // Calculate the new balance
-        let newBalance = switch (currentBalance) {
-            case (null) { amount }; // If no existing balance, set the balance to the amount
-            case (?balance) { balance + amount }; // Add the amount to the existing balance
-        };
-
-        // Update the user's balance in the HashMap
-        balanceMap.put(userId, newBalance);
-
-        // Return a success message
-        return "Success";
-    };
-
     //=================================Reports======================================//
 
     public query func generatePerformanceReport() : async Text {
@@ -362,101 +512,5 @@ actor class AccountActor(accountId : Text, groupId : Text, initialBalance : Nat,
         };
 
         return report;
-    };
-    //=================================Initialization======================================//
-    public shared (msg) func withdrawFunds(amount : Nat, description : Text) : async Text {
-        let caller = msg.caller;
-
-        // Check if the caller is authorized
-        let authorizedUser = Array.find(
-            users,
-            func(u : AccountUser) : Bool {
-                u.userId == caller and (u.role == #Owner or u.dailyLimit >= amount);
-            },
-        );
-
-        if (authorizedUser == null) {
-            return "Unauthorized: You do not have permission to withdraw funds.";
-        };
-
-        // Enforce daily limit for non-owners
-        switch (authorizedUser) {
-            case (?user) {
-                if (user.role != #Owner) {
-                    let currentDailyWithdrawal = switch (dailyWithdrawals.get(caller)) {
-                        case null { 0 };
-                        case (?amt) { amt };
-                    };
-
-                    if (currentDailyWithdrawal + amount > user.dailyLimit) {
-                        return "Unauthorized: Daily withdrawal limit exceeded.";
-                    };
-
-                    // Update the daily withdrawal record
-                    dailyWithdrawals.put(caller, currentDailyWithdrawal + amount);
-                };
-            };
-            case (null) {
-
-            };
-        };
-
-        // Proceed with the withdrawal
-        if (balance < amount) {
-            return "Insufficient funds.";
-        };
-
-        balance := balance - amount;
-
-        transactions := Array.append(
-            transactions,
-            [{
-                accountId = accountId;
-                groupId = groupId;
-                amount = amount; // Ensure the type matches (e.g., Nat or Int)
-                timestamp = Time.now();
-                description = description;
-                approvedBy = [];
-            }],
-        );
-
-        return "Withdrawal successful.";
-    };
-
-    // Check if the caller is the owner
-    private func isOwner(caller : Principal) : async Bool {
-        return Array.find(
-            users,
-            func(u : AccountUser) : Bool {
-                u.userId == caller and u.role == #Owner;
-            },
-        ) != null;
-    };
-
-    // Update a user's daily limit
-    public shared (msg) func updateUserDailyLimit(userId : Principal, newDailyLimit : Nat) : async Text {
-        if (not (await isOwner(msg.caller))) {
-            return "Only the owner can update user limits.";
-        };
-
-        var updated = false;
-
-        users := Array.map<AccountUser, AccountUser>(
-            users,
-            func(u : AccountUser) : AccountUser {
-                if (u.userId == userId) {
-                    updated := true;
-                    return { u with dailyLimit = newDailyLimit };
-                } else {
-                    return u;
-                };
-            },
-        );
-
-        return if (updated) {
-            "User daily limit updated successfully.";
-        } else {
-            "User not found.";
-        };
     };
 };

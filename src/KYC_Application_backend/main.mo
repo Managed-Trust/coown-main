@@ -2393,7 +2393,8 @@ public func deletePolicy(id: Text): async Bool {
       allowCardPayments: Bool;
       allowBankTransfer: Bool;
       voucherReference: ?Text;
-      externalDatabaseLink: ?Text;
+      allowVoucherPayments: Bool;  // New field
+      issueDate: Text;             // New field
       annualRenewalFee: Bool;
   };
 
@@ -2462,7 +2463,8 @@ public func deletePolicy(id: Text): async Bool {
       allowCardPayments: Bool,
       allowBankTransfer: Bool,
       voucherReference: ?Text,
-      externalDatabaseLink: ?Text,
+      allowVoucherPayments:Bool,
+      issueDate:Text,
       annualRenewalFee: Bool
   ): async Text {
       switch (productsMap.get(productId)) {
@@ -2476,8 +2478,9 @@ public func deletePolicy(id: Text): async Bool {
                   allowCardPayments = allowCardPayments;
                   allowBankTransfer = allowBankTransfer;
                   voucherReference = voucherReference;
-                  externalDatabaseLink = externalDatabaseLink;
                   annualRenewalFee = annualRenewalFee;
+                  allowVoucherPayments= allowVoucherPayments;  // New field
+                  issueDate= issueDate;             // New field
               };
 
               let updatedProduct = { product with payment = ?updatedPaymentDetails };
@@ -2486,6 +2489,7 @@ public func deletePolicy(id: Text): async Bool {
             };
         };
     };
+
 
     public func configureProfitSplit(
         productId: Text,
@@ -2600,6 +2604,11 @@ public func deletePolicy(id: Text): async Bool {
             };
         };
     };
+  
+  
+  
+  
+  
   public func configurePaymentMethods(
       productId: Text,
       enableCrypto: Bool,
