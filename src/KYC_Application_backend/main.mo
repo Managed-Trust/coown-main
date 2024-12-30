@@ -2456,17 +2456,17 @@ public func deletePolicy(id: Text): async Bool {
         return productsMap.remove(id) != null;
     };
 
-  public func configurePaymentOptions(
-      productId: Text,
-      actualPrice: Nat,
-      allowCryptoPayments: Bool,
-      allowCardPayments: Bool,
-      allowBankTransfer: Bool,
-      voucherReference: ?Text,
-      allowVoucherPayments:Bool,
-      issueDate:Text,
-      annualRenewalFee: Bool
-  ): async Text {
+    public func configurePaymentOptions(
+        productId: Text,
+        actualPrice: Nat,
+        allowCryptoPayments: Bool,
+        allowCardPayments: Bool,
+        allowBankTransfer: Bool,
+        voucherReference: Text,
+        allowVoucherPayments:Bool,
+        issueDate:Text,
+        annualRenewalFee: Bool
+    ): async Text {
       switch (productsMap.get(productId)) {
           case null {
               return "Product not found.";
@@ -2477,7 +2477,7 @@ public func deletePolicy(id: Text): async Bool {
                   allowCryptoPayments = allowCryptoPayments;
                   allowCardPayments = allowCardPayments;
                   allowBankTransfer = allowBankTransfer;
-                  voucherReference = voucherReference;
+                  voucherReference = ?voucherReference;
                   annualRenewalFee = annualRenewalFee;
                   allowVoucherPayments= allowVoucherPayments;  // New field
                   issueDate= issueDate;             // New field
@@ -2497,7 +2497,7 @@ public func deletePolicy(id: Text): async Bool {
         operatorPart: Nat,
         stakingPart: Nat,
         thirdPartyPart: Nat,
-        thirdPartyIdentifier: ?Text
+        thirdPartyIdentifier: Text
     ): async Text {
         switch (productsMap.get(productId)) {
             case null {
@@ -2509,7 +2509,7 @@ public func deletePolicy(id: Text): async Bool {
                     operatorPart = operatorPart;
                     stakingPart = stakingPart;
                     thirdPartyPart = thirdPartyPart;
-                    thirdPartyIdentifier = thirdPartyIdentifier;
+                    thirdPartyIdentifier = ?thirdPartyIdentifier;
                 };
 
                 let updatedProduct = { product with profitSplit = ?updatedProfitSplit };
@@ -2522,7 +2522,7 @@ public func deletePolicy(id: Text): async Bool {
       public func configureTerms(
           productId: Text,
           applyGeneralTerms: Bool,
-          termsLink: ?Text
+          termsLink: Text
       ): async Text {
           switch (productsMap.get(productId)) {
               case null {
@@ -2531,7 +2531,7 @@ public func deletePolicy(id: Text): async Bool {
               case (?product) {
                   let updatedTerms = {
                       applyGeneralTerms = applyGeneralTerms;
-                      termsLink = termsLink;
+                      termsLink = ?termsLink;
                   };
 
                   let updatedProduct = { product with terms = ?updatedTerms };
@@ -2604,9 +2604,6 @@ public func deletePolicy(id: Text): async Bool {
             };
         };
     };
-  
-  
-  
   
   
   public func configurePaymentMethods(
@@ -2737,106 +2734,107 @@ public func deletePolicy(id: Text): async Bool {
   // ===============================================//
   //================Page 4 Section 4 =========
   // ===============================================//
-// Stable variable for storing Key Account Managers
-private var keyAccountManagers : HashMap.HashMap<Text, Text> = HashMap.HashMap<Text, Text>(0, Text.equal, Text.hash);
+  // Stable variable for storing Key Account Managers
+  private var keyAccountManagers : HashMap.HashMap<Text, Text> = HashMap.HashMap<Text, Text>(0, Text.equal, Text.hash);
 
-// Stable variable for storing Supervisors
-private var supervisors : HashMap.HashMap<Text, Text> = HashMap.HashMap<Text, Text>(0, Text.equal, Text.hash);
+  // Stable variable for storing Supervisors
+  private var supervisors : HashMap.HashMap<Text, Text> = HashMap.HashMap<Text, Text>(0, Text.equal, Text.hash);
 
-// Stable variable for CRM Teams
-private  var crmTeams : HashMap.HashMap<Text, { name: Text; email: Text }> = HashMap.HashMap<Text, { name: Text; email: Text }>(0, Text.equal, Text.hash);
+  // Stable variable for CRM Teams
+  private  var crmTeams : HashMap.HashMap<Text, { name: Text; email: Text }> = HashMap.HashMap<Text, { name: Text; email: Text }>(0, Text.equal, Text.hash);
 
-// Stable variable for CRM Automation settings
-private  var crmAutomation : HashMap.HashMap<Text, Bool> = HashMap.HashMap<Text, Bool>(0, Text.equal, Text.hash);
+  // Stable variable for CRM Automation settings
+  private  var crmAutomation : HashMap.HashMap<Text, Bool> = HashMap.HashMap<Text, Bool>(0, Text.equal, Text.hash);
 
-// Stable variable for CRM Tool Integration
-private  var crmToolIntegration : HashMap.HashMap<Text, Text> = HashMap.HashMap<Text, Text>(0, Text.equal, Text.hash);
+  // Stable variable for CRM Tool Integration
+  private  var crmToolIntegration : HashMap.HashMap<Text, Text> = HashMap.HashMap<Text, Text>(0, Text.equal, Text.hash);
 
-public func assignKeyAccountManager(userId: Text, managerEmail: Text) : async Text {
-  if (users1.get(userId) == null) {
-    return "User not found.";
-  };
-  keyAccountManagers.put(userId, managerEmail);
-  return "Key Account Manager assigned successfully.";
-};
-
-public func assignSupervisor(userId: Text, supervisorEmail: Text) : async Text {
-  if (users1.get(userId) == null) {
-    return "User not found.";
-  };
-  supervisors.put(userId, supervisorEmail);
-  return "Supervisor assigned successfully.";
-};
-
-public func addCRMTeam(email: Text, teamName: Text) : async Text {
-  switch (crmTeams.get(email)) {
-    case(?data){
-      return "already exsists";
+  public func assignKeyAccountManager(userId: Text, managerEmail: Text) : async Text {
+    if (users1.get(userId) == null) {
+      return "User not found.";
     };
-    case null
-    {
-      crmTeams.put(email, { name = teamName; email = email });
+    keyAccountManagers.put(userId, managerEmail);
+    return "Key Account Manager assigned successfully.";
+  };
+
+  public func assignSupervisor(userId: Text, supervisorEmail: Text) : async Text {
+    if (users1.get(userId) == null) {
+      return "User not found.";
+    };
+    supervisors.put(userId, supervisorEmail);
+    return "Supervisor assigned successfully.";
+  };
+
+  public func addCRMTeam(email: Text, teamName: Text) : async Text {
+    switch (crmTeams.get(email)) {
+      case(?data){
+        return "already exsists";
+      };
+      case null
+      {
+        crmTeams.put(email, { name = teamName; email = email });
+      };
+    };
+    crmTeams.put(email, { name = teamName; email = email });
+    return "CRM Team added successfully.";
+  };
+
+  public func updateCRMTeam(email: Text, newTeamName: Text) : async Text {
+    switch (crmTeams.get(email)) {
+      case null {
+        return "CRM Team not found.";
+      };
+      case (?team) {
+        crmTeams.put(email, { team with name = newTeamName });
+        return "CRM Team updated successfully.";
+      };
     };
   };
-  crmTeams.put(email, { name = teamName; email = email });
-  return "CRM Team added successfully.";
-};
 
-public func updateCRMTeam(email: Text, newTeamName: Text) : async Text {
-  switch (crmTeams.get(email)) {
-    case null {
-      return "CRM Team not found.";
+  public query func getKeyAccountManager(userId: Text) : async ?Text {
+    return keyAccountManagers.get(userId);
+  };
+
+  public query func getSupervisor(userId: Text) : async ?Text {
+    return supervisors.get(userId);
+  };
+  
+  public query func getCRMTeam(email: Text) : async ?{ name: Text; email: Text } {
+    return crmTeams.get(email);
+  };
+
+  public query func listCRMTeams() : async [{ name: Text; email: Text }] {
+    return Iter.toArray(crmTeams.vals());
+  };
+
+  public func integrateCRMTool(userId: Text, crmUrl: Text) : async Text {
+    if (users1.get(userId) == null) {
+      return "User not found.";
     };
-    case (?team) {
-      crmTeams.put(email, { team with name = newTeamName });
-      return "CRM Team updated successfully.";
+  
+    crmToolIntegration.put(userId, crmUrl);
+    return "CRM tool integrated successfully.";
+  };
+
+  public query func getCRMToolIntegration(userId: Text) : async ?Text {
+    return crmToolIntegration.get(userId);
+  };
+
+  public func toggleCRMAutomation(userId: Text, enable: Bool) : async Text {
+    if (users1.get(userId) == null) {
+      return "User not found.";
+    };
+    crmAutomation.put(userId, enable);
+    return if (enable) {
+      "CRM automation enabled."
+    } else {
+      "CRM automation disabled.";
     };
   };
-};
 
-public query func getKeyAccountManager(userId: Text) : async ?Text {
-  return keyAccountManagers.get(userId);
-};
-
-public query func getSupervisor(userId: Text) : async ?Text {
-  return supervisors.get(userId);
-};
-public query func getCRMTeam(email: Text) : async ?{ name: Text; email: Text } {
-  return crmTeams.get(email);
-};
-
-public query func listCRMTeams() : async [{ name: Text; email: Text }] {
-  return Iter.toArray(crmTeams.vals());
-};
-
-public func integrateCRMTool(userId: Text, crmUrl: Text) : async Text {
-  if (users1.get(userId) == null) {
-    return "User not found.";
+  public query func isCRMAutomationEnabled(userId: Text) : async ?Bool {
+    return crmAutomation.get(userId);
   };
- 
-  crmToolIntegration.put(userId, crmUrl);
-  return "CRM tool integrated successfully.";
-};
-
-public query func getCRMToolIntegration(userId: Text) : async ?Text {
-  return crmToolIntegration.get(userId);
-};
-
-public func toggleCRMAutomation(userId: Text, enable: Bool) : async Text {
-  if (users1.get(userId) == null) {
-    return "User not found.";
-  };
-  crmAutomation.put(userId, enable);
-  return if (enable) {
-    "CRM automation enabled."
-  } else {
-    "CRM automation disabled.";
-  };
-};
-
-public query func isCRMAutomationEnabled(userId: Text) : async ?Bool {
-  return crmAutomation.get(userId);
-};
 
   // ===== Foundation Overview =====
   public query func getFoundationOverview(): async {
