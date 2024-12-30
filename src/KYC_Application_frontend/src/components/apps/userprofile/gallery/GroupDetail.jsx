@@ -234,46 +234,46 @@ const GroupDetailPage = () => {
                   </Card>
 
                   {group[0] && group[0].groupType == "Incorporation" &&
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      backgroundColor: '#4e84ff',
-                      padding: '10px 20px',
-                      borderRadius: '5px',
-                      color: '#fff',
-                      my: 1,
-                      boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
-                    }}
-                  >
-                    {/* Left side - Info text with an icon */}
-                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                      <InfoOutlinedIcon sx={{ marginRight: '8px', color: '#fff' }} />
-                      <Typography variant="body1">
-                      To begin using your group and accounts, please compete the initial group setup and the KYC verification.
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        backgroundColor: '#4e84ff',
+                        padding: '10px 20px',
+                        borderRadius: '5px',
+                        color: '#fff',
+                        my: 1,
+                        boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
+                      }}
+                    >
+                      {/* Left side - Info text with an icon */}
+                      <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                        <InfoOutlinedIcon sx={{ marginRight: '8px', color: '#fff' }} />
+                        <Typography variant="body1">
+                          To begin using your group and accounts, please compete the initial group setup and the KYC verification.
 
-                      </Typography>
+                        </Typography>
+                      </Box>
+                      {groupId &&
+                        <Link to={`/group/registerCompany/${groupId}`} >
+                          <Typography
+                            sx={{
+                              color: '#fff',
+                              borderRadius: '20px',
+                              padding: '6px 16px',
+                              textTransform: 'none',
+                              '&:hover': {
+                                backgroundColor: '#333',
+                              },
+                            }}
+                          >
+                            Start verification
+                          </Typography>
+                        </Link>
+                      }
                     </Box>
-                    {groupId &&
-                    <Link to={`/group/registerCompany/${groupId}`} >
-                      <Typography
-                        sx={{
-                          color: '#fff',
-                          borderRadius: '20px',
-                          padding: '6px 16px',
-                          textTransform: 'none',
-                          '&:hover': {
-                            backgroundColor: '#333',
-                          },
-                        }}
-                      >
-                       Start verification 
-                      </Typography>
-                    </Link>
-}
-                  </Box>
-}
+                  }
                   {group[0] &&
                     <>
                       {group[0] && group[0].groupType === "Incorporation" ?
@@ -396,7 +396,7 @@ const GroupDetailPage = () => {
                                 {tabValue === 3 && (
                                   <Box>
                                     {/* Member Component */}
-                                    <GroupMembers />
+                                    <GroupMembers groupId={groupId}/>
                                   </Box>
                                 )}
                                 {tabValue === 4 && (

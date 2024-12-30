@@ -134,7 +134,7 @@ function GroupTable({ groups }) {
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {renderGroupRows(groups.filter(group => group[0].groupType === 'Private Group' || group[0].groupType === 'Default'))}
+                            {renderGroupRows(groups.filter(group => group[0].groupType === 'private' || group[0].groupType === 'Default'))}
                         </TableBody>
                     </Table>
                 </ChildCard>

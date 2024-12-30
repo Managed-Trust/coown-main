@@ -168,7 +168,7 @@ const GroupMembers = ({groupId}) => {
     setOrder(isAsc ? 'desc' : 'asc');
     setOrderBy(property);
   };
-
+  console.log("Group member:",groupId);
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
@@ -198,6 +198,7 @@ const GroupMembers = ({groupId}) => {
         recordType: formData.recordType,
         groupId: groupId,
       };
+      console.log("Email Params:", emailParams);
 
       await emailjs.send(
         "service_idh0h15",
