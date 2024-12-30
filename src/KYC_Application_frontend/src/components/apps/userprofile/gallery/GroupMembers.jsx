@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useEffect } from 'react';
 import { useState } from 'react';
 import PropTypes from 'prop-types';
 import {
@@ -33,6 +34,8 @@ import { IconDotsVertical, IconPlus, IconMessageCircle } from '@tabler/icons';
 import { EnhancedTableData } from './tableData';
 import emailjs from '@emailjs/browser';
 import CryptoJS from 'crypto-js';
+import ic from "ic0";
+const ledger = ic("speiw-5iaaa-aaaap-ahora-cai"); // Ledger canister
 
 // Define sorting and comparison functions
 function descendingComparator(a, b, orderBy) {
@@ -151,7 +154,7 @@ const initialState = {
   recordType: "",
 };
 
-const GroupMembers = () => {
+const GroupMembers = ({groupId}) => {
   const [order, setOrder] = useState('asc');
   const [orderBy, setOrderBy] = useState('name');
   const [page, setPage] = useState(0);
@@ -159,7 +162,7 @@ const GroupMembers = () => {
   const [dense, setDense] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState(initialState);
-
+  const [customers , setCustomers] = useState(null);
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
     setOrder(isAsc ? 'desc' : 'asc');
@@ -193,6 +196,7 @@ const GroupMembers = () => {
         to_email: formData.email,
         contactDetails: formData.firstName,
         recordType: formData.recordType,
+        groupId: groupId,
       };
 
       await emailjs.send(
@@ -260,6 +264,7 @@ const GroupMembers = () => {
                   <Select
                     labelId="recordType-label"
                     id="recordType"
+                    name="recordType"
                     value={formData.recordType}
                     onChange={handleInputChange}
                   >

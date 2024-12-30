@@ -316,7 +316,7 @@ const GroupDetailPage = () => {
                                 {tabValue === 3 && (
                                   <Box>
                                     {/* Member Component */}
-                                    <GroupMembers />
+                                    <GroupMembers groupId = {groupId}/>
                                   </Box>
                                 )}
                                 {tabValue === 4 && (
