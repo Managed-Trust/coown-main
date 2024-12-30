@@ -63,8 +63,9 @@ const LoginUser = () => {
             });
             const data = await response.json();
             console.log("Google User Profile:", data);
-            const isGoogleUserVerified = await ledger.call("getUser", data.email); // Simulated function call
-            if (isGoogleUserVerified.length > 0) {
+            const isGoogleUserVerified = await ledger.call("createUser", data.email, '', 'Google');
+            console.log("Verified:",isGoogleUserVerified);
+            if (data.email_verified == true) {
                 setUser(data.email);
                 swal("Success", "Logged in successfully with Google!", "success").then(() => {
                     navigate('/dashboards/ecommerce');

@@ -33,7 +33,7 @@ function App() {
   const customizer = useSelector((state) => state.customizer);
 
   return (
-    <GoogleOAuthProvider clientId="725664575664-3tboqhepr5uggob4mitv569jj9vfv362.apps.googleusercontent.com">
+    <GoogleOAuthProvider clientId="87003526098-o3cj84v0dpbak43pf1nte4qoc3bk7pgt.apps.googleusercontent.com">
       <ThemeProvider theme={theme}>
         <RTL direction={customizer.activeDir}>
           <CssBaseline />
