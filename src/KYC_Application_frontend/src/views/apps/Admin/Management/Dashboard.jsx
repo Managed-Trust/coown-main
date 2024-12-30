@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box, Paper, Checkbox,
   Button,
-  IconButton, Link, Radio, Grid, TextField, Typography, FormControl, FormControlLabel, Switch, MenuItem, List, ListItem, ListItemIcon, ListItemText,
+  IconButton, Card, Radio, Grid, TextField, Typography, FormControl, FormControlLabel, Switch, MenuItem, List, ListItem, ListItemIcon, ListItemText,
   Table,
   TableBody,
   TableCell,
@@ -19,9 +19,14 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import SecurityIcon from '@mui/icons-material/Security';
 import LockIcon from '@mui/icons-material/Lock';
 import LinkIcon from '@mui/icons-material/Link';
-import icp from '../../../../assets/images/svgs/Layer_1.svg';
-import { ConnectDialog, useConnect, useDialog } from "@connect2ic/react";
+import ic from "ic0";
+const ledger = ic("speiw-5iaaa-aaaap-ahora-cai");
 
+const settingsOptions = [
+  { label: 'Announcements', icon: <AccountCircleIcon /> },
+  { label: 'Quick Links', icon: <LinkIcon /> },
+  { label: 'Policies', icon: <LockIcon /> },
+];
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
   '&:hover': {
     backgroundColor: 'rgba(0, 0, 0, 0.04)',
@@ -31,40 +36,80 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
 }));
 
-const settingsOptions = [
-  { label: 'Announcements', icon: <AccountCircleIcon /> },
-  { label: 'Links', icon: <SecurityIcon /> },
-  { label: 'Policies', icon: <LockIcon /> },
-];
+const initialState = {
+  internalAnn: '',
+  isInternalPublish: false,
+  acc1: [],
+  publicAnn: '',
+  isPublicPublish: false,
+  acc2: []
+};
 
-const Dashboard = () => {
+const AnnouncementCard = ({ message, createdBy, createdAt }) => {
+  // const formattedDate = new Date(Number(createdAt.toString().slice(0, -6))).toLocaleString("en-US", {
+  //   month: "short",
+  //   day: "numeric",
+  //   year: "numeric",
+  //   hour: "2-digit",
+  //   minute: "2-digit",
+  // });
+
+  return (
+    <Card
+      sx={{
+        padding: 2,
+        backgroundColor: "#f0f5ff",
+        border: "1px solid #e0e7ff",
+      }}
+    >
+      <Typography variant="body1" color="textPrimary" gutterBottom>
+        {message}
+      </Typography>
+      <Typography variant="caption" color="primary">
+        Published by {createdBy}
+      </Typography>
+    </Card>
+  );
+};
+
+const Dashboard = ({ openDrawer,openDrawer2 }) => {
   const [activeStep, setActiveStep] = useState(0);
-  const [productNotifications, setProductNotifications] = useState(true);
-  const [marketingNotifications, setMarketingNotifications] = useState(true);
+  const [quickLinks, setQuickLinks] = useState([]);
+  const [polices, setPolices] = useState([]);
+  const [formData, setFormData] = useState(initialState);
+  const [toggleEditInternal, setToggleEditInternal] = useState(false);
+  const [toggleEditPublic, setToggleEditPublic] = useState(false);
 
-  const { open, close, isOpen } = useDialog()
-  const { isConnected, principal, disconnect } = useConnect({
-    onConnect: () => {
-      console.log("User connected!");
-    },
-    onDisconnect: () => {
+  const [renderTrigger, setRenderTrigger] = useState(0);
+  const [linkValues, setLinkValues] = useState({});
 
-      console.log("User disconnected!");
-    }
-  });
+  const handleURLChange = (id, value) => {
+    setLinkValues((prev) => ({
+      ...prev,
+      [id]: value,
+    }));
+  };
+
+  const handleInputChange = (e) => {
+    const { id, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [id]: value,
+    }));
+  };
 
   const affiliatesData = [
     {
       name: 'Operator Policy',
       totalMembers: 'Regional Operators',
       Balance: 'https://www.notion',
-      total_revenue: 'Steering Committee',
+      total_revenue: 'Steering ',
     },
     {
       name: 'User  Policy - Template',
       totalMembers: 'New Account',
       Balance: 'https://www.notion',
-      total_revenue: 'Executive Committee',
+      total_revenue: 'Executive ',
     },
     {
       name: 'Global Marketplace Policy',
@@ -74,48 +119,282 @@ const Dashboard = () => {
     },
   ];
 
-  const handleConnect = () => {
-    if (isConnected) {
-      swal({
-        title: 'Success',
-        text: 'Your wallet disconnected successfully',
-        icon: 'success'
-      });
-      console.log("Disconnecting...");
-      disconnect(); // If already connected, clicking will disconnect
+
+  useEffect(() => {
+    const fetchAnnouncements = async () => {
+      try {
+        // Fetch internal announcements
+        const internalResponse = await ledger.call('getInternalAnnouncements');
+        console.log('Internal Announcements:', internalResponse);
+        if (internalResponse.length > 0) {
+          const acc1 = internalResponse[0] || {};
+          const isInternalPublish = acc1.isPublished || false;
+          const internalAnn = acc1.message || '';
+
+          setFormData((prevFormData) => ({
+            ...prevFormData,
+            isInternalPublish,
+            internalAnn,
+            acc1,
+          }));
+        }
+
+        // Fetch public announcements
+        const publicResponse = await ledger.call('getPublicAnnouncements');
+        console.log('Public Announcements:', publicResponse);
+        if (publicResponse.length > 0) {
+          const acc2 = publicResponse[0] || {};
+          const isPublicPublish = acc2.isPublished || false;
+          const publicAnn = acc2.message || '';
+
+          setFormData((prevFormData) => ({
+            ...prevFormData,
+            isPublicPublish,
+            publicAnn,
+            acc2,
+          }));
+        }
+      } catch (e) {
+        console.error('Error fetching announcements:', e);
+      }
+    };
+
+    const fetchQuickLinks = async () => {
+      try {
+        const response = await ledger.call('getQuickLinks');
+        console.log('response quick link', response);
+        if (response) {
+          setQuickLinks(response);
+          const preFilledValues = response.reduce((acc, link) => {
+            acc[link.id] = link.url || ''; // Default to an empty string if URL is missing
+            return acc;
+          }, {});
+
+          setLinkValues(preFilledValues);
+        }
+      } catch (error) {
+        console.log('error', error);
+      }
+    }
+    
+    const fetchPolicies = async () => {
+      try {
+        const response = await ledger.call('getPolicies');
+        console.log('response policy', response);
+        if (response) {
+          setPolices(response);
+         
+        }
+      } catch (error) {
+        console.log('error', error);
+      }
+    }
+    fetchPolicies();
+    fetchQuickLinks();
+    fetchAnnouncements();
+  }, [renderTrigger]); // Dependency array
+
+
+  const handleAddInternalAnnouncement = async (publish) => {
+    if (!formData.internalAnn) {
+      swal('Warning', 'Please fill the internal Announcemnt field', 'warning');
+      return;
+    }
+    const id = `internalAnn-${Math.floor(100000 + Math.random() * 900000).toString()}`;
+    try {
+      const response = await ledger.call('addOrUpdateInternalAnnouncement', id, formData.internalAnn, 'user', publish);
+      console.log('response', response);
+      if (response) {
+        swal({
+          title: 'Success',
+          text: 'Internal Announcemnet Update Successfully',
+          icon: 'success'
+        });
+        setRenderTrigger(!renderTrigger);
+      } else {
+        swal({
+          title: 'Error',
+          text: 'Something went wrong',
+          icon: 'error'
+        });
+      }
+    }
+    catch (e) {
+      console.log('error', e);
+    }
+  }
+  const handleUpdateInternalAnnouncement = async (id, publish) => {
+    if (!formData.internalAnn) {
+      swal('Warning', 'Please fill the internal Announcemnt field', 'warning');
+      return;
+    }
+    try {
+      const response = await ledger.call('addOrUpdateInternalAnnouncement', id, formData.internalAnn, 'user', publish);
+      console.log('response', response);
+      if (response) {
+        swal({
+          title: 'Success',
+          text: 'Internal Announcemnet Update Successfully',
+          icon: 'success'
+        });
+        setToggleEditInternal(false);
+        setRenderTrigger(!renderTrigger);
+      } else {
+        swal({
+          title: 'Error',
+          text: 'Something went wrong',
+          icon: 'error'
+        });
+      }
+    }
+    catch (e) {
+      console.log('error', e);
+    }
+  }
+  const handleUnpublisInternal = async (id) => {
+    console.log('id', id);
+    try {
+      const response = await ledger.call('unpublishInternalAnnouncement', id);
+      console.log('resp', response);
+      if (response) {
+        swal('Success', 'Internal Announcement unpublished', 'success');
+        setRenderTrigger(!renderTrigger);
+      } else {
+        swal('Warning', 'Something went wrong', 'warning');
+        setRenderTrigger(!renderTrigger);
+      }
+    } catch (e) {
+      console.log('error', e);
+    }
+  }
+  const handlepublisInternal = async (id) => {
+    try {
+      const response = await ledger.call('publishInternalAnnouncement', id);
+      if (response) {
+        swal('Success', 'Internal Announcement published', 'success');
+      } else {
+        swal('Warning', 'Something went wrong', 'warning')
+      }
+    } catch (e) {
+      console.log('error', e);
+    }
+  }
+
+  const handleAddPublicAnnouncement = async (publish) => {
+    if (!formData.publicAnn) {
+      swal('Warning', 'Please fill the public Announcemnt field', 'warning');
+      return;
+    }
+    const id = `publicAnn-${Math.floor(100000 + Math.random() * 900000).toString()}`;
+    try {
+      const response = await ledger.call('addOrUpdatePublicAnnouncement', id, formData.publicAnn, 'user', publish);
+      console.log('response', response);
+      if (response) {
+        swal({
+          title: 'Success',
+          text: 'Public Announcemnet Update Successfully',
+          icon: 'success'
+        });
+        setRenderTrigger(!renderTrigger);
+      } else {
+        swal({
+          title: 'Error',
+          text: 'Something went wrong',
+          icon: 'error'
+        });
+      }
+    }
+    catch (e) {
+      console.log('error', e);
+    }
+  }
+  const handleUpdatePublicAnnouncement = async (id, publish) => {
+    if (!formData.publicAnn) {
+      swal('Warning', 'Please fill the internal Announcemnt field', 'warning');
+      return;
+    }
+    try {
+      const response = await ledger.call('addOrUpdatePublicAnnouncement', id, formData.publicAnn, 'user', publish);
+      console.log('response', response);
+      if (response) {
+        swal({
+          title: 'Success',
+          text: 'Public Announcemnet Update Successfully',
+          icon: 'success'
+        });
+        setToggleEditPublic(false);
+        setRenderTrigger(!renderTrigger);
+      } else {
+        swal({
+          title: 'Error',
+          text: 'Something went wrong',
+          icon: 'error'
+        });
+      }
+    }
+    catch (e) {
+      console.log('error', e);
+    }
+  }
+  const handleUnpublishPublic = async (id) => {
+    console.log('id', id);
+    try {
+      const response = await ledger.call('unpublishPublicAnnouncement', id);
+      console.log('resp', response);
+      if (response) {
+        swal('Success', 'Public Announcement unpublished', 'success');
+        setRenderTrigger(!renderTrigger);
+      } else {
+        swal('Warning', 'Something went wrong', 'warning');
+        setRenderTrigger(!renderTrigger);
+      }
+    } catch (e) {
+      console.log('error', e);
+    }
+  }
+  const handlepublishPublic = async (id) => {
+    try {
+      const response = await ledger.call('publishPublicAnnouncement', id);
+      if (response) {
+        swal('Success', 'Public Announcement published', 'success');
+      } else {
+        swal('Warning', 'Something went wrong', 'warning');
+      }
+    } catch (e) {
+      swal('ERROR', e, 'error');
+      console.log('error', e);
+    }
+  }
+
+  const handlePublishQuickLink = async (id, url) => {
+    try {
+      const response = await ledger.call('updateQuickLinkUrl', id, url);
+      if (response) {
+        swal('Success', 'QuicK Link Updated', 'success');
+      } else {
+        swal('Warning', 'Something went wrong', 'warning')
+      }
+    } catch (e) {
+
+      swal('ERROR', e, 'error');
+      console.log('error', e);
+    }
+  }
+  const handleCopy = (id) => {
+    if (linkValues[id]) {
+      navigator.clipboard
+        .writeText(linkValues[id])
+        .then(() => {
+          swal("Copied!", "The link has been copied to your clipboard.", "success");
+        })
+        .catch((error) => {
+          console.error("Copy failed", error);
+          swal("Error", "Failed to copy the link.", "error");
+        });
     } else {
-      console.log("Connecting...");
-      open(); // If not connected, clicking will trigger connection
+      swal("Error", "No link available to copy.", "error");
     }
   };
-
-
-  function Row({ row }) {
-    return (
-      <>
-        <StyledTableRow>
-          <TableCell sx={{ pl: 2, display: 'flex', alignItems: 'center', gap: 1, py: 2 }}>
-            <Typography variant="body2" sx={{ color: '#1e293b', fontWeight: 500 }}>
-              {row.name}
-            </Typography>
-          </TableCell>
-          <TableCell sx={{ color: '#1e293b' }}>{row.totalMembers}</TableCell>
-          <TableCell sx={{ color: '#1e293b', display: 'flex', alignItems: 'center', gap: 1 }}>
-            {row.Balance}
-          </TableCell>
-          <TableCell sx={{ color: '#1e293b', display: 'flex', alignItems: 'center', gap: 1 }}>
-            {row.total_revenue}
-          </TableCell>
-          <TableCell align="right">
-
-            <IconButton size="small" sx={{ color: '#94a3b8', '&:hover': { color: '#6366f1' } }}>
-              <ArrowForwardIcon fontSize="small" />
-            </IconButton>
-          </TableCell>
-        </StyledTableRow>
-      </>
-    );
-  }
 
   const handleListItemClick = (index) => {
     setActiveStep(index);
@@ -142,27 +421,83 @@ const Dashboard = () => {
                 </Typography>
               </Grid>
               <Grid item xs={12} sm={12} md={8}>
-                <Grid container spacing={2} >
-                  <Grid item xs={12}>
-                    <CustomFormLabel htmlFor="acc1">Announcement to regional operators and other affiliates</CustomFormLabel>
-                    <TextField
-                      id="acc1"
-                      fullWidth
-                      multiline
-                      rows={4}
-                      variant="outlined"
-                      placeholder='Type announcement message'
-                    />
+                {formData.acc1.length !== 0 ?
+                  <Grid container spacing={2} >
+                    <Grid item xs={12}>
+                      <CustomFormLabel htmlFor="acc1">Announcement to regional operators and other affiliates</CustomFormLabel>
+                      {toggleEditInternal ?
+                        <TextField
+                          id="internalAnn"
+                          fullWidth
+                          onChange={handleInputChange}
+                          value={formData.internalAnn}
+                          multiline
+                          rows={4}
+                          variant="outlined"
+                          placeholder='Type announcement message'
+                        /> :
+
+                        <AnnouncementCard {...formData.acc1} />}
+                    </Grid>
+                    <Grid item xs={12} sx={{ display: 'flex', gap: 1 }}>
+                      {formData.isInternalPublish ?
+                        <>
+                          <Button onClick={() => handleUnpublisInternal(formData.acc1.id)} variant="contained" sx={{ textTransform: 'none' }}>
+                            UnPublish
+                          </Button>
+                          {toggleEditInternal ?
+                            <Button onClick={() => handleUpdateInternalAnnouncement(formData.acc1.id, false)} variant="outlined" sx={{ textTransform: 'none' }}>
+                              Edit
+                            </Button>
+                            :
+                            <Button onClick={() => setToggleEditInternal(true)} variant="outlined" sx={{ textTransform: 'none' }}>
+                              Edit
+                            </Button>
+                          }
+                        </> :
+                        <>
+                          <Button
+                            onClick={() => handlepublisInternal(formData.acc1.id)} variant="contained" sx={{ textTransform: 'none' }}>
+                            Publish
+                          </Button>
+                          {toggleEditInternal ?
+                            <Button onClick={() => handleUpdateInternalAnnouncement(formData.acc1.id, false)} variant="outlined" sx={{ textTransform: 'none' }}>
+                              Edit
+                            </Button>
+                            :
+                            <Button onClick={() => setToggleEditInternal(true)} variant="outlined" sx={{ textTransform: 'none' }}>
+                              Edit
+                            </Button>
+                          }
+                        </>
+                      }
+                    </Grid>
+                  </Grid> :
+                  <Grid container spacing={2} >
+                    <Grid item xs={12}>
+                      <CustomFormLabel htmlFor="acc1">Announcement to regional operators and other affiliates</CustomFormLabel>
+                      <TextField
+                        id="internalAnn"
+                        fullWidth
+                        onChange={handleInputChange}
+                        value={formData.internalAnn}
+                        multiline
+                        rows={4}
+                        variant="outlined"
+                        placeholder='Type announcement message'
+                      />
+                    </Grid>
+                    <Grid item xs={12} sx={{ display: 'flex', gap: 1 }}>
+                      <Button
+                        onClick={() => handleAddInternalAnnouncement(true)} variant="contained" sx={{ textTransform: 'none' }}>
+                        Publish
+                      </Button>
+                      <Button onClick={() => handleAddInternalAnnouncement(false)} variant="outlined" sx={{ textTransform: 'none' }}>
+                        Save draft
+                      </Button>
+                    </Grid>
                   </Grid>
-                  <Grid item xs={12} sx={{ display: 'flex', gap: 1 }}>
-                    <Button variant="contained" sx={{ textTransform: 'none' }}>
-                      Publish
-                    </Button>
-                    <Button variant="outlined" sx={{ textTransform: 'none' }}>
-                      Save draft
-                    </Button>
-                  </Grid>
-                </Grid>
+                }
               </Grid>
             </Grid>
 
@@ -175,29 +510,89 @@ const Dashboard = () => {
                 </Typography>
               </Grid>
               <Grid item xs={12} sm={12} md={8}>
-                <Grid container spacing={2} >
-                  <Grid item xs={12}>
-                    <CustomFormLabel htmlFor="acc2">
-                      Announcement to end-users of COOWN app
-                    </CustomFormLabel>
-                    <TextField
-                      id="acc2"
-                      fullWidth
-                      multiline
-                      rows={4}
-                      variant="outlined"
-                      placeholder='Search by name or email'
-                    />
+                {formData.acc2.length !== 0 ?
+                  <Grid container spacing={2} >
+                    <Grid item xs={12}>
+                      <CustomFormLabel htmlFor="acc2">
+                        Announcement to end-users of COOWN app      </CustomFormLabel>
+                      {toggleEditPublic ?
+                        <TextField
+                          id="publicAnn"
+                          fullWidth
+                          multiline
+                          onChange={handleInputChange}
+                          value={formData.publicAnn}
+                          rows={4}
+                          variant="outlined"
+                          placeholder='Public Announcemnet'
+                        /> :
+
+                        <AnnouncementCard {...formData.acc2} />
+                      }
+
+
+                    </Grid>
+                    <Grid item xs={12} sx={{ display: 'flex', gap: 1 }}>
+                      {formData.isPublicPublish ?
+                        <>
+                          <Button onClick={() => handleUnpublishPublic(formData.acc1.id, false)} variant="contained" sx={{ textTransform: 'none' }}>
+                            UnPublish
+                          </Button>
+                          {toggleEditPublic ?
+                            <Button onClick={() => handleUpdatePublicAnnouncement(formData.acc2.id, false)} variant="outlined" sx={{ textTransform: 'none' }}>
+                              Edit
+                            </Button>
+                            :
+                            <Button onClick={() => setToggleEditPublic(true)} variant="outlined" sx={{ textTransform: 'none' }}>
+                              Edit
+                            </Button>
+                          }
+                        </> :
+                        <>
+                          <Button onClick={() => handlepublishPublic(formData.acc2.id, false)} variant="contained" sx={{ textTransform: 'none' }}>
+                            Publish
+                          </Button>
+                          {toggleEditPublic ?
+                            <Button onClick={() => handleUpdatePublicAnnouncement(formData.acc2.id, false)} variant="outlined" sx={{ textTransform: 'none' }}>
+                              Edit
+                            </Button>
+                            :
+                            <Button onClick={() => setToggleEditPublic(true)} variant="outlined" sx={{ textTransform: 'none' }}>
+                              Edit
+                            </Button>
+                          }
+                        </>
+                      }
+                    </Grid>
+                  </Grid> :
+                  <Grid container spacing={2} >
+                    <Grid item xs={12}>
+                      <CustomFormLabel htmlFor="acc2">
+                        Announcement to end-users of COOWN app
+                      </CustomFormLabel>
+                      <TextField
+                        id="publicAnn"
+                        fullWidth
+                        multiline
+                        onChange={handleInputChange}
+                        value={formData.publicAnn}
+                        rows={4}
+                        variant="outlined"
+                      />
+                    </Grid>
+                    <Grid item xs={12} sx={{ display: 'flex', gap: 1 }}>
+
+                      <Button
+                        onClick={() => handleAddPublicAnnouncement(true)} variant="contained" sx={{ textTransform: 'none' }}>
+                        Publish
+                      </Button>
+                      <Button onClick={() => handleAddPublicAnnouncement(false)} variant="outlined" sx={{ textTransform: 'none' }}>
+                        Save draft
+                      </Button>
+
+                    </Grid>
                   </Grid>
-                  <Grid item xs={12} sx={{ display: 'flex', gap: 1 }}>
-                    <Button variant="contained" sx={{ textTransform: 'none' }}>
-                      Publish
-                    </Button>
-                    <Button variant="outlined" sx={{ textTransform: 'none' }}>
-                      Save draft
-                    </Button>
-                  </Grid>
-                </Grid>
+                }
               </Grid>
             </Grid>
           </Box>
@@ -206,74 +601,70 @@ const Dashboard = () => {
         return (
           <Box>
             <Grid item xs={12} sm={12} md={12}>
-              <Typography variant="h6" gutterBottom>
-                Links
-              </Typography>
-              <Typography variant="body1" color={'#5A6A85'} >
-                Changing this details will require additional KYC verfication.
-              </Typography>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Box>
+                  <Typography variant="h6" gutterBottom>
+                    Quick Links
+                  </Typography>
+                  <Typography variant="body1" color={'#5A6A85'} >
+                    Changing this details will require additional KYC verfication.
+                  </Typography>
+                </Box>
+                <Button
+                  onClick={() => openDrawer()}
+                  variant="outlined"
+                  startIcon={<AddIcon />}
+                  sx={{
+                    borderRadius: 1,
+                    textTransform: 'none',
+                    '&:hover': {
+                      backgroundColor: '#5d87ff',
+                    },
+                    boxShadow: 'none',
+                    padding: '8px 16px',
+                  }}
+                >
+                  Add Quick Link
+                </Button>
+              </Box>
             </Grid>
-            <Grid container spacing={2} sx={{
-              py: '20px'
-            }}>
-              <Grid item xs={12} sm={12} md={4}>
-                <Typography sx={{ paddingTop: '30px' }} variant="h6" gutterBottom>
-                  Management system
-                </Typography>
-              </Grid>
-              <Grid item xs={12} sm={12} md={8}>
-                <Grid container spacing={2} >
-                  <Grid item xs={12}>
-                    <CustomFormLabel htmlFor="link1">Link to management system</CustomFormLabel>
-                    <TextField
-                      id="link2"
-                      fullWidth
-                      placeholder='Germany'
-                    />
+            {quickLinks && quickLinks.length > 0 && quickLinks.map((link) => (
+              <Grid container spacing={2} sx={{
+                py: '20px'
+              }}>
+                <Grid item xs={12} sm={12} md={4}>
+                  <Typography sx={{ paddingTop: '30px' }} variant="h6" gutterBottom>
+                    {link.name}
+                  </Typography>
+                </Grid>
+                <Grid item xs={12} sm={12} md={8}>
+                  <Grid container spacing={2} >
+                    <Grid item xs={12}>
+                      <CustomFormLabel htmlFor="link1">Link to {link.name}</CustomFormLabel>
+                      <TextField
+                        id={`${link.id}`}
+                        name=""
+                        fullWidth
+                        value={linkValues[link.id] || ''}
+                        onChange={(e) => handleURLChange(link.id, e.target.value)}
+                        placeholder="Enter URL"
+                      />
+                    </Grid>
+                  </Grid>
+                  <Grid item xs={12} sx={{ display: 'flex', gap: 1, mt: 1 }}>
+                    <Button onClick={() => handlePublishQuickLink(link.id, linkValues[link.id])} variant="contained" sx={{ textTransform: 'none' }}>
+                      Save
+                    </Button>
+                    <Button
+                      onClick={() => handleCopy(link.id)} variant="outlined" sx={{ textTransform: 'none' }}>
+                      Copy
+                    </Button>
+
                   </Grid>
                 </Grid>
-                <Grid item xs={12} sx={{ display: 'flex', gap: 1, mt: 1 }}>
-                  <Button variant="outlined" sx={{ textTransform: 'none' }}>
-                    Copy
-                  </Button>
-                  <Button variant="contained" sx={{ textTransform: 'none' }}>
-                    Publish
-                  </Button>
-
-                </Grid>
               </Grid>
-            </Grid>
 
-            <Grid container spacing={2} sx={{
-              py: '20px'
-            }}>
-              <Grid item xs={12} sm={12} md={4}>
-                <Typography sx={{ paddingTop: '30px' }} variant="h6" gutterBottom>
-                  Management system
-                </Typography>
-              </Grid>
-              <Grid item xs={12} sm={12} md={8}>
-                <Grid container spacing={2} >
-                  <Grid item xs={12}>
-                    <CustomFormLabel htmlFor="link1">Link to management system</CustomFormLabel>
-                    <TextField
-                      id="link2"
-                      fullWidth
-                      placeholder='Germany'
-                    />
-                  </Grid>
-                </Grid>
-                <Grid item xs={12} sx={{ display: 'flex', gap: 1, mt: 1 }}>
-                  <Button variant="outlined" sx={{ textTransform: 'none' }}>
-                    Copy
-                  </Button>
-                  <Button variant="contained" sx={{ textTransform: 'none' }}>
-                    Publish
-                  </Button>
-
-                </Grid>
-              </Grid>
-            </Grid>
+            ))}
           </Box>
         );
       case 2:
@@ -286,7 +677,8 @@ const Dashboard = () => {
                 </Typography>
 
               </Box>
-              <Button
+              <Button              
+              onClick={() => openDrawer2()}
                 variant="outlined"
                 startIcon={<AddIcon />}
                 sx={{
@@ -300,7 +692,6 @@ const Dashboard = () => {
                 Add policy
               </Button>
             </Box>
-
             <TableContainer component={Paper} elevation={0}>
               <Table sx={{ minWidth: 650 }}>
                 <TableHead>
@@ -313,9 +704,19 @@ const Dashboard = () => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {affiliatesData.map((row) => (
-                    <Row key={row.name} row={row} />
-                  ))}
+                {polices.map((row) => (
+                  <StyledTableRow>
+                    <TableCell sx={{ color: '#1e293b' }}>{row.name}</TableCell>
+                    <TableCell sx={{ color: '#1e293b' }}>{row.applicability}</TableCell>
+                    <TableCell sx={{ color: '#1e293b' }}>{row.link}</TableCell>
+                    <TableCell sx={{ color: '#1e293b' }}>{row.responsibleEntity}</TableCell>
+                    <TableCell align="right">                    
+                      <IconButton size="small" sx={{ color: '#94a3b8', '&:hover': { color: '#6366f1' } }}>
+                        <ArrowForwardIcon fontSize="small" />
+                      </IconButton>
+                    </TableCell>
+                  </StyledTableRow>
+                ))}
                 </TableBody>
               </Table>
             </TableContainer>
@@ -353,8 +754,6 @@ const Dashboard = () => {
             {renderStepContent(activeStep)}
           </Paper>
         </Grid>
-
-        <ConnectDialog dark={false} />
       </Grid>
     </Box>
   );
