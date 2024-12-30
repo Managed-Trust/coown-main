@@ -55,12 +55,19 @@ function GroupInvitation() {
   const [loading, setLoading] = useState(false);
 
   const { isConnected, principal } = useConnect({
-    onConnect: () => {},
-    onDisconnect: () => {},
+    onConnect: () => { },
+    onDisconnect: () => { },
   });
 
   const handleAccept = async () => {
     setLoading(true);
+    // Assuming these variables are defined earlier
+    console.log("Logging parameters:");
+    console.log("groupId:", groupId);
+    console.log("email:", email);
+    console.log("Encoded Variant:", encodeVariant(GroupUserStatus.Approved));
+    console.log("Encrypted Data:", encryptData(email));
+
     try {
       console.log("enc", encryptData(email));
       const response = await ledger.call(
