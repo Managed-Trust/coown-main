@@ -145,7 +145,7 @@ const ProfileBanner = () => {
                   <ProfileImage>
                     <Avatar
                       src={profile.live_photo[0]}
-                      alt={decryptData(profile.given_name)}
+                      alt={profile.given_name}
                       sx={{
                         borderRadius: '50%',
                         width: '100px',

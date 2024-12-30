@@ -50,7 +50,7 @@ const currencies = [
   },
 ];
 
-const AccountTab = () => {
+const AccountTab = ({profile}) => {
   const [location, setLocation] = React.useState('india');
 
   const handleChange1 = (event) => {

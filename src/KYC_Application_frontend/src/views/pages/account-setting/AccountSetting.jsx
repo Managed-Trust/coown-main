@@ -10,6 +10,9 @@ import BlankCard from '../../../components/shared/BlankCard';
 import NotificationTab from '../../../components/pages/account-setting/NotificationTab';
 import BillsTab from '../../../components/pages/account-setting/BillsTab';
 import SecurityTab from '../../../components/pages/account-setting/SecurityTab';
+import ic from "ic0";
+import { useUser } from '../../../userContext/UserContext';
+const ledger = ic("speiw-5iaaa-aaaap-ahora-cai"); // Ledger canister
 
 const BCrumb = [
   {
@@ -51,6 +54,33 @@ const AccountSetting = () => {
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
+
+
+  const { user, setUser } = useUser();
+  const [profile, setProfile] = useState(null);
+
+  const fetchProfile = async () => {
+    try {
+      const response = await ledger.call("getCustomer", user);
+      console.log("Profile:", response);
+      if (response.length > 0) {
+        const profileData = response[0];
+        setProfile(profileData);
+      }
+
+    } catch (e) {
+      console.log("Error Fetching Profile:", e);
+    }
+  };
+
+
+  useEffect(() => {
+    console.log('user', user);
+    if (user) {
+      fetchProfile();
+    }
+  }, [user]);
+
 
   return (
     <PageContainer title="Account Setting" description="this is Account Setting page">
@@ -98,7 +128,7 @@ const AccountSetting = () => {
             <Divider />
             <CardContent>
               <TabPanel value={value} index={0}>
-                <AccountTab />
+                <AccountTab profile = {profile} />
               </TabPanel>
               <TabPanel value={value} index={1}>
                 <NotificationTab />

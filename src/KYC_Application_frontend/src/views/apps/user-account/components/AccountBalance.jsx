@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import usdc from '../../../../assets/images/svgs/usdc pic.svg';
-import xaut from '../../../../assets/images/svgs/XAUT.svg';
+import xaut from '../../../../assets/images/svgs/GLDT.svg';
 import btc from '../../../../assets/images/svgs/btc-pic.svg';
 import coown from '../../../../assets/images/svgs/coown-pic.svg';
 import icp from '../../../../assets/images/svgs/icp-pic.svg';
@@ -34,7 +34,6 @@ const initialCurrencyData = [
     { coin: 'Gold', symbol: 'ckXAUt', balance: '79.15', usd: '209 453.85 USD', lastWeek: '+1700', lastMonth: '+1700', percentage: '7.11%', icon: xaut, isVisible: true },
     { coin: 'ICP', symbol: 'Platform utility', balance: '9 453.20', usd: '78 270.84 USD', lastWeek: '+1700', lastMonth: '-5000', percentage: '-7.11%', icon: icp, isVisible: true },
     { coin: '$COOWN', symbol: 'Product utility', balance: '79.15', usd: '209 453.85 USD', lastWeek: '+1700', lastMonth: '+1700', percentage: '7.11%', icon: coown, isVisible: true },
-    { coin: '? USD ?', symbol: '?USDC - Ethereum?', balance: '79.85', usd: '80 USD', lastWeek: '+1700', lastMonth: '+1700', percentage: '7.11%', icon: usdc, isVisible: true },
 ];
 
 const AccountBalance = () => {

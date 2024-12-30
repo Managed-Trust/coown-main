@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ChildCard from '../../../../components/shared/ChildCard';
-import { Box, Paper, Checkbox, Button, Link, Radio, Grid, TextField, Typography, FormControl, FormControlLabel, Switch, MenuItem, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
+import { Box, Paper, Checkbox, Button, Link, Radio, Grid, Chip, Stack, TextField, Typography, FormControl, FormControlLabel, Switch, MenuItem, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import CustomFormLabel from '../../../../components/forms/theme-elements/CustomFormLabel';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import SecurityIcon from '@mui/icons-material/Security';
@@ -8,7 +8,9 @@ import LockIcon from '@mui/icons-material/Lock';
 import LinkIcon from '@mui/icons-material/Link';
 import icp from '../../../../assets/images/svgs/Layer_1.svg';
 import { ConnectDialog, useConnect, useDialog } from "@connect2ic/react";
-
+import ic from "ic0";
+import { useUser } from '../../../../userContext/UserContext';
+const ledger = ic("speiw-5iaaa-aaaap-ahora-cai"); // Ledger canister
 const settingsOptions = [
     { label: 'Profile', icon: <AccountCircleIcon /> },
     { label: 'KYC Data', icon: <SecurityIcon /> },
@@ -25,7 +27,7 @@ const SettingForm = () => {
     const [socialMedia, setSocialMedia] = useState('Only to contacts');
     const [productNotifications, setProductNotifications] = useState(true);
     const [marketingNotifications, setMarketingNotifications] = useState(true);
-    
+
     const { open, close, isOpen } = useDialog()
     const { isConnected, principal, disconnect } = useConnect({
         onConnect: () => {
@@ -37,6 +39,28 @@ const SettingForm = () => {
         }
     });
 
+
+    const { user, setUser } = useUser();
+    const [profile, setProfile] = useState(null);
+    const fetchProfile = async () => {
+        try {
+            const response = await ledger.call("getCustomer", user);
+            console.log("Profile:", response);
+            if (response.length > 0) {
+                const profileData = response[0];
+                setProfile(profileData);
+            }
+
+        } catch (e) {
+            console.log("Error Fetching Profile:", e);
+        }
+    };
+    useEffect(() => {
+        console.log('user', user);
+        if (user) {
+            fetchProfile();
+        }
+    }, [user]);
 
     const handleConnect = () => {
         if (isConnected) {
@@ -89,32 +113,37 @@ const SettingForm = () => {
                                     Your sign in information
                                 </Typography>
                             </Grid>
-                            <Grid item xs={12} sm={12} md={8}>
-                                <Grid container spacing={2} >
-                                    <Grid item xs={12}>
-                                        <CustomFormLabel htmlFor="Principal" sx={{ color: '#9499a3' }}>Principal email</CustomFormLabel>
-                                        <TextField
-                                            id="Principal"
-                                            fullWidth
-                                            placeholder='h.muster@gmail.come'
-                                        />
-                                    </Grid>
+                            {profile && (
+                                <>
+                                    <Grid item xs={12} sm={12} md={8}>
+                                        <Grid container spacing={2} >
+                                            <Grid item xs={12}>
+                                                <CustomFormLabel htmlFor="Principal" sx={{ color: '#9499a3' }}>Principal email</CustomFormLabel>
+                                                <TextField
+                                                    id="Principal"
+                                                    fullWidth
+                                                    value={profile.id || ''}
+                                                />
+                                            </Grid>
 
-                                    <Grid item xs={12}>
-                                        <CustomFormLabel htmlFor="Phonenumber">Phone number</CustomFormLabel>
-                                        <TextField
-                                            id="Phonenumber"
-                                            fullWidth
-                                            placeholder='Phone number'
-                                        />
+                                            <Grid item xs={12}>
+                                                <CustomFormLabel htmlFor="Phonenumber">Phone number</CustomFormLabel>
+                                                <TextField
+                                                    id="Phonenumber"
+                                                    fullWidth
+                                                    value={profile.phone || ''}
+                                                />
+                                            </Grid>
+                                            <Grid item xs={12}>
+                                                <Button variant="contained" sx={{ textTransform: 'none' }}>
+                                                    Save Changes
+                                                </Button>
+                                            </Grid>
+                                        </Grid>
                                     </Grid>
-                                    <Grid item xs={12}>
-                                        <Button variant="contained" sx={{ textTransform: 'none' }}>
-                                            Save Changes
-                                        </Button>
-                                    </Grid>
-                                </Grid>
-                            </Grid>
+                                </>)
+                            }
+
                         </Grid>
 
                         <Grid container spacing={2}
@@ -130,93 +159,98 @@ const SettingForm = () => {
                                     This information will be displayed on your public profile
                                 </Typography>
                             </Grid>
-                            <Grid item xs={12} sm={12} md={8}>
-                                <Grid container spacing={2}>
-                                    <Grid item xs={12} md={6}>
-                                        <CustomFormLabel htmlFor="name" sx={{ color: '#9499a3' }}>Given name</CustomFormLabel>
-                                        <TextField
-                                            id="name"
-                                            fullWidth
-                                            placeholder='Hans'
-                                        />
-                                    </Grid>
-                                    <Grid item xs={12} md={6}>
-                                        <CustomFormLabel htmlFor="Familyname" sx={{ color: '#9499a3' }}>Family name</CustomFormLabel>
-                                        <TextField
-                                            id="Familyname"
-                                            fullWidth
-                                            placeholder='Muster'
-                                        />
-                                    </Grid>
-                                    <Grid item xs={12}>
-                                        <CustomFormLabel htmlFor="Tagline">Tagline</CustomFormLabel>
-                                        <TextField
-                                            id="Tagline"
-                                            fullWidth
-                                            placeholder='Tagline'
-                                        />
-                                    </Grid>
+                            {profile && (
+                                <>
+                                    <Grid item xs={12} sm={12} md={8}>
+                                        <Grid container spacing={2}>
+                                            <Grid item xs={12} md={6}>
+                                                <CustomFormLabel htmlFor="name" sx={{ color: '#9499a3' }}>Given name</CustomFormLabel>
+                                                <TextField
+                                                    id="name"
+                                                    fullWidth
+                                                    value={profile.given_name || ''}
+                                                />
+                                            </Grid>
+                                            <Grid item xs={12} md={6}>
+                                                <CustomFormLabel htmlFor="Familyname" sx={{ color: '#9499a3' }}>Family name</CustomFormLabel>
+                                                <TextField
+                                                    id="Familyname"
+                                                    fullWidth
+                                                    value={profile.family_name || ''}
+                                                />
+                                            </Grid>
+                                            <Grid item xs={12}>
+                                                <CustomFormLabel htmlFor="Tagline">Tagline</CustomFormLabel>
+                                                <TextField
+                                                    id="Tagline"
+                                                    fullWidth
+                                                    placeholder='Tagline'
+                                                />
+                                            </Grid>
 
-                                    <Grid item xs={12} md={6}>
-                                        <CustomFormLabel htmlFor="PublicEmail">Public email</CustomFormLabel>
-                                        <TextField
-                                            id="PublicEmail"
-                                            fullWidth
-                                            placeholder='Public email'
-                                        />
-                                    </Grid>
+                                            <Grid item xs={12} md={6}>
+                                                <CustomFormLabel htmlFor="PublicEmail">Public email</CustomFormLabel>
+                                                <TextField
+                                                    id="PublicEmail"
+                                                    fullWidth
+                                                    value={profile.id || ''}
+                                                />
+                                            </Grid>
 
-                                    <Grid item xs={12} md={6}>
-                                        <CustomFormLabel htmlFor="Publicphone">Public phone</CustomFormLabel>
-                                        <TextField
-                                            id="Publicphone"
-                                            fullWidth
-                                            placeholder='Public phone'
-                                        />
-                                    </Grid>
-                                    <Grid item xs={12} md={6}>
-                                        <CustomFormLabel htmlFor="Company">Company</CustomFormLabel>
-                                        <TextField
-                                            id="Company"
-                                            fullWidth
-                                            placeholder='Company'
-                                        />
-                                    </Grid>
+                                            <Grid item xs={12} md={6}>
+                                                <CustomFormLabel htmlFor="Publicphone">Public phone</CustomFormLabel>
+                                                <TextField
+                                                    id="Publicphone"
+                                                    fullWidth
+                                                    value={profile.phone || ''}
+                                                />
+                                            </Grid>
+                                            <Grid item xs={12} md={6}>
+                                                <CustomFormLabel htmlFor="Company">Company</CustomFormLabel>
+                                                <TextField
+                                                    id="Company"
+                                                    fullWidth
+                                                    placeholder='Company'
+                                                />
+                                            </Grid>
 
-                                    <Grid item xs={12} md={6}>
-                                        <CustomFormLabel htmlFor="Jobtitle">Job title</CustomFormLabel>
-                                        <TextField
-                                            id="Jobtitle"
-                                            fullWidth
-                                            placeholder='Job title'
-                                        />
+                                            <Grid item xs={12} md={6}>
+                                                <CustomFormLabel htmlFor="Jobtitle">Job title</CustomFormLabel>
+                                                <TextField
+                                                    id="Jobtitle"
+                                                    fullWidth
+                                                    placeholder='Job title'
+                                                />
+                                            </Grid>
+                                            <Grid item xs={12}>
+                                                <CustomFormLabel htmlFor="Location">Location</CustomFormLabel>
+                                                <TextField
+                                                    id="Location"
+                                                    fullWidth
+                                                    placeholder='City or economic area'
+                                                />
+                                            </Grid>
+                                            <Grid item xs={12}>
+                                                <CustomFormLabel htmlFor="AboutYou">About you</CustomFormLabel>
+                                                <TextField
+                                                    id="AboutYou"
+                                                    fullWidth
+                                                    multiline
+                                                    rows={4}
+                                                    variant="outlined"
+                                                    placeholder='Write couple of sentences about you'
+                                                />
+                                            </Grid>
+                                            <Grid item xs={12}>
+                                                <Button variant="contained" sx={{ textTransform: 'none' }}>
+                                                    Save Changes
+                                                </Button>
+                                            </Grid>
+                                        </Grid>
                                     </Grid>
-                                    <Grid item xs={12}>
-                                        <CustomFormLabel htmlFor="Location">Location</CustomFormLabel>
-                                        <TextField
-                                            id="Location"
-                                            fullWidth
-                                            placeholder='City or economic area'
-                                        />
-                                    </Grid>
-                                    <Grid item xs={12}>
-                                        <CustomFormLabel htmlFor="AboutYou">About you</CustomFormLabel>
-                                        <TextField
-                                            id="AboutYou"
-                                            fullWidth
-                                            multiline
-                                            rows={4}
-                                            variant="outlined"
-                                            placeholder='Write couple of sentences about you'
-                                        />
-                                    </Grid>
-                                    <Grid item xs={12}>
-                                        <Button variant="contained" sx={{ textTransform: 'none' }}>
-                                            Save Changes
-                                        </Button>
-                                    </Grid>
-                                </Grid>
-                            </Grid>
+                                </>
+                            )}
+
                         </Grid>
                         <Grid container spacing={2}>
                             <Grid item xs={12} sm={12} md={4}>
@@ -307,7 +341,7 @@ const SettingForm = () => {
                                         <TextField
                                             id="country"
                                             fullWidth
-                                            placeholder='Germany'
+                                            value={profile.resident_country}
                                         />
                                     </Grid>
 
@@ -319,16 +353,32 @@ const SettingForm = () => {
                                             multiline
                                             rows={4}
                                             variant="outlined"
-                                            placeholder='Address'
+                                            value={profile.resident_address}
                                         />
                                     </Grid>
                                     <Grid item xs={12}>
                                         <CustomFormLabel htmlFor="Citizenship" sx={{ color: '#9499a3' }}>Citizenship</CustomFormLabel>
-                                        <TextField
-                                            id="Citizenship"
-                                            fullWidth
-                                            placeholder='German'
-                                        />
+                                        <Box sx={{ mt: 1 }}>
+                                            {profile.citizenship && (profile.citizenship).length > 0 ? (
+                                                <Stack direction="row" spacing={1} flexWrap="wrap">
+                                                    {(profile.citizenship).map((citizenship, index) => (
+                                                        <Chip
+                                                            key={index}
+                                                            label={citizenship}
+                                                            color="primary"
+                                                            variant="outlined"
+                                                            sx={{ mb: 1 }}
+                                                        />
+                                                    ))}
+                                                </Stack>
+                                            ) : (
+                                                <TextField
+                                                    id="Citizenship"
+                                                    fullWidth
+                                                    placeholder='Add citizenship'
+                                                />
+                                            )}
+                                        </Box>
                                     </Grid>
                                     <Grid item xs={12}>
                                         <Button variant="contained" sx={{ textTransform: 'none' }}>
@@ -606,8 +656,8 @@ const SettingForm = () => {
                                 selected={activeStep === index}
                                 onClick={() => handleListItemClick(index)}
                             >
-                                <ListItemIcon sx={{color:'#5A6A85'}}>{option.icon}</ListItemIcon>
-                                <ListItemText primary={option.label} sx={{marginLeft:'-20px'}} />
+                                <ListItemIcon sx={{ color: '#5A6A85' }}>{option.icon}</ListItemIcon>
+                                <ListItemText primary={option.label} sx={{ marginLeft: '-20px' }} />
                             </ListItem>
                         ))}
                     </List>
@@ -619,7 +669,7 @@ const SettingForm = () => {
                     {renderStepContent(activeStep)}
                 </Paper>
             </Grid>
-            
+
             <ConnectDialog dark={false} />
         </Grid>
     );
