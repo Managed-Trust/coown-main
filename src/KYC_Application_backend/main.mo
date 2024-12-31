@@ -2085,8 +2085,8 @@ public func addOrUpdatePolicy(
   applicability: Text,
   responsibleEntity: Text,
   link: Text,
-  workingDirectory: ?Text,
-  focalPoint: ?Text
+  workingDirectory: Text,
+  focalPoint: Text
 ): async Bool {
   let timestamp = Time.now();
   let policy = {
@@ -2095,8 +2095,8 @@ public func addOrUpdatePolicy(
     applicability = applicability;
     responsibleEntity = responsibleEntity;
     link = link;
-    workingDirectory = workingDirectory;
-    focalPoint = focalPoint;
+    workingDirectory = ?workingDirectory;
+    focalPoint = ?focalPoint;
     createdAt = timestamp;
     updatedAt =  ?timestamp;
   };
