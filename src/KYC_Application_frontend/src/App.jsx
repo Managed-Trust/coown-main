@@ -27,7 +27,7 @@ import NFTPresaleMarketplace from './PreSale/Nft';
 import ICPTokenSwap from './PreSale/kycapp';
 import SignUpPage from './views/pages/signup/SignUpPage';
 import LoginUser from './views/pages/loginuser/LoginUser';
-
+import Prototype from './views/pages/prototype/Prototype';
 function App() {
   const theme = ThemeSettings();
   const customizer = useSelector((state) => state.customizer);
@@ -50,6 +50,7 @@ function App() {
                 <Route path="/contact-us" element={<ContactUs/>} /> 
                 <Route path='/user/sign-up' element={<LoginPage />} />
                 <Route path='/user/login' element={<LoginUser />} />
+                <Route path='/user/prototype' element={<Prototype/>} />
                 <Route path='/user/connect' element={<ConnectPage/>} />
                 <Route path="/prelaunch" element={<ICPTokenSwap />} />
                 <Route path="/prelaunch-social" element={<AtlasDashboard />} />

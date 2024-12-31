@@ -52,7 +52,7 @@ const Navigations = () => {
       <StyledButton color="inherit" variant="text" href="/contact-us">
       Contact
       </StyledButton>
-      <Button color="primary" target="_blank" variant="contained" component={NavLink} to="/user/login">
+      <Button color="primary" target="_blank" variant="contained" component={NavLink} to="/user/prototype">
         Sign In
       </Button>
     </>

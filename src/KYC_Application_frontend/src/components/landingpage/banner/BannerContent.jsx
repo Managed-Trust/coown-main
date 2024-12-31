@@ -156,7 +156,7 @@ const BannerContent = () => {
             ) :
               (
                 <>
-                  <StyledButton variant="contained" color="primary" to="/user/login" component={NavLink}>
+                  <StyledButton variant="contained" color="primary" to="/user/prototype" component={NavLink}>
                     Sign In
                   </StyledButton>
                 </>
