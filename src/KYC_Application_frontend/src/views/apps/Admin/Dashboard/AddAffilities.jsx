@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     Box,
     Paper,
@@ -15,6 +15,9 @@ import {
     ListItemIcon,
     ListItemText,
     CircularProgress,
+    InputAdornment,
+    Popper,
+    ClickAwayListener,
 } from '@mui/material';
 import CustomFormLabel from '../../../../components/forms/theme-elements/CustomFormLabel';
 import IconButton from '@mui/material/IconButton';
@@ -49,6 +52,8 @@ const AddAffilities = ({ onFormShow }) => {
     const [afiliateKey, setKey] = useState(generateRandomKey());
     const [completedSteps, setCompletedSteps] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [groups, setGroups] = useState([]);
+
     // State for form data
     const [formData, setFormData] = useState({
         associateType: '',
@@ -78,6 +83,37 @@ const AddAffilities = ({ onFormShow }) => {
         nonExclusiveAreas: [], // Changed to an array
     });
 
+    const [searchQuery, setSearchQuery] = useState("");
+    const [anchorEl, setAnchorEl] = useState(null);
+
+    const filteredGroups = groups.filter(
+        (group) =>
+            group.groupName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            group.adminId.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
+    const handleOpenDropdown = (event) => {
+        setAnchorEl(anchorEl ? null : event.currentTarget);
+    };
+
+    const handleCloseDropdown = () => {
+        setAnchorEl(null);
+    };
+
+    const open = Boolean(anchorEl);
+
+    useEffect(() => {
+        const fetchGroups = async () => {
+            try {
+                const response = await ledger.call("getAllGroups");
+                setGroups(response);
+                console.log("Groups:", response);
+            } catch (e) {
+                console.log("Error fetching groups:", e);
+            }
+        };
+        fetchGroups();
+    }, []);
 
     const handleNext = () => {
         if (activeStep < settingsOptions.length - 1) {
@@ -249,21 +285,78 @@ const AddAffilities = ({ onFormShow }) => {
                                         <MenuItem value="Type2">Type 2</MenuItem>
                                     </TextField>
                                 </Grid>
-
-                                {/* Affiliate Group */}
-                                <Grid item xs={12} sm={6}>
-                                    <CustomFormLabel htmlFor="affiliateGroup">Affiliate group</CustomFormLabel>
-                                    <TextField
-                                        id="affiliateGroup"
-                                        name="affiliateGroup"
-                                        select
-                                        fullWidth
-                                        value={formData.affiliateGroup}
-                                        onChange={handleChange}
-                                    >
-                                        <MenuItem value="Group1">Group 1</MenuItem>
-                                        <MenuItem value="Group2">Group 2</MenuItem>
-                                    </TextField>
+                                <Grid item xs={12} sm={6} mt={3}>
+                                    <Typography variant="body1" sx={{ marginBottom: "8px" }}>
+                                        Affiliate Group
+                                    </Typography>
+                                    <Box>
+                                        <TextField
+                                            fullWidth
+                                            placeholder="Select group"
+                                            value={formData.affiliateGroup}
+                                            onClick={handleOpenDropdown}
+                                            readOnly
+                                        />
+                                        <Popper
+                                            open={open}
+                                            anchorEl={anchorEl}
+                                            placement="bottom-start"
+                                            style={{ zIndex: 1300 }}
+                                        >
+                                            <ClickAwayListener onClickAway={handleCloseDropdown}>
+                                                <Paper sx={{ width: anchorEl?.offsetWidth || 300, maxHeight: 300, overflowY: "auto" }}>
+                                                    {/* Input Field for Search */}
+                                                    <Box sx={{ padding: "8px" }}>
+                                                        <input
+                                                            type="text"
+                                                            placeholder="Search by group name or ID"
+                                                            value={searchQuery}
+                                                            onChange={(e) => setSearchQuery(e.target.value)}
+                                                            style={{
+                                                                width: "100%",
+                                                                padding: "8px",
+                                                                boxSizing: "border-box",
+                                                                border: "1px solid #ccc",
+                                                                borderRadius: "4px",
+                                                            }}
+                                                        />
+                                                    </Box>
+                                                    {/* Render Group Options */}
+                                                    <List>
+                                                        {filteredGroups.length > 0 ? (
+                                                            filteredGroups.map((group, index) => (
+                                                                <ListItem
+                                                                    key={index}
+                                                                    button
+                                                                    onClick={() => {
+                                                                        handleChange({ target: { name: "affiliateGroup", value: group.groupName } });
+                                                                        handleCloseDropdown();
+                                                                    }}
+                                                                >
+                                                                    <Box display="flex" alignItems="center" gap={2} width="100%">
+                                                                        <Box>
+                                                                            <Typography variant="body1" sx={{ fontWeight: "bold" }}>
+                                                                                {group.groupName}
+                                                                            </Typography>
+                                                                            <Typography variant="caption" sx={{ color: "#64748b" }}>
+                                                                                #{group.adminId}
+                                                                            </Typography>
+                                                                        </Box>
+                                                                    </Box>
+                                                                </ListItem>
+                                                            ))
+                                                        ) : (
+                                                            <ListItem>
+                                                                <Typography variant="body2" sx={{ color: "#999" }}>
+                                                                    No groups found
+                                                                </Typography>
+                                                            </ListItem>
+                                                        )}
+                                                    </List>
+                                                </Paper>
+                                            </ClickAwayListener>
+                                        </Popper>
+                                    </Box>
                                 </Grid>
 
                                 {/* Affiliate Website */}

@@ -14,6 +14,7 @@ import {
   Collapse,
   styled,
   CircularProgress,
+  TextField,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
@@ -36,7 +37,6 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 function Row({ row, openDrawer }) {
   const [open, setOpen] = useState(false);
 
-  // Add safety checks for accessing nested properties
   const affiliateGroup = row[1]?.affiliate?.[0]?.affiliateGroup || "Unknown Group";
   const affiliateWebsite = row[1]?.affiliate?.[0]?.affiliateWebsite || "Unknown Website";
   const associateType = row[1]?.affiliate?.[0]?.associateType || "Unknown Type";
@@ -156,30 +156,46 @@ function Row({ row, openDrawer }) {
   );
 }
 
-export default function Dashboard({openDrawer}) {
+export default function Dashboard({ openDrawer }) {
   const [showForm, setShowForm] = useState(false);
   const [affiliates, setAffiliates] = useState(null);
+  const [filteredAffiliates, setFilteredAffiliates] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchAfiliates = async () => {
+    const fetchAffiliates = async () => {
       try {
         const response = await ledger.call("getAllDetails");
         console.log("Affiliate Response:", response);
         if (response.length > 0) {
           setAffiliates(response);
+          setFilteredAffiliates(response);
         } else {
           setAffiliates([]);
+          setFilteredAffiliates([]);
         }
       } catch (e) {
         console.log("Error Fetching Affiliates:", e);
         setAffiliates([]);
+        setFilteredAffiliates([]);
       } finally {
         setLoading(false);
       }
     };
-    fetchAfiliates();
+    fetchAffiliates();
   }, [showForm]);
+
+  const handleSearch = (e) => {
+    const value = e.target.value.toLowerCase();
+    setSearchQuery(value);
+    setFilteredAffiliates(
+      affiliates.filter((affiliate) =>
+        affiliate[1]?.affiliate?.[0]?.affiliateGroup?.toLowerCase().includes(value) ||
+        affiliate[1]?.affiliate?.[0]?.affiliateWebsite?.toLowerCase().includes(value)
+      )
+    );
+  };
 
   return (
     <Box mt={4} sx={{ width: '100%', bgcolor: 'background.paper', borderRadius: 2, overflow: 'hidden', boxShadow: '0 0 10px rgba(0,0,0,0.1)' }}>
@@ -230,11 +246,21 @@ export default function Dashboard({openDrawer}) {
             </Button>
           </Box>
 
+          <Box sx={{ p: 3 }}>
+            <TextField
+              label="Search Affiliates"
+              variant="outlined"
+              fullWidth
+              value={searchQuery}
+              onChange={handleSearch}
+            />
+          </Box>
+
           {loading ? (
             <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>
               <CircularProgress />
             </Box>
-          ) : affiliates && affiliates.length > 0 ? (
+          ) : filteredAffiliates && filteredAffiliates.length > 0 ? (
             <TableContainer component={Paper}>
               <Table>
                 <TableHead>
@@ -248,7 +274,7 @@ export default function Dashboard({openDrawer}) {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {affiliates.map((affiliate, index) => (
+                  {filteredAffiliates.map((affiliate, index) => (
                     <Row key={`affiliate-${index}`} row={affiliate} openDrawer={openDrawer} />
                   ))}
                 </TableBody>
