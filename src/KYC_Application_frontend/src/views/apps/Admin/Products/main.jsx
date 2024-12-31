@@ -9,7 +9,8 @@ import ic from "ic0";
 const ledger = ic("speiw-5iaaa-aaaap-ahora-cai");
 
 function Products() {
-    const [drawer, setDrawer] = useState(false);
+    const [drawer, setDrawer] = useState(false); 
+        const [renderAgain, setRenderAgain] = useState(false);
     const [products, setProducts] = useState([]);
     const [selectedProduct, setSelectedProduct] = useState(null);
 
@@ -24,13 +25,16 @@ function Products() {
             }
         };
         fetchProducts();
-    }, []);
+    }, [renderAgain]);
 
     const toggleDrawer = (product) => {
         setSelectedProduct(product);
         setDrawer((prev) => !prev);
     };
-
+    
+    const handleFormSubmit = () => {
+        setRenderAgain((prev) => !prev); // Trigger useEffect
+    };
     return (
         <>
             <PageContainer title="Admin Dashboard" description="this is Admin Dashboard page">
@@ -42,11 +46,12 @@ function Products() {
                         <AdminTabs />
                     </Grid>
                     <Grid item xs={12}>
-                        <Dashboard openDrawer={toggleDrawer} products={products} />
+                        <Dashboard openDrawer={toggleDrawer} products={products}  renderAgain={renderAgain}
+                            onFormSubmit={handleFormSubmit} />
                     </Grid>
                 </Grid>
             </PageContainer>
-            <Sidebar openDrawer={toggleDrawer} drawer={drawer} product={selectedProduct}/>
+            <Sidebar openDrawer={toggleDrawer} drawer={drawer} product={selectedProduct} onFormSubmit={handleFormSubmit} />
         </>
     );
 }

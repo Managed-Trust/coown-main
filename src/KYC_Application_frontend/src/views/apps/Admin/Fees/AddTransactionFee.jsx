@@ -43,7 +43,7 @@ const initialState = {
         thirdPartyIdentifier: "", // Text, initialized to an empty string
     },
 };
-const AddTransactionFee = () => {
+const AddTransactionFee = ({onFormShow,onFormSubmit}) => {
     const [activeStep, setActiveStep] = useState(0);
     const [formData, setFormData] = useState(initialState);
     const [loading, setLoading] = useState(false);
@@ -191,9 +191,12 @@ const AddTransactionFee = () => {
                 if (response && response2) {
                     console.log('Function call response:', response2);
                     swal('Transaction Rule Created', '', 'success');
+                    onFormShow(false);
+                    onFormSubmit();
                 } else {
                     swal('Error', 'Error creating transaction rule', 'error');
                 }
+
             } catch (e) {
                 console.log('Error submiting  form', e);
             }

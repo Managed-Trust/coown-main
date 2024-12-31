@@ -26,7 +26,7 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
 }));
 
-export default function Dashboard({ openDrawer, products }) {
+export default function Dashboard({ openDrawer, products,renderAgain, onFormSubmit }) {
   const [showForm, setShowForm] = useState(false);
   return (
 
@@ -57,7 +57,7 @@ export default function Dashboard({ openDrawer, products }) {
                   Back
                 </Button>
               </Box>
-              <AddProduct onFormShow={setShowForm} />
+              <AddProduct onFormShow={setShowForm} onFormSubmit={onFormSubmit} />
             </Box>
           </Box>
         </> :

@@ -1,4 +1,4 @@
-import React, {useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Grid } from '@mui/material';
 import PageContainer from '../../../../components/container/PageContainer';
 import Banner from './Banner';
@@ -11,6 +11,7 @@ const ledger = ic("speiw-5iaaa-aaaap-ahora-cai");
 
 function Fees() {
     const [drawer, setDrawer] = useState(false);
+    const [renderAgain, setRenderAgain] = useState(false);
     const [transactionRules, setTransactionRule] = useState([]);
     const [selectedTransaction, setSelectedTransaction] = useState(null);
 
@@ -25,12 +26,16 @@ function Fees() {
             }
         };
         fetchTransactionRule();
-    }, []);
+    }, [renderAgain]);
     const toggleDrawer = (transaction) => {
         console.log('Transaction:', transaction);
         setSelectedTransaction(transaction);
-        
+
         setDrawer((prev) => !prev);
+    };
+
+    const handleFormSubmit = () => {
+        setRenderAgain((prev) => !prev); // Trigger useEffect
     };
 
     return (
@@ -47,7 +52,12 @@ function Fees() {
                         <InfoCard />
                     </Grid>
                     <Grid item xs={12}>
-                    <Dashboard openDrawer={toggleDrawer} transactionRules={transactionRules} />
+                        <Dashboard
+                            openDrawer={toggleDrawer}
+                            transactionRules={transactionRules}
+                            renderAgain={renderAgain}
+                            onFormSubmit={handleFormSubmit}
+                        />
                     </Grid>
                 </Grid>
             </PageContainer>

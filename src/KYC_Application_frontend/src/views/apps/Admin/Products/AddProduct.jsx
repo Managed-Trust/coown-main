@@ -21,7 +21,7 @@ const initialState = {
     salesChannel: "", // Text (string)
 };
 
-const AddProduct = () => {
+const AddProduct = ({onFormShow,onFormSubmit}) => {
     const [formData, setFormData] = useState(initialState);
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState({});
@@ -57,6 +57,8 @@ const AddProduct = () => {
                 console.log('Product Added:', response);
                 swal("Success", "Product added successfully", "success");
                 setFormData(initialState); // Reset form
+                onFormShow(false);
+                onFormSubmit();
             } else {
                 swal("Error", "Product not added", "error");
             }

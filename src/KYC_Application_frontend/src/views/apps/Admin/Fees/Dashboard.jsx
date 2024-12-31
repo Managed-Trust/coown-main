@@ -31,16 +31,34 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
 }));
 
-export default function Dashboard({ openDrawer,transactionRules }) {
+export default function Dashboard({ openDrawer, transactionRules, renderAgain, onFormSubmit }) {
   const [showForm, setShowForm] = useState(false);
 
   const deleteTransactionRule = async (id) => {
     try {
       const response = await ledger.call('deleteTransactionRule', id);
       console.log('Transaction Rule Deleted:', response);
-
+      if (response) {
+        swal({
+          title: 'Deleted',
+          text: 'Transaction Rule Deleted Successfully',
+          icon: 'success'
+        });
+        onFormSubmit();
+      } else {
+        swal({
+          title: 'Warning',
+          text: 'Something went wrong',
+          icon: 'warning'
+        });
+      }
     } catch (e) {
       console.log('Error deleting Transaction Rule:', e);
+      swal({
+        title: 'Error',
+        text: 'Something went wrong',
+        icon: 'error'
+      });
     }
   }
   return (
@@ -69,7 +87,7 @@ export default function Dashboard({ openDrawer,transactionRules }) {
               Back
             </Button>
           </Box>
-          <AddTransactionFee onFormShow={setShowForm} />
+          <AddTransactionFee onFormShow={setShowForm} onFormSubmit={onFormSubmit} />
         </Box>
       ) : (
         <>
@@ -128,15 +146,12 @@ export default function Dashboard({ openDrawer,transactionRules }) {
                     </TableCell>
                     <TableCell sx={{ color: '#1e293b' }}>{row.operatorAcceptance[0]}</TableCell>
                     <TableCell align="center">
-                      <IconButton size="small" sx={{ color: '#94a3b8', '&:hover': { color: '#6366f1' } }}>
-                        <EditIcon fontSize="small" />
-                      </IconButton>
-                      <IconButton 
-                      onClick={() => deleteTransactionRule(row.id)} 
-                      size="small" sx={{ color: '#94a3b8', '&:hover': { color: '#6366f1' } }}>
+                      <IconButton
+                        onClick={() => deleteTransactionRule(row.id)}
+                        size="small" sx={{ color: '#94a3b8', '&:hover': { color: '#6366f1' } }}>
                         <DeleteIcon fontSize="small" />
                       </IconButton>
-                      <IconButton size="small" sx={{ color: '#94a3b8', '&:hover': { color: '#6366f1' } }}  onClick={() => openDrawer(row)}>
+                      <IconButton size="small" sx={{ color: '#94a3b8', '&:hover': { color: '#6366f1' } }} onClick={() => openDrawer(row)}>
                         <ArrowForwardIcon fontSize="small" />
                       </IconButton>
                     </TableCell>

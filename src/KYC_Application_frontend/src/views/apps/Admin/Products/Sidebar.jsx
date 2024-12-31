@@ -56,7 +56,7 @@ const TabPanel = ({ children, value, index }) => {
   );
 };
 
-const Sidebar = ({ openDrawer, drawer, product }) => {
+const Sidebar = ({ openDrawer, drawer, product,onFormSubmit }) => {
   const [tabIndex, setTabIndex] = useState(0);
   const [formData, setFormData] = useState(initialState);
   const [loading, setLoading] = useState(false);
@@ -188,7 +188,8 @@ const Sidebar = ({ openDrawer, drawer, product }) => {
         formData.allowVoucherPayments, formData.issueDate, formData.annualRenewalFee
       )
       if (response) {
-        swal('Successfully', 'Payment Update Successfully', 'success')
+        swal('Successfully', 'Payment Update Successfully', 'success');
+        onFormSubmit();
       } else {
         swal({
           title: 'Error',
@@ -206,7 +207,8 @@ const Sidebar = ({ openDrawer, drawer, product }) => {
     try {
       const response = await ledger.call('configureProfitSplit', product.id, formData.foundationPart, formData.operatorPart, formData.stakingPart, formData.thirdPartyPart, formData.thirdPartyIdentifier);
       if (response) {
-        swal('Successfully', 'Profit Split Update Successfully', 'success')
+        swal('Successfully', 'Profit Split Update Successfully', 'success');
+        onFormSubmit();
       } else {
         swal({
           title: 'Error',
@@ -225,7 +227,8 @@ const Sidebar = ({ openDrawer, drawer, product }) => {
     try {
       const response = await ledger.call('configureTerms', product.id, formData.applyGeneralTerms, formData.termsLink);
       if (response) {
-        swal('Successfully', 'Profit Split Update Successfully', 'success')
+        swal('Successfully', 'Terms Update Successfully', 'success');
+        onFormSubmit();
       } else {
         swal({
           title: 'Error',
@@ -244,7 +247,8 @@ const Sidebar = ({ openDrawer, drawer, product }) => {
     try {
       const response = await ledger.call('configureLocalization', product.id, formData.countries);
       if (response) {
-        swal('Successfully', 'Profit Split Update Successfully', 'success')
+        swal('Successfully', 'Localization Update Successfully', 'success');
+        onFormSubmit();
       } else {
         swal({
           title: 'Error',
@@ -253,7 +257,7 @@ const Sidebar = ({ openDrawer, drawer, product }) => {
         });
       }
     } catch (e) {
-      console.log('Error saving profit split products:', e);
+      console.log('Error saving localization:', e);
     }
     setLoading(false);
   }
