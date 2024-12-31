@@ -61,7 +61,7 @@ const Footer = () => {
             </Link>
 
             <Link href="https://coown.notion.site/a8174463fc134e88b36bfaa85bb5dcba?v=ddcece06d04b43b191bee5f9067c0634" target="_blank" color="textSecondary" underline="none" mb={1} display="block">
-              Brank Kit
+              Brand Kit
             </Link>
             <Link href="https://coown.notion.site/Data-Privacy-Policy-9b0e10d106ee4925b53b498e9910b840" target="_blank" color="textSecondary" underline="none" mb={1} display="block">
               Data Privacy Policy
