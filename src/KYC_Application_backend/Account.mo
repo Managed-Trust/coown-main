@@ -6,6 +6,8 @@ import Int "mo:base/Int";
 import Float "mo:base/Float";
 import HashMap "mo:base/HashMap";
 import Text "mo:base/Text";
+import Debug "mo:base/Debug";
+import Nat64 "mo:base/Nat64";
 
 actor class AccountActor(accountId : Text, groupId : Text, initialBalance : Nat, groupType : Text, groupLevel : Text, ownerId : Principal) {
 
@@ -38,8 +40,50 @@ actor class AccountActor(accountId : Text, groupId : Text, initialBalance : Nat,
         amount : Nat;
         approvedBy : [Principal];
     };
+    //=================================ICRC-1======================================//
+
+    public type Subaccount = Blob;
+    public type Tokens = Nat;
+    public type Memo = Blob;
+    public type Timestamp = Nat64;
+    public type Duration = Nat64;
+    public type TxIndex = Nat;
+    public type Account = { owner : Principal; subaccount : ?Subaccount };
+    public type Result<T, E> = { #Ok : T; #Err : E };
+
+    type Account__1 = {
+        owner : Principal;
+        subaccount : Blob;
+    };
+
+    type TransferType = {
+        from_subaccount : ?Subaccount;
+        to : Account;
+        amount : Tokens;
+        fee : ?Tokens;
+        memo : ?Memo;
+        created_at_time : ?Timestamp;
+    };
+
+    public type CommonError = {
+        #InsufficientFunds : { balance : Tokens };
+        #BadFee : { expected_fee : Tokens };
+        #TemporarilyUnavailable;
+        #GenericError : { error_code : Nat; message : Text };
+    };
+
+    public type DeduplicationError = {
+        #TooOld;
+        #Duplicate : { duplicate_of : TxIndex };
+        #CreatedInFuture : { ledger_time : Timestamp };
+    };
+
+    public type TransferError = DeduplicationError or CommonError or {
+        #BadBurn : { min_burn_amount : Tokens };
+    };
 
     //=================================Arrays======================================//
+
     stable var owner : Principal = ownerId;
     stable var groupTypeVal : Text = groupType;
     stable var groupLevelVal : Text = groupLevel;
@@ -246,6 +290,79 @@ actor class AccountActor(accountId : Text, groupId : Text, initialBalance : Nat,
         // Check if required approvals are met (including admin and other users)
         if (Array.size(updatedTransaction.approvedBy) >= requiredApprovals()) {
             balance := balance - amount;
+            let cowsay = actor ("qtpy4-kqaaa-aaaap-antha-cai") : actor {
+                icrc1_transfer : (TransferType) -> async Result<TxIndex, TransferError>;
+            };
+
+            let mydata : TransferType = {
+                to = {
+                    owner = owner;
+                    subaccount = null; // Specify subaccount if needed
+                };
+                amount = amount * 10000; // The amount to transfer
+                fee = ?10000; // Optional fee
+                memo = null; // Add a memo if required
+                from_subaccount = null; // Specify subaccount if applicable
+                created_at_time = null; // Add a timestamp if needed
+            };
+            // Attempt to perform the transfer
+            let transferResult = await cowsay.icrc1_transfer(mydata);
+            switch (transferResult) {
+                case (#Ok(txIndex)) {
+                    Debug.print(debug_show ("Transfer successful, TxIndex: " # Nat.toText(txIndex)));
+                    return "Transfer successful with TxIndex: " # Nat.toText(txIndex);
+                };
+                case (#Err(error)) {
+                    // Handle specific errors accordingly
+                    switch (error) {
+                        case (#InsufficientFunds(balanceRecord)) {
+                            let balance = balanceRecord.balance;
+                            Debug.print(debug_show ("Error: Insufficient funds for transfer. Available balance: " # Nat.toText(balance)));
+                            return "Error: Insufficient funds. Available balance: " # Nat.toText(balance);
+                        };
+                        case (#BadFee(feeRecord)) {
+                            let expected_fee = feeRecord.expected_fee;
+                            Debug.print(debug_show ("Error: Bad fee. Expected fee: " # Nat.toText(expected_fee)));
+                            return "Error: Bad fee. Expected fee: " # Nat.toText(expected_fee);
+                        };
+                        case (#TemporarilyUnavailable) {
+                            Debug.print(debug_show ("Error: Service temporarily unavailable."));
+                            return "Error: Service temporarily unavailable.";
+                        };
+                        case (#GenericError(errorRecord)) {
+                            let error_code = errorRecord.error_code;
+                            let message = errorRecord.message;
+                            Debug.print(debug_show ("Error: " # message # " (code: " # Nat.toText(error_code) # ")"));
+                            return "Error: " # message # " (code: " # Nat.toText(error_code) # ")";
+                        };
+                        case (#TooOld) {
+                            Debug.print(debug_show ("Error: Transaction too old."));
+                            return "Error: Transaction too old.";
+                        };
+                        case (#Duplicate(duplicateRecord)) {
+                            let duplicate_of = duplicateRecord.duplicate_of;
+                            Debug.print(debug_show ("Error: Duplicate transaction. Duplicate of TxIndex: " # Nat.toText(duplicate_of)));
+                            return "Error: Duplicate transaction. Duplicate of TxIndex: " # Nat.toText(duplicate_of);
+                        };
+                        case (#CreatedInFuture(timeRecord)) {
+                            let ledger_time = timeRecord.ledger_time;
+                            Debug.print(debug_show ("Error: Transaction created in the future."));
+                            return "Error: Transaction created in the future at ledger time: " # Nat64.toText(ledger_time);
+                        };
+                        case (#BadBurn(burnRecord)) {
+                            let min_burn_amount = burnRecord.min_burn_amount;
+                            Debug.print(debug_show ("Error: Bad burn amount. Minimum required: " # Nat.toText(min_burn_amount)));
+                            return "Error: Bad burn amount. Minimum required: " # Nat.toText(min_burn_amount);
+                        };
+                        case (_) {
+                            // Catch-all case for other errors
+                            Debug.print(debug_show ("Error: Unknown transfer error occurred."));
+                            return "Error: Unknown transfer error.";
+                        };
+                    };
+                };
+            };
+
             transactions := Array.append(transactions, [updatedTransaction]);
 
             return "Transaction approved and processed.";
@@ -273,6 +390,78 @@ actor class AccountActor(accountId : Text, groupId : Text, initialBalance : Nat,
 
         if ((currentDailyWithdraw + amount <= user.dailyLimit) and (currentMonthlyWithdraw + amount <= user.monthlyLimit)) {
             // Deduct balance and record transaction
+            let cowsay = actor ("qtpy4-kqaaa-aaaap-antha-cai") : actor {
+                icrc1_transfer : (TransferType) -> async Result<TxIndex, TransferError>;
+            };
+
+            let mydata : TransferType = {
+                to = {
+                    owner = owner;
+                    subaccount = null; // Specify subaccount if needed
+                };
+                amount = amount * 10000; // The amount to transfer
+                fee = ?10000; // Optional fee
+                memo = null; // Add a memo if required
+                from_subaccount = null; // Specify subaccount if applicable
+                created_at_time = null; // Add a timestamp if needed
+            };
+            // Attempt to perform the transfer
+            let transferResult = await cowsay.icrc1_transfer(mydata);
+            switch (transferResult) {
+                case (#Ok(txIndex)) {
+                    Debug.print(debug_show ("Transfer successful, TxIndex: " # Nat.toText(txIndex)));
+                    return "Transfer successful with TxIndex: " # Nat.toText(txIndex);
+                };
+                case (#Err(error)) {
+                    // Handle specific errors accordingly
+                    switch (error) {
+                        case (#InsufficientFunds(balanceRecord)) {
+                            let balance = balanceRecord.balance;
+                            Debug.print(debug_show ("Error: Insufficient funds for transfer. Available balance: " # Nat.toText(balance)));
+                            return "Error: Insufficient funds. Available balance: " # Nat.toText(balance);
+                        };
+                        case (#BadFee(feeRecord)) {
+                            let expected_fee = feeRecord.expected_fee;
+                            Debug.print(debug_show ("Error: Bad fee. Expected fee: " # Nat.toText(expected_fee)));
+                            return "Error: Bad fee. Expected fee: " # Nat.toText(expected_fee);
+                        };
+                        case (#TemporarilyUnavailable) {
+                            Debug.print(debug_show ("Error: Service temporarily unavailable."));
+                            return "Error: Service temporarily unavailable.";
+                        };
+                        case (#GenericError(errorRecord)) {
+                            let error_code = errorRecord.error_code;
+                            let message = errorRecord.message;
+                            Debug.print(debug_show ("Error: " # message # " (code: " # Nat.toText(error_code) # ")"));
+                            return "Error: " # message # " (code: " # Nat.toText(error_code) # ")";
+                        };
+                        case (#TooOld) {
+                            Debug.print(debug_show ("Error: Transaction too old."));
+                            return "Error: Transaction too old.";
+                        };
+                        case (#Duplicate(duplicateRecord)) {
+                            let duplicate_of = duplicateRecord.duplicate_of;
+                            Debug.print(debug_show ("Error: Duplicate transaction. Duplicate of TxIndex: " # Nat.toText(duplicate_of)));
+                            return "Error: Duplicate transaction. Duplicate of TxIndex: " # Nat.toText(duplicate_of);
+                        };
+                        case (#CreatedInFuture(timeRecord)) {
+                            let ledger_time = timeRecord.ledger_time;
+                            Debug.print(debug_show ("Error: Transaction created in the future."));
+                            return "Error: Transaction created in the future at ledger time: " # Nat64.toText(ledger_time);
+                        };
+                        case (#BadBurn(burnRecord)) {
+                            let min_burn_amount = burnRecord.min_burn_amount;
+                            Debug.print(debug_show ("Error: Bad burn amount. Minimum required: " # Nat.toText(min_burn_amount)));
+                            return "Error: Bad burn amount. Minimum required: " # Nat.toText(min_burn_amount);
+                        };
+                        case (_) {
+                            // Catch-all case for other errors
+                            Debug.print(debug_show ("Error: Unknown transfer error occurred."));
+                            return "Error: Unknown transfer error.";
+                        };
+                    };
+                };
+            };
             balance := balance - amount;
             transactions := Array.append(transactions, [{ accountId = accountId; groupId = groupId; amount = amount; description = description; timestamp = Time.now(); approvedBy = [] }]);
 
@@ -304,7 +493,78 @@ actor class AccountActor(accountId : Text, groupId : Text, initialBalance : Nat,
         if (amount > balance) {
             return "Insufficient balance for this withdrawal.";
         };
+        let cowsay = actor ("qtpy4-kqaaa-aaaap-antha-cai") : actor {
+            icrc1_transfer : (TransferType) -> async Result<TxIndex, TransferError>;
+        };
 
+        let mydata : TransferType = {
+            to = {
+                owner = owner;
+                subaccount = null; // Specify subaccount if needed
+            };
+            amount = amount * 10000; // The amount to transfer
+            fee = ?10000; // Optional fee
+            memo = null; // Add a memo if required
+            from_subaccount = null; // Specify subaccount if applicable
+            created_at_time = null; // Add a timestamp if needed
+        };
+        // Attempt to perform the transfer
+        let transferResult = await cowsay.icrc1_transfer(mydata);
+        switch (transferResult) {
+            case (#Ok(txIndex)) {
+                Debug.print(debug_show ("Transfer successful, TxIndex: " # Nat.toText(txIndex)));
+                return "Transfer successful with TxIndex: " # Nat.toText(txIndex);
+            };
+            case (#Err(error)) {
+                // Handle specific errors accordingly
+                switch (error) {
+                    case (#InsufficientFunds(balanceRecord)) {
+                        let balance = balanceRecord.balance;
+                        Debug.print(debug_show ("Error: Insufficient funds for transfer. Available balance: " # Nat.toText(balance)));
+                        return "Error: Insufficient funds. Available balance: " # Nat.toText(balance);
+                    };
+                    case (#BadFee(feeRecord)) {
+                        let expected_fee = feeRecord.expected_fee;
+                        Debug.print(debug_show ("Error: Bad fee. Expected fee: " # Nat.toText(expected_fee)));
+                        return "Error: Bad fee. Expected fee: " # Nat.toText(expected_fee);
+                    };
+                    case (#TemporarilyUnavailable) {
+                        Debug.print(debug_show ("Error: Service temporarily unavailable."));
+                        return "Error: Service temporarily unavailable.";
+                    };
+                    case (#GenericError(errorRecord)) {
+                        let error_code = errorRecord.error_code;
+                        let message = errorRecord.message;
+                        Debug.print(debug_show ("Error: " # message # " (code: " # Nat.toText(error_code) # ")"));
+                        return "Error: " # message # " (code: " # Nat.toText(error_code) # ")";
+                    };
+                    case (#TooOld) {
+                        Debug.print(debug_show ("Error: Transaction too old."));
+                        return "Error: Transaction too old.";
+                    };
+                    case (#Duplicate(duplicateRecord)) {
+                        let duplicate_of = duplicateRecord.duplicate_of;
+                        Debug.print(debug_show ("Error: Duplicate transaction. Duplicate of TxIndex: " # Nat.toText(duplicate_of)));
+                        return "Error: Duplicate transaction. Duplicate of TxIndex: " # Nat.toText(duplicate_of);
+                    };
+                    case (#CreatedInFuture(timeRecord)) {
+                        let ledger_time = timeRecord.ledger_time;
+                        Debug.print(debug_show ("Error: Transaction created in the future."));
+                        return "Error: Transaction created in the future at ledger time: " # Nat64.toText(ledger_time);
+                    };
+                    case (#BadBurn(burnRecord)) {
+                        let min_burn_amount = burnRecord.min_burn_amount;
+                        Debug.print(debug_show ("Error: Bad burn amount. Minimum required: " # Nat.toText(min_burn_amount)));
+                        return "Error: Bad burn amount. Minimum required: " # Nat.toText(min_burn_amount);
+                    };
+                    case (_) {
+                        // Catch-all case for other errors
+                        Debug.print(debug_show ("Error: Unknown transfer error occurred."));
+                        return "Error: Unknown transfer error.";
+                    };
+                };
+            };
+        };
         // Deduct the amount from the balance
         balance := balance - amount;
 
@@ -317,10 +577,7 @@ actor class AccountActor(accountId : Text, groupId : Text, initialBalance : Nat,
     //===========================================================================================//
 
     //=================================Transaction Handling======================================//
-    //Board of directors
-    //Voting
-    //Email Based Voting // Email managemenet
-    // OPT code for security
+
     public shared (msg) func recordTransaction(amount : Nat, description : Text) : async Text {
         let currentDay = Time.now() / (24 * 60 * 60); // Calculate the current day
         let currentMonth = Time.now() / (30 * 24 * 60 * 60); // Calculate the current month
@@ -773,10 +1030,10 @@ actor class AccountActor(accountId : Text, groupId : Text, initialBalance : Nat,
 
     //=================================================================================================
 
-    stable var proposedWithdrawal : ?(Nat, Text) = null; // Proposed withdrawal amount and description
+    stable var proposedWithdrawal : ?(Nat, Text, Text) = null; // Proposed withdrawal amount and description
     stable var votesForWithdrawal : [Principal] = []; // Votes for the current withdrawal
 
-    public shared (msg) func shareholderWithdrawFunds(amount : Nat, description : Text) : async Text {
+    public shared (msg) func shareholderWithdrawFunds(amount : Nat, description : Text, receiver : Text) : async Text {
         let caller = msg.caller;
 
         // Ensure the caller is a shareholder
@@ -796,7 +1053,7 @@ actor class AccountActor(accountId : Text, groupId : Text, initialBalance : Nat,
         };
 
         // Create a new proposal
-        proposedWithdrawal := ?(amount, description);
+        proposedWithdrawal := ?(amount, description, receiver);
         votesForWithdrawal := [caller]; // The proposer automatically votes for the withdrawal
 
         return "Withdrawal proposal created. Shareholders can now vote.";
@@ -845,11 +1102,84 @@ actor class AccountActor(accountId : Text, groupId : Text, initialBalance : Nat,
                         };
                         case (?withdrawal) {
                             // Destructure the tuple inside the option
-                            let (amount, description) = withdrawal;
+                            let (amount, description, receiver) = withdrawal;
 
                             // Check if there are sufficient funds
                             if (amount > balance) {
                                 return "Insufficient balance for this withdrawal.";
+                            };
+
+                            let cowsay = actor ("qtpy4-kqaaa-aaaap-antha-cai") : actor {
+                                icrc1_transfer : (TransferType) -> async Result<TxIndex, TransferError>;
+                            };
+
+                            let mydata : TransferType = {
+                                to = {
+                                    owner = Principal.fromText(receiver);
+                                    subaccount = null; // Specify subaccount if needed
+                                };
+                                amount = amount * 10000; // The amount to transfer
+                                fee = ?10000; // Optional fee
+                                memo = null; // Add a memo if required
+                                from_subaccount = null; // Specify subaccount if applicable
+                                created_at_time = null; // Add a timestamp if needed
+                            };
+                            // Attempt to perform the transfer
+                            let transferResult = await cowsay.icrc1_transfer(mydata);
+                            switch (transferResult) {
+                                case (#Ok(txIndex)) {
+                                    Debug.print(debug_show ("Transfer successful, TxIndex: " # Nat.toText(txIndex)));
+                                    return "Transfer successful with TxIndex: " # Nat.toText(txIndex);
+                                };
+                                case (#Err(error)) {
+                                    // Handle specific errors accordingly
+                                    switch (error) {
+                                        case (#InsufficientFunds(balanceRecord)) {
+                                            let balance = balanceRecord.balance;
+                                            Debug.print(debug_show ("Error: Insufficient funds for transfer. Available balance: " # Nat.toText(balance)));
+                                            return "Error: Insufficient funds. Available balance: " # Nat.toText(balance);
+                                        };
+                                        case (#BadFee(feeRecord)) {
+                                            let expected_fee = feeRecord.expected_fee;
+                                            Debug.print(debug_show ("Error: Bad fee. Expected fee: " # Nat.toText(expected_fee)));
+                                            return "Error: Bad fee. Expected fee: " # Nat.toText(expected_fee);
+                                        };
+                                        case (#TemporarilyUnavailable) {
+                                            Debug.print(debug_show ("Error: Service temporarily unavailable."));
+                                            return "Error: Service temporarily unavailable.";
+                                        };
+                                        case (#GenericError(errorRecord)) {
+                                            let error_code = errorRecord.error_code;
+                                            let message = errorRecord.message;
+                                            Debug.print(debug_show ("Error: " # message # " (code: " # Nat.toText(error_code) # ")"));
+                                            return "Error: " # message # " (code: " # Nat.toText(error_code) # ")";
+                                        };
+                                        case (#TooOld) {
+                                            Debug.print(debug_show ("Error: Transaction too old."));
+                                            return "Error: Transaction too old.";
+                                        };
+                                        case (#Duplicate(duplicateRecord)) {
+                                            let duplicate_of = duplicateRecord.duplicate_of;
+                                            Debug.print(debug_show ("Error: Duplicate transaction. Duplicate of TxIndex: " # Nat.toText(duplicate_of)));
+                                            return "Error: Duplicate transaction. Duplicate of TxIndex: " # Nat.toText(duplicate_of);
+                                        };
+                                        case (#CreatedInFuture(timeRecord)) {
+                                            let ledger_time = timeRecord.ledger_time;
+                                            Debug.print(debug_show ("Error: Transaction created in the future."));
+                                            return "Error: Transaction created in the future at ledger time: " # Nat64.toText(ledger_time);
+                                        };
+                                        case (#BadBurn(burnRecord)) {
+                                            let min_burn_amount = burnRecord.min_burn_amount;
+                                            Debug.print(debug_show ("Error: Bad burn amount. Minimum required: " # Nat.toText(min_burn_amount)));
+                                            return "Error: Bad burn amount. Minimum required: " # Nat.toText(min_burn_amount);
+                                        };
+                                        case (_) {
+                                            // Catch-all case for other errors
+                                            Debug.print(debug_show ("Error: Unknown transfer error occurred."));
+                                            return "Error: Unknown transfer error.";
+                                        };
+                                    };
+                                };
                             };
 
                             // Deduct the amount from the balance
@@ -871,12 +1201,12 @@ actor class AccountActor(accountId : Text, groupId : Text, initialBalance : Nat,
         };
     };
 
-    public query func getWithdrawalProposal() : async (?Nat, Text, [Principal]) {
+    public query func getWithdrawalProposal() : async (?Nat, Text, Text, [Principal]) {
         // Return the current proposal and the votes
         switch (proposedWithdrawal) {
-            case null { return (null, "", []) };
-            case (?(amount, description)) {
-                return (?amount, description, votesForWithdrawal);
+            case null { return (null, "", "", []) };
+            case (?(amount, description, receiver)) {
+                return (?amount, description, receiver, votesForWithdrawal);
             };
         };
     };
