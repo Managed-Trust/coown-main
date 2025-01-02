@@ -167,7 +167,7 @@ actor class AccountActor(accountId : Text, groupId : Text, initialBalance : Nat,
             "User not found.";
         };
     };
-    
+
     //=================================Admin Functions======================================//
 
     private func isAdmin(caller : Principal) : async Bool {
@@ -285,6 +285,36 @@ actor class AccountActor(accountId : Text, groupId : Text, initialBalance : Nat,
             return "Exceeded withdrawal limits. Requires approval.";
         };
     };
+
+    //=========================================================================================
+
+    public shared (msg) func adminWithdrawFunds(amount : Nat, description : Text) : async Text {
+        if (not isAdminOnlyMode) {
+            return "Admin-Only Mode is not active. Use the normal withdrawal process.";
+        };
+
+        let caller = msg.caller;
+
+        // Ensure the caller is an admin
+        if (not (await isAdmin(caller))) {
+            return "Only admins can perform this action in Admin-Only Mode.";
+        };
+
+        // Check if there are sufficient funds
+        if (amount > balance) {
+            return "Insufficient balance for this withdrawal.";
+        };
+
+        // Deduct the amount from the balance
+        balance := balance - amount;
+
+        // Record the transaction
+        transactions := Array.append(transactions, [{ accountId = accountId; groupId = groupId; amount = amount; description = description; timestamp = Time.now(); approvedBy = [caller] }]);
+
+        return "Withdrawal successful.";
+    };
+
+    //===========================================================================================//
 
     //=================================Transaction Handling======================================//
     //Board of directors
@@ -513,4 +543,342 @@ actor class AccountActor(accountId : Text, groupId : Text, initialBalance : Nat,
 
         return report;
     };
+
+    //==============================================================================//
+
+    type Shareholder = {
+        id : Principal;
+        votes : Nat;
+    };
+
+    stable var shareholders : [Shareholder] = [];
+    stable var requiredVotes : Nat = 0;
+    stable var votesForAdminMode : [Principal] = [];
+
+    public shared (msg) func toggleAdminMode() : async Text {
+        // Check if turning off admin-only mode
+        if (isAdminOnlyMode) {
+            // Only an admin can turn off isAdminOnlyMode
+            if (not (await isAdmin(msg.caller))) {
+                return "Only admins can turn off Admin-Only Mode.";
+            };
+
+            // Turn off admin-only mode
+            isAdminOnlyMode := false;
+            return "Admin-Only Mode has been turned off.";
+        } else {
+            return "Admin mode is Off, only share holders can turn it on";
+        };
+
+        return "Invalid operation.";
+    };
+
+    public shared (msg) func voteForAdminMode() : async Text {
+
+        let caller = msg.caller;
+        if (not isAdminOnlyMode) {
+
+            // Check if the caller is a shareholder
+            let shareholder = Array.find<Shareholder>(
+                shareholders,
+                func(sh : Shareholder) : Bool {
+                    sh.id == caller;
+                },
+            );
+
+            if (shareholder == null) {
+                return "You are not a shareholder.";
+            };
+
+            // Check if the shareholder has already voted
+            if (Array.find(votesForAdminMode, func(voter : Principal) : Bool { voter == caller }) != null) {
+                return "You have already voted.";
+            };
+
+            // Add the shareholder's vote
+
+            votesForAdminMode := Array.append(votesForAdminMode, [caller]);
+
+            // Count the total votes
+            let totalVotes = Array.foldLeft<Principal, Nat>(
+                votesForAdminMode,
+                0,
+                func(acc : Nat, voter : Principal) : Nat {
+                    let voterShare = Array.find<Shareholder>(
+                        shareholders,
+                        func(sh : Shareholder) : Bool {
+                            sh.id == voter;
+                        },
+                    );
+                    switch (voterShare) {
+                        case (null) { acc };
+                        case (?sh) { acc + sh.votes };
+                    };
+                },
+            );
+
+            // Check if the required votes are met
+            if (totalVotes >= requiredVotes) {
+                isAdminOnlyMode := true;
+                votesForAdminMode := []; // Reset votes after approval
+                return "Admin-Only Mode has been turned back on by shareholder approval.";
+            };
+
+            return "Vote recorded. Waiting for more votes.";
+
+        };
+
+        return "Only admin has authroity";
+
+    };
+
+    public shared (msg) func addShareholder(newShareholder : Principal, votes : Nat) : async Text {
+        // Only admin or owner can add shareholders
+        if (not (await isAdmin(msg.caller)) and not (await isOwner(msg.caller))) {
+            return "Only admin or owner can add shareholders.";
+        };
+
+        let existing = Array.find<Shareholder>(
+            shareholders,
+            func(sh : Shareholder) : Bool {
+                sh.id == newShareholder;
+            },
+        );
+
+        if (switch existing { case null { false }; case (?_) { true } }) {
+            return "Shareholder already exists.";
+        };
+
+        // Add the new shareholder
+        shareholders := Array.append(shareholders, [{ id = newShareholder; votes }]);
+        return "Shareholder added successfully.";
+    };
+
+    public shared (msg) func setRequiredVotes(newRequiredVotes : Nat) : async Text {
+        if (not (await isAdmin(msg.caller)) and not (await isOwner(msg.caller))) {
+            return "Only admin or owner can set the required votes.";
+        };
+
+        requiredVotes := newRequiredVotes;
+        return "Required votes for administrative tasks updated successfully.";
+    };
+
+    public query func getShareholders() : async [Shareholder] {
+        return shareholders;
+    };
+
+    public query func getVotesForAdminMode() : async [Principal] {
+        return votesForAdminMode;
+    };
+
+    stable var votesForSettingsUpdate : [Principal] = [];
+    stable var proposedSettings : ?{
+        dailyLimit : Nat;
+        monthlyLimit : Nat;
+        maxWithdrawLimit : Nat;
+        isAdminOnlyMode : Bool;
+    } = null;
+
+    public shared (msg) func proposeSettingsUpdate(
+        newDailyLimit : Nat,
+        newMonthlyLimit : Nat,
+        newMaxWithdrawLimit : Nat,
+        newIsAdminOnlyMode : Bool,
+    ) : async Text {
+        let caller = msg.caller;
+
+        // Ensure the caller is a shareholder
+        let isShareholder = Array.find(shareholders, func(sh : Shareholder) : Bool { sh.id == caller });
+        if (isShareholder == null) {
+            return "Only shareholders can propose settings updates.";
+        };
+
+        // Set the proposed settings
+        proposedSettings := ?{
+            dailyLimit = newDailyLimit;
+            monthlyLimit = newMonthlyLimit;
+            maxWithdrawLimit = newMaxWithdrawLimit;
+            isAdminOnlyMode = newIsAdminOnlyMode;
+        };
+        votesForSettingsUpdate := [caller]; // Reset votes and add the proposer
+
+        return "Settings update proposal created. Shareholders can now vote.";
+    };
+
+    public shared (msg) func voteForSettingsUpdate() : async Text {
+        // Ensure a proposal exists
+        switch (proposedSettings) {
+            case null { return "No settings update proposal exists." };
+            case (?settings) {
+                let caller = msg.caller;
+
+                // Ensure the caller is a shareholder
+                let isShareholder = Array.find(shareholders, func(sh : Shareholder) : Bool { sh.id == caller });
+                if (isShareholder == null) {
+                    return "Only shareholders can vote on this proposal.";
+                };
+
+                // Ensure the caller hasn't already voted
+                if (Array.find(votesForSettingsUpdate, func(voter : Principal) : Bool { voter == caller }) != null) {
+                    return "You have already voted on this proposal.";
+                };
+
+                // Add the caller's vote
+                votesForSettingsUpdate := Array.append(votesForSettingsUpdate, [caller]);
+
+                // Count total votes
+                let totalVotes = Array.foldLeft<Principal, Nat>(
+                    votesForSettingsUpdate,
+                    0,
+                    func(acc : Nat, voter : Principal) : Nat {
+                        let voterShare = Array.find(shareholders, func(sh : Shareholder) : Bool { sh.id == voter });
+                        switch (voterShare) {
+                            case null { acc };
+                            case (?sh) { acc + sh.votes };
+                        };
+                    },
+                );
+
+                // Check if the required votes are met
+                if (totalVotes >= requiredVotes) {
+                    // Apply the settings
+                    dailyLimit := settings.dailyLimit;
+                    monthlyLimit := settings.monthlyLimit;
+                    maxWithdrawLimit := settings.maxWithdrawLimit;
+                    isAdminOnlyMode := settings.isAdminOnlyMode;
+
+                    // Reset proposal and votes
+                    proposedSettings := null;
+                    votesForSettingsUpdate := [];
+
+                    return "Settings updated successfully.";
+                };
+
+                return "Vote recorded. Waiting for more votes.";
+            };
+        };
+    };
+
+    public query func getSettingsProposal() : async (
+        ?{
+            dailyLimit : Nat;
+            monthlyLimit : Nat;
+            maxWithdrawLimit : Nat;
+            isAdminOnlyMode : Bool;
+        },
+        [Principal],
+    ) {
+        return (proposedSettings, votesForSettingsUpdate);
+    };
+
+    //=================================================================================================
+
+    stable var proposedWithdrawal : ?(Nat, Text) = null; // Proposed withdrawal amount and description
+    stable var votesForWithdrawal : [Principal] = []; // Votes for the current withdrawal
+
+    public shared (msg) func shareholderWithdrawFunds(amount : Nat, description : Text) : async Text {
+        let caller = msg.caller;
+
+        // Ensure the caller is a shareholder
+        let shareholder = Array.find(shareholders, func(sh : Shareholder) : Bool { sh.id == caller });
+        if (shareholder == null) {
+            return "Only shareholders can propose or vote on withdrawals.";
+        };
+
+        // Ensure no active withdrawal proposal exists
+        if (proposedWithdrawal != null) {
+            return "An active withdrawal proposal already exists. Please vote on it.";
+        };
+
+        // Ensure sufficient balance
+        if (amount > balance) {
+            return "Insufficient balance for the proposed withdrawal.";
+        };
+
+        // Create a new proposal
+        proposedWithdrawal := ?(amount, description);
+        votesForWithdrawal := [caller]; // The proposer automatically votes for the withdrawal
+
+        return "Withdrawal proposal created. Shareholders can now vote.";
+    };
+
+    public shared (msg) func voteForWithdrawal() : async Text {
+        // Ensure a withdrawal proposal exists
+        switch (proposedWithdrawal) {
+            case null { return "No active withdrawal proposal exists." };
+            case (?withdrawal) {
+                let caller = msg.caller;
+
+                // Ensure the caller is a shareholder
+                let shareholder = Array.find(shareholders, func(sh : Shareholder) : Bool { sh.id == caller });
+                if (shareholder == null) {
+                    return "Only shareholders can vote on withdrawals.";
+                };
+
+                // Ensure the caller hasn't already voted
+                if (Array.find(votesForWithdrawal, func(voter : Principal) : Bool { voter == caller }) != null) {
+                    return "You have already voted for this withdrawal.";
+                };
+
+                // Add the caller's vote
+                votesForWithdrawal := Array.append(votesForWithdrawal, [caller]);
+
+                // Count total votes
+                let totalVotes = Array.foldLeft<Principal, Nat>(
+                    votesForWithdrawal,
+                    0,
+                    func(acc : Nat, voter : Principal) : Nat {
+                        let voterShare = Array.find(shareholders, func(sh : Shareholder) : Bool { sh.id == voter });
+                        switch (voterShare) {
+                            case null { acc };
+                            case (?sh) { acc + sh.votes };
+                        };
+                    },
+                );
+
+                // Check if the required votes are met
+                if (totalVotes >= requiredVotes) {
+                    // Execute the withdrawal
+                    switch (proposedWithdrawal) {
+                        case null {
+                            return "No active withdrawal proposal exists.";
+                        };
+                        case (?withdrawal) {
+                            // Destructure the tuple inside the option
+                            let (amount, description) = withdrawal;
+
+                            // Check if there are sufficient funds
+                            if (amount > balance) {
+                                return "Insufficient balance for this withdrawal.";
+                            };
+
+                            // Deduct the amount from the balance
+                            balance := balance - amount;
+
+                            // Record the transaction
+                            transactions := Array.append(transactions, [{ accountId = accountId; groupId = groupId; amount = amount; description = description; timestamp = Time.now(); approvedBy = votesForWithdrawal }]);
+
+                            // Reset the proposal
+                            proposedWithdrawal := null;
+                            votesForWithdrawal := [];
+                            return "Withdrawal executed successfully.";
+                        };
+                    };
+                };
+
+                return "Vote recorded. Waiting for more votes.";
+            };
+        };
+    };
+
+    public query func getWithdrawalProposal() : async (?Nat, Text, [Principal]) {
+        // Return the current proposal and the votes
+        switch (proposedWithdrawal) {
+            case null { return (null, "", []) };
+            case (?(amount, description)) {
+                return (?amount, description, votesForWithdrawal);
+            };
+        };
+    };
+
 };
