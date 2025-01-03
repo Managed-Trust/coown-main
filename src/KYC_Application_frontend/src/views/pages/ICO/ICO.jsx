@@ -70,7 +70,7 @@ const ICO = () => {
             }}
           >
             <StyledTab label="Token Swap" />
-            <StyledTab label="Social Rewards" disabled /> {/* Disable this tab */}
+            <StyledTab label="Social Rewards" /> {/* Disable this tab */}
             <StyledTab label="NFT" disabled /> {/* Disable this tab */}
             <StyledTab label="About" disabled /> {/* Disable this tab */}
           </Tabs>

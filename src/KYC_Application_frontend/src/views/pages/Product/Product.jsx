@@ -13,7 +13,7 @@ import ShareHolderComponent from '../../../components/product/ShareHolderCompone
 import ShareControlComponent from '../../../components/product/ShareControlComponent/ShareControlComponent';
 import IntegratedCommunication from '../../../components/product/IntegratedCommunication/IntegratedCommunication';
 import DevelopmentPlan from '../../../components/landingpage/DevelopmentPlan/DevelopmentPlan';
-
+import RecentUpdates from '../../../components/product/RecentUpdates/RecentUpdates';
 const Product = () => {
     return (
         <>
@@ -28,6 +28,7 @@ const Product = () => {
                 <ShareControlComponent />
                 <IntegratedCommunication />
                 <DevelopmentPlan/>
+                <RecentUpdates />
                 {/* <Contact /> */}
                 <C2a2 />
                 <Footer />

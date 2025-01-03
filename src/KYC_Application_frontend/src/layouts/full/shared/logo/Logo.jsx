@@ -1,10 +1,10 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-import LogoDark from '../../../../assets/images/logos/logo_full.jpg';
-import LogoDarkRTL from '../../../../assets/images/logos/logo_full.jpg';
-import LogoLight from '../../../../assets/images/logos/dark_full.png';
-import LogoLightRTL from '../../../../assets/images/logos/dark_full.png';
+import LogoDark from '../../../../assets/images/logos/dark-logo.svg';
+import LogoDarkRTL from '../../../../assets/images/logos/dark-rtl-logo.svg';
+import LogoLight from '../../../../assets/images/logos/light-logo.svg';
+import LogoLightRTL from '../../../../assets/images/logos/light-logo-rtl.svg';
 import { styled } from '@mui/material';
 
 const Logo = () => {

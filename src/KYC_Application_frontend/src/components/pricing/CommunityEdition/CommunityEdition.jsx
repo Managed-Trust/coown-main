@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Typography, Grid, List, ListItem, ListItemIcon, ListItemText ,Container} from '@mui/material';
+import { Box, Typography, Grid, List, ListItem, ListItemIcon, ListItemText, Container } from '@mui/material';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { motion } from 'framer-motion';
 import img from '../../../assets/images/landingpage/image94.png';
@@ -24,9 +24,24 @@ const CommunityEdition = () => {
                     <Grid item xs={12} md={4}>
                         <Typography
                             variant="h2"
-                            sx={{ fontWeight: 'bold' }}
-                        >Community edition is available for free
+                            sx={{
+                                fontWeight: 'bold',
+                                display: 'inline-block', // Ensures proper block rendering for the gradient
+                            }}
+                        >
+                            Community edition is available{' '}
+                            <span
+                                style={{
+                                    background: 'linear-gradient(90deg, #F9A6A7 0%, #E382AF 25%, #5D87FF 50%, #62B6FF 100%)',
+                                    WebkitBackgroundClip: 'text',
+                                    WebkitTextFillColor: 'transparent',
+                                    display: 'inline-block', // Keeps inline styling
+                                }}
+                            >
+                                for free
+                            </span>
                         </Typography>
+
                         <List>
                             <ListItem disableGutters>
                                 <ListItemIcon>
@@ -34,7 +49,7 @@ const CommunityEdition = () => {
                                 </ListItemIcon>
                                 <ListItemText primary="No subscription nor sign-up fees" />
                             </ListItem>
-                            <ListItem disableGutters sx={{marginTop:'-10px'}}>
+                            <ListItem disableGutters sx={{ marginTop: '-10px' }}>
                                 <ListItemIcon>
                                     <CheckCircleIcon color="primary" />
                                 </ListItemIcon>

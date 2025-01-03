@@ -86,7 +86,7 @@ export default function RewardsAndAffiliate() {
       </Grid>
       <Grid container spacing={4} sx={{ mt: 4 }}>
         <Grid item xs={12} md={5}>
-          <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold', color: '#1e293b' }}>
+          <Typography variant="h3" gutterBottom sx={{ fontWeight: 'bold', color: '#1e293b' }}>
             Referral Code
           </Typography>
           <Typography variant="body2" paragraph sx={{ color: '#64748b', mb: 2, fontSize: '14px' }}>
@@ -108,7 +108,7 @@ export default function RewardsAndAffiliate() {
             }}
           >
             <CardContent sx={{ p: 3 }}>
-              <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: 'medium' }}>
+              <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold' }}>
                 Create invite code
               </Typography>
               <Typography variant="body2" color="text.secondary" gutterBottom>
