@@ -1,6 +1,6 @@
 import React from 'react';
 import { Grid, Link, Typography, Container, Box } from '@mui/material';
-import img from '../../../assets/images/landingpage/Vector.svg';
+import img from '../../../assets/images/logos/dark-logo.svg';
 import logo from '../../../assets/images/partnerlogo/logoo1.png';
 const Footer = () => {
   return (
@@ -16,8 +16,7 @@ const Footer = () => {
           {/* Left Section (Logo + Info) */}
           <Grid item xs={12} sm={6}>
             <Box mb={2} display="flex" >
-              <img src={img} alt="logo" style={{ width: '80px' }} />
-              <Typography variant='h1' m={2} >COOWN</Typography>
+              <img src={img} alt="logo" width="180px"/>
             </Box>
             <Typography variant="subtitle" color="textSecondary" mb={2}>
               Team-based asset management for private groups,
