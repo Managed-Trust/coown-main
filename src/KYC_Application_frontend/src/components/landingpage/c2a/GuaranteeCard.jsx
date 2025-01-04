@@ -2,7 +2,14 @@ import React from 'react';
 import { Button, Stack, IconButton, styled, useMediaQuery } from '@mui/material';
 import { Facebook, Instagram, YouTube, LinkedIn, Reddit } from '@mui/icons-material';
 import TelegramIcon from '@mui/icons-material/Telegram';
-
+import OpenChat from '../../../assets/images/logos/OpenChat.svg';
+import Discord from '../../../assets/images/logos/Discord.svg';
+import Twitter from '../../../assets/images/logos/Twitter.svg';
+import Github from '../../../assets/images/logos/Github.svg';
+import Youtube from '../../../assets/images/logos/Youtube.svg';
+import LinkedInIcon from '../../../assets/images/logos/LinkedIn.svg';
+import FacebookIcon from '../../../assets/images/logos/Facebook.svg';
+import Telegram from '../../../assets/images/logos/Telegram.svg';
 import BlankCard from '../../shared/BlankCard';
 
 // Styled components
@@ -26,27 +33,38 @@ const GuaranteeCard = () => {
           padding: '10px 20px',
           borderRadius: '12px',
           flexWrap: 'wrap',
+          gap: '15px',
         }}
       >
         {/* Social Media Icons */}
-        <IconButton href="https://t.me/+1hFUCL-Pg4gyMjZk" aria-label="telegram">
-          <TelegramIcon fontSize="large" />
-        </IconButton>
-        <IconButton href="https://www.youtube.com/@coown" aria-label="youtube">
-          <YouTube fontSize="large" />
-        </IconButton>
-        <IconButton href="https://www.linkedin.com/company/co-own-io/" aria-label="linkedin">
-          <LinkedIn fontSize="large" />
-        </IconButton>
-        <IconButton href="https://www.facebook.com/people/COOWN/61557016146014/" aria-label="facebook">
-          <Facebook fontSize="large" />
-        </IconButton>
-        <IconButton href="https://www.instagram.com/co_own_io_wallet/" aria-label="instagram">
-          <Instagram fontSize="large" />
-        </IconButton>
-        <IconButton href="https://www.reddit.com/user/COOWN/" aria-label="reddit">
-          <Reddit fontSize="large" />
-        </IconButton>
+        <a href="#" aria-label="OpenChat">
+          <img src={OpenChat}/>
+        </a>
+        <a href="https://www.youtube.com/@coown" target='_blank' aria-label="Youtube">
+          <img src={Youtube}/>
+        </a>
+
+        <a href="https://t.me/+1hFUCL-Pg4gyMjZk" target='_blank' aria-label="Telegram">
+          <img src={Telegram}/>
+        </a>
+
+        <a href="https://www.linkedin.com/company/co-own-io/" target='_blank' aria-label="linkedin">
+          <img src={LinkedInIcon}/>
+        </a>
+
+        <a href="https://www.facebook.com/people/COOWN/61557016146014/" target='_blank' aria-label="FacebookIcon">
+          <img src={FacebookIcon}/>
+        </a>
+
+        <a href="#" aria-label="Discord">
+          <img src={Discord}/>
+        </a>
+        <a href="#" aria-label="Twitter">
+          <img src={Twitter}/>
+        </a>
+        <a href="#" aria-label="Github">
+          <img src={Github}/>
+        </a>
       </Stack>
     </ImgCard>
   );

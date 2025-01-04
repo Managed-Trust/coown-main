@@ -11,19 +11,23 @@ const StyledButton = styled(Button)(({ theme }) => ({
   backgroundColor: theme.palette.background.paper,
   color: theme.palette.primary.main,
   fontWeight: 600,
+  borderRadius: '12px',
 }));
 
 const StyledButton2 = styled(Button)(({ theme }) => ({
   padding: '13px 34px',
   fontSize: '16px',
-  borderColor: theme.palette.background.paper,
-  color: theme.palette.background.paper,
+  border: '1px solid white', // Ensure the border is solid and white
+  color: 'white', // Text color is white
   fontWeight: 600,
+  backgroundColor: 'transparent', // Transparent background
+  borderRadius: '12px',
   '&:hover': {
-    backgroundColor: theme.palette.background.paper,
-    color: theme.palette.primary.main,
+    backgroundColor: theme.palette.background.paper, // Slightly opaque white background on hover
+    color: theme.palette.primary.main, // Primary color on hover
   },
 }));
+
 
 const C2a2 = () => {
   return (
@@ -46,6 +50,9 @@ const C2a2 = () => {
                 <StyledButton variant="contained" color="inherit" component={NavLink} to="/contact-us">
                   Contact now
                 </StyledButton>
+                <StyledButton2 variant="contained" color="inherit" component={NavLink} to="/contact-us">
+                  Get in touch
+                </StyledButton2>
               </Stack>
             </Grid>
             <Grid item xs={12} lg={5}>
