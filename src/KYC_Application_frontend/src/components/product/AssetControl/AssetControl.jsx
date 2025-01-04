@@ -194,12 +194,13 @@ const AssetControl = () => {
                     <Grid item xs={12} md={6} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                         <Grid container spacing={1} p={2} justifyContent="center" alignItems="center">
                             <Box
-                                component="iframe"
-                                src="https://www.youtube.com/embed/gYw4uIP8vKQ"
+                                component="video"
+                                src="https://ipfs.io/ipfs/QmSzyqJUEh5J1Yzy6ARW2vBEXEn51yFQSPZw5QVrrrviTj"
                                 title="YouTube video"
                                 frameBorder="0"
                                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                                 allowFullScreen
+                                controls
                                 sx={{
                                     width: { xs: '80%', md: '55%' }, // Adjust width for mobile and desktop
                                     maxHeight: '500px',             // Limit height
