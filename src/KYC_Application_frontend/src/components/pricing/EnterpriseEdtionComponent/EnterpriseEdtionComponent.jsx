@@ -72,7 +72,7 @@ const EnterpriseEdtionComponent = () => {
                     ))}
                 </Grid>
                 <Box>
-                    <Typography variant="caption" color="textSecondary">
+                    <Typography variant="caption" fontSize="14px" color="textSecondary">
                         * The above prices are applied by the       <Typography variant="caption" gutterBottom sx={{ color: '#5D87FF' }}>
                             sandbox operator  </Typography>to early adopters for testing and launching the product with residents and companies of selected countries. Prices provided by your regional operator may differ.
                     </Typography>

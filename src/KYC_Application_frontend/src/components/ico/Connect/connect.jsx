@@ -78,7 +78,7 @@ export default function Connect() {
               ) : (
                 <>
                   <img src="/images/logos/icp_pic.svg" alt="ICP Logo" />
-                  <img src="/images/logos/plug_pic.svg" alt="Plug Wallet Logo" />
+                  {/* <img src="/images/logos/plug_pic.svg" alt="Plug Wallet Logo" /> */}
                 </>
               )}
             </Box>
@@ -89,7 +89,7 @@ export default function Connect() {
                 </Typography>
               ) : (
                 <Typography variant="subtitle1" component="div" sx={{ fontWeight: 'bold' }}>
-                  Connect with Internet Identity or Plug Wallet
+                  Connect with Internet Identity
                 </Typography>
               )}
 

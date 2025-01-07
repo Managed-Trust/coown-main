@@ -16,15 +16,15 @@ const Footer = () => {
           {/* Left Section (Logo + Info) */}
           <Grid item xs={12} sm={6}>
             <Box mb={2} display="flex" >
-              <img src={img} alt="logo" width="180px"/>
+              <img src={img} alt="logo" width="180px" />
             </Box>
             <Typography variant="subtitle" color="textSecondary" mb={2}>
               Team-based asset management for private groups,
               <br /> corporations, and public law entities.
             </Typography>
             <br />
-            <Link href="mailto:info@co-own.com" color="primary" underline="none">
-              info@co-own.com
+            <Link href="mailto:coown@dmail.com" color="primary" underline="none">
+              coown@dmail.com
             </Link>
           </Grid>
 
@@ -77,10 +77,10 @@ const Footer = () => {
         {/* Bottom Copyright Section */}
         <Grid container justifyContent="center" mt={4} flexDirection="column" gap="10px">
           <Typography variant="body2" color="textSecondary" textAlign="center" fontSize="14px" fontWeight="bold">
-            Powred by&nbsp;<img src={logo} style={{ width: '25px', marginTop: '5px' }} />
+            Powered by&nbsp;<img src={logo} style={{ width: '25px', marginTop: '5px' }} />
           </Typography>
           <Typography variant="body2" color="textSecondary" textAlign="center">
-            Copyright © 2024 , Cookie-free
+            Copyright © 2025 , Cookie-free
           </Typography>
         </Grid>
       </Container>

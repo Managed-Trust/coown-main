@@ -69,25 +69,25 @@ const ICO = () => {
               },
             }}
           >
-            <StyledTab label="Token Swap" />
-            <StyledTab label="Social Rewards" /> {/* Disable this tab */}
+            <StyledTab label="About" /> {/* Disable this tab */}
+            <StyledTab label="Token Swap" disabled />
+            <StyledTab label="Social Rewards" disabled /> {/* Disable this tab */}
             <StyledTab label="NFT" disabled /> {/* Disable this tab */}
-            <StyledTab label="About" disabled /> {/* Disable this tab */}
+
           </Tabs>
         </Container>
       </AppBar>
 
       <Connect />
       <Box sx={{ p: 3 }}>
-        {value === 0 && <SwapComponent />}
+        {value === 0 && <>
+          <DoughnutChart />
+          <TokenDistribution />
+          <TokenPlan />
+        </>}
         {value === 1 && <RewardsAndAffiliate />}
         {value === 2 && <NFTSwap />}
-        {value === 3 && (
-          <>
-            <DoughnutChart />
-            <TokenDistribution />
-            <TokenPlan />
-          </>
+        {value === 3 && ( <SwapComponent />
         )}
       </Box>
 
