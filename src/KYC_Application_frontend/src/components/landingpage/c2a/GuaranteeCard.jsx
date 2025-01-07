@@ -14,7 +14,7 @@ import BlankCard from '../../shared/BlankCard';
 
 // Styled components
 const ImgCard = styled(BlankCard)(() => ({
-  marginTop: '-70px',
+  marginTop: '-50px',
 }));
 
 const GuaranteeCard = () => {
