@@ -4,7 +4,7 @@ import bank from '../../../assets/images/svgs/bank.svg';
 import code from '../../../assets/images/svgs/code-snippet-02.svg';
 import crypto from '../../../assets/images/svgs/cryptocurrency-04.svg';
 import certificate from '../../../assets/images/svgs/certificate-01.svg';
-import globe from '../../../assets/images/svgs/globe-05.svg';
+import globe from '../../../assets/images/svgs/Icon.svg';
 import dataflow from '../../../assets/images/svgs/dataflow-04.svg';
 
 const EntityBox = ({ icon, title, description }) => (

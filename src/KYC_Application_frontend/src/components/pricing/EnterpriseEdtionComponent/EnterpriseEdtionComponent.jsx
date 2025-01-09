@@ -7,7 +7,7 @@ import {
     Chip,
     TextField,
     CardMedia,
-    Button,
+    Button, Tooltip,
     Container
 } from "@mui/material";
 import { Link } from "react-router-dom";
@@ -72,9 +72,16 @@ const EnterpriseEdtionComponent = () => {
                     ))}
                 </Grid>
                 <Box>
-                    <Typography variant="caption" fontSize="14px" color="textSecondary">
-                        * The above prices are applied by the       <Typography variant="caption" gutterBottom sx={{ color: '#5D87FF' }}>
-                            sandbox operator  </Typography>to early adopters for testing and launching the product with residents and companies of selected countries. Prices provided by your regional operator may differ.
+                    <Typography variant="caption" fontSize="14px" sx={{ color: '#5A6A85' }}>
+                        * The above prices are applied by the      <Tooltip title="COOWN INIT SOCIEDAD DE RESPONSABILIDAD LIMITADA, Costa Rica, Reg. No 3-102-914520">
+                            <Typography
+                                variant="caption"
+                                gutterBottom
+                                sx={{ color: "#5D87FF", fontWeight: "600" }}
+                            >
+                                sandbox operator
+                            </Typography>
+                        </Tooltip>to early adopters for testing and launching the product with residents and companies of selected countries. Prices provided by your regional operator may differ.
                     </Typography>
                 </Box>
             </Container>

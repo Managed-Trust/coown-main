@@ -72,10 +72,9 @@ const AnnouncementCard = ({ message, createdBy, createdAt }) => {
   );
 };
 
-const Dashboard = ({ openDrawer,openDrawer2 }) => {
+const Dashboard = ({ openDrawer,openDrawer2,polices }) => {
   const [activeStep, setActiveStep] = useState(0);
   const [quickLinks, setQuickLinks] = useState([]);
-  const [polices, setPolices] = useState([]);
   const [formData, setFormData] = useState(initialState);
   const [toggleEditInternal, setToggleEditInternal] = useState(false);
   const [toggleEditPublic, setToggleEditPublic] = useState(false);
@@ -176,20 +175,7 @@ const Dashboard = ({ openDrawer,openDrawer2 }) => {
         console.log('error', error);
       }
     }
-    
-    const fetchPolicies = async () => {
-      try {
-        const response = await ledger.call('getPolicies');
-        console.log('response policy', response);
-        if (response) {
-          setPolices(response);
-         
-        }
-      } catch (error) {
-        console.log('error', error);
-      }
-    }
-    fetchPolicies();
+
     fetchQuickLinks();
     fetchAnnouncements();
   }, [renderTrigger]); // Dependency array
