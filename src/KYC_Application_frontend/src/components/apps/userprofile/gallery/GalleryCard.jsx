@@ -105,7 +105,7 @@ const GalleryCard = () => {
   const cardData = [
     { title: "Set-up a private association", desc: "Add  more user groups with separate accounts as informal private associations, where you are considered as the sole economic beneficiary. ", Icon: mygroup1, value: '19 USD', per: 'per year', link: '/create-group/private', btn: 'Select' },
     { title: "Set-up a registered company", desc: "Following the KYC for legal entities, shareholder voting, limited transaction power of executives, and subgroups for business units become available. ", Icon: mygroup2, value: '168 USD', per: 'per year', link: '/create-group/Incorporation', btn: 'Select' },
-    { title: "Set-up a public law entitiy", desc: "Get all the benefits of registered company groups with additional KYC data verification by a legal expert to ensure legitimacy and data quality.", Icon: mygroup3, value: '680 USD', per: 'per year', link: '', btn: 'Send Inquiry' }
+    { title: "Set-up a public law entitiy", desc: "Get all the benefits of registered company groups with additional KYC data verification by a legal expert to ensure legitimacy and data quality.", Icon: mygroup3, value: '680 USD', per: 'per year', link: 'https://coown.notion.site/139e4beacc2281edada2d169544c4eb9', btn: 'Send Inquiry' }
   ];
 
   useEffect(() => {

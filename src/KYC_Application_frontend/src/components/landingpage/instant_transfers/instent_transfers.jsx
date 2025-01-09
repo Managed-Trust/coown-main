@@ -14,11 +14,11 @@ export default function InstantTransfers() {
                         <Typography
                             color="primary"
                             variant="subtitle1"
-                            sx={{ mb: 2, fontWeight: 500 }}
+                            sx={{ mb: 2, fontWeight: 600, fontSize:'16px' }}
                         >
                             Manage group assets with ease
                         </Typography>
-                        <Typography variant="h3" sx={{ mb: 3, fontWeight: 600 }}>
+                        <Typography variant="h2" sx={{ mb: 3, fontWeight: 600, fontSize:'36px' }}>
                             Instant Transfers with Low Fees
                         </Typography>
                         <Typography

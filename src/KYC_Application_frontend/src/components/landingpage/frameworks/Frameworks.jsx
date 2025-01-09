@@ -4,7 +4,7 @@ import FrameworksTitle from './FrameworksTitle';
 
 // images
 
-import  SliderImage  from '../../../assets/images/backgrounds/SliderImage.png';
+import  SliderImage  from '../../../assets/images/backgrounds/SliderImage.svg';
 
 const SliderBox = styled(Box)(() => ({
   '@keyframes slide': {

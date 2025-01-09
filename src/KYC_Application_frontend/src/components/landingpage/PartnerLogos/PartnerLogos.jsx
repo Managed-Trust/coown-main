@@ -32,7 +32,7 @@ const PartnerLogos = () => {
 
     return (
         <Box sx={{ textAlign: 'center', margin: '30px 0', padding: '10px 0' }}>
-            <Typography variant="h3" sx={{ fontWeight: 'bold', marginBottom: '20px' }}>
+            <Typography variant="h2" sx={{ fontWeight: 'bold', marginBottom: '20px',fontSize:'36px', letterSpacing:'-1.35px' }}>
                 Our friends
             </Typography>
             <Slider {...settings}>

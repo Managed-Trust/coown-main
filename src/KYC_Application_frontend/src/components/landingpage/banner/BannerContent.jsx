@@ -13,6 +13,7 @@ const StyledButton = styled(Button)(() => ({
   textTransform: 'none',
   borderRadius: '8px',
   backgroundColor: '#4A80F6',
+  fontWeight: '600',
   color: '#fff',
   '&:hover': {
     backgroundColor: '#3a6fcc',
@@ -23,6 +24,7 @@ const StyledButton = styled(Button)(() => ({
 const StyledButton2 = styled(Button)(() => ({
   padding: '10px 40px',
   fontSize: '16px',
+  fontWeight: '600',
   textTransform: 'none',
   borderRadius: '8px',
   color: '#4A80F6',
@@ -86,7 +88,7 @@ const BannerContent = () => {
             damping: 30,
           }}
         >
-          <Typography variant="h6" display={'flex'} gap={1} mb={2}>
+          <Typography variant="h6" display={'flex'} gap={1} mb={2} fontSize="16px" fontWeight="600">
             <Typography color={'#5D87FF'}>
               <IconWallet size={'21'} />
             </Typography>{' '}
@@ -98,10 +100,10 @@ const BannerContent = () => {
             fontWeight="bold"
             sx={{
               fontSize: {
-                md: '48px',
+                md: '54px',
               },
               lineHeight: {
-                md: '54px',
+                md: '60px',
               },
              
             }}
@@ -131,7 +133,7 @@ const BannerContent = () => {
               delay: 0.2,
             }}
           >
-            <Typography variant="body2" fontSize={18} lineHeight={1.5} fontWeight={400} color="#5A6A85">
+            <Typography variant="body2" fontSize="18px" lineHeight="26px" fontWeight={500} color="#5A6A85">
               Group accounts with spending limits, transaction approvals, and custom securities for regional markets, suitable for private groups, corporations and public law entities.
             </Typography>
           </motion.div>
@@ -149,14 +151,14 @@ const BannerContent = () => {
           <Stack direction='row' spacing={2} mt={3}>
             {user ? (
               <>
-                <StyledButton variant="contained" color="primary" to="/dashboards/ecommerce" component={NavLink}>
+                <StyledButton variant="contained" color="primary" fontSize="16px" fontWeight="600" to="/dashboards/ecommerce" component={NavLink}>
                   Launch App
                 </StyledButton>
               </>
             ) :
               (
                 <>
-                  <StyledButton variant="contained" color="primary" to="/user/prototype" component={NavLink}>
+                  <StyledButton variant="contained" color="primary" fontSize="16px" fontWeight="600" to="/user/prototype" component={NavLink}>
                     Sign In
                   </StyledButton>
                 </>

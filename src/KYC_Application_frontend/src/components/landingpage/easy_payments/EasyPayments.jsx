@@ -24,17 +24,18 @@ export default function EasyPayments() {
             <Typography
               color="primary"
               variant="subtitle1"
-              sx={{ mb: 2, fontWeight: 500 }}
+              fontSize='16px'
+              sx={{ mb: 2, fontWeight: 600 }}
             >
               Free and Instant Crypto Transactions
             </Typography>
-            <Typography variant="h3" sx={{ mb: 3, fontWeight: 600 }}>
+            <Typography variant="h2" sx={{ mb: 3, fontWeight: 700, fontSize: "36px" }}>
               Easy Payments
             </Typography>
             <Typography
               variant="body1"
               color="#5A6A85"
-              sx={{ lineHeight: 1.5, fontSize: "16px" }}
+              sx={{ lineHeight: '24px', fontSize: "16px" }}
             >
               COOWN makes crypto payments simple for businesses and individuals.
               Enjoy secure, hassle-free transactions with full control over your data.

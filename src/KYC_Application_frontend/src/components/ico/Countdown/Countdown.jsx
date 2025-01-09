@@ -36,41 +36,41 @@ const Countdown = () => {
       <Container maxWidth="lg">
         <Grid container  spacing={2} >
           <Grid item xs={6}>
-            <Typography variant="h2" sx={{ fontWeight: 'bold' }}>
+            <Typography variant="h2" sx={{ fontWeight: 'bold', fontSize:'36px', lineHeight:'44px' }}>
               Next token sale phase starts in
             </Typography>           
           </Grid>
           <Grid item   xs={6} >
             <Grid container spacing={1} alignItems="center">
               <Grid item sx={{ marginRight: '20px' }}>
-                <Typography variant="h1" sx={{ color: '#5D87FF', fontWeight: 'bold' }}>
+                <Typography variant="h2" sx={{ color: '#5D87FF', fontWeight: 'bold' }}>
                   {timeLeft.days}
                 </Typography>
-                <Typography variant="body2" align="center">
+                <Typography variant="body2" fontSize="16px" align="center">
                   Days
                 </Typography>
               </Grid>
               <Grid item sx={{ marginRight: '20px' }}>
-                <Typography variant="h1" sx={{ color: '#5D87FF', fontWeight: 'bold' }}>
+                <Typography variant="h2" sx={{ color: '#5D87FF', fontWeight: 'bold' }}>
                   {timeLeft.hours}
                 </Typography>
-                <Typography variant="body2" align="center">
+                <Typography variant="body2" fontSize="16px" align="center">
                   Hours
                 </Typography>
               </Grid>
               <Grid item sx={{ marginRight: '20px' }}>
-                <Typography variant="h1" sx={{ color: '#5D87FF', fontWeight: 'bold' }}>
+                <Typography variant="h2" sx={{ color: '#5D87FF', fontWeight: 'bold' }}>
                   {timeLeft.minutes}
                 </Typography>
-                <Typography variant="body2" align="center">
+                <Typography variant="body2" fontSize="16px" align="center">
                   Minutes
                 </Typography>
               </Grid>
               <Grid item sx={{ marginRight: '20px' }}>
-                <Typography variant="h1" sx={{ color: '#5D87FF', fontWeight: 'bold' }}>
+                <Typography variant="h2" sx={{ color: '#5D87FF', fontWeight: 'bold' }}>
                   {timeLeft.seconds}
                 </Typography>
-                <Typography variant="body2" align="center">
+                <Typography variant="body2" fontSize="16px" align="center">
                   Seconds
                 </Typography>
               </Grid>

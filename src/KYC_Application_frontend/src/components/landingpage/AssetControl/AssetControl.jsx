@@ -19,14 +19,16 @@ const AssetControl = () => {
                                     damping: 30,
                                 }}
                             >
-                                <Typography variant="body" sx={{ color: '#5D87FF', fontWeight: 'bold' }} gap={1} mb={2}>
+                                <Typography variant="body" sx={{ color: '#5D87FF', fontWeight: '600', fontSize:'16px', lineHeight:'24px' }} gap={1} mb={2}>
 
                                     Manage group assets with ease
                                 </Typography>
 
                                 <Typography
-                                    variant="h1"
+                                    variant="h2"
                                     fontWeight={700}
+                                    fontSize="36px"
+                                    lineHeight="44px"
                                 >
                                     Streamline asset control and decision-making 
                                 </Typography>
@@ -42,7 +44,7 @@ const AssetControl = () => {
                                         delay: 0.2,
                                     }}
                                 >
-                                    <Typography variant="body" color="#5A6A85" fontSize={16} lineHeight={1.5}>
+                                    <Typography variant="body" color="#5A6A85" fontSize="16px" lineHeight="24px" fontWeight={400}>
                                         COOWN offers an integrated solution for families, corporations, and public entities to share and control digital assets. Spending limits can be set by administrators or executive managers for each user individually. Transaction approvals are implemented by management decisions or even shareholder voting as needed. COOWN empowers groups to manage assets securely, fully on-chain, and in compliance with local regulations. Simplify governance, enhance transparency, and gain control over group finances with COOWN.   
                                     </Typography>
                                 </motion.div>
