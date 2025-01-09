@@ -197,6 +197,7 @@ const AssetControl = () => {
                                 component="video"
                                 src="https://bafybeihxswn3ablhdzzcdfrxpwfupuavoji245pfpjmaajaci34umphd3q.ipfs.flk-ipfs.xyz/"
                                 controls
+                                playsInline
                                 title="Video"
                                 sx={{
                                     width: { xs: '80%', md: '55%' }, // Responsive width
