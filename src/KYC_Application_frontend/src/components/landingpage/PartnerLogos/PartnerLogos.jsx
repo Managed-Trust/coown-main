@@ -31,7 +31,7 @@ const PartnerLogos = () => {
     const logos = [logo1, logo2, logo3, logo4, logo5, logo6, logo7, logo8, logo9, logo10, logo1, logo2, logo3, logo4, logo5, logo6, logo7, logo8, logo9, logo10]; // Duplicate for seamless loop
 
     return (
-        <Box sx={{ textAlign: 'center', margin: '30px 0', padding: '10px 0' }}>
+        <Box sx={{ textAlign: 'center', margin: '40px 0 80px', padding: '10px 0' }}>
             <Typography variant="h2" sx={{ fontWeight: 'bold', marginBottom: '20px',fontSize:'36px', letterSpacing:'-1.35px' }}>
                 Our friends
             </Typography>

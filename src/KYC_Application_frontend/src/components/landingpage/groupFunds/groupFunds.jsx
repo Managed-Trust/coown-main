@@ -7,7 +7,7 @@ export default function GroupFunds() {
     <Grid container spacing={4} sx={{ p: 4 }}>
       <Grid item xs={12} md={6}>
         <Box sx={{ overflow: 'hidden', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-          <img src='/images/landingPage/simple_control_over_group.jpg'
+          <img src='/images/landingPage/simple_control_over_group.svg'
             style={{
               maxWidth: '100%',
               height: 'auto',
@@ -23,11 +23,11 @@ export default function GroupFunds() {
           <Typography
             color="primary"
             variant="subtitle1"
-            sx={{ mb: 2, fontWeight: 500 }}
+            sx={{ mb: 2, fontWeight: 600, fontSize: '16px' }}
           >
             Easy Group Asset Management
           </Typography>
-          <Typography variant="h3" sx={{ mb: 3, fontWeight: 600 }}>
+          <Typography variant="h2" sx={{ mb: 3, fontWeight: 700, fontSize:'36px' }}>
             Simple Control Over Group Funds
           </Typography>
           <Typography

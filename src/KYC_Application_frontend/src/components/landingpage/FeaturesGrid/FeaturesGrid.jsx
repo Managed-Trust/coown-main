@@ -59,10 +59,10 @@ const FeaturesGrid = () => {
                                 }}
                             >
                                 <img src={feature.icon} alt="" width='50px' />
-                                <Typography variant="h6" fontWeight={600} mt={2} mb={2}>
+                                <Typography variant="h6" fontWeight={600} mt={2} mb={2} fontSize="18px">
                                     {feature.title}
                                 </Typography>
-                                <Typography variant="body2" color="#5A6A85" fontSize={14} lineHeight={1.3}>
+                                <Typography variant="body2" color="#5A6A85" fontSize={14} lineHeight={1.5}>
                                     {feature.description}
                                 </Typography>
                             </Box>

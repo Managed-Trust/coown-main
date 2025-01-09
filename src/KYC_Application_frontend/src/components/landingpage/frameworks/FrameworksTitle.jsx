@@ -8,17 +8,11 @@ const FrameworksTitle = () => {
         <Grid container spacing={3} justifyContent="center">
             <Grid item xs={12} sm={10} lg={8}>
                 <Typography variant='h2' fontWeight={700} textAlign="center" sx={{
-                    fontSize: {
-                        lg: '36px',
-                        xs: '25px'
-                    },
-                    lineHeight: {
-                        lg: '43px',
-                        xs: '30px'
-                    }
+                    fontSize: '36px',
+                    lineHeight: '44px'
                 }}>Innovative tools for secure <br/> collaboration</Typography>
                 
-                <Typography variant='body2' mt={2} sx={{fontSize:'16px'}} color="#5A6A85" textAlign="center">
+                <Typography variant='body2' mt={2} sx={{fontSize:'16px', lineHeight:'26px'}} color="#5A6A85" textAlign="center">
                 Empower your team with features designed to <br/> simplify collective financial management.
                     </Typography>
             </Grid>

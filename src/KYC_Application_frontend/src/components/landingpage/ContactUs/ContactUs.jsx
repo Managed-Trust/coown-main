@@ -21,7 +21,7 @@ const ContactUs = () => {
         <Grid container spacing={4}>
           {/* Form Section */}
           <Grid item xs={12} md={6}>
-            <Typography variant="h3" fontWeight={700} mt={2}>
+            <Typography variant="h2" fontSize='36px' fontWeight={700} mt={2}>
               Get in touch
             </Typography>
 

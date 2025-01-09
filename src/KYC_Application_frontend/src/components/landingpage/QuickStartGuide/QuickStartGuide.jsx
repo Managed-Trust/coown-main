@@ -41,7 +41,7 @@ const QuickStartGuide = () => {
         {/* Title Section */}
         <Typography
           variant="body1"
-          sx={{ color: '#5D87FF', textAlign: 'center', fontWeight: 'bold' }}
+          sx={{ color: '#5D87FF', textAlign: 'center', fontWeight: '600',fontSize:'16px' }} 
           mb={1}
         >
           Simple and effective
@@ -51,6 +51,7 @@ const QuickStartGuide = () => {
           textAlign="center"
           fontWeight={700}
           mb={4}
+          fontSize='36px'
         >
           Quick Start Guide
         </Typography>
@@ -70,13 +71,14 @@ const QuickStartGuide = () => {
               >
                 <Typography
                   variant="h3"
-                  fontWeight={700}
+                  fontWeight={600}
+                  fontSize='30px'
                   color="#5D87FF"
                   mb={2}
                 >
                   {step.number}
                 </Typography>
-                <Typography variant="h6" fontWeight={600} mb={1}>
+                <Typography variant="h4" fontWeight={600} mb={1} fontSize='18px'>
                   {step.title}
                 </Typography>
                 <Typography variant="body2" color="#5A6A85" lineHeight={1.3} sx={{fontSize:'16px'}}> 

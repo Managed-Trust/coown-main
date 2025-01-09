@@ -72,6 +72,7 @@ const FAQs = () => {
           variant="h2"
           fontWeight={700}
           mb={4}
+          fontSize='36px'
           textAlign="center"
         >
           Frequently Asked Questions

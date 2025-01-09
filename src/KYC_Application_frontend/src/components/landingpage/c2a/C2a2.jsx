@@ -45,6 +45,8 @@ const C2a2 = () => {
                 color="background.paper"
                 fontWeight={700}
                 mt={4}
+                fontSize='36px'
+                lineHeight='44px'
                 textAlign="start"
               >
                 Streamline asset management and collaborate across your teams and organizations
@@ -56,10 +58,10 @@ const C2a2 = () => {
                 mt={3}
                 justifyContent="start"
               >
-                <StyledButton variant="contained" color="inherit" component={NavLink} to="/contact-us">
+                <StyledButton variant="contained" fontSize='16px' lineHeight='24px' color="inherit" component={NavLink} to="/contact-us">
                   Contact now
                 </StyledButton>
-                <StyledButton2 variant="contained" color="inherit" component={NavLink} to="/contact-us">
+                <StyledButton2 variant="contained" fontSize='16px' lineHeight='24px' color="inherit" component={NavLink} to="/contact-us">
                   Get in touch
                 </StyledButton2>
               </Stack>

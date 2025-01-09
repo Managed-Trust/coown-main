@@ -72,7 +72,7 @@ export default function Contact() {
         <ThemeProvider theme={theme}>
             <Box width="100%" sx={{ backgroundColor: '#F4F8FB' }}>
                 <Container sx={{ p: 4 , mt:10,paddingBottom: 10 }} >
-                    <Typography variant="h3" mt={5} gutterBottom>
+                    <Typography variant="h2" fontSize='36px' mt={5} gutterBottom>
                         Get in touch
                     </Typography>
                     <Grid container spacing={4}>

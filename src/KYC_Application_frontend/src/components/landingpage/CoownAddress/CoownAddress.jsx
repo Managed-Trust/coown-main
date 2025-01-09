@@ -31,23 +31,17 @@ const CoownAddress = () => {
               >
                 <Typography
                   variant="body1"
-                  sx={{ color: '#5D87FF', fontWeight: 'bold' }}
+                  sx={{ color: '#5D87FF', fontWeight: '600', fontSize:'16px' }}
                   mb={2}
                 >
                   Tailored solutions for diverse user groups
                 </Typography>
                 <Typography
-                  variant="h3"
+                  variant="h2"
                   fontWeight={700}
                   sx={{
-                    fontSize: {
-                      lg: '36px',
-                      xs: '25px'
-                    },
-                    lineHeight: {
-                      lg: '43px',
-                      xs: '30px'
-                    }
+                    fontSize: '36px',
+                    lineHeight: '44px',
                   }}
                 >
                   Coown addresses various organizational and financial needs
@@ -67,8 +61,8 @@ const CoownAddress = () => {
                     </Avatar>
                   </ListItemIcon>
                   <ListItemText
-                    primary={<Typography variant="h6" fontWeight={600}>{group.title}</Typography>}
-                    secondary={<Typography variant="body2" color="#5A6A85" fontSize={14}>{group.description}</Typography>}
+                    primary={<Typography variant="h6" fontWeight={600} mb={1}>{group.title}</Typography>}
+                    secondary={<Typography variant="body2" color="#5A6A85" fontSize={16} lineHeight='24px'>{group.description}</Typography>}
                   />
                 </ListItem>
               ))}

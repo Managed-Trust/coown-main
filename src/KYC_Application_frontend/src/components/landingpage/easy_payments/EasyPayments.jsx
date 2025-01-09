@@ -2,7 +2,7 @@ import { Box, Typography, Grid, Container } from '@mui/material';
 
 export default function EasyPayments() {
   return (
-    <Container maxWidth="lg">
+    <Container maxWidth="lg" style={{ paddingTop: '40px' }}>
       <Grid 
         container 
         spacing={4} 

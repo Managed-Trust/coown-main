@@ -133,7 +133,7 @@ export default function Contact() {
         <ThemeProvider theme={theme}>
             <Box width="100%" sx={{ bgcolor: 'background.default' }}>
                 <Box sx={{ maxWidth: 1200, margin: 'auto', p: 4 }}>
-                    <Typography variant="h3" gutterBottom>
+                    <Typography variant="h2" gutterBottom fontSize='36px'>
                         Get in touch
                     </Typography>
                     <Grid container spacing={4}>

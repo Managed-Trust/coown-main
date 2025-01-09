@@ -18,13 +18,13 @@ export default function InstantTransfers() {
                         >
                             Manage group assets with ease
                         </Typography>
-                        <Typography variant="h2" sx={{ mb: 3, fontWeight: 600, fontSize:'36px' }}>
+                        <Typography variant="h2" sx={{ mb: 3, fontWeight: 700, fontSize:'36px' }}>
                             Instant Transfers with Low Fees
                         </Typography>
                         <Typography
                             variant="body1"
                             color="#5A6A85"
-                            sx={{ lineHeight: 1.5, fontSize: '16px' }} // Consistent font size
+                            sx={{ lineHeight: "24px", fontSize: '16px' }} // Consistent font size
                         >
                             With COOWN, you can make instant payments easily. Transactions take less than 2 seconds, and a typical transaction fee is around $0.05, with no extra charges for using the network.
                         </Typography>
