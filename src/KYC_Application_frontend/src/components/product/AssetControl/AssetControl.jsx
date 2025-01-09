@@ -195,21 +195,19 @@ const AssetControl = () => {
                         <Grid container spacing={1} p={2} justifyContent="center" alignItems="center">
                             <Box
                                 component="video"
-                                src="https://ipfs.io/ipfs/QmSzyqJUEh5J1Yzy6ARW2vBEXEn51yFQSPZw5QVrrrviTj"
-                                title="YouTube video"
-                                frameBorder="0"
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                allowFullScreen
+                                src="https://bafybeihxswn3ablhdzzcdfrxpwfupuavoji245pfpjmaajaci34umphd3q.ipfs.flk-ipfs.xyz/"
                                 controls
+                                title="Video"
                                 sx={{
-                                    width: { xs: '80%', md: '55%' }, // Adjust width for mobile and desktop
-                                    maxHeight: '500px',             // Limit height
-                                    aspectRatio: '9 / 16',          // Maintain Shorts video aspect ratio
-                                    objectFit: 'cover',
-                                    borderRadius: '12px',           // Rounded corners
+                                    width: { xs: '80%', md: '55%' }, // Responsive width
+                                    maxHeight: '500px',             // Limit maximum height
+                                    aspectRatio: '9 / 16',          // Modern browsers support this
+                                    objectFit: 'cover',             // Ensure proper video fitting
+                                    borderRadius: '12px',           // Add rounded corners
                                     margin: '0 auto',               // Center on smaller screens
                                 }}
                             />
+
                         </Grid>
                     </Grid>
                 </Grid>
