@@ -1,17 +1,12 @@
 import React from 'react';
 import { Container, Grid, Box, Typography, Paper, Avatar } from '@mui/material';
-import icon1 from '../../../assets/images/landingpage/icon1.png'
-import icon2 from '../../../assets/images/landingpage/icon2.png'
-import icon3 from '../../../assets/images/landingpage/icon3.png'
-import icon4 from '../../../assets/images/landingpage/icon4.png'
-import icon5 from '../../../assets/images/landingpage/icon5.png'
-import icon6 from '../../../assets/images/landingpage/icon6.png'
-import GroupIcon from '@mui/icons-material/Group'; // For "Flexible Role-Based Permissions"
-import AttachMoneyIcon from '@mui/icons-material/AttachMoney'; // For "Multi-Currency Support"
-import AutoAwesomeMotionIcon from '@mui/icons-material/AutoAwesomeMotion'; // For "Automated Financial Workflows"
-import BusinessIcon from '@mui/icons-material/Business'; // For "Digitalized Company Shares"
-import PrivacyTipIcon from '@mui/icons-material/PrivacyTip'; // For "Privacy and Compliance"
-import WorkspacesIcon from '@mui/icons-material/Workspaces'; // For "Real-World Asset (RWA) Tokenization"
+import icon1 from '../../../assets/images/landingpage/icon1.svg'
+import icon2 from '../../../assets/images/landingpage/icon2.svg'
+import icon3 from '../../../assets/images/landingpage/icon3.svg'
+import icon4 from '../../../assets/images/landingpage/icon4.svg'
+import icon5 from '../../../assets/images/landingpage/icon5.svg'
+import icon6 from '../../../assets/images/landingpage/icon6.svg'
+
 
 const features = [
     {
