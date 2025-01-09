@@ -275,39 +275,39 @@ actor Treasury {
         auditLog := Array.append(auditLog, [action]);
     };
 
-    public func setThresholdLimit(newLimit : Nat) : async Text {
-        thresholdLimit := newLimit;
-        await logAction("Threshold limit updated to " # Nat.toText(newLimit));
-        return "Threshold limit updated successfully.";
-    };
+    // public func setThresholdLimit(newLimit : Nat) : async Text {
+    //     thresholdLimit := newLimit;
+    //     await logAction("Threshold limit updated to " # Nat.toText(newLimit));
+    //     return "Threshold limit updated successfully.";
+    // };
 
-    public func addRecipient(principal : Principal, percentage : Float) : async Text {
-        recipients := Array.append(
-            recipients,
-            [{
-                account = { owner = principal; subaccount = null };
-                percentage = percentage;
-            }],
-        );
-        await logAction("Recipient added: " # Principal.toText(principal) # " with " # Float.toText(percentage) # "% allocation.");
-        return "Recipient added successfully.";
-    };
+    // public func addRecipient(principal : Principal, percentage : Float) : async Text {
+    //     recipients := Array.append(
+    //         recipients,
+    //         [{
+    //             account = { owner = principal; subaccount = null };
+    //             percentage = percentage;
+    //         }],
+    //     );
+    //     await logAction("Recipient added: " # Principal.toText(principal) # " with " # Float.toText(percentage) # "% allocation.");
+    //     return "Recipient added successfully.";
+    // };
 
-    public func updateRecipient(principal : Principal, newPercentage : Float) : async Text {
-        let updatedRecipients = Iter.map(
-            recipients.vals(),
-            func(recipient) {
-                if (recipient.account.owner == principal) {
-                    { account = recipient.account; percentage = newPercentage };
-                } else {
-                    recipient;
-                };
-            },
-        );
-        recipients := Array.fromIter(updatedRecipients);
-        await logAction("Recipient updated: " # Principal.toText(principal) # " with new " # Float.toText(newPercentage) # "% allocation.");
-        return "Recipient updated successfully.";
-    };
+    // public func updateRecipient(principal : Principal, newPercentage : Float) : async Text {
+    //     let updatedRecipients = Iter.map(
+    //         recipients.vals(),
+    //         func(recipient) {
+    //             if (recipient.account.owner == principal) {
+    //                 { account = recipient.account; percentage = newPercentage };
+    //             } else {
+    //                 recipient;
+    //             };
+    //         },
+    //     );
+    //     recipients := Array.fromIter(updatedRecipients);
+    //     await logAction("Recipient updated: " # Principal.toText(principal) # " with new " # Float.toText(newPercentage) # "% allocation.");
+    //     return "Recipient updated successfully.";
+    // };
 
     public func reconcileBalance() : async Text {
         let actualBalance = await getTotalICPBalanceOfCanister();
@@ -323,26 +323,26 @@ actor Treasury {
         };
     };
 
-    public func transferBetweenAccounts(
-        from : Account,
-        to : Account,
-        amount : Nat,
-    ) : async Text {
-        let transferResult = await performICPTransfer(to, amount);
-        switch transferResult {
-            case (#Ok(_)) {
-                await logAction(
-                    "Transfer successful from " # Principal.toText(from.owner) #
-                    " to " # Principal.toText(to.owner) #
-                    " Amount: " # Nat.toText(amount)
-                );
-                return "Transfer successful.";
-            };
-            case (#Err(err)) {
-                return "Transfer failed: " # Debug.show(err);
-            };
-        };
-    };
+    // public func transferBetweenAccounts(
+    //     from : Account,
+    //     to : Account,
+    //     amount : Nat,
+    // ) : async Text {
+    //     let transferResult = await performICPTransfer(to, amount);
+    //     switch transferResult {
+    //         case (#Ok(_)) {
+    //             await logAction(
+    //                 "Transfer successful from " # Principal.toText(from.owner) #
+    //                 " to " # Principal.toText(to.owner) #
+    //                 " Amount: " # Nat.toText(amount)
+    //             );
+    //             return "Transfer successful.";
+    //         };
+    //         case (#Err(err)) {
+    //             return "Transfer failed: " # Debug.show(err);
+    //         };
+    //     };
+    // };
 
     private var lockedFunds : Nat = 0;
 
@@ -383,43 +383,43 @@ actor Treasury {
         };
     };
 
-    public func cancelTransaction(transactionId : Text) : async Text {
-        switch treasury {
-            case (null) {
-                return "Treasury not found.";
-            };
-            case (?t) {
-                let (updatedTransactions, reversedTransaction) = Iter.fold(
-                    t.transactions.vals(),
-                    ([], null),
-                    func((acc, found), tx) {
-                        if (tx.id == transactionId) {
-                            let reverseAmount = if (tx.isDebit) tx.amount else -tx.amount;
-                            treasury := ?{
-                                t with
-                                remainingBalance = t.remainingBalance + reverseAmount;
-                            };
-                            (acc, ?tx);
-                        } else {
-                            (Array.append(acc, [tx]), found);
-                        };
-                    },
-                );
+    // public func cancelTransaction(transactionId : Text) : async Text {
+    //     switch treasury {
+    //         case (null) {
+    //             return "Treasury not found.";
+    //         };
+    //         case (?t) {
+    //             let (updatedTransactions, reversedTransaction) = Iter.fold(
+    //                 t.transactions.vals(),
+    //                 ([], null),
+    //                 func((acc, found), tx) {
+    //                     if (tx.id == transactionId) {
+    //                         let reverseAmount = if (tx.isDebit) tx.amount else -tx.amount;
+    //                         treasury := ?{
+    //                             t with
+    //                             remainingBalance = t.remainingBalance + reverseAmount;
+    //                         };
+    //                         (acc, ?tx);
+    //                     } else {
+    //                         (Array.append(acc, [tx]), found);
+    //                     };
+    //                 },
+    //             );
 
-                treasury := ?{ t with transactions = updatedTransactions };
+    //             treasury := ?{ t with transactions = updatedTransactions };
 
-                switch reversedTransaction {
-                    case (null) {
-                        return "Transaction not found.";
-                    };
-                    case (?tx) {
-                        await logAction("Transaction cancelled: " # tx.id);
-                        return "Transaction cancelled successfully.";
-                    };
-                };
-            };
-        };
-    };
+    //             switch reversedTransaction {
+    //                 case (null) {
+    //                     return "Transaction not found.";
+    //                 };
+    //                 case (?tx) {
+    //                     await logAction("Transaction cancelled: " # tx.id);
+    //                     return "Transaction cancelled successfully.";
+    //                 };
+    //             };
+    //         };
+    //     };
+    // };
 
     public query func getLockedFunds() : async Nat {
         return lockedFunds;

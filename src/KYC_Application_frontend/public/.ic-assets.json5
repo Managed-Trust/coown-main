@@ -1,5 +1,9 @@
 [
     {
+        "match": ".well-known",
+        "ignore": false
+    },
+    {
         "match": "**/*",
         "headers": {
             // Security: The Content Security Policy (CSP) given below aims at working with many apps rather than providing maximal security.
