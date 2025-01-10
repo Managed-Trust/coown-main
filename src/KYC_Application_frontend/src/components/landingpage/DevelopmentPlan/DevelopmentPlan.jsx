@@ -31,15 +31,16 @@ const DevelopmentPlan = () => {
         {/* Title Section */}
         <Typography
           variant="body1"
-          sx={{ color: '#5D87FF', textAlign: 'center', fontWeight: 'bold' }}
+          sx={{ color: '#5D87FF', textAlign: 'center', fontWeight: '600', fontSize:'16px' }}
           mb={1}
         >
           Our roadmap
         </Typography>
         <Typography
-          variant="h4"
+          variant="h2"
           textAlign="center"
           fontWeight={700}
+          fontSize='36px'
           mb={4}
         >
           Development plan
@@ -60,7 +61,7 @@ const DevelopmentPlan = () => {
               >
                 <Typography
                   variant="h3"
-                  fontWeight={700}
+                  fontWeight={600}
                   color="#5D87FF"
                   mb={2} textAlign={'start'}
                 >

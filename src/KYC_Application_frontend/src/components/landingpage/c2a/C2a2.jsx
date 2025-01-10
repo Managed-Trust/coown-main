@@ -29,7 +29,7 @@ const StyledButton2 = styled(Button)(({ theme }) => ({
 
 const C2a2 = () => {
   return (
-    <Box bgcolor="#f8f9fb">
+    <Box bgcolor="#f8f9fb" mt={15}>
       <Box
         bgcolor="primary.main"
         sx={{

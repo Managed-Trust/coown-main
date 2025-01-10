@@ -37,6 +37,8 @@ export default function Card() {
       <Typography
         variant="h2"
         align="center"
+        fontSize='36px'
+        lineHeight='44px'
         gutterBottom
         sx={{ fontWeight: 'bold' }}
       >

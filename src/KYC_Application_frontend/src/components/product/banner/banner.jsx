@@ -7,19 +7,19 @@ function Banner() {
     return (
         <>
             <Box sx={{ width: '100%', maxWidth: '100%', background: 'linear-gradient(to bottom, #FFFFFF, #F2F6FA)' }}>
-                <Box sx={{ maxWidth: 800, margin: 'auto', padding: '4 4 4 0' }}>
-                    <Typography variant="h6" align="center" mt={10} display={'flex'} justifyContent={'center'} gutterBottom>
+                <Box sx={{ maxWidth: 950, margin: 'auto', padding: '4 4 4 0' }}>
+                    <Typography variant="h6" align="center" mt={10} mb={2} display={'flex'} justifyContent={'center'} gutterBottom>
                         <img src={coown}  />
                        <Typography  variant="h6"> &nbsp; Product</Typography> 
                     </Typography>
-                    <Typography variant="h3" align="center" gutterBottom sx={{ fontWeight: 700 }}>
+                    <Typography variant="h1" fontSize='54px' align="center" gutterBottom sx={{ fontWeight: 700, letterSpacing:'-1.35px', lineHeight:"60px" }}>
                         Manage {' '}
                         <Box component="span" sx={{ color: '#3b82f6' }}>
                             shared assets
                         </Box>{' '}
                         with your team
                     </Typography>
-                    <Typography variant="body1" align="center" paragraph sx={{ color: "#5A6A85", fontSize:'16px' }}>
+                    <Typography variant="p" align="center" paragraph sx={{ color: "#5A6A85", fontSize:'18px', lineHeight:'26px' }}>
                         Group accounts with spending limits, transaction approvals, and custom securities for regional markets, suitable for private groups,  corporations and public law entities.
                     </Typography>
                     <Box

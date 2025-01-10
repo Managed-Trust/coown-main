@@ -75,7 +75,7 @@ const FAQSection = () => {
     setExpanded(isExpanded ? panel : false);
   }
   return (
-    <Box mt={10} mb={5}>
+    <Box mt={15} mb={5}>
       <Container maxWidth="lg">
         {/* Title Section */}
         <Typography

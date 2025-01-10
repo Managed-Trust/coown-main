@@ -36,15 +36,17 @@ const RecentUpdates = () => {
                     color="primary"
                     textAlign="center"
                     gutterBottom
+                    fontSize='16px'
+                    fontWeight='600'
                 >
                     What's new
                 </Typography>
 
                 <Typography
-                    variant="h4"
-                    component="h1"
+                    variant="h2"
                     textAlign="center"
                     sx={{ mb: 4 }}
+                    fontSize='36px'
                 >
                     Our recent updates
                 </Typography>
@@ -75,7 +77,6 @@ const RecentUpdates = () => {
 
                                     <Typography
                                         variant="h6"
-                                        component="h2"
                                         sx={{ mb: 1 }}
                                     >
                                         {update.title}

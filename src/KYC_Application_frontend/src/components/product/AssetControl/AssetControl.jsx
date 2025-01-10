@@ -66,10 +66,10 @@ const AssetControl = () => {
                                     damping: 30,
                                 }}
                             >
-                                <Typography variant="body" sx={{ color: '#5D87FF' }} gap={1} mb={2}>
+                                <Typography variant="body" sx={{ color: '#5D87FF', fontSize:'16px', fontWeight:'600' }} gap={1} mb={2}>
                                     A solution for managing assets as a team
                                 </Typography>
-                                <Typography variant="h2" fontWeight={700} >
+                                <Typography variant="h2" fontWeight={700} fontSize='36px'>
                                     Decentralized application running fully on ICP’s blockchain
                                 </Typography>
                             </motion.div>
