@@ -37,13 +37,13 @@ const EntityBox = ({ icon, title, description }) => (
 export default function Card() {
   return (
     <Box sx={{ maxWidth: 1000, margin: 'auto', p: 4 }}>
-      <Typography variant="body2" display="block" align="center" gutterBottom sx={{fontSize:'14px', color: '#5D87FF' }}>
+      <Typography variant="body2" display="block" align="center" gutterBottom sx={{fontSize:'16px',fontWeight:'600', color: '#5D87FF' }}>
         Decentralized Autonomous Organization
       </Typography>
-      <Typography variant="h2" align="center" gutterBottom sx={{ fontWeight: 'bold' }}>
+      <Typography variant="h2" align="center" fontSize='36px' gutterBottom sx={{ fontWeight: 'bold' }}>
         COOWN is governed by a DAO
       </Typography>
-      <Typography variant="body1" align="center" paragraph sx={{ color:"#5A6A85",fontSize:'16px' }}>
+      <Typography variant="body1" align="center" paragraph sx={{ color:"#5A6A85",fontSize:'16px', lineHeight:'24px' }}>
         Token holders elect the Foundation and approve transactions fees for performance based staking rewards.
       </Typography>
 

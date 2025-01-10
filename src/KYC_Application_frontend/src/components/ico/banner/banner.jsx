@@ -11,19 +11,19 @@ function Banner() {
                 py: 10,
             }}
         >
-            <Box sx={{ maxWidth: 800, margin: 'auto', textAlign: 'center', px: 2 }}>
+            <Box sx={{ maxWidth: 950, margin: 'auto', textAlign: 'center', px: 2 }}>
                 <Typography variant="body" align="center" mb={2} display={'flex'} justifyContent={'center'} gutterBottom>
                     <img src={img} />
-                    <Typography variant="body" sx={{ fontWeight: 'bold' }} mt={0.5}> &nbsp;  Investment opportunity</Typography>
+                    <Typography variant="body" sx={{ fontWeight: 'bold', fontSize:'16px' }} mt={0.5}> &nbsp;  Investment opportunity</Typography>
                 </Typography>
-                <Typography variant="h1" align="center" gutterBottom sx={{ fontWeight: 700 }}>
+                <Typography variant="h1" align="center" gutterBottom sx={{ fontWeight: 700, fontSize:'54px', lineHeight:'60px' }}>
                     Participate in our{' '}
                     <Box component="span" sx={{ color: '#3b82f6' }}>
                         Initial Coin Offering
                     </Box>{' '}
                     (ICO)
                 </Typography>
-                <Typography variant="body1" align="center" paragraph sx={{ color: '#5A6A85', mb: 4 }}>
+                <Typography variant="body1" align="center" paragraph sx={{ color: '#5A6A85', mb: 4, fontSize:'18px', lineHeight:'26px' }}>
                     Invest in our platform for governing and benefitting from performance based staking rewards
                 </Typography>
                 {/* <Grid container spacing={2} justifyContent="center">

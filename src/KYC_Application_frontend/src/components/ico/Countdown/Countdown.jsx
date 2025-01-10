@@ -46,7 +46,7 @@ const Countdown = () => {
                 <Typography variant="h2" sx={{ color: '#5D87FF', fontWeight: 'bold' }}>
                   {timeLeft.days}
                 </Typography>
-                <Typography variant="body2" fontSize="16px" align="center">
+                <Typography variant="body2" fontSize="16px" align="center" color="#5A6A85" fontWeight="400">
                   Days
                 </Typography>
               </Grid>
@@ -54,7 +54,7 @@ const Countdown = () => {
                 <Typography variant="h2" sx={{ color: '#5D87FF', fontWeight: 'bold' }}>
                   {timeLeft.hours}
                 </Typography>
-                <Typography variant="body2" fontSize="16px" align="center">
+                <Typography variant="body2" fontSize="16px" align="center" color="#5A6A85" fontWeight="400">
                   Hours
                 </Typography>
               </Grid>
@@ -62,7 +62,7 @@ const Countdown = () => {
                 <Typography variant="h2" sx={{ color: '#5D87FF', fontWeight: 'bold' }}>
                   {timeLeft.minutes}
                 </Typography>
-                <Typography variant="body2" fontSize="16px" align="center">
+                <Typography variant="body2" fontSize="16px" align="center" color="#5A6A85" fontWeight="400">
                   Minutes
                 </Typography>
               </Grid>
@@ -70,7 +70,7 @@ const Countdown = () => {
                 <Typography variant="h2" sx={{ color: '#5D87FF', fontWeight: 'bold' }}>
                   {timeLeft.seconds}
                 </Typography>
-                <Typography variant="body2" fontSize="16px" align="center">
+                <Typography variant="body2" fontSize="16px" align="center" color="#5A6A85" fontWeight="400">
                   Seconds
                 </Typography>
               </Grid>

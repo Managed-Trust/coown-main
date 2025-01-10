@@ -6,7 +6,7 @@ const TokenDistribution = () => {
         <Box mt={15} mb={10}>
             <Container maxWidth="md">
                 {/* Title */}
-                <Typography variant="h2" fontWeight="bold" gutterBottom textAlign="center" mb={3}>
+                <Typography variant="h2" fontWeight="bold" gutterBottom textAlign="center" mb={3} fontSize={36}>
                     Ongoing token distribution of $COOWN token
                 </Typography>
 

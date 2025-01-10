@@ -9,13 +9,13 @@ import Simon_Image from "../../../assets/images/organization/Simon_Kaiser.svg";
 export default function Visionary() {
   return (
     <Box sx={{ maxWidth: 1000, margin: 'auto', p: 4,mt:10, mb:5 }}>
-      <Typography variant="body2" display="block" align="center" gutterBottom color="primary" sx={{ fontSize:'14px',  fontWeight: 'semibold' }}>
+      <Typography variant="body2" display="block" align="center" gutterBottom color="primary" sx={{ fontSize:'16px',  fontWeight: '600' }}>
         The Visionaries Behind COOWN
       </Typography>
-      <Typography variant="h3" align="center" gutterBottom sx={{ fontWeight: 'bold', color: 'text.primary' }}>
+      <Typography variant="h2" align="center" gutterBottom sx={{ fontWeight: 'bold', color: 'text.primary' }}>
         Foundation and Developers
       </Typography>
-      <Typography variant="body1" align="center" paragraph sx={{ mb: 6,color: '#5A6A85' }}>
+      <Typography variant="body1" align="center" paragraph sx={{ mb: 6,color: '#5A6A85', fontSize:'16px' }}>
         With experience from the cybersecurity related of Swiss banks, our founders are passionate about creating an innovative digital asset management platform that blends security and user-friendliness. We aim to empower groups globally with the tools needed for efficient, cooperative financial management.
       </Typography>
 

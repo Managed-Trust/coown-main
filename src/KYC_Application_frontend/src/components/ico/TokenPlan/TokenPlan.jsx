@@ -133,7 +133,7 @@ const TokenPlan = () => {
         <Box mt={10} mb={5}>
             <Container maxWidth="lg">
                 {/* Title */}
-                <Typography variant="h4" fontWeight="bold" gutterBottom textAlign="center" mb={3}>
+                <Typography variant="h2" fontWeight="bold" fontSize={36} gutterBottom textAlign="center" mb={3}>
                     Token Distribution Plan
                 </Typography>
 

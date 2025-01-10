@@ -27,7 +27,7 @@ export default function COOWN() {
           <Grid item xs={12} sm={6}>
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 2, gap: '10px' }}>
               <img src="/images/logos/coown-logo.svg" alt="$COOWN Logo" style={{ width: '50px' }} />
-              <Typography variant="h2" component="div" sx={{ fontWeight: 'bold' }}>
+              <Typography variant="h2" component="div" sx={{ fontWeight: 'bold', fontSize: '36px' }}>
                 $COOWN
               </Typography>
             </Box>
