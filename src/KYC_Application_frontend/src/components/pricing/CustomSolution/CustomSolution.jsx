@@ -27,13 +27,13 @@ const CustomSolution = () => {
                     <Grid item xs={12} md={4}>
                         <Typography
                             variant="h2"
-                            sx={{ fontWeight: 'bold' }}
+                            sx={{ fontWeight: 'bold', fontSize: '36px', lineHeight:'44px' }}
                         >Custom solutions for your unique needs
                         </Typography>
 
                         <Typography
                             variant="body2"
-                            sx={{ mt: 2, fontSize: '14px', color: '#5A6A85' }}
+                            sx={{ mt: 2, fontSize: '16px', color: '#5A6A85' }}
                         >Feel free to contact as via form below.
                         </Typography>
                     </Grid>

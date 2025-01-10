@@ -30,13 +30,13 @@ export default function AssetMiningComponent() {
                     />
                 </Grid>
                 <Grid item xs={12} md={6} p={10} mt={8}>
-                    <Typography variant="body" sx={{ color: '#5D87FF', fontWeight: 'semibold' }} gap={1} mb={2}>
+                    <Typography variant="body" sx={{ color: '#5D87FF', fontWeight: '600', fontSize:'16px' }} gap={1} mb={2}>
                         In the roadmap
                     </Typography>
-                    <Typography variant="h2" sx={{ fontWeight: 'bold'}}>
+                    <Typography variant="h2" sx={{ fontWeight: 'bold', fontSize: '36px' }}>
                         Custom asset minting
                     </Typography>
-                    <Typography variant="body2" sx={{ mt: 2, fontSize: '14px', color: '#5A6A85' }}>
+                    <Typography variant="body2" sx={{ mt: 2, fontSize: '16px', color: '#5A6A85', lineHeight: '24px' }}>
                         Custom NFT minting is available on request, allowing you to create and share unique  blockchain-based items. Regional marketplaces for trading assets are on our roadmap.    </Typography>
                     <List>
                         <ListItem disableGutters>

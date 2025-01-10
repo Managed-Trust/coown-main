@@ -19,7 +19,7 @@ export default function FileSharingComponent() {
                     <Typography variant="h2" sx={{ fontWeight: 'bold', mt: 8 }}>
                         Decentralized storage capacity
                     </Typography>
-                    <Typography variant="body2" sx={{ mt: 2, fontSize: '14px', color: '#5A6A85' }}>
+                    <Typography variant="body2" sx={{ mt: 2, fontSize: '16px', color: '#5A6A85', lineHeight: '24px' }}>
                         Optionally, you can expand file sharing capacity to allow members to easily send and share files directly within the group chat.
                     </Typography>
                     <List>

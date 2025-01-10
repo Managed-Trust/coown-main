@@ -85,15 +85,15 @@ export default function Card() {
         }
         arrow
       >
-        <Typography variant="body2" display="block" align="center" gutterBottom sx={{ fontSize: '14px', color: '#5D87FF', fontWeight: '600' }}>
+        <Typography variant="body2" display="block" align="center" gutterBottom sx={{ fontSize: '16px', color: '#5D87FF', fontWeight: '600' }}>
           100% free transactions
         </Typography>
       </Tooltip>
 
-      <Typography variant="h2" align="center" gutterBottom sx={{ fontWeight: 'bold' }}>
+      <Typography variant="h2" align="center" gutterBottom sx={{ fontWeight: 'bold', fontSize: '36px' }}>
         Get free transactions with Enterprise Edition
       </Typography>
-      <Typography variant="p2" align="center" paragraph sx={{ color: "#5A6A85", fontSize: '16px' }}>
+      <Typography variant="p2" align="center" paragraph sx={{ color: "#5A6A85", fontSize: '16px', lineHeight: '24px' }}>
         With Enterprise edition you will get 365 free transactions for each currency per year. Transaction exceeding the limit will cost the regular fee starting  from 0.008 USD to around 0.05 USD.  Higher fees apply to larger transactions exceeding the value of  10 000 USD.
       </Typography>
       <Link> <Typography variant="body2" display="block" align="center" gutterBottom sx={{ fontSize: '14px', color: '#5D87FF', fontWeight: '600' }}>

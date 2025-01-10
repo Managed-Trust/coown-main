@@ -27,11 +27,11 @@ function Banner() {
         <>
             <Box sx={{ width: '100%', maxWidth: '100%' }}>
                 <Container sx={{ maxWidth: 800, margin: 'auto', padding: 6 }}>
-                    <Typography variant="h6" display={'flex'} justifyContent={'center'} gap={1} gutterBottom>
+                    <Typography variant="h6" fontSize='16px' display={'flex'} justifyContent={'center'} gap={1} gutterBottom>
                         <img src={img} alt="" />
                         <Typography variant="h6" mt={1} align="center" gutterBottom>Contact us</Typography>
                     </Typography>
-                    <Typography variant="h1" align="center" gutterBottom>
+                    <Typography variant="h1" fontSize='54px' lineHeight='60px' align="center" gutterBottom>
                         We’d love to hear from you
                     </Typography>
 
@@ -67,14 +67,14 @@ function Banner() {
                     <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
                         <img src="/images/landingPage/Contact_image.jpg" />
                     </div>
-                    <Typography variant="h2" align="center" gutterBottom>
+                    <Typography variant="h2" align="center" fontSize='36px' gutterBottom>
                         Send us messages
                     </Typography>
                     <Typography variant="body2" fontSize={16} align="center" gutterBottom>
                         Feel free to contact us for opportunities, support, or customization. Our team will respond promptly.
                     </Typography>
                     <div style={{ display:'flex',justifyContent:'center' }}>
-                        <Button variant="contained" color="primary" sx={{ mt: 2 }}>
+                        <Button variant="contained" color="primary" sx={{ mt: 2, fontSize:'16px' }}>
                             Get in touch
                         </Button>
                     </div>

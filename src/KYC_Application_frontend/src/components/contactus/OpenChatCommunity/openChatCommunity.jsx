@@ -7,14 +7,14 @@ export default function OpenChatCommunity() {
             <Grid item xs={12} md={6}>
                 <Box sx={{ pt: { xs: 0, md: 8 } }}>
                     <img style={{ marginBottom: '10px' }} src="/images/landingPage/OpenChatImage.jpg" />
-                    <Typography variant="h2" sx={{ mb: 3, fontWeight: 600 }}>
+                    <Typography variant="h2" sx={{ mb: 3, fontWeight: 700, fontSize:'36px' }}>
                         Join Our OpenChat Community
                     </Typography>
                     <Typography
                         variant="body1"
                         color="text.secondary"
-                        sx={{ lineHeight: 1.8 }}
-                        style={{ fontSize: "14px" }}
+                        sx={{ lineHeight: '24px' }}
+                        style={{ fontSize: "16px" }}
                     >
                         Join our community on OpenChat! Connect with us and stay updated — click to join the conversation.
                     </Typography>

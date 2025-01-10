@@ -83,6 +83,7 @@ const FAQSection = () => {
           fontWeight={700}
           mb={4}
           textAlign="center"
+          fontSize='36px'
         >
           Frequently Asked Questions
         </Typography>

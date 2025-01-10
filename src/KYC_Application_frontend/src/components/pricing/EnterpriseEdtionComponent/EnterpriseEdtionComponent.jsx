@@ -33,10 +33,10 @@ const EnterpriseEdtionComponent = () => {
         <Box mt={10} mb={5}>
             <Container maxWidth="lg">
                 <Box textAlign="center">
-                    <Typography variant="h2" sx={{ fontWeight: 'bold' }}>
+                    <Typography variant="h2" sx={{ fontWeight: 'bold', fontSize: '36px', lineHeight: '44px' }}>
                         Enterprise edition
                     </Typography>
-                    <Typography variant="subtitle1" sx={{ color: 'gray', mt: 1 }}>
+                    <Typography variant="subtitle1" sx={{ color: 'gray', mt: 1, fontSize: '16px', lineHeight: '24px' }}>
                         Suitable for larger structures and enterprises.
                     </Typography>
                 </Box>

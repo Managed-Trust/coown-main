@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import img from '../../../assets/images/landingpage/image94.png';
 
 const FeatureItem = ({ title, description }) => (
-    <Box mb={3}>
+    <Box mb={3} pt={2}>
         <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 1 }}>
             {title}
         </Typography>
@@ -27,6 +27,8 @@ const CommunityEdition = () => {
                             sx={{
                                 fontWeight: 'bold',
                                 display: 'inline-block', // Ensures proper block rendering for the gradient
+                                fontSize: '36px',
+                                lineHeight: '44px',
                             }}
                         >
                             Community edition is available{' '}
