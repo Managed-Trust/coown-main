@@ -8,7 +8,7 @@ import { useTheme } from '@mui/material/styles';
 const PersonalAccount = () => {
   const theme = useTheme();
   const StarReward = '#DFE5EF';
-  const Total = '#4472ff';
+  const Total = '#49BEFF';
 
   const optionsareachart = {
     chart: {
@@ -54,14 +54,7 @@ const PersonalAccount = () => {
       opposite: false,
       labels: {
         show: true,
-      },
-      title: {
-        text: 'ICP',
-        style: {
-          color: '#adb0bb',
-          fontWeight: 600,
-        },
-      },
+      }
     },
     legend: {
       show: true,
@@ -95,7 +88,7 @@ const PersonalAccount = () => {
     <Paper
       elevation={3}>
       <Box sx={{ width: '100%', padding: '20px' }}>
-        <Typography variant="h6" gutterBottom>
+        <Typography variant="h5" gutterBottom fontSize="18px">
           Personal Account
         </Typography>
       </Box>

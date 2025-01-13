@@ -58,7 +58,7 @@ const RewardTabs = () => {
                                             backgroundColor: 'rgba(106, 153, 242, 0.15)',
                                             color: 'rgb(106, 153, 242)',
                                             fontWeight: 'bold',
-                                            fontSize:'16px'
+                                            fontSize:'18px'
                                         }}
                                     />
                                 </Typography>
@@ -92,7 +92,7 @@ const RewardTabs = () => {
                         <Grid item xs={12} sm={12} md={6} container alignItems="center" justifyContent="start">
                             <img src={icp} alt="ICP Icon" style={{ maxWidth: '100%', height: 'auto' }} />
                             <Typography ml={2} variant="h5">Staking rewards
-                                <Typography variant="body2" color="#5A6A85">
+                                <Typography variant="body2" color="#5A6A85" fontSize="14px">
                                     Receive rewards for processing $COOWN
                                 </Typography>
                             </Typography>
@@ -101,25 +101,25 @@ const RewardTabs = () => {
                         <Grid item xs={12} sm={12} md={6} lg={6}>
                             <Grid container spacing={2}>
                                 <Grid item xs={4} sm={4} md={4} lg={4}>
-                                    <Typography variant="body2" color="#7C8FAC">
+                                    <Typography variant="body2" color="#7C8FAC" fontSize="14px" marginBottom="5px">
                                         Total rewards
                                     </Typography>
-                                    <Typography variant="h6">52 ICP</Typography>
+                                    <Typography variant="h6" fontSize="21px">52 ICP</Typography>
                                 </Grid>
                                 <Grid item xs={4} sm={4} md={4} lg={4}>
-                                    <Typography variant="body2" color="#7C8FAC">
+                                    <Typography variant="body2" color="#7C8FAC" marginBottom="5px" fontSize="14px">
                                         Rewards past 3 months
                                     </Typography>
-                                    <Typography display={'flex'} variant="h6">21 ICP <Typography mx={1} variant="body2" color="#FF695E">
+                                    <Typography display={'flex'} variant="h6" fontSize="21px">21 ICP <Typography mx={1} variant="body2" color="#FF695E">
                                     ↘   -2%
                                     </Typography></Typography>
 
                                 </Grid>
                                 <Grid item xs={4} sm={4} md={4} lg={4}>
-                                    <Typography variant="body2" color="#7C8FAC">
+                                    <Typography variant="body2" color="#7C8FAC" marginBottom="5px" fontSize="14px">
                                         Rewards past year
                                     </Typography>
-                                    <Typography display={'flex'} variant="h6">1,615 ICP <Typography   mx={1} variant="body2" color="#19BB8D">
+                                    <Typography display={'flex'} variant="h6" fontSize="21px">1,615 ICP <Typography   mx={1} variant="body2" color="#19BB8D">
                                         ↗  +9%
                                     </Typography></Typography>
 

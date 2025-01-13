@@ -262,7 +262,7 @@ const ProfileBanner = () => {
               justifyContent: 'space-between',
               alignItems: 'center',
               backgroundColor: '#4e84ff',
-              padding: '10px 20px',
+              padding: '10px 20px 10px 32px',
               borderRadius: '5px',
               color: '#fff',
               my: 1,
@@ -303,7 +303,7 @@ const ProfileBanner = () => {
 
           </Box>
         }
-        <ProfileTab />
+        <ProfileTab profile={profile} />
       </BlankCard >
     </>
   );

@@ -21,8 +21,8 @@ const CurrentLevelCard = () => {
         sx={{ flexDirection: { xs: 'column', sm: 'row' } }}
       >
         <Typography
-          variant="h6"
-          sx={{ fontSize: { xs: '1.25rem', sm: '1.5rem' } }}
+          variant="h5"
+          sx={{ fontSize: '18px' }}
         >
           Your current level
         </Typography>
@@ -41,36 +41,36 @@ const CurrentLevelCard = () => {
         variant="body2"
         color="textSecondary"
         gutterBottom
-        sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}
+        sx={{ fontSize: '14px',lineHeight: '1.5', color:'#5A6A85' }} 
       >
         Upgrade your account to unlock all platform features
       </Typography>
 
       <List>
-        <ListItem>
+        <ListItem style={{paddingLeft: '0px', paddingRight: '0px'}}>
           <ListItemIcon>
-            <CheckCircleIcon sx={{ color: '#007BFF', fontSize: { xs: '20px', sm: '24px' } }} />
+            <CheckCircleIcon sx={{ color: '#5D87FF', fontSize: { xs: '20px', sm: '24px' } }} />
           </ListItemIcon>
           <ListItemText
-            sx={{ ml: '-20px', fontSize: { xs: '0.875rem', sm: '1rem' } }}
+            sx={{ ml: '-20px', fontSize: '14px' }}
             primary="View group balance"
           />
         </ListItem>
-        <ListItem>
+        <ListItem style={{paddingLeft: '0px', paddingRight: '0px'}}>
           <ListItemIcon>
-            <CheckCircleIcon sx={{ color: '#007BFF', fontSize: { xs: '20px', sm: '24px' } }} />
+            <CheckCircleIcon sx={{ color: '#5D87FF', fontSize: { xs: '20px', sm: '24px' } }} />
           </ListItemIcon>
           <ListItemText
-            sx={{ ml: '-20px', fontSize: { xs: '0.875rem', sm: '1rem' } }}
+            sx={{ ml: '-20px', fontSize: '14px' }}
             primary="Access group chat"
           />
         </ListItem>
-        <ListItem>
+        <ListItem style={{paddingLeft: '0px', paddingRight: '0px'}}>
           <ListItemIcon>
-            <CheckCircleIcon sx={{ color: '#007BFF', fontSize: { xs: '20px', sm: '24px' } }} />
+            <CheckCircleIcon sx={{ color: '#5D87FF', fontSize: { xs: '20px', sm: '24px' } }} />
           </ListItemIcon>
           <ListItemText
-            sx={{ ml: '-20px', fontSize: { xs: '0.875rem', sm: '1rem' } }}
+            sx={{ ml: '-20px', fontSize: '14px' }}
             primary="Engage in group votes"
           />
         </ListItem>

@@ -13,7 +13,7 @@ const Gallery = () => {
           <ProfileBanner />
         </Grid>
         <Grid item sm={12}>
-          <GalleryCard />
+          <GalleryCard paddingLeft="0px" paddingRight="0px" />
         </Grid>
       </Grid>
     </PageContainer>
