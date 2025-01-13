@@ -15,6 +15,7 @@ import Nat64 "mo:base/Nat64";
 import Nat "mo:base/Nat";
 import Blob "mo:base/Blob";
 import Random "mo:base/Random";
+import Error "mo:base/Error";
 import AccountActorClass "./Account";
 
 actor KYC_Canister {
@@ -3996,6 +3997,53 @@ public func participateInVote(userId : Text) : async Text {
 };
 //======================================================================
 //======================================================================
+
+  //==================================================================
+  //=================================================================
+  type CanisterId = Principal;
+
+  type DefiniteCanisterSettings = {
+    controllers : [Principal];
+    compute_allocation : Nat;
+    memory_allocation : Nat;
+    freezing_threshold : Nat;
+  };
+
+  type CanisterStatusResponse = {
+    status : {
+      #stopped;
+      #stopping;
+      #running;
+    };
+    memory_size : Nat;
+    cycles : Nat;
+    settings : DefiniteCanisterSettings;
+    idle_cycles_burned_per_day : Nat;
+    module_hash : ?[Nat8];
+  };
+
+  let ICManagement = actor ("aaaaa-aa") : actor {
+    canister_status : shared ({ canister_id : CanisterId }) -> async CanisterStatusResponse;
+    deposit_cycles : shared ({ canister_id : CanisterId }) -> async ();
+  };
+
+  public shared func transferCycles(targetCanisterId : Text, amount : Nat) : async () {
+    let targetCanister = Principal.fromText(targetCanisterId);
+    Cycles.add(amount);
+    try {
+      await ICManagement.deposit_cycles({ canister_id = targetCanister });
+    } catch (err) {
+      throw Error.reject("Failed to deposit cycles: " # Error.message(err));
+    };
+  };
+
+  public shared func getCanisterStatus(canister_id : Text) : async CanisterStatusResponse {
+    let canisterPrincipal = Principal.fromText(canister_id);
+    let result = await ICManagement.canister_status({
+      canister_id = canisterPrincipal;
+    });
+    return result;
+  };
   private stable var accounts : [Principal] = [];
 
   private stable var accountGroupEntries : [(Text, [Principal])] = [];
