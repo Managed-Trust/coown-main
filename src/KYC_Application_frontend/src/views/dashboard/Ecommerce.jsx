@@ -15,6 +15,7 @@ import Sales from '../../components/dashboards/ecommerce/Sales';
 import MonthlyEarnings from '../../components/dashboards/ecommerce/MonthlyEarnings';
 import ProductPerformances from '../../components/dashboards/ecommerce/ProductPerformances';
 import RecentTransactions from '../../components/dashboards/ecommerce/RecentTransactions';
+import TopUpComponent from '../../components/apps/userprofile/gallery/overviewComponent/TopUpComponent';
 
 const Ecommerce = () => {
   return (
@@ -79,6 +80,9 @@ const Ecommerce = () => {
 
           <Grid item xs={12} lg={8}>
             <ProductPerformances />
+          </Grid>
+          <Grid  item xs={12}>
+            <TopUpComponent/>
           </Grid>
         </Grid>
       </Box>
