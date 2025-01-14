@@ -167,9 +167,9 @@ const TopUpComponent = () => {
                             </TableHead>
                             <TableBody>
                                 <TableRow>
-                                    <TableCell>{cnloading ? "..." : calculateTimeRemaining(Number(frontendCanister.cycles), Number(frontendCanister.idle_cycles_burned_per_day)) + ' weeks'}</TableCell>
-                                    <TableCell align="center">{cnloading ? "..." : calculateTimeRemaining(Number(frontendCanister.cycles), Number(frontendCanister.idle_cycles_burned_per_day)) + ' weeks'}</TableCell>
-                                    <TableCell align="center">{cnloading ? "..." : calculateTimeRemaining(Number(frontendCanister.cycles), Number(frontendCanister.idle_cycles_burned_per_day)) + ' weeks'}</TableCell>
+                                    <TableCell>{cnloading ? "..." : calculateTimeRemaining(Number(frontendCanister.cycles), dailyToWeekly(Number(frontendCanister.idle_cycles_burned_per_day))) + ' weeks'}</TableCell>
+                                    <TableCell align="center">{cnloading ? "..." : calculateTimeRemaining(Number(frontendCanister.cycles), dailyToWeekly(Number(frontendCanister.idle_cycles_burned_per_day))) + ' weeks'}</TableCell>
+                                    <TableCell align="center">{cnloading ? "..." : calculateTimeRemaining(Number(frontendCanister.cycles), dailyToWeekly(Number(frontendCanister.idle_cycles_burned_per_day))) + ' weeks'}</TableCell>
                                 </TableRow>
                             </TableBody>
                         </Table>
@@ -217,9 +217,9 @@ const TopUpComponent = () => {
                             </TableHead>
                             <TableBody>
                             <TableRow>
-                                    <TableCell>{cnloading ? "..." : calculateTimeRemaining(Number(backendCanister.cycles), Number(backendCanister.idle_cycles_burned_per_day)) + ' weeks'}</TableCell>
-                                    <TableCell align="center">{cnloading ? "..." : calculateTimeRemaining(Number(backendCanister.cycles), Number(backendCanister.idle_cycles_burned_per_day)) + ' weeks'}</TableCell>
-                                    <TableCell align="center">{cnloading ? "..." : calculateTimeRemaining(Number(backendCanister.cycles), Number(backendCanister.idle_cycles_burned_per_day)) + ' weeks'}</TableCell>
+                                    <TableCell>{cnloading ? "..." : calculateTimeRemaining(Number(backendCanister.cycles), dailyToWeekly(Number(backendCanister.idle_cycles_burned_per_day))) + ' weeks'}</TableCell>
+                                    <TableCell align="center">{cnloading ? "..." : calculateTimeRemaining(Number(backendCanister.cycles), dailyToWeekly(Number(backendCanister.idle_cycles_burned_per_day))) + ' weeks'}</TableCell>
+                                    <TableCell align="center">{cnloading ? "..." : calculateTimeRemaining(Number(backendCanister.cycles), dailyToWeekly(Number(backendCanister.idle_cycles_burned_per_day))) + ' weeks'}</TableCell>
                                 </TableRow>
                             </TableBody>
                         </Table>
