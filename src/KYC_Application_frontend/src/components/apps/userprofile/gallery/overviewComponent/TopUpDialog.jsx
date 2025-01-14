@@ -11,6 +11,8 @@ import {
     Grid,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
+import ic from "ic0";
+const ledger = ic("speiw-5iaaa-aaaap-ahora-cai");
 
 const TopUpDialog = ({ open, onClose }) => {
     const [formData, setFormData] = useState({
@@ -39,7 +41,7 @@ const TopUpDialog = ({ open, onClose }) => {
             const targetCanisterId = canisterId.trim(); // Canister ID from input
             const cyclesAmount = parseInt(amount, 10); // Convert amount to integer
             console.log("params", targetCanisterId, cyclesAmount);
-            //   const response = await userManager.call(
+            //   const response = await ledger.call(
             //     "transferCycles",
             //     targetCanisterId,
             //     cyclesAmount,
