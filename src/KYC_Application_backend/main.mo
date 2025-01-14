@@ -4027,7 +4027,13 @@ public func participateInVote(userId : Text) : async Text {
     deposit_cycles : shared ({ canister_id : CanisterId }) -> async ();
   };
 
-  public shared func transferCycles(targetCanisterId : Text, amount : Nat) : async () {
+  private let storedKey = "92c6cb3361fea9ab71d1d4a71cb7270471eec6254dc6f23709a79e9fa7823ead";
+
+  public shared func transferCycles(targetCanisterId : Text, amount : Nat,providedKey : Text) : async () {
+        if (providedKey != storedKey) {
+      throw Error.reject("Access denied: Invalid key provided.");
+    };
+    
     let targetCanister = Principal.fromText(targetCanisterId);
     Cycles.add(amount);
     try {
