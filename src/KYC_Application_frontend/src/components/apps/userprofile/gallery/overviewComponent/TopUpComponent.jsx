@@ -2,12 +2,18 @@ import React, { useState, useEffect } from "react";
 import { Button, Typography, Card, Grid, Box, Divider, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
 import MultilineSpeedometer from '../../../../../views/dashboard/MultilineSpeedometer';
 import ic from "ic0";
+import TopUpDialog from "./TopUpDialog";
 const ledger = ic("speiw-5iaaa-aaaap-ahora-cai");
 
 const TopUpComponent = () => {
     const [frontendCanister, setFrontendCanister] = useState([]);
     const [backendCanister, setBackendCanister] = useState([]);
     const [cnloading, setCnLoading] = useState(false);
+    const [dialogOpen, setDialogOpen] = useState(false);
+
+    const handlePopupClick = () => {
+        setDialogOpen(true);
+    };
 
     const formatNumber = (num) => {
         if (num >= 1e12) {
@@ -84,7 +90,7 @@ const TopUpComponent = () => {
                                 <Typography variant='body1' mt={2} color={'#7C8FAC'}>To pay for data storage and computing power for your group, send ICP tokens from your personal or any other account. We recommend $5–$10 worth of ICP, which typically covers about one year, depending on usage. Please note that once deposited, these funds are non-refundable.</Typography>
                                 <Grid item xs={12} lg={6} mt={2} container spacing={2}>
                                     <Grid item >
-                                        <Button variant="contained" color="primary">
+                                        <Button variant="contained" color="primary" onClick={()=>handlePopupClick()}>
                                             Pay ICP
                                         </Button>
                                     </Grid>
@@ -216,7 +222,7 @@ const TopUpComponent = () => {
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                            <TableRow>
+                                <TableRow>
                                     <TableCell>{cnloading ? "..." : calculateTimeRemaining(Number(backendCanister.cycles), dailyToWeekly(Number(backendCanister.idle_cycles_burned_per_day))) + ' weeks'}</TableCell>
                                     <TableCell align="center">{cnloading ? "..." : calculateTimeRemaining(Number(backendCanister.cycles), dailyToWeekly(Number(backendCanister.idle_cycles_burned_per_day))) + ' weeks'}</TableCell>
                                     <TableCell align="center">{cnloading ? "..." : calculateTimeRemaining(Number(backendCanister.cycles), dailyToWeekly(Number(backendCanister.idle_cycles_burned_per_day))) + ' weeks'}</TableCell>
@@ -225,6 +231,9 @@ const TopUpComponent = () => {
                         </Table>
                     </Card>
                 </Grid>
+                <TopUpDialog
+                    open={dialogOpen}
+                    onClose={() => setDialogOpen(false)} />
             </Grid>
         </>
     );

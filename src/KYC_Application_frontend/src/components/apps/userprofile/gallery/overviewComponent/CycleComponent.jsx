@@ -2,12 +2,18 @@ import React, { useState, useEffect } from "react";
 import { Button, Typography, Card, Grid, Box, Divider } from '@mui/material';
 import MultilineSpeedometer from '../../../../../views/dashboard/MultilineSpeedometer';
 import ic from "ic0";
+import TopUpDialog from "./TopUpDialog";
 const ledger = ic("speiw-5iaaa-aaaap-ahora-cai");
 
-const CycleComponent = () => {
+const CycleComponent = ({ toggleShowDetails }) => {
     const [backendCanister, setBackendCanister] = useState([]);
     const [cnloading, setCnLoading] = useState(false);
+    const [dialogOpen, setDialogOpen] = useState(false);
 
+    const handlePopupClick = () => {
+        setDialogOpen(true);
+    };
+ 
     const formatNumber = (num) => {
         if (num >= 1e12) {
             return (num / 1e12).toFixed(2) + ' T';
@@ -43,12 +49,12 @@ const CycleComponent = () => {
                             <Typography variant='body1' mt={2} color={'#7C8FAC'}>You need cycle token to keep your  account running. Depending on the usage,  it typically costs around 5 USD per year, and need to be paid in ICP.</Typography>
                             <Grid item xs={12} lg={6} mt={2} container spacing={2}>
                                 <Grid item >
-                                    <Button variant="contained" color="primary">
+                                    <Button variant="contained" color="primary" onClick={()=>handlePopupClick()}>
                                         Top up
                                     </Button>
                                 </Grid>
                                 <Grid item>
-                                    <Button variant="outlined" color="primary">
+                                    <Button variant="outlined" color="primary" onClick={() => toggleShowDetails()}>
                                         Details
                                     </Button>
                                 </Grid>
@@ -84,6 +90,9 @@ const CycleComponent = () => {
 
                 </Grid>
             </Box>
+            <TopUpDialog 
+          open={dialogOpen}
+          onClose={() => setDialogOpen(false)}/>
         </Card>
     );
 };

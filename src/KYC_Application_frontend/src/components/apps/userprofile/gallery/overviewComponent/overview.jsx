@@ -25,7 +25,11 @@ import TopUpComponent from './TopUpComponent';
 // Adjust as needed for your environment
 
 const Overview = () => {
-    const [showDetails, setShowDetails] = useState(true);
+    const [showDetails, setShowDetails] = useState(false);
+    
+    const toggleShowDetails= ()=>{
+        setShowDetails(!showDetails);
+    }
     const cardData = [
         { title: "Total members", value: "15", Icon: PeopleIcon, bgColor: '#ecf2ff', textColor: '#5883ff' },
         { title: "Transactions", value: "16.5K", Icon: TransactionsIcon, bgColor: '#fef5e5', textColor: '#ffa90f' },
@@ -108,10 +112,9 @@ const Overview = () => {
                             </Grid>
                         ))}
                     </Grid>
-
                     <Grid container sx={{ marginTop: '10px' }}>
                         <Grid item xs={12} display='flex' alignItems="start">
-                            <CycleComponent />
+                            <CycleComponent toggleShowDetails={toggleShowDetails}/>
                         </Grid>
                     </Grid>
                     <Grid container spacing={2} sx={{ marginTop: '10px' }}>
