@@ -7,7 +7,7 @@ const Card = ({ title, value, unit }) => (
     elevation={2} 
     sx={{ 
       p: { xs: 2, sm: 3 }, 
-      boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)', // Add box shadow
+      boxShadow: '0px 1px 10px rgba(0, 0, 0, 0.1)', // Add box shadow
       borderRadius: '8px' // Optional: Add rounded corners
     }}
   >

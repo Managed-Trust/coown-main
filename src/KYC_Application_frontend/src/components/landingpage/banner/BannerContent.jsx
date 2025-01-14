@@ -105,7 +105,7 @@ const BannerContent = () => {
               lineHeight: {
                 md: '60px',
               },
-             
+
             }}
           >
             Manage{' '}
@@ -148,32 +148,48 @@ const BannerContent = () => {
             delay: 0.4,
           }}
         >
-          <Stack direction='row' spacing={2} mt={3}>
+          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} mt={3}>
             {user ? (
               <>
-                <StyledButton variant="contained" color="primary" fontSize="16px" fontWeight="600" to="/dashboards/ecommerce" component={NavLink}>
+                <StyledButton
+                  variant="contained"
+                  color="primary"
+                  fontSize="16px"
+                  fontWeight="600"
+                  to="/dashboards/ecommerce"
+                  component={NavLink}
+                  sx={{ width: { xs: '100%', sm: '45%' } }}
+                >
                   Launch App
                 </StyledButton>
               </>
-            ) :
-              (
-                <>
-                  <StyledButton variant="contained" color="primary" fontSize="16px" fontWeight="600" to="/user/prototype" component={NavLink}>
-                    Sign In
-                  </StyledButton>
-                </>
-              )}
-
+            ) : (
+              <>
+                <StyledButton
+                  variant="contained"
+                  color="primary"
+                  fontSize="16px"
+                  fontWeight="600"
+                  to="/user/prototype"
+                  component={NavLink}
+                  sx={{ width: { xs: '100%', sm: '45%' } }}
+                >
+                  Sign In
+                </StyledButton>
+              </>
+            )}
 
             {/* Custom Google Login Button */}
-            <Link to="/ico">
-              <StyledButton2>
+            <Link to="/ico" style={{ width: '100%' }}>
+              <StyledButton2
+                sx={{ width: { xs: '100%', sm: 'auto' } }}
+              >
                 Contact us
               </StyledButton2>
             </Link>
-
-
           </Stack>
+
+
         </motion.div>
       </Box>
     </GoogleOAuthProvider>

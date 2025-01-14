@@ -73,19 +73,19 @@ const LevelsStepper = () => {
               <Box key={index} sx={{mb:{xs:1, sm: 2}  }}>
                 <Typography
                   variant="body1"
-                  sx={{ fontWeight: 'bold', color: '#007BFF', fontSize: { xs: '1rem', sm: '1.25rem' } }}
+                  sx={{ fontWeight: '600', color: '#5D87FF', fontSize: '14px' }}
                 >
                   {level.label}
                 </Typography>
                 <Typography
                   variant="body2"
-                  sx={{ fontWeight: '600', fontSize: { xs: '0.875rem', sm: '1rem' } }}
+                  sx={{ fontWeight: '600', fontSize: '14px', color:'#2A3547' }}
                 >
                   {level.title}
                 </Typography>
                 <Typography
                   variant="body2"
-                  sx={{ color: 'textSecondary', fontSize: { xs: '0.75rem', sm: '0.875rem' }, mb: {xs:1, sm: 2} }}
+                  sx={{ color: '#5A6A85', fontSize: '14px', fontWeight:'500', mb: {xs:1, sm: 2} }}
                 >
                   {level.description}
                 </Typography>
