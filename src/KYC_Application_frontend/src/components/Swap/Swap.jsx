@@ -191,7 +191,7 @@ const TokenSwap = () => {
         const result = await ledger.call(
           "sendTokensToUser",
           Principal.fromText(principal),
-          coOwnTokens * 10000,
+          coOwnTokens * 1000000000,
           "mysecret"
         );
 
