@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Button, Typography, Card, Grid, Box, Divider, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
-import MultilineSpeedometer from '../../../../../views/dashboard/MultilineSpeedometer';
+import MultilineSpeedometer from "../dashboard/MultilineSpeedometer";
 import ic from "ic0";
 import TopUpDialog from "./TopUpDialog";
 const ledger = ic("speiw-5iaaa-aaaap-ahora-cai");
