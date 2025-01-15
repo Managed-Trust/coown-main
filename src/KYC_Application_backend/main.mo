@@ -819,7 +819,96 @@ actor KYC_Canister {
             };
         };
     };
-};
+  };
+
+// Reset the password using the OTP
+  public func resetPassword(email : Text, otp : Text, newPassword : Text) : async Text {
+      // Check if the user exists
+      switch (users.get(email)) {
+          case (null) {
+              return "User not found.";
+          };
+          case (?user) {
+              // Verify the OTP and check if it's not expired
+              switch (user.otp, user.otpExpiry) {
+                  case (?storedOtp, ?expiry) {
+                      if (storedOtp == otp and Time.now() <= expiry) {
+                          // OTP is valid; update the password
+                          let updatedUser = {
+                              user with
+                              password = newPassword;
+                              otp = null;
+                              otpExpiry = null;
+                          };
+                          users.put(email, updatedUser); // Clear OTP and update the password
+                          return "Password reset successfully.";
+                      } else {
+                          return "Invalid or expired OTP.";
+                      };
+                  };
+                  case _ {
+                      return "OTP not generated or expired.";
+                  };
+              };
+          };
+      };
+  };
+
+  // Update password (user must be logged in)
+  public func updatePassword(email : Text, currentPassword : Text, newPassword : Text) : async Text {
+      // Check if the user exists
+      switch (users.get(email)) {
+          case (null) {
+              return "User not found.";
+          };
+          case (?user) {
+              // Verify the current password
+              if (user.password == currentPassword) {
+                  let updatedUser = {
+                      user with
+                      password = newPassword;
+                  };
+                  users.put(email, updatedUser);
+                  return "Password updated successfully.";
+              } else {
+                  return "Incorrect current password.";
+              };
+          };
+      };
+  };
+
+  // Verify the OTP to log in the user
+  public func loginWithOTP(email : Text, otp : Text) : async ?User {
+      // Check if the user exists
+      switch (users.get(email)) {
+          case (null) {
+              return null; // User not found
+          };
+          case (?user) {
+              // Verify the OTP and check if it's not expired
+              switch (user.otp, user.otpExpiry) {
+                  case (?storedOtp, ?expiry) {
+                      if (storedOtp == otp and Time.now() <= expiry) {
+                          // OTP is valid; log in the user
+                          let updatedUser = {
+                              user with
+                              otp = null;
+                              otpExpiry = null;
+                          };
+                          users.put(email, updatedUser); // Clear OTP after successful login
+                          return ?updatedUser;
+                      } else {
+                          return null; // Invalid or expired OTP
+                      };
+                  };
+                  case _ {
+                      return null; // OTP not generated or expired
+                  };
+              };
+          };
+      };
+  };
+  
   //==============================================================
   //OTP logic
   //==============================================================
@@ -3621,12 +3710,12 @@ type FoundationOperator = {
   public func sendTokensToUser(owner : Principal, amount : Nat, secret : Text) : async Text {
     // Calculate the amount and fee based on your requirements
     let transferAmount = amount; // Adjust amount if needed
-    let transferFee = 500; // Example fee, adjust as needed
+    // let transferFee = 500; // Example fee, adjust as needed
     if (secret != "mysecret") {
       return "Unauthorized";
     };
     // Create the transfer data
-    let cowsay = actor ("4j6si-waaaa-aaaap-abzia-cai") : actor {
+    let cowsay = actor ("qtpy4-kqaaa-aaaap-antha-cai") : actor {
       icrc1_transfer : (TransferType) -> async Result<TxIndex, TransferError>;
     };
 
@@ -3636,7 +3725,7 @@ type FoundationOperator = {
         subaccount = null; // Specify subaccount if needed
       };
       amount = transferAmount; // The amount to transfer
-      fee = ?transferFee; // Optional fee
+      fee = ?10000; // Optional fee
       memo = null; // Add a memo if required
       from_subaccount = null; // Specify subaccount if applicable
       created_at_time = null; // Add a timestamp if needed
