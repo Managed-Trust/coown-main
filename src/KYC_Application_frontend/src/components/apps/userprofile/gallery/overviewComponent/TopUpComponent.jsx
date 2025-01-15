@@ -141,7 +141,7 @@ const TopUpComponent = () => {
                             <TableHead>
                                 <TableRow>
                                     <TableCell> <Typography variant="subtitle1" color="#7C8FAC"> Cycles</Typography></TableCell>
-                                    <TableCell align="center"><Typography variant="subtitle1" color="#7C8FAC">Burn rate <br /> (cycles/day)</Typography></TableCell>
+                                    <TableCell align="center"><Typography variant="subtitle1" color="#7C8FAC">Burn rate (cycles/day)</Typography></TableCell>
                                     <TableCell align="center"><Typography variant="subtitle1" color="#7C8FAC">Memory</Typography></TableCell>
                                 </TableRow>
                             </TableHead>
@@ -191,7 +191,7 @@ const TopUpComponent = () => {
                             <TableHead>
                                 <TableRow>
                                     <TableCell> <Typography variant="subtitle1" color="#7C8FAC"> Cycles</Typography></TableCell>
-                                    <TableCell align="center"><Typography variant="subtitle1" color="#7C8FAC">Burn rate <br /> (cycles/day)</Typography></TableCell>
+                                    <TableCell align="center"><Typography variant="subtitle1" color="#7C8FAC">Burn rate (cycles/day)</Typography></TableCell>
                                     <TableCell align="center"><Typography variant="subtitle1" color="#7C8FAC">Memory</Typography></TableCell>
                                 </TableRow>
                             </TableHead>

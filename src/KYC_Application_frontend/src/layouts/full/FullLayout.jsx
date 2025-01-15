@@ -45,6 +45,7 @@ import Profile from '../../views/apps/user-profile/Profile.jsx';
 import UserSetting from '../../views/apps/user-setting/UserSetting.jsx';
 
 import WarningBanner from './WarningBanner';
+import AdminSetting from '../../views/admin/AdminSetting';
 
 const MainWrapper = styled('div')(() => ({
   display: 'flex',
@@ -90,6 +91,7 @@ const FullLayout = () => {
           >
             <Box sx={{ minHeight: 'calc(100vh - 170px)' }}>
               <Routes>
+                <Route path="/admin/settings" element={<AdminSetting/>} />  
                 <Route path="/dashboards/ecommerce" element={<EcommerceDash />} />
                 <Route path="/dashboards/modern" element={<Modern />} />
                 <Route path="/apps/followers" element={<Followers />} />

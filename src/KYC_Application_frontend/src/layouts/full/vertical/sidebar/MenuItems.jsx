@@ -66,9 +66,8 @@ const Menuitems = [
         id: uniqueId(),
         title: 'Admin Settings',
         icon: IconArrowsShuffle,
-        href: '/admin-setting',
-        children: [
-        ],
+        href: 'admin/settings',
+       
       },
 
       {

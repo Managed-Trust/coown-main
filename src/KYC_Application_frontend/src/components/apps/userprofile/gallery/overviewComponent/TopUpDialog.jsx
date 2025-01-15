@@ -43,6 +43,9 @@ const TopUpDialog = ({ open, onClose }) => {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
+        if (name === "amount" && (isNaN(value) || parseFloat(value) < 0)) {
+            return; // Ignore invalid values or negative numbers
+        }
         setFormData((prev) => ({ ...prev, [name]: value }));
     };
 
@@ -57,10 +60,11 @@ const TopUpDialog = ({ open, onClose }) => {
     }, []); // Empty dependency array ensures this runs only once
 
     useEffect(() => {
-        const amountBigInt = BigInt(formData.amount || 0); // Convert to BigInt or default to 0
-        const total = amountBigInt * BigInt(tcycle); // Ensure tcycle is BigInt
-        setTotalCylce(total.toString())
-    }, [formData.amount]);
+        const parsedAmount = parseFloat(formData.amount) || 0; // Ensure valid number
+        const amountBigInt = BigInt(Math.round(parsedAmount * 100)); // Convert to smallest unit (e.g., cents)
+        const total = amountBigInt * BigInt(tcycle); // tcycle must also be in smallest unit
+        setTotalCylce(total.toString());
+    }, [formData.amount, tcycle]);
     const handleSubmit = async (e) => {
         e.preventDefault(); // Prevent the default form submission behavior
 
@@ -135,7 +139,7 @@ const TopUpDialog = ({ open, onClose }) => {
                                 <Grid item xs={12}>
                                     <TextField
                                         fullWidth
-                                        label="Amount"
+                                        label="Amount in ICP"
                                         id="amount"
                                         name="amount"
                                         type="number"
@@ -143,13 +147,14 @@ const TopUpDialog = ({ open, onClose }) => {
                                         placeholder="Enter Amount"
                                         value={formData.amount}
                                         onChange={handleChange}
+                                        step="0.01"
                                     />
                                 </Grid>
                                 <Grid item xs={12}>
                                     <TextField
                                         fullWidth
-                                        label="TCycle"
-                                        name="TCycle"
+                                        label="Cycle"
+                                        name="Cycle"
                                         type="number"
                                         disabled
                                         variant="outlined"

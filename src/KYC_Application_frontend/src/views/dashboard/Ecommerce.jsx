@@ -81,9 +81,9 @@ const Ecommerce = () => {
           <Grid item xs={12} lg={8}>
             <ProductPerformances />
           </Grid>
-          <Grid  item xs={12}>
+          {/* <Grid  item xs={12}>
             <TopUpComponent/>
-          </Grid>
+          </Grid> */}
         </Grid>
       </Box>
     </PageContainer>
