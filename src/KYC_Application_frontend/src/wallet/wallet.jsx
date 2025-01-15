@@ -807,6 +807,7 @@ import {
   Logout as LogoutIcon,
 } from "@mui/icons-material";
 import { useConnect } from "@connect2ic/react";
+import { AuthClient } from "@dfinity/auth-client";
 
 import { createActor } from "../../../declarations/Token";
 import { theme } from "./theme";
@@ -814,10 +815,10 @@ import { theme } from "./theme";
 const canisterIds = {
   icp: "ryjl3-tyaaa-aaaaa-aaaba-cai",
   dummy: "qtpy4-kqaaa-aaaap-antha-cai",
-  ckbtc: "mxzaz-hqaaa-aaaar-qaada-cai",
-  cketh: "ss2fx-dyaaa-aaaar-qacoq-cai",
+//   ckbtc: "mxzaz-hqaaa-aaaar-qaada-cai",
+//   cketh: "ss2fx-dyaaa-aaaar-qacoq-cai",
   ckusdc: "xevnm-gaaaa-aaaar-qafnq-cai",
-  ckxaut: "nza5v-qaaaa-aaaar-qahzq-cai",
+//   ckxaut: "nza5v-qaaaa-aaaar-qahzq-cai",
 };
 
 export default function WalletComponent() {
@@ -830,11 +831,25 @@ export default function WalletComponent() {
   const [amount, setAmount] = useState("");
   const [tokenType, setTokenType] = useState("icp");
   const [loading, setLoading] = useState(false);
+  const [identity, setIdentity] = useState(null);
+  const [authClient, setAuthClient] = useState(null);
 
   const { isConnected, principal, disconnect } = useConnect({
     onConnect: () => {},
     onDisconnect: () => {},
   });
+  const init = async () => {
+    const client = await AuthClient.create();
+    setAuthClient(client);
+    if (await client.isAuthenticated()) {
+      handleAuthenticated(client);
+    }
+  };
+
+  const handleAuthenticated = async (client) => {
+    const identity = await client.getIdentity();
+    setIdentity(identity);
+  };
 
   const shortPrincipal = principal
     ? `${principal.slice(0, 6)}...${principal.slice(-4)}`
@@ -853,7 +868,7 @@ export default function WalletComponent() {
   };
 
   const handleDisconnect = async () => {
-     disconnect();
+    disconnect();
     alert("Wallet disconnected.");
     setWalletOpen(false);
   };
@@ -870,7 +885,7 @@ export default function WalletComponent() {
           owner: Principal.fromText(principal),
           subaccount: [],
         });
-        console.log("balance",balance)
+        console.log("balance", balance);
         newBalances[type] = Number(balance) / 100000000; // Adjust for token decimals
       } catch (error) {
         console.error(`Failed to fetch balance for ${type}:`, error);
@@ -882,6 +897,7 @@ export default function WalletComponent() {
   };
 
   useEffect(() => {
+    init();
     if (walletOpen && isConnected) {
       fetchAllBalances();
     }
@@ -897,7 +913,12 @@ export default function WalletComponent() {
       if (!canisterId) {
         throw new Error(`Unsupported token type: ${tokenType}`);
       }
-      const actor = createActor(canisterId, {});
+
+      const actor = createActor(canisterId, {
+        agentOptions: { identity },
+      });
+
+      //   const actor = createActor(canisterId, {});
       await actor.icrc1_transfer({
         to: {
           owner: Principal.fromText(to),
@@ -907,7 +928,7 @@ export default function WalletComponent() {
         memo: [],
         from_subaccount: [],
         created_at_time: [],
-        amount: BigInt(amount * 100000), // Adjust for token decimals
+        amount: BigInt(amount * 100000000), // Adjust for token decimals
       });
       alert("Transaction Successful");
       fetchAllBalances(); // Refresh balances
