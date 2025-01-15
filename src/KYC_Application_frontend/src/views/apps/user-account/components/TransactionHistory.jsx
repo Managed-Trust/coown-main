@@ -1,45 +1,24 @@
-import React from 'react';
-import usdc from '../../../../assets/images/svgs/usdc pic.svg';
-import xaut from '../../../../assets/images/svgs/XAUT.svg';
-import btc from '../../../../assets/images/svgs/btc-pic.svg';
-import coown from '../../../../assets/images/svgs/coown-pic.svg';
-import icp from '../../../../assets/images/svgs/icp-pic.svg';
-import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import React, { useState } from 'react';
 import {
-    Container,
-    Card,
-    Grid,
-    CardContent,
-    CardMedia,
-    Typography,
+    Paper,
     Table,
     TableBody,
     TableCell,
     TableContainer,
     TableHead,
     TableRow,
-    Toolbar,
-    Paper,
-    IconButton,
-    Tooltip,
+    Typography,
     Box,
+    Avatar,
     Button,
-    TextField,
-    CircularProgress,
+    TablePagination,
+    InputBase,
     FormControl,
     Select,
     MenuItem,
-    Stack,
-    Tabs,
-    Tab,
-    TablePagination,
-    TableFooter,
-    Input,
-    Avatar,
-    Chip,
-    InputBase,
-    useMediaQuery
 } from "@mui/material";
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+
 import img1 from '../../../../assets/images/profile/user-1.jpg';
 import img2 from '../../../../assets/images/profile/user-2.jpg';
 import img3 from '../../../../assets/images/profile/user-3.jpg';
@@ -58,8 +37,8 @@ const transactionData = [
         status: 'Complete',
         member: {
             avatar: img1,
-            name: 'Alice Johnson'
-        }
+            name: 'Alice Johnson',
+        },
     },
     {
         id: '987654321',
@@ -72,8 +51,8 @@ const transactionData = [
         status: 'Pending',
         member: {
             avatar: img2,
-            name: 'John Doe'
-        }
+            name: 'John Doe',
+        },
     },
     {
         id: '112233445',
@@ -86,8 +65,8 @@ const transactionData = [
         status: 'Declined',
         member: {
             avatar: img3,
-            name: 'Emma Watson'
-        }
+            name: 'Emma Watson',
+        },
     },
     {
         id: '998877665',
@@ -100,8 +79,8 @@ const transactionData = [
         status: 'Complete',
         member: {
             avatar: img4,
-            name: 'Michael Brown'
-        }
+            name: 'Michael Brown',
+        },
     },
     {
         id: '445566778',
@@ -114,12 +93,29 @@ const transactionData = [
         status: 'Complete',
         member: {
             avatar: img5,
-            name: 'Sophia Davis'
-        }
-    }
+            name: 'Sophia Davis',
+        },
+    },
 ];
 
 const TransactionHistory = () => {
+    const [page, setPage] = useState(0); // Current page
+    const [rowsPerPage, setRowsPerPage] = useState(3); // Rows per page
+
+    // Handle page change
+    const handleChangePage = (event, newPage) => {
+        setPage(newPage);
+    };
+
+    // Handle rows per page change
+    const handleChangeRowsPerPage = (event) => {
+        setRowsPerPage(parseInt(event.target.value, 10));
+        setPage(0); // Reset to first page
+    };
+
+    // Paginated data
+    const paginatedData = transactionData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+
     return (
         <Paper
             elevation={3}
@@ -132,19 +128,19 @@ const TransactionHistory = () => {
             }}
         >
             <Box mt={2}>
-                <Typography variant="h5" gutterBottom>
+                <Typography variant="h5" mb={2} fontSize="18px" fontWeight="600">
                     Transaction history
                 </Typography>
-                <Box sx={{ backgroundColor: '#DFE5EF', p: 1, borderRadius: '8px', mb: 3 }}>
+                <Box sx={{ backgroundColor: '#F2F6FA', p: 2.5, borderRadius: '8px', mb: 3 }}>
                     <Box
                         display="flex"
                         alignItems="center"
                         gap={2}
-                        flexWrap="wrap" // Allows wrapping for smaller screens
+                        flexWrap="wrap"
                         sx={{
                             flexDirection: {
-                                xs: 'column', // Stack vertically on extra small screens (mobile)
-                                sm: 'row', // Horizontal layout on small screens and above
+                                xs: 'column',
+                                sm: 'row',
                             },
                         }}
                     >
@@ -159,8 +155,8 @@ const TransactionHistory = () => {
                                 fontSize: '16px',
                                 backgroundColor: 'white',
                                 width: {
-                                    xs: '100%', // Full width on small screens
-                                    sm: 'auto', // Auto width on larger screens
+                                    xs: '100%',
+                                    sm: 'auto',
                                 },
                             }}
                         />
@@ -234,12 +230,12 @@ const TransactionHistory = () => {
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {transactionData.map((row) => (
+                            {paginatedData.map((row) => (
                                 <TableRow key={row.id}>
-                                    <TableCell sx={{ color: 'gray', fontSize: '16px' }}>{row.id}</TableCell>
+                                    <TableCell sx={{ color: 'gray', fontSize: '14px', fontWeight:'400' }}>{row.id}</TableCell>
                                     <TableCell>
-                                        <Typography variant="body1" sx={{ fontWeight: 'bold', fontSize: '16px' }}>{row.amount}</Typography>
-                                        <Typography variant="body2" sx={{ color: 'gray', fontSize: '12px' }}>{row.usd} USD</Typography>
+                                        <Typography variant="body1" sx={{ fontSize: '14px', fontWeight:'600' }}>{row.amount}</Typography>
+                                        <Typography variant="body2" sx={{ color: 'gray', fontSize: '14px', fontWeight:'400' }}>{row.usd} USD</Typography>
                                     </TableCell>
                                     <TableCell>
                                         <Button
@@ -251,6 +247,7 @@ const TransactionHistory = () => {
                                                 color: row.type === 'Received' ? '#2B8A3E' : '#1A73E8',
                                                 textTransform: 'none',
                                                 fontSize: '14px',
+                                                fontWeight:'600',
                                                 '&:hover': {
                                                     backgroundColor: row.type === 'Received' ? '#E6FFFA' : '#E0E7FF',
                                                 },
@@ -259,7 +256,7 @@ const TransactionHistory = () => {
                                             {row.type}
                                         </Button>
                                     </TableCell>
-                                    <TableCell sx={{ color: 'gray', fontSize: '16px' }}>{row.dateTime}</TableCell>
+                                    <TableCell sx={{ color: 'gray', fontSize: '14px', fontWeight:'400' }}>{row.dateTime}</TableCell>
                                     <TableCell>
                                         <Typography
                                             variant="body2"
@@ -269,14 +266,15 @@ const TransactionHistory = () => {
                                                 textOverflow: 'ellipsis',
                                                 maxWidth: '160px',
                                                 color: 'gray',
-                                                fontSize: '12px',
+                                                fontSize: '14px',
+                                                fonrWeight:'400',
                                             }}
                                         >
                                             {row.counterparty}
                                         </Typography>
                                         <ContentCopyIcon fontSize="small" />
                                     </TableCell>
-                                    <TableCell sx={{ color: 'gray', fontSize: '12px' }}>{row.fees}</TableCell>
+                                    <TableCell sx={{ color: 'gray', fontSize: '14px', fontWeight:'400' }}>{row.fees}</TableCell>
                                     <TableCell>
                                         <Button
                                             variant="contained"
@@ -298,7 +296,7 @@ const TransactionHistory = () => {
                                                         row.status === 'Complete' ? '#E6FFFA' :
                                                             row.status === 'Pending' ? '#FFF7E0' :
                                                                 '#FFE0E0',
-                                                }
+                                                },
                                             }}
                                         >
                                             {row.status}
@@ -307,7 +305,7 @@ const TransactionHistory = () => {
                                     <TableCell>
                                         <Box display="flex" alignItems="center">
                                             <Avatar src={row.member.avatar} alt={row.member.name} sx={{ width: 36, height: 36 }} />
-                                            <Typography sx={{ marginLeft: '8px', fontSize: '16px' }}>{row.member.name}</Typography>
+                                            <Typography sx={{ marginLeft: '8px', fontSize: '14px', fontWeight:'400' }}>{row.member.name}</Typography>
                                         </Box>
                                     </TableCell>
                                 </TableRow>
@@ -315,6 +313,15 @@ const TransactionHistory = () => {
                         </TableBody>
                     </Table>
                 </TableContainer>
+                <TablePagination
+                    rowsPerPageOptions={[3, 5, 10]}
+                    component="div"
+                    count={transactionData.length}
+                    rowsPerPage={rowsPerPage}
+                    page={page}
+                    onPageChange={handleChangePage}
+                    onRowsPerPageChange={handleChangeRowsPerPage}
+                />
             </Box>
         </Paper>
     );

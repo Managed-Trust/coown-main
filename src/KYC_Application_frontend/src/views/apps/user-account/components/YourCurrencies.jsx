@@ -94,7 +94,7 @@ const YourCurrencies = () => {
                     Your currencies
                 </Typography>
                 <Box display="flex" alignItems="center" mt={1}>
-                    <Typography variant="body2" color="textSecondary" mr={1}>
+                    <Typography variant="body2" color="textSecondary" mr={1} fontSize="14px">
                         Current balance breakdown
                     </Typography>
                 </Box>

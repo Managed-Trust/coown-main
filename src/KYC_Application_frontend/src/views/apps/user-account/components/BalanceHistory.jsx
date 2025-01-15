@@ -57,13 +57,6 @@ const BalanceHistory = () => {
             labels: {
                 show: true,
             },
-            title: {
-                text: 'ICP',
-                style: {
-                    color: '#adb0bb',
-                    fontWeight: 600,
-                },
-            },
         },
         legend: {
             show: true,

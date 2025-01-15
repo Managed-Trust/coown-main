@@ -22,14 +22,14 @@ const ResellerProgramCard = () => {
       variant="outlined"
     >
       <CardContent>
-        <Typography variant="h5" color="white" sx={{ fontSize: { xs: '1.25rem', sm: '1.5rem' } }}>
+        <Typography variant="h5" color="white" sx={{ fontSize:"18px", fontWeight:"600" }}>
           Reseller Program
         </Typography>
         <Typography
           variant="subtitle1"
           color="white"
           mb={1}
-          sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}
+          sx={{ fontSize: '14px', fontWeight: '400' }}
         >
           Invite your friends and get rewards
         </Typography>
@@ -64,6 +64,8 @@ const ResellerProgramCard = () => {
             variant="body1"
             sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}
             gutterBottom
+            fontSize="16px" 
+            fontWeight="600"
           >
             Send link to your friend
           </Typography>
@@ -71,21 +73,19 @@ const ResellerProgramCard = () => {
             fullWidth
             variant="outlined"
             value="https://co-own.com/affiliate/i94hf8f2h3h"
+            style={{ color:'#7C8FAC'}}
             InputProps={{
               readOnly: true,
               sx: {
                 '&.MuiOutlinedInput-root': {
                   '& fieldset': {
                     border: 'none', // Removes the border
-                    color: '#7C8FAC'
                   },
                   '&:hover fieldset': {
                     border: 'none', // Ensures no border on hover
-                    color: '#7C8FAC'
                   },
                   '&.Mui-focused fieldset': {
                     border: 'none', // Ensures no border on focus
-                    color: '#7C8FAC'
                   },
                 },
               },

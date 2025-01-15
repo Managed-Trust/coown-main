@@ -110,9 +110,9 @@ const PendingMember = () => {
     >
       <Box mt={2}>
         <Typography variant="h5" gutterBottom>
-          Pending Transaction
+          Pending Members Transaction
         </Typography>
-        <TableContainer component={Paper} sx={{ borderRadius: '12px' }}>
+        <TableContainer component={Paper} sx={{ borderRadius: '12px', boxShadow:'0' }}>
           <Table sx={{ minWidth: 650 }} aria-label="transaction history table">
             <TableHead>
               <TableRow>
@@ -134,20 +134,20 @@ const PendingMember = () => {
                         alt={row.logoName}
                         sx={{ width: 30, height: 30 }}
                       />
-                      <Typography variant="h6" fontWeight="600">
+                      <Typography variant="h6" fontWeight="600" fontSize="14px">
                         {row.logoName}
                       </Typography>
                     </Stack>
                   </TableCell>
                   <TableCell>
-                    <Typography variant="h6">{row.amount}</Typography>
-                    <Typography variant="body2" sx={{ color: 'gray' }}>
+                    <Typography variant="h6" fontSize="14px" fontWeight="600">{row.amount}</Typography>
+                    <Typography variant="body2" sx={{ color: 'gray', fontSize:'14px', fontWeight:'400' }}>
                       {row.usd}
                     </Typography>
                   </TableCell>
-                  <TableCell sx={{ color: 'gray', fontSize: '16px' }}>{row.date}</TableCell>
+                  <TableCell sx={{ color: 'gray', fontSize:'14px', fontWeight:'400' }}>{row.date}</TableCell>
                   <TableCell>
-                    <Typography sx={{ color: 'gray', fontSize: '12px' }}>
+                    <Typography sx={{ color: 'gray', fontSize:'14px', fontWeight:'400' }}>
                       {row.counterparty}
                     </Typography>
                     <ContentCopyIcon fontSize="small" />
@@ -159,7 +159,7 @@ const PendingMember = () => {
                         alt={row.customer}
                         sx={{ width: 30, height: 30 }}
                       />
-                      <Typography variant="h6" fontWeight="600">
+                      <Typography variant="h6" fontWeight="600" fontSize="14px">
                         {row.customer}
                       </Typography>
                     </Stack>
@@ -175,11 +175,11 @@ const PendingMember = () => {
                         Approve
                       </Button>
                       <Button 
-                        className="btn-decline" 
                         variant="contained" 
-                        sx={{ color: 'white', backgroundColor: 'red' }}
+                        sx={{ color: 'white' }}
+                        style={{ backgroundColor: '#FF695E'}}
                       >
-                        Reject
+                        Decline
                       </Button>
                     </Box>
                   </TableCell>

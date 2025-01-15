@@ -39,7 +39,7 @@ const RecentContact = () => {
 
   return (
     <Card sx={{ p: { xs: 2, sm: 3 }, borderRadius: '8px' }}>
-      <Typography variant="h6" gutterBottom sx={{ fontSize: { xs: '1.25rem', sm: '1.5rem' } }}>
+      <Typography variant="h5" gutterBottom sx={{ fontSize: '18px', fontWeight: 600 }}>
         Recent Contacts
       </Typography>
       <List sx={{ px: 0 }}>
@@ -99,7 +99,7 @@ const RecentContact = () => {
                 }
                 sx={{ my: 0 }}
               />
-              <Box sx={{ display: 'flex', gap: { xs: '1px', sm: '2px' }, alignItems: 'center' }}>
+              <Box sx={{ display: 'flex', gap: '1em', alignItems: 'center' }}>
                 <img src={dollarIcon} alt="dollar" />
                 <img src={chaticon} alt="chat" />
               </Box>

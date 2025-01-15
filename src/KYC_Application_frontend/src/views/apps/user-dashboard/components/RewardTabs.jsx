@@ -57,7 +57,7 @@ const RewardTabs = () => {
                                             ml: 2,
                                             backgroundColor: 'rgba(106, 153, 242, 0.15)',
                                             color: 'rgb(106, 153, 242)',
-                                            fontWeight: 'bold',
+                                            fontWeight: '600',
                                             fontSize:'18px'
                                         }}
                                     />

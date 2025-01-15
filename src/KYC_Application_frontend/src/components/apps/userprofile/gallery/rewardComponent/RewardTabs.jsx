@@ -50,7 +50,7 @@ const RewardTabs = () => {
                                 <img src={icp} alt="ICP Icon" style={{ maxWidth: '100%', height: 'auto' }} />
                             </Grid>
                             <Grid item xs={8} md={10}>
-                                <Typography sx={{ padding: '3px 0px' }} variant="h6">
+                                <Typography sx={{ padding: '3px 0px' }} fontSize='18px' fontWeight='600' variant="h5">
                                     Get rewards by staking $COOWN token
                                 </Typography>
                                 <Typography sx={{ padding: '3px 0px' }} variant="body1" color="textSecondary">

@@ -390,7 +390,7 @@ const Accounts = () => {
                     <Grid item xs={12} md={6}>
                         <Card
                             sx={{
-                                background: 'linear-gradient(135deg, #1C2944, #314f7b)', // Adjust the gradient colors to match the design
+                                background: 'linear-gradient(135deg, #2A3547, #1A5A8A)', // Adjust the gradient colors to match the design
                                 color: 'white',
                                 borderRadius: '13px', // Adjust the border radius as needed
                                 padding: 1, // Add padding for consistent spacing
