@@ -61,9 +61,11 @@ const TopUpDialog = ({ open, onClose }) => {
 
     useEffect(() => {
         const parsedAmount = parseFloat(formData.amount) || 0; // Ensure valid number
-        const amountBigInt = BigInt(Math.round(parsedAmount * 100)); // Convert to smallest unit (e.g., cents)
-        const total = amountBigInt * BigInt(tcycle); // tcycle must also be in smallest unit
-        setTotalCylce(total.toString());
+        const amountBigInt = BigInt(Math.round(parsedAmount * 10000000000)); // Convert to smallest unit (e.g., cents)
+        const tcycleBigInt = BigInt(tcycle); // Convert tcycle to BigInt
+        const total = amountBigInt * tcycleBigInt; // Calculate total in smallest unit
+        const Ttotal = Number(total) / 10000000000; // Convert back to original unit (e.g., dollars)
+        setTotalCylce(Ttotal); // Ensure 2 decimal places in the result
     }, [formData.amount, tcycle]);
     const handleSubmit = async (e) => {
         e.preventDefault(); // Prevent the default form submission behavior
