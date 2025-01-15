@@ -135,7 +135,7 @@ const TopUpComponent = () => {
             <Grid container spacing={2} mt={2}>
                 <Grid item xs={12} lg={6}>
                     <Card p={2}>
-                        <Typography variant="h5" align="left" mb={2}>Your cycles</Typography>
+                        <Typography variant="h5" align="left" mb={2}>Your cycles (Frontend)</Typography>
 
                         <Table>
                             <TableHead>
@@ -158,7 +158,7 @@ const TopUpComponent = () => {
 
                 <Grid item xs={12} lg={6}>
                     <Card>
-                        <Typography variant="h5" align="left" mb={2} >Cycles will run out </Typography>
+                        <Typography variant="h5" align="left" mb={2} >Cycles will run out (Frontend)</Typography>
 
                         <Table>
                             <TableHead>
@@ -182,7 +182,7 @@ const TopUpComponent = () => {
                     </Card>
                 </Grid>
             </Grid>
-            {/* <Grid container spacing={2} mt={2}>
+            <Grid container spacing={2} mt={2}>
                 <Grid item xs={12} lg={6}>
                     <Card p={2}>
                         <Typography variant="h5" align="left" mb={2}>Your cycles (Backend)</Typography>
@@ -231,10 +231,10 @@ const TopUpComponent = () => {
                         </Table>
                     </Card>
                 </Grid>
-            </Grid> */}
                 <TopUpDialog
                     open={dialogOpen}
                     onClose={() => setDialogOpen(false)} />
+            </Grid>
         </>
     );
 };

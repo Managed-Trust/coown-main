@@ -83,15 +83,15 @@ const TopUpDialog = ({ open, onClose }) => {
             const targetCanisterId = canisterId.trim(); // Canister ID from input
             const cyclesAmount = parseInt(amount, 10); // Convert amount to integer
             console.log("params", targetCanisterId, cyclesAmount);
-            // const response = await ledger.call(
-            //     "transferCycles",
-            //     targetCanisterId,
-            //     cyclesAmount,
-            //     key
-            // );
-            // console.log("response", response);
-            swal('Cycles Transferred Successfully', '', 'success');
-            // alert("Cycles transferred successfully!");
+            const response = await ledger.call(
+                "transferCycles",
+                targetCanisterId,
+                cyclesAmount,
+                key
+            );
+            console.log("response", response);
+
+            alert("Cycles transferred successfully!");
             setFormData({ canisterId: "", amount: "" }); // Reset the form
         } catch (error) {
             console.error("Error transferring cycles:", error);

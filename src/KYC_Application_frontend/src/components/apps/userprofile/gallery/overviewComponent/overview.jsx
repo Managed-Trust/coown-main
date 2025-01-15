@@ -112,11 +112,11 @@ const Overview = () => {
                             </Grid>
                         ))}
                     </Grid>
-                    {/* <Grid container sx={{ marginTop: '10px' }}>
+                    <Grid container sx={{ marginTop: '10px' }}>
                         <Grid item xs={12} display='flex' alignItems="start">
                             <CycleComponent toggleShowDetails={toggleShowDetails}/>
                         </Grid>
-                    </Grid> */}
+                    </Grid>
                     <Grid container spacing={2} sx={{ marginTop: '10px' }}>
                         <Grid item xs={12} lg={6}>
                             <TotalEstimatedChart />
