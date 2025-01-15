@@ -1,11 +1,20 @@
-import React from 'react';
-import { Box, Typography, Card, CardContent, useMediaQuery, useTheme, Button } from '@mui/material';
+import React from "react";
+import {
+  Box,
+  Typography,
+  Card,
+  CardContent,
+  useMediaQuery,
+  useTheme,
+  Button,
+} from "@mui/material";
 import { ConnectButton, ConnectDialog, useConnect } from "@connect2ic/react";
-import swal from 'sweetalert';
+import swal from "sweetalert";
+import WalletComponent from "../../../wallet/wallet";
 
 export default function Connect() {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm')); // Detect mobile view
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm")); // Detect mobile view
 
   const { isConnected, activeProvider } = useConnect({
     onConnect: () => {
@@ -18,12 +27,12 @@ export default function Connect() {
 
   const handleClick = () => {
     swal({
-      title: 'Swap Coming Soon!',
-      text: 'Stay tuned, the swap feature will be available soon.',
-      icon: 'info',
+      title: "Swap Coming Soon!",
+      text: "Stay tuned, the swap feature will be available soon.",
+      icon: "info",
       button: {
-        text: 'OK',
-        className: 'btn btn-primary',
+        text: "OK",
+        className: "btn btn-primary",
       },
     });
   };
@@ -45,36 +54,52 @@ export default function Connect() {
   return (
     <Box
       sx={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
         marginTop: 10,
         marginBottom: 4,
       }}
     >
-      <Card sx={{ maxWidth: 1000, bgcolor: '#F8F6FF', borderRadius: 3, width: '100%' }}>
+      <Card
+        sx={{
+          maxWidth: 1000,
+          bgcolor: "#F8F6FF",
+          borderRadius: 3,
+          width: "100%",
+        }}
+      >
         <CardContent
           sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: isMobile ? 'center' : 'space-between', // Center content on mobile
-            flexDirection: isMobile ? 'column' : 'row', // Column layout for mobile
+            display: "flex",
+            alignItems: "center",
+            justifyContent: isMobile ? "center" : "space-between", // Center content on mobile
+            flexDirection: isMobile ? "column" : "row", // Column layout for mobile
             gap: isMobile ? 2 : 0, // Add gap between elements on mobile
             p: 2,
           }}
         >
-          <Box sx={{ display: 'flex', alignItems: 'center', flexDirection: isMobile ? 'column' : 'row' }}>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              flexDirection: isMobile ? "column" : "row",
+            }}
+          >
             <Box
               sx={{
-                display: 'flex',
+                display: "flex",
                 mr: isMobile ? 0 : 2, // Adjust margin for mobile
                 mb: isMobile ? 2 : 0, // Add margin bottom on mobile
-                gap: '10px',
+                gap: "10px",
               }}
             >
               {/* Show either Plug or Internet Identity icon and name if connected */}
               {connectedProvider ? (
-                <img src={connectedProvider.icon} alt={`${connectedProvider.name} Logo`} />
+                <img
+                  src={connectedProvider.icon}
+                  alt={`${connectedProvider.name} Logo`}
+                />
               ) : (
                 <>
                   <img src="/images/logos/icp_pic.svg" alt="ICP Logo" />
@@ -82,23 +107,33 @@ export default function Connect() {
                 </>
               )}
             </Box>
-            <Box textAlign={isMobile ? 'center' : 'left'}> {/* Center text on mobile */}
+            <Box textAlign={isMobile ? "center" : "left"}>
+              {" "}
+              {/* Center text on mobile */}
               {connectedProvider ? (
-                <Typography variant="subtitle1" component="div" sx={{ fontWeight: 'bold' }}>
+                <Typography
+                  variant="subtitle1"
+                  component="div"
+                  sx={{ fontWeight: "bold" }}
+                >
                   {connectedProvider.name} is connected
                 </Typography>
               ) : (
-                <Typography variant="subtitle1" component="div" sx={{ fontWeight: 'bold' }}>
+                <Typography
+                  variant="subtitle1"
+                  component="div"
+                  sx={{ fontWeight: "bold" }}
+                >
                   Connect with Internet Identity
                 </Typography>
               )}
-
               <Typography variant="body2" color="text.secondary">
-                Your $COOWN will be saved to this wallet, and may remain hidden initially
+                Your $COOWN will be saved to this wallet, and may remain hidden
+                initially
               </Typography>
             </Box>
           </Box>
-          <Button
+          {/* <Button
             onClick={handleClick}
             variant="contained"
             sx={{
@@ -113,8 +148,17 @@ export default function Connect() {
             }}
           >
             Coming Soon
-          </Button>
-
+          </Button> */}
+          {isConnected ? (
+            <>
+              <WalletComponent />
+            </>
+          ) : (
+            <>
+              {" "}
+              <ConnectButton />
+            </>
+          )}
           {/* <ConnectButton /> */}
           <ConnectDialog dark={false} />
         </CardContent>
