@@ -100,7 +100,7 @@ import InfoOutlined from "@mui/icons-material/InfoOutlined";
 import { useConnect } from "@connect2ic/react";
 import { Principal } from "@dfinity/principal";
 import { AuthClient } from "@dfinity/auth-client";
-import { createActor } from "../../../declarations/Token";
+import { createActor } from "../../../../../declarations/Token";
 import ic from "ic0";
 const ledger = ic("speiw-5iaaa-aaaap-ahora-cai"); // Adjust as needed for your environment
 
