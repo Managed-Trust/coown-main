@@ -4178,6 +4178,245 @@ public func participateInVote(userId : Text) : async Text {
     };
     
   // Function to get the total number of users
+
+
+  type RewardClaim = {
+    principal: Text;
+    task: Text;
+    proof: Text;
+    tokenValue: Nat;
+    status: Text; // "Pending", "Approved", "Rejected"
+    timestamp: Int;
+  };
+
+  stable var rewardClaims: [(Text, RewardClaim)] = [];
+  var claimsMap = HashMap.HashMap<Text, RewardClaim>(0, Text.equal, Text.hash);
+
+  stable var rewardHistory: [(Text, RewardClaim)] = [];
+  var historyMap = HashMap.HashMap<Text, Bool>(0, Text.equal, Text.hash);
+
+ // Admin Principal ID (should be set in initialization or by another function)
+  stable var adminPrincipal: Text = "admin-principal-id"; // Replace with the actual admin ID
+
+  // Add Reward Claim
+  public func addRewardClaim(
+    principal: Text,
+    task: Text,
+    proof: Text,
+    tokenValue: Nat
+  ): async Text {
+    let claimId = principal # ":" # task;
+
+    // Check if the user has already claimed the reward for this task
+    switch (claimsMap.get(claimId)) {
+      case (?existingClaim) {
+        return "You have already submitted a claim for this task.";
+      };
+      case null {
+        let newClaim: RewardClaim = {
+          principal = principal;
+          task = task;
+          proof = proof;
+          tokenValue = tokenValue;
+          status = "Pending";
+          timestamp = Time.now();
+        };
+        claimsMap.put(claimId, newClaim);
+        rewardClaims := Array.append(rewardClaims, [(claimId, newClaim)]);
+        return "Reward claim submitted successfully.";
+      };
+    };
+  };
+
+  // Approve Reward Claim (Admin Only)
+  public func approveRewardClaim(caller: Text, claimId: Text): async Text {
+    // if (caller != adminPrincipal) {
+    //   return "Access denied: Only admins can approve rewards.";
+    // };
+
+    switch (claimsMap.get(claimId)) {
+      case null {
+        return "Reward claim not found.";
+      };
+      case (?claim) {
+        if (claim.status != "Pending") {
+          return "Reward claim has already been processed.";
+        };
+
+        // Update claim status to "Approved"
+        let approvedClaim = { claim with status = "Approved" };
+        claimsMap.put(claimId, approvedClaim);
+
+        // Add to reward history to ensure it can't be claimed again
+        historyMap.put(claimId, true);
+        rewardHistory := Array.append(rewardHistory, [(claimId, approvedClaim)]);
+
+        // Transfer tokens to the user's account
+        let transferResult = await transferTokens(
+          claim.principal,
+          claim.tokenValue
+        );
+        // if (transferResult != "Success") {
+        //   return "Failed to transfer tokens: " # transferResult;
+        // };
+
+        return "Reward claim approved and tokens transferred successfully.";
+      };
+    };
+  };
+
+  // Reject Reward Claim (Admin Only)
+  public func rejectRewardClaim(caller: Text, claimId: Text, reason: Text): async Text {
+    // if (caller != adminPrincipal) {
+    //   return "Access denied: Only admins can reject rewards.";
+    // };
+
+    switch (claimsMap.get(claimId)) {
+      case null {
+        return "Reward claim not found.";
+      };
+      case (?claim) {
+        if (claim.status != "Pending") {
+          return "Reward claim has already been processed.";
+        };
+
+        // Update claim status to "Rejected"
+        let rejectedClaim = { claim with status = "Rejected" };
+        claimsMap.put(claimId, rejectedClaim);
+
+        return "Reward claim rejected with reason: " # reason;
+      };
+    };
+  };
+  
+  // Transfer Tokens (Simulated for demo purposes)
+  private func transferTokens(to: Text, amount: Nat):async Text {
+    // Replace this with actual token transfer logic
+    // For example, calling the `icrc1_transfer` function of a token canister
+
+    let cowsay = actor ("qtpy4-kqaaa-aaaap-antha-cai") : actor {
+      icrc1_transfer : (TransferType) -> async Result<TxIndex, TransferError>;
+    };
+
+
+  let mydata : TransferType = {
+      to = {
+        owner = Principal.fromText(to);
+        subaccount = null; // Specify subaccount if needed
+      };
+      amount = amount; // The amount to transfer
+      fee = ?10000; // Optional fee
+      memo = null; // Add a memo if required
+      from_subaccount = null; // Specify subaccount if applicable
+      created_at_time = null; // Add a timestamp if needed
+    };
+
+    // let transferResult2 = {
+    //   to = {
+    //     owner = to;
+    //     subaccount = null;
+    //   };
+    //   amount = amount;
+    //   fee = ?10000; // Optional fee
+    //   memo = null;
+    //   from_subaccount = null;
+    //   created_at_time = null;
+    // };
+    let transferResult = await cowsay.icrc1_transfer(mydata);
+
+     switch (transferResult) {
+      case (#Ok(txIndex)) {
+        Debug.print(debug_show ("Transfer successful, TxIndex: " # Nat.toText(txIndex)));
+        return "Transfer successful with TxIndex: " # Nat.toText(txIndex);
+      };
+      case (#Err(error)) {
+        // Handle specific errors accordingly
+        switch (error) {
+          case (#InsufficientFunds(balanceRecord)) {
+            let balance = balanceRecord.balance;
+            Debug.print(debug_show ("Error: Insufficient funds for transfer. Available balance: " # Nat.toText(balance)));
+            return "Error: Insufficient funds. Available balance: " # Nat.toText(balance);
+          };
+          case (#BadFee(feeRecord)) {
+            let expected_fee = feeRecord.expected_fee;
+            Debug.print(debug_show ("Error: Bad fee. Expected fee: " # Nat.toText(expected_fee)));
+            return "Error: Bad fee. Expected fee: " # Nat.toText(expected_fee);
+          };
+          case (#TemporarilyUnavailable) {
+            Debug.print(debug_show ("Error: Service temporarily unavailable."));
+            return "Error: Service temporarily unavailable.";
+          };
+          case (#GenericError(errorRecord)) {
+            let error_code = errorRecord.error_code;
+            let message = errorRecord.message;
+            Debug.print(debug_show ("Error: " # message # " (code: " # Nat.toText(error_code) # ")"));
+            return "Error: " # message # " (code: " # Nat.toText(error_code) # ")";
+          };
+          case (#TooOld) {
+            Debug.print(debug_show ("Error: Transaction too old."));
+            return "Error: Transaction too old.";
+          };
+          case (#Duplicate(duplicateRecord)) {
+            let duplicate_of = duplicateRecord.duplicate_of;
+            Debug.print(debug_show ("Error: Duplicate transaction. Duplicate of TxIndex: " # Nat.toText(duplicate_of)));
+            return "Error: Duplicate transaction. Duplicate of TxIndex: " # Nat.toText(duplicate_of);
+          };
+          case (#CreatedInFuture(timeRecord)) {
+            let ledger_time = timeRecord.ledger_time;
+            Debug.print(debug_show ("Error: Transaction created in the future."));
+            return "Error: Transaction created in the future at ledger time: " # Nat64.toText(ledger_time);
+          };
+          case (#BadBurn(burnRecord)) {
+            let min_burn_amount = burnRecord.min_burn_amount;
+            Debug.print(debug_show ("Error: Bad burn amount. Minimum required: " # Nat.toText(min_burn_amount)));
+            return "Error: Bad burn amount. Minimum required: " # Nat.toText(min_burn_amount);
+          };
+          case (_) {
+            // Catch-all case for other errors
+            Debug.print(debug_show ("Error: Unknown transfer error occurred."));
+            return "Error: Unknown transfer error.";
+          };
+        };
+      };
+      case (_) {
+        // Catch-all case for unhandled patterns
+        Debug.print(debug_show ("Error: Unexpected pattern in transfer result."));
+        return "Error: Unexpected pattern in transfer result.";
+      };
+    };
+
+    // Simulated success
+    return "Success";
+  };
+
+   // Get All Reward Claims (Admin Only)
+  public query func getAllRewardClaims(caller: Text): async [RewardClaim] {
+    // if (caller != adminPrincipal) {
+    //   return [];
+    // };
+
+    return Iter.toArray(claimsMap.vals());
+  };
+
+  // Get Reward History for a User
+  public query func getRewardHistory(caller: Text, principal: Text): async [RewardClaim] {
+      let history = Iter.filter<(Text, RewardClaim)>(
+        rewardHistory.vals(),
+        func(entry) : Bool {
+          entry.1.principal == principal;
+        }
+      );
+
+      return Iter.toArray(
+        Iter.map<(Text, RewardClaim), RewardClaim>(
+          history,
+          func(entry) : RewardClaim {
+            entry.1;
+          }
+        )
+      );
+    };
+
   system func preupgrade() {
     mapEntries := Iter.toArray(map.entries());
     //==========================================================
@@ -4210,6 +4449,7 @@ public func participateInVote(userId : Text) : async Text {
     affiliateEntries := Iter.toArray(affiliates.entries());
 
   };
+  
   system func postupgrade() {
     map := HashMap.fromIter<Text, Customer>(mapEntries.vals(), 1, Text.equal, Text.hash);
     //==========================================================
