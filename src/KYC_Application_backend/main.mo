@@ -4185,6 +4185,7 @@ public func participateInVote(userId : Text) : async Text {
     task: Text;
     proof: Text;
     tokenValue: Nat;
+    img :Text;
     status: Text; // "Pending", "Approved", "Rejected"
     timestamp: Int;
   };
@@ -4203,7 +4204,8 @@ public func participateInVote(userId : Text) : async Text {
     principal: Text,
     task: Text,
     proof: Text,
-    tokenValue: Nat
+    tokenValue: Nat,
+        img: Text
   ): async Text {
     let claimId = principal # ":" # task;
 
@@ -4218,6 +4220,7 @@ public func participateInVote(userId : Text) : async Text {
           task = task;
           proof = proof;
           tokenValue = tokenValue;
+          img = img;
           status = "Pending";
           timestamp = Time.now();
         };
@@ -4304,7 +4307,7 @@ public func participateInVote(userId : Text) : async Text {
         owner = Principal.fromText(to);
         subaccount = null; // Specify subaccount if needed
       };
-      amount = amount; // The amount to transfer
+      amount = amount*100000000; // The amount to transfer
       fee = ?10000; // Optional fee
       memo = null; // Add a memo if required
       from_subaccount = null; // Specify subaccount if applicable
@@ -4390,12 +4393,34 @@ public func participateInVote(userId : Text) : async Text {
   };
 
    // Get All Reward Claims (Admin Only)
-  public query func getAllRewardClaims(caller: Text): async [RewardClaim] {
+  //  caller: Text
+  public query func getAllRewardClaims(): async [RewardClaim] {
     // if (caller != adminPrincipal) {
     //   return [];
     // };
 
     return Iter.toArray(claimsMap.vals());
+  };
+
+  // Get Rewards for a Single User
+  public query func getUserRewards(principal: Text): async [RewardClaim] {
+      // Filter reward claims belonging to the specified user
+      let userRewards = Iter.filter<(Text, RewardClaim)>(
+          rewardClaims.vals(),
+          func(entry) : Bool {
+              entry.1.principal == principal;
+          }
+      );
+
+      // Return the filtered rewards as an array of RewardClaim
+      return Iter.toArray(
+          Iter.map<(Text, RewardClaim), RewardClaim>(
+              userRewards,
+              func(entry) : RewardClaim {
+                  entry.1;
+              }
+          )
+      );
   };
 
   // Get Reward History for a User

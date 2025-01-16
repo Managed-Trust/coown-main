@@ -217,7 +217,8 @@ export default function RewardsAndAffiliate() {
       principal,
       selectedTask,
       proof,
-      tokenValue
+      tokenValue,
+      ""
     );
 
     alert(`Proof of work submitted for task: ${selectedTask}`);
