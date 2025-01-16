@@ -98,9 +98,9 @@ const ICO = () => {
             <TokenPlan />
           </>
         )}
-        {value === 1 && <RewardsAndAffiliate />}
-        {value === 2 && <NFTSwap />}
-        {value === 3 && <SwapComponent />}
+        {value === 2 && <RewardsAndAffiliate />}
+        {value === 3 && <NFTSwap />}
+        {value === 1 && <SwapComponent />}
       </Box>
 
       {/* <Contact /> */}
