@@ -105,7 +105,15 @@ const LoginPage = () => {
             otpRefs.current[0].focus(); // Focus back to the first input
         }
     };
-
+    const handlePaste = (e) => {
+        e.preventDefault();
+        const pasteData = e.clipboardData.getData('text').slice(0, otp.length).split('');
+        if (pasteData.length === otp.length) {
+            setOtp(pasteData);
+            // Focus the last input after pasting
+            otpRefs.current[otp.length - 1].focus();
+        }
+    };
 
     // Function to go back to email form
     const handleBack = () => {
@@ -311,6 +319,7 @@ const LoginPage = () => {
                                         key={index}
                                         value={digit}
                                         onChange={(e) => handleOtpChange(e.target.value, index)}
+                                        onPaste={handlePaste}
                                         inputRef={(el) => (otpRefs.current[index] = el)}
                                         inputProps={{
                                             maxLength: 1,

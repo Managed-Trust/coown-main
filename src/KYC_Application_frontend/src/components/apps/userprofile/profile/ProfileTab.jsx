@@ -56,7 +56,7 @@ const ProfileTab = ({ profile }) => {
       label: 'Settings',
       icon: <IconSettings size="20" />,
       to: '/apps/user-setting',
-      disabled: isSettingsDisabled,
+      // disabled: isSettingsDisabled,
     },
   ];
 

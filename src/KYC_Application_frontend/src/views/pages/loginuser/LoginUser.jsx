@@ -26,6 +26,25 @@ const LoginUser = () => {
     const navigate = useNavigate();
     const otpRefs = useRef([]);
 
+    const handleOtpChange = (value, index) => {
+        const newOtp = [...otp];
+        newOtp[index] = value;
+        setOtp(newOtp);
+        // Move focus to next input on type
+        if (value.length === 1 && index < otp.length - 1) {
+            otpRefs.current[index + 1].focus();
+        }
+    };
+
+    const handlePaste = (e) => {
+        e.preventDefault();
+        const pasteData = e.clipboardData.getData('text').slice(0, otp.length).split('');
+        if (pasteData.length === otp.length) {
+            setOtp(pasteData);
+            // Focus the last input after pasting
+            otpRefs.current[otp.length - 1].focus();
+        }
+    };
     // Function to verify email for login
     const handleEmailLogin = async () => {
         setIsLoading(true); // Show loader
@@ -125,20 +144,9 @@ const LoginUser = () => {
         }
     };
 
-    // Handle OTP input changes
-    const handleOtpChange = (value, index) => {
-        const newOtp = [...otp];
-        newOtp[index] = value.slice(-1); // Ensure only 1 digit is added
-        setOtp(newOtp);
-
-        // Move to the next input if a digit is entered
-        if (value && index < otpRefs.current.length - 1) {
-            otpRefs.current[index + 1].focus();
-        }
-    };
-
     // Handle form submission (for OTP verification)
     const verifyOtp = async () => {
+        setIsLoading(true);
         const enteredOtp = otp.join(''); // Combine OTP digits into a single string
         try {
             // Make the backend call to verify OTP
@@ -158,6 +166,7 @@ const LoginUser = () => {
             setOtp(new Array(6).fill('')); // Clear OTP state
             otpRefs.current[0].focus(); // Focus back to the first input
         }
+        setIsLoading(false);
     };
 
 
@@ -347,6 +356,7 @@ const LoginUser = () => {
                                         key={index}
                                         value={digit}
                                         onChange={(e) => handleOtpChange(e.target.value, index)}
+                                        onPaste={handlePaste}
                                         inputRef={(el) => (otpRefs.current[index] = el)}
                                         inputProps={{
                                             maxLength: 1,
@@ -480,7 +490,7 @@ const LoginUser = () => {
                         </>
                     )}
                     <Typography variant="body2" gutterBottom sx={{ fontSize: '14px', textAlign: 'center', marginTop: '10px' }}>
-                        or Register new Account, <Link to="/user/sign-up" color="primary">Regirster Account</Link>
+                        or Register new Account, <Link to="/user/sign-up" color="primary">Register Account</Link>
                     </Typography>
                 </Box>
             </Grid>
