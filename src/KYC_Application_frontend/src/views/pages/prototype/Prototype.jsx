@@ -20,7 +20,7 @@ const Prototype = () => {
         setAcknowledgement2(event.target.checked);
     };
 
-    const isButtonDisabled = !(acknowledgement1 && acknowledgement2);
+    const isButtonDisabled = !(acknowledgement1);
 
     return (
         <Grid container component="main" sx={{ height: '100vh' }}>
