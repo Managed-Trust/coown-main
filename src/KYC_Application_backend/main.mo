@@ -4440,8 +4440,10 @@ public func participateInVote(userId : Text) : async Text {
           }
         )
       );
-    };
+  };
 
+  
+  
   system func preupgrade() {
     mapEntries := Iter.toArray(map.entries());
     //==========================================================
@@ -4473,6 +4475,10 @@ public func participateInVote(userId : Text) : async Text {
 
     affiliateEntries := Iter.toArray(affiliates.entries());
 
+    //==============================================================
+
+    rewardClaims := Iter.toArray(claimsMap.entries());    
+
   };
   
   system func postupgrade() {
@@ -4500,6 +4506,10 @@ public func participateInVote(userId : Text) : async Text {
     // groupIds := HashMap.fromIter<Text, Buffer.Buffer<Text>>(groupIdEntries.vals(), 1, Text.equal, Text.hash);
     accountGroups := HashMap.fromIter<Text, [Principal]>(accountGroupEntries.vals(), 1, Text.equal, Text.hash);
     affiliates := HashMap.fromIter<Text, AffiliateDetails>(affiliateEntries.vals(), 1, Text.equal, Text.hash);
+
+    claimsMap := HashMap.fromIter<Text, RewardClaim>(rewardClaims.vals(), 1, Text.equal, Text.hash);
+   //======================================
+ 
 
   };
 };
