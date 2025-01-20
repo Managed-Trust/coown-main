@@ -87,13 +87,13 @@ const AccountBalance = () => {
         }
 
         setBalances(updatedBalances);
-
+        console.log("Balances:", updatedBalances);
         const updatedCurrencyData = initialCurrencyData.map((currency) => {
             const balance = updatedBalances[currency.symbol.toLowerCase()] || 0;
             return {
                 ...currency,
-                balance: balance.toFixed(2),
-                usd: `${(balance * 1).toFixed(2)} USD`,
+                balance: balances.toFixed(2),
+                usd: `${(balances * 1).toFixed(2)} USD`,
             };
         });
 
