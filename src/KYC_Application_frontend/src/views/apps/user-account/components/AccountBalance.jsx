@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import usdc from '../../../../assets/images/svgs/usdc pic.svg';
 import usdt from '../../../../assets/images/svgs/usdt.svg';
 import xaut from '../../../../assets/images/svgs/GLDT.svg';
@@ -15,7 +15,6 @@ import {
     TableRow,
     Typography,
     Paper,
-    Chip,
     Button,
     Dialog,
     DialogTitle,
@@ -27,29 +26,98 @@ import {
     useMediaQuery,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
-import ListAltIcon from '@mui/icons-material/ListAlt'; // Import the List icon
+import ListAltIcon from '@mui/icons-material/ListAlt';
+import { Principal } from "@dfinity/principal";
+import { useConnect } from "@connect2ic/react";
+import { AuthClient } from "@dfinity/auth-client";
+import { createActor } from "../../../../../../declarations/Token";
 
 const initialCurrencyData = [
-    { coin: 'USD', symbol: 'ckUSDC', balance: '155 458.20', usd: '155 458 USD', lastWeek: '+1700', lastMonth: '+1700', percentage: '7.11%', icon: usdt, isVisible: true },
-    { coin: 'Bitcoin', symbol: 'ckBTC', balance: '6.157813', usd: '388 721.18 USD', lastWeek: '+1700', lastMonth: '+1700', percentage: '7.11%', icon: btc, isVisible: true },
-    { coin: 'Gold', symbol: 'ckXAUt', balance: '79.15', usd: '209 453.85 USD', lastWeek: '+1700', lastMonth: '+1700', percentage: '7.11%', icon: xaut, isVisible: true },
-    { coin: 'ICP', symbol: 'Platform utility', balance: '9 453.20', usd: '78 270.84 USD', lastWeek: '+1700', lastMonth: '-5000', percentage: '-7.11%', icon: icp, isVisible: true },
-    { coin: '$COOWN', symbol: 'Product utility', balance: '79.15', usd: '209 453.85 USD', lastWeek: '+1700', lastMonth: '+1700', percentage: '7.11%', icon: coown, isVisible: true },
-    { coin: 'USD', symbol: 'ckUSDT', balance: '155 458.20', usd: '155 458 USD', lastWeek: '+1700', lastMonth: '+1700', percentage: '7.11%', icon: usdc, isVisible: true },
+    { coin: 'USD', symbol: 'ckUSDC', balance: '0', usd: '0 USD', icon: usdt, isVisible: true },
+    { coin: 'Bitcoin', symbol: 'ckBTC', balance: '0', usd: '0 USD', icon: btc, isVisible: true },
+    { coin: 'Gold', symbol: 'ckXAUt', balance: '0', usd: '0 USD', icon: xaut, isVisible: true },
+    { coin: 'ICP', symbol: 'Platform utility', balance: '0', usd: '0 USD', icon: icp, isVisible: true },
+    { coin: '$COOWN', symbol: 'Product utility', balance: '0', usd: '0 USD', icon: coown, isVisible: true },
+    { coin: 'Ethereum', symbol: 'ckETH', balance: '0', usd: '0 USD', icon: usdc, isVisible: true },
 ];
+
+const canisterIds = {
+    icp: "ryjl3-tyaaa-aaaaa-aaaba-cai",
+    dummy: "qtpy4-kqaaa-aaaap-antha-cai",
+    ckbtc: "mxzaz-hqaaa-aaaar-qaada-cai",
+    cketh: "ss2fx-dyaaa-aaaar-qacoq-cai",
+    ckusdc: "xevnm-gaaaa-aaaar-qafnq-cai",
+    ckxaut: "nza5v-qaaaa-aaaar-qahzq-cai",
+};
 
 const AccountBalance = () => {
     const [currencyData, setCurrencyData] = useState(initialCurrencyData);
     const [isDialogOpen, setDialogOpen] = useState(false);
+    const [sendDialogData, setSendDialogData] = useState(null);
+    const [receiveDialogData, setReceiveDialogData] = useState(null);
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+    const [balances, setBalances] = useState({});
+    const [identity, setIdentity] = useState(null);
+    const { isConnected, principal, disconnect } = useConnect();
 
+    const initAuthClient = async () => {
+        const client = await AuthClient.create();
+        if (await client.isAuthenticated()) {
+            setIdentity(await client.getIdentity());
+        }
+    };
+
+    const fetchBalances = async () => {
+        if (!principal) return;
+
+        const updatedBalances = {};
+        for (const [symbol, canisterId] of Object.entries(canisterIds)) {
+            try {
+                const actor = createActor(canisterId, {});
+                const balance = await actor.icrc1_balance_of({
+                    owner: Principal.fromText(principal),
+                    subaccount: [],
+                });
+                updatedBalances[symbol.toLowerCase()] = Number(balance) / 100000000;
+            } catch (error) {
+                console.error(`Error fetching balance for ${symbol}:`, error);
+                updatedBalances[symbol.toLowerCase()] = 0;
+            }
+        }
+
+        setBalances(updatedBalances);
+
+        const updatedCurrencyData = initialCurrencyData.map((currency) => {
+            const balance = updatedBalances[currency.symbol.toLowerCase()] || 0;
+            return {
+                ...currency,
+                balance: balance.toFixed(2),
+                usd: `${(balance * 1).toFixed(2)} USD`,
+            };
+        });
+
+        setCurrencyData(updatedCurrencyData);
+    };
+
+    useEffect(() => {
+        initAuthClient();
+        if (isConnected) {
+            fetchBalances();
+        }
+    }, [isConnected]);
+
+    const handleSend = (row) => setSendDialogData(row);
+    const handleReceive = (row) => setReceiveDialogData(row);
+
+    const handleCloseSendDialog = () => setSendDialogData(null);
+    const handleCloseReceiveDialog = () => setReceiveDialogData(null);
     const handleToggleVisibility = (index) => {
         const updatedData = [...currencyData];
         updatedData[index].isVisible = !updatedData[index].isVisible;
         setCurrencyData(updatedData);
     };
-
+    
     const handleOpenDialog = () => {
         setDialogOpen(true);
     };
@@ -60,23 +128,34 @@ const AccountBalance = () => {
 
     return (
         <Paper
-            elevation={3}
             style={{
                 marginBottom: '40px',
                 padding: '20px',
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'space-between',
+                marginTop: '40px',
             }}
         >
             <Box display="flex" justifyContent="space-between" alignItems="center">
-                <Typography variant="h6" gutterBottom>
-                    Account balance
-                </Typography>
+                <Box display="flex" flexDirection="column" alignItems="flex-start" gap={1}>
+                    <Typography variant="h5" fontSize="16px" fontWeight="500" color="#5A6A85">
+                        Estimated Total
+                    </Typography>
+                    <Box display="flex" flexDirection="row" alignItems="center" gap={1}>
+                        <Typography variant="h2" fontSize="44px" fontWeight="500" color="#2A3547">
+                            100,567
+                        </Typography>
+                        <Typography variant="h5" fontSize="18px" fontWeight="600" color="#2A3547">
+                            USD
+                        </Typography>
+                    </Box>
+                </Box>
+
                 <Button
                     variant="outlined"
-                    onClick={handleOpenDialog}
-                    startIcon={<ListAltIcon />} // Add the icon here
+                    onClick={() => setDialogOpen(true)}
+                    startIcon={<ListAltIcon />}
                 >
                     Manage List
                 </Button>
@@ -86,112 +165,112 @@ const AccountBalance = () => {
                 <Table aria-label="account balance table">
                     <TableHead>
                         <TableRow>
-                            <TableCell>Coin</TableCell>
-                            <TableCell>Balance</TableCell>
-                            <TableCell align="center">Last week</TableCell>
-                            <TableCell align="center">Last month</TableCell>
+                            <TableCell color="#7C8FAC" style={{ fontSize:'14px', fontWeight:'500' }}>Coin</TableCell>
+                            <TableCell color="#7C8FAC" style={{ fontSize:'14px', fontWeight:'500' }}>Balance</TableCell>
+                            <TableCell color="#7C8FAC" style={{ fontSize:'14px', fontWeight:'500' }}>Estimated Value</TableCell>
+                            <TableCell color="#7C8FAC" style={{ fontSize:'14px', fontWeight:'500' }}>Actions</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
                         {currencyData
-                            .filter((row) => row.isVisible)
-                            .map((row, index) => (
-                                <TableRow key={row.coin}>
-                                    <TableCell component="th" scope="row">
-                                        <Box display="flex" alignItems="center" gap={1}>
-                                            <img src={row.icon} alt={row.coin} />
-                                            <Box>
-                                                <Typography variant="h6">{row.coin}</Typography>
-                                                <Typography variant="body2" color="textSecondary">
-                                                    {row.symbol}
-                                                </Typography>
-                                            </Box>
-                                        </Box>
-                                    </TableCell>
-                                    <TableCell>
-                                        <Typography variant="h6" fontWeight="bold">
-                                            {row.balance}
-                                        </Typography>
-                                        <Typography variant="body2" color="textSecondary">
-                                            {row.usd}
-                                        </Typography>
-                                    </TableCell>
-                                    <TableCell align="right">
-                                        <Box display="flex" flexDirection="column" alignItems="center" gap={1}>
-                                            <Box display="flex" alignItems="center" gap={1}>
-                                                <Typography variant="body1" fontWeight="bold">
-                                                    {row.lastWeek}
-                                                </Typography>
-                                                <Chip
-                                                    label={
-                                                        <Box display="flex" alignItems="center" gap={0.5}>
-                                                            <span style={{ display: 'inline-block', transform: row.lastMonth.startsWith('-') ? 'rotate(90deg)' : '' }}>
-                                                                ➚ &nbsp;
-                                                            </span>
-                                                            <Typography sx={{ fontSize: '12px' }}>7.11%</Typography>
-                                                        </Box>
-                                                    }
-                                                    sx={{
-                                                        backgroundColor: row.lastMonth.startsWith('-') ? 'rgba(255,0,0,0.1)' : 'rgba(76,175,80,0.15)',
-                                                        color: row.lastMonth.startsWith('-') ? 'error.main' : 'success.main',
-                                                        borderRadius: '16px',
-
-                                                    }}
-                                                />
-                                            </Box>
+                        .filter((row) => row.isVisible)
+                        .map((row) => (
+                            <TableRow key={row.coin}>
+                                <TableCell>
+                                    <Box display="flex" alignItems="center" gap={1}>
+                                        <img src={row.icon} alt={row.coin} />
+                                        <Box>
+                                            <Typography variant="h6">{row.coin}</Typography>
                                             <Typography variant="body2" color="textSecondary">
-                                                {row.usd}
+                                                {row.symbol}
                                             </Typography>
                                         </Box>
-                                    </TableCell>
-                                    <TableCell align="right">
-                                        <Box display="flex" flexDirection="column" alignItems="center" gap={1}>
-                                            <Box display="flex" alignItems="center" gap={1}>
-                                                <Typography variant="body1" fontWeight="bold">
-                                                    {row.lastWeek}
-                                                </Typography>
-                                                <Chip
-                                                    label={
-                                                        <Box display="flex" alignItems="center" gap={0.5}>
-                                                            <span style={{ display: 'inline-block', transform: row.lastMonth.startsWith('-') ? 'rotate(90deg)' : '' }}>
-                                                                ➚ &nbsp;
-                                                            </span>
-                                                            <Typography sx={{ fontSize: '12px' }}>7.11%</Typography>
-                                                        </Box>
-                                                    }
-                                                    sx={{
-                                                        backgroundColor: row.lastMonth.startsWith('-') ? 'rgba(255,0,0,0.1)' : 'rgba(76,175,80,0.15)',
-                                                        color: row.lastMonth.startsWith('-') ? 'error.main' : 'success.main',
-                                                        borderRadius: '16px',
-
-                                                    }}
-                                                />
-                                            </Box>
-                                            <Typography variant="body2" color="textSecondary">
-                                                {row.usd}
-                                            </Typography>
-                                        </Box>
-                                    </TableCell>
-                                </TableRow>
-                            ))}
+                                    </Box>
+                                </TableCell>
+                                <TableCell>
+                                    <Typography variant="h6" fontWeight="bold">
+                                        {row.balance}
+                                    </Typography>
+                                </TableCell>
+                                <TableCell>
+                                    <Typography variant="body2" color="#5A6A85">
+                                        {row.usd}
+                                    </Typography>
+                                </TableCell>
+                                <TableCell>
+                                    <Box display="flex" gap={1}>
+                                        <Button
+                                            variant="outlined"
+                                            style={{ color: '#7C8FAC', borderColor: '#DFE5EF' }}
+                                            onClick={() => handleReceive(row)}
+                                            size="large"
+                                        >
+                                            Receive
+                                        </Button>
+                                        <Button
+                                            variant="outlined"
+                                            style={{ color: '#7C8FAC', borderColor: '#DFE5EF' }}
+                                            onClick={() => handleSend(row)}
+                                            size="large"
+                                        >
+                                            Send
+                                        </Button>
+                                    </Box>
+                                </TableCell>
+                            </TableRow>
+                        ))}
                     </TableBody>
                 </Table>
             </TableContainer>
 
-            {/* Popup Dialog */}
-            <Dialog
-                open={isDialogOpen}
-                onClose={handleCloseDialog}
-                fullWidth
-                maxWidth={isMobile ? 'xs' : 'md'} // Make it larger and responsive
-                PaperProps={{ style: { padding: '20px', borderRadius: '12px' } }} // Style the dialog box
-            >
+            {/* Send Dialog */}
+            <Dialog open={!!sendDialogData} onClose={handleCloseSendDialog} fullWidth maxWidth="sm">
+                <DialogTitle>
+                    <Box display="flex" justifyContent="space-between" alignItems="center">
+                        <Typography variant="h6">Send {sendDialogData?.coin}</Typography>
+                        <IconButton onClick={handleCloseSendDialog}>
+                            <CloseIcon />
+                        </IconButton>
+                    </Box>
+                </DialogTitle>
+                <DialogContent>
+                    <Typography>Send functionality for {sendDialogData?.coin}.</Typography>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseSendDialog} color="primary">
+                        Close
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            {/* Receive Dialog */}
+            <Dialog open={!!receiveDialogData} onClose={handleCloseReceiveDialog} fullWidth maxWidth="sm">
+                <DialogTitle>
+                    <Box display="flex" justifyContent="space-between" alignItems="center">
+                        <Typography variant="h6">Receive {receiveDialogData?.coin}</Typography>
+                        <IconButton onClick={handleCloseReceiveDialog}>
+                            <CloseIcon />
+                        </IconButton>
+                    </Box>
+                </DialogTitle>
+                <DialogContent>
+                    <Typography>Receive functionality for {receiveDialogData?.coin}.</Typography>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseReceiveDialog} color="primary">
+                        Close
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            {/* Manage List Dialog */}
+            <Dialog open={isDialogOpen} onClose={() => setDialogOpen(false)} fullWidth maxWidth={isMobile ? 'xs' : 'md'}>
                 <DialogTitle>
                     <Box display="flex" justifyContent="space-between" alignItems="center">
                         <Typography variant="h5" fontWeight="bold">
                             Select Currencies
                         </Typography>
-                        <IconButton onClick={handleCloseDialog}>
+                        <IconButton onClick={() => setDialogOpen(false)}>
                             <CloseIcon />
                         </IconButton>
                     </Box>
@@ -228,7 +307,7 @@ const AccountBalance = () => {
                     ))}
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleCloseDialog} variant="contained" color="primary">
+                    <Button onClick={() => setDialogOpen(false)} variant="contained" color="primary">
                         Done
                     </Button>
                 </DialogActions>

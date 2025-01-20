@@ -22,7 +22,7 @@ const UserAccount = () => {
           <ProfileBanner />
         </Grid>
         <Container>
-          <IntroCard />
+          {/* <IntroCard /> */}
           <AccountBalance />
           <Grid container spacing={2} mb={2}> 
             <Grid item xs={12} sm={4} md={4}>
