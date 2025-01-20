@@ -97,6 +97,7 @@ const AccountBalance = () => {
                 usd: `${(balance * 1).toFixed(2)} USD`,
             };
         });
+        console.log("Updated Currency Data:", updatedCurrencyData);
 
         setCurrencyData(updatedCurrencyData);
     };
