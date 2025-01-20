@@ -68,6 +68,7 @@ const AccountBalance = () => {
         }
     };
 
+
     const fetchBalances = async () => {
         if (!principal) return;
 
@@ -87,13 +88,13 @@ const AccountBalance = () => {
         }
 
         setBalances(updatedBalances);
-        console.log("Balances:", updatedBalances);
+        console.log("Balances:", balances);  
         const updatedCurrencyData = initialCurrencyData.map((currency) => {
-            const balance = updatedBalances[currency.symbol.toLowerCase()] || 0;
+            const balance = balances[currency.symbol.toLowerCase()] || 0;
             return {
                 ...currency,
-                balance: balances.toFixed(2),
-                usd: `${(balances * 1).toFixed(2)} USD`,
+                balance: balance.toFixed(2),
+                usd: `${(balance * 1).toFixed(2)} USD`,
             };
         });
 
