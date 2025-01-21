@@ -87,20 +87,24 @@ const AccountBalance = () => {
             }
         }
 
+        // Update the state
         setBalances(updatedBalances);
-        console.log("Balances:", balances);  
+
+        // Use `updatedBalances` to update `currencyData`
         const updatedCurrencyData = initialCurrencyData.map((currency) => {
-            const balance = balances[currency.symbol.toLowerCase()] || 0;
+            const balance = updatedBalances[currency.symbol.toLowerCase()] || 0;
             return {
                 ...currency,
                 balance: balance.toFixed(2),
-                usd: `${(balance * 1).toFixed(2)} USD`,
+                usd: `${(balance * 1).toFixed(2)} USD`, // Replace with actual USD conversion rate if needed
             };
         });
-        console.log("Updated Currency Data:", updatedCurrencyData);
+
+        console.log("Currency Data", updatedCurrencyData);
 
         setCurrencyData(updatedCurrencyData);
     };
+
 
     useEffect(() => {
         initAuthClient();
@@ -119,7 +123,7 @@ const AccountBalance = () => {
         updatedData[index].isVisible = !updatedData[index].isVisible;
         setCurrencyData(updatedData);
     };
-    
+
     const handleOpenDialog = () => {
         setDialogOpen(true);
     };
@@ -167,60 +171,60 @@ const AccountBalance = () => {
                 <Table aria-label="account balance table">
                     <TableHead>
                         <TableRow>
-                            <TableCell color="#7C8FAC" style={{ fontSize:'14px', fontWeight:'500' }}>Coin</TableCell>
-                            <TableCell color="#7C8FAC" style={{ fontSize:'14px', fontWeight:'500' }}>Balance</TableCell>
-                            <TableCell color="#7C8FAC" style={{ fontSize:'14px', fontWeight:'500' }}>Estimated Value</TableCell>
-                            <TableCell color="#7C8FAC" style={{ fontSize:'14px', fontWeight:'500' }}>Actions</TableCell>
+                            <TableCell color="#7C8FAC" style={{ fontSize: '14px', fontWeight: '500' }}>Coin</TableCell>
+                            <TableCell color="#7C8FAC" style={{ fontSize: '14px', fontWeight: '500' }}>Balance</TableCell>
+                            <TableCell color="#7C8FAC" style={{ fontSize: '14px', fontWeight: '500' }}>Estimated Value</TableCell>
+                            <TableCell color="#7C8FAC" style={{ fontSize: '14px', fontWeight: '500' }}>Actions</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
                         {currencyData
-                        .filter((row) => row.isVisible)
-                        .map((row) => (
-                            <TableRow key={row.coin}>
-                                <TableCell>
-                                    <Box display="flex" alignItems="center" gap={1}>
-                                        <img src={row.icon} alt={row.coin} />
-                                        <Box>
-                                            <Typography variant="h6">{row.coin}</Typography>
-                                            <Typography variant="body2" color="textSecondary">
-                                                {row.symbol}
-                                            </Typography>
+                            .filter((row) => row.isVisible)
+                            .map((row) => (
+                                <TableRow key={row.coin}>
+                                    <TableCell>
+                                        <Box display="flex" alignItems="center" gap={1}>
+                                            <img src={row.icon} alt={row.coin} />
+                                            <Box>
+                                                <Typography variant="h6">{row.coin}</Typography>
+                                                <Typography variant="body2" color="textSecondary">
+                                                    {row.symbol}
+                                                </Typography>
+                                            </Box>
                                         </Box>
-                                    </Box>
-                                </TableCell>
-                                <TableCell>
-                                    <Typography variant="h6" fontWeight="bold">
-                                        {row.balance}
-                                    </Typography>
-                                </TableCell>
-                                <TableCell>
-                                    <Typography variant="body2" color="#5A6A85">
-                                        {row.usd}
-                                    </Typography>
-                                </TableCell>
-                                <TableCell>
-                                    <Box display="flex" gap={1}>
-                                        <Button
-                                            variant="outlined"
-                                            style={{ color: '#7C8FAC', borderColor: '#DFE5EF' }}
-                                            onClick={() => handleReceive(row)}
-                                            size="large"
-                                        >
-                                            Receive
-                                        </Button>
-                                        <Button
-                                            variant="outlined"
-                                            style={{ color: '#7C8FAC', borderColor: '#DFE5EF' }}
-                                            onClick={() => handleSend(row)}
-                                            size="large"
-                                        >
-                                            Send
-                                        </Button>
-                                    </Box>
-                                </TableCell>
-                            </TableRow>
-                        ))}
+                                    </TableCell>
+                                    <TableCell>
+                                        <Typography variant="h6" fontWeight="bold">
+                                            {row.balance}
+                                        </Typography>
+                                    </TableCell>
+                                    <TableCell>
+                                        <Typography variant="body2" color="#5A6A85">
+                                            {row.usd}
+                                        </Typography>
+                                    </TableCell>
+                                    <TableCell>
+                                        <Box display="flex" gap={1}>
+                                            <Button
+                                                variant="outlined"
+                                                style={{ color: '#7C8FAC', borderColor: '#DFE5EF' }}
+                                                onClick={() => handleReceive(row)}
+                                                size="large"
+                                            >
+                                                Receive
+                                            </Button>
+                                            <Button
+                                                variant="outlined"
+                                                style={{ color: '#7C8FAC', borderColor: '#DFE5EF' }}
+                                                onClick={() => handleSend(row)}
+                                                size="large"
+                                            >
+                                                Send
+                                            </Button>
+                                        </Box>
+                                    </TableCell>
+                                </TableRow>
+                            ))}
                     </TableBody>
                 </Table>
             </TableContainer>
