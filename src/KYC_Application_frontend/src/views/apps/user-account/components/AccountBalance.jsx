@@ -33,12 +33,13 @@ import { AuthClient } from "@dfinity/auth-client";
 import { createActor } from "../../../../../../declarations/Token";
 
 const initialCurrencyData = [
-    { coin: 'USD', symbol: 'ckUSDC', balance: '0', usd: '0 USD', icon: usdt, isVisible: true },
-    { coin: 'Bitcoin', symbol: 'ckBTC', balance: '0', usd: '0 USD', icon: btc, isVisible: true },
-    { coin: 'Gold', symbol: 'ckXAUt', balance: '0', usd: '0 USD', icon: xaut, isVisible: true },
-    { coin: 'ICP', symbol: 'Platform utility', balance: '0', usd: '0 USD', icon: icp, isVisible: true },
+    { coin: 'USD', symbol: 'ckusdc', balance: '0', usd: '0 USD', icon: usdt, isVisible: true },
+    { coin: 'Bitcoin', symbol: 'ckbtc', balance: '0', usd: '0 USD', icon: btc, isVisible: true },
+    { coin: 'Gold', symbol: 'ckxaut', balance: '0', usd: '0 USD', icon: xaut, isVisible: true },
+    { coin: 'ICP', symbol: 'icp', balance: '0', usd: '0 USD', icon: icp, isVisible: true },
     { coin: '$COOWN', symbol: 'Product utility', balance: '0', usd: '0 USD', icon: coown, isVisible: true },
-    { coin: 'Ethereum', symbol: 'ckETH', balance: '0', usd: '0 USD', icon: usdc, isVisible: true },
+    { coin: 'Ethereum', symbol: 'cketh', balance: '0', usd: '0 USD', icon: usdc, isVisible: true },
+    { coin: 'Dummy', symbol: 'dummy', balance: '0', usd: '0 USD', icon: icp, isVisible: true },
 ];
 
 const canisterIds = {
@@ -89,7 +90,7 @@ const AccountBalance = () => {
 
         // Update the state
         setBalances(updatedBalances);
-
+        console.log("Balances", updatedBalances);
         // Use `updatedBalances` to update `currencyData`
         const updatedCurrencyData = initialCurrencyData.map((currency) => {
             const balance = updatedBalances[currency.symbol.toLowerCase()] || 0;
