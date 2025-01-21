@@ -66,6 +66,7 @@ const AccountBalance = () => {
     const [to, setTo] = useState("");
     const [amount, setAmount] = useState("");
     const [isPreviewDialogOpen, setIsPreviewDialogOpen] = useState(false);
+
     const initAuthClient = async () => {
         const client = await AuthClient.create();
         if (await client.isAuthenticated()) {
@@ -73,7 +74,11 @@ const AccountBalance = () => {
         }
     };
     const [loading, setLoading] = useState(false);
-
+    
+    const handleAuthenticated = async (client) => {
+        const identity = await client.getIdentity();
+        setIdentity(identity);
+    };
     const fetchBalances = async () => {
         if (!principal) return;
 
@@ -121,7 +126,7 @@ const AccountBalance = () => {
 
     const handleTokenSend = async (tokenType) => {
         if (!principal) return;
-
+        console.log("Sending tokens:", tokenType, to, amount);
         setLoading(true);
         try {
             const canisterId = canisterIds[tokenType];
