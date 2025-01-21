@@ -66,7 +66,7 @@ const AccountBalance = () => {
     const [to, setTo] = useState("");
     const [amount, setAmount] = useState("");
     const [isPreviewDialogOpen, setIsPreviewDialogOpen] = useState(false);
-
+    const [authClient, setAuthClient] = useState(null);
     const initAuthClient = async () => {
         const client = await AuthClient.create();
         if (await client.isAuthenticated()) {
@@ -74,7 +74,7 @@ const AccountBalance = () => {
         }
     };
     const [loading, setLoading] = useState(false);
-    
+
     const handleAuthenticated = async (client) => {
         const identity = await client.getIdentity();
         setIdentity(identity);
